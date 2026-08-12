@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rung — ne yapacağız</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
+<style>
+.page { max-width: 900px; margin: 0 auto; padding: 0 26px 120px; position: relative; z-index: 1; }
+
+/* ── hero ─────────────────────────────────────────────────────── */
+.hero { position: relative; padding: 64px 0 58px; }
+.hero::before {
+  content: ""; position: absolute; inset: -26% 34% auto -14%; height: 420px;
+  background: radial-gradient(ellipse at 30% 45%, var(--accent-wash), transparent 65%);
+  pointer-events: none;
+}
+.hero > * { position: relative; }
+.hero h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(42px, 7vw, 72px); line-height: 1.02; letter-spacing: -0.025em; margin: 18px 0 0; }
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero .lede { font-size: 18px; color: var(--ink-2); max-width: 56ch; margin: 24px 0 0; }
+.strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+
+/* ── kısa bilgi ───────────────────────────────────────────────── */
+.brief { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1px; background: var(--hairline); border: 1px solid var(--hairline); border-radius: var(--r-lg); overflow: hidden; }
+@media (max-width: 680px) { .brief { grid-template-columns: minmax(0,1fr); } }
+.brief-cell { background: var(--surface); padding: 24px 26px; }
+.brief-cell .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 11px; }
+.brief-cell h3 { font-family: var(--serif); font-weight: 400; font-size: 22px; letter-spacing: -0.015em; margin-bottom: 9px; }
+.brief-cell p { font-size: 14px; color: var(--ink-2); margin: 0; }
+.brief-cell p + p { margin-top: 9px; }
+.brief-cell b { color: var(--ink); font-weight: 600; }
+
+/* analiz hattı şeridi */
+.pipe { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin-top: 26px; }
+.pipe-step {
+  flex: 1 1 150px; min-width: 0;
+  border: 1px solid var(--hairline); border-radius: var(--r-md);
+  background: var(--surface); padding: 15px 16px;
+}
+.pipe-step.model { border-color: var(--model-line); background: var(--model-wash); }
+.pipe-step .id { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.pipe-step.model .id { color: var(--model); }
+.pipe-step .nm { font-size: 14px; font-weight: 600; color: var(--ink); margin: 7px 0 6px; }
+.pipe-step .ds { font-size: 12.5px; color: var(--ink-3); line-height: 1.5; }
+
+.keyline {
+  margin-top: 22px; padding: 17px 21px;
+  border: 1px solid var(--error-line); background: var(--error-wash);
+  border-radius: var(--r-md); font-size: 14.5px; color: var(--ink-2);
+}
+.keyline b { color: var(--ink); font-weight: 620; }
+
+/* ── yol haritası ─────────────────────────────────────────────── */
+.road { position: relative; padding-left: 52px; margin-top: 34px; }
+.road::before { content: ""; position: absolute; left: 17px; top: 20px; bottom: 30px; width: 1px; background: var(--hairline); }
+
+.stage { position: relative; margin-bottom: 20px; }
+.pin {
+  position: absolute; left: -52px; top: 20px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--hairline);
+  display: grid; place-items: center;
+  font-family: var(--mono); font-size: 11px; color: var(--ink-3);
+}
+.stage.now .pin { border-color: var(--accent); background: var(--accent-wash); color: var(--accent); }
+
+.stage-card {
+  border: 1px solid var(--hairline); border-radius: var(--r-lg);
+  background: var(--surface); box-shadow: var(--inner-hi);
+  padding: 22px 24px 8px;
+}
+.stage.now .stage-card { border-color: var(--accent-line); }
+
+.stage-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+.stage-top h3 { font-family: var(--serif); font-weight: 400; font-size: 25px; letter-spacing: -0.015em; }
+.stage-top .hrs { margin-left: auto; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; color: var(--ink-3); }
+.stage-what { font-size: 14px; color: var(--ink-2); margin: 9px 0 0; }
+
+.steps { list-style: none; counter-reset: s; padding: 0; margin: 18px 0 0; }
+.steps li {
+  counter-increment: s; position: relative;
+  padding: 10px 0 10px 36px; border-top: 1px solid var(--hairline);
+  font-size: 14px; color: var(--ink-2); line-height: 1.55;
+}
+.steps li::before {
+  content: counter(s); position: absolute; left: 0; top: 10px;
+  width: 23px; height: 23px; border-radius: 6px;
+  background: var(--surface-2); color: var(--ink-3);
+  font-family: var(--mono); font-size: 10px;
+  display: grid; place-items: center;
+}
+.steps li b { color: var(--ink); font-weight: 600; }
+.steps li code { font-family: var(--mono); font-size: 12.5px; background: var(--surface-2); border-radius: 4px; padding: 1px 6px; color: var(--ink); }
+.steps li.now::before { background: var(--accent); color: var(--plane); font-weight: 700; }
+.steps li.now { color: var(--ink); }
+.steps li .here {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent); border: 1px solid var(--accent-line); border-radius: 4px;
+  padding: 2px 6px; margin-left: 8px; white-space: nowrap;
+}
+
+.stage-done {
+  margin: 14px -24px 0; padding: 13px 24px;
+  border-top: 1px solid var(--hairline);
+  font-size: 13.5px; color: var(--ink-2);
+}
+.stage-done b {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent); margin-right: 9px;
+}
+
+.screen-tag {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.11em; text-transform: uppercase;
+  color: var(--accent); border: 1px solid var(--accent-line); background: var(--accent-wash);
+  border-radius: 4px; padding: 2px 7px; margin-left: 8px; white-space: nowrap;
+}
+
+/* ── kapanış ──────────────────────────────────────────────────── */
+.nextup {
+  margin-top: 30px; padding: 26px 28px;
+  border: 1px solid var(--accent-line); background: var(--accent-wash); border-radius: var(--r-lg);
+}
+.nextup .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+.nextup h3 { font-family: var(--serif); font-weight: 400; font-size: 27px; letter-spacing: -0.015em; margin-bottom: 10px; }
+.nextup p { color: var(--ink-2); margin: 0; max-width: 66ch; }
+.nextup code { font-family: var(--mono); font-size: 13.5px; background: var(--surface); border: 1px solid var(--hairline); border-radius: 5px; padding: 2px 8px; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="theme-bar">
+    <button class="theme-toggle" type="button"><span class="glyph">◐</span><span class="name">sistem</span></button>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow">Rung · yol haritası · 12 Ağustos 2026</div>
+    <h1>Sıfırdan finale,<br><em>adım adım.</em></h1>
+    <p class="lede">
+      Önce projenin ne olduğu — beş kutuda. Sonra dokuz aşama ve <b>83 adım</b>: her biri tek
+      oturumda bitecek büyüklükte, sırası bağlayıcı.
+    </p>
+    <div class="strip">
+      <span class="chip">9 aşama</span>
+      <span class="chip">83 adım</span>
+      <span class="chip">~62 saat</span>
+      <span class="chip t-accent">şu an: aşama 00 · adım 5</span>
+    </div>
+  </header>
+
+  <hr class="rule">
+
+  <!-- ══ KISA BİLGİ ══ -->
+  <div class="section-head"><span class="section-num">01</span><h2 class="section-title">Proje kısaca</h2></div>
+
+  <div class="brief">
+    <div class="brief-cell">
+      <div class="k">ne</div>
+      <h3>Bir ölçüm aleti</h3>
+      <p>Rung İngilizce <b>öğretmiyor.</b> Senin yazdığın İngilizceye bakıp nerede, neden ve ne
+        sıklıkla hata yaptığını çıkarıyor, aylarca takip ediyor.</p>
+      <p>Grammarly cümleyi düzeltir ve unutur. Rung düzeltir, <b>kaydeder</b>, ve altı ay sonra
+        "bu hatayı 34 kez yaptın, azalmıyor" der.</p>
+    </div>
+
+    <div class="brief-cell">
+      <div class="k">kime</div>
+      <h3>Türkçe konuşanlara</h3>
+      <p>Türkçede artikel yok, cinsiyetli zamir yok, sözcük sırası farklı. Bu yüzden Türkçe
+        konuşanlar <b>öngörülebilir</b> hatalar yapıyor: <i>"I am agree"</i>, <i>"the meeting of
+        tomorrow"</i>, artikel düşürme.</p>
+      <p>Bunlar ayrı bir hata ailesi olarak izleniyor — genel bir aracın veremeyeceği şey bu.</p>
+    </div>
+
+    <div class="brief-cell">
+      <div class="k">ne değil</div>
+      <h3>Dört şey olmayacak</h3>
+      <p><b>Kurs değil</b> — ders anlatmaz. <b>Sohbet botu değil</b> — modelle konuşmuyorsun.
+        <b>Yazım denetleyicisi değil</b> — düzeltip unutmuyor. <b>Oyunlaştırma yok</b> — seri
+        sayacı, rozet, puan yok.</p>
+      <p>Bunlar eksik değil, <b>karar</b>. Kapsamı dışarıdan çizmezsek proje şişer ve biter.</p>
+    </div>
+
+    <div class="brief-cell">
+      <div class="k">neden değerli</div>
+      <h3>Ölçüm katmanı</h3>
+      <p>2026'da "yapay zekâ özelliği ekledim" cümlesinin değeri yok — herkes ekliyor.
+        Kimse <b>çalıştığını kanıtlayamıyor.</b></p>
+      <p>Rung kendi doğruluğunu ölçüyor ve ekranda gösteriyor. Mülakatta konuşulacak şey bu.</p>
+    </div>
+  </div>
+
+  <h3 style="font-family:var(--serif); font-weight:400; font-size:23px; margin:44px 0 4px">Analiz hattı — beş katman</h3>
+  <p style="color:var(--ink-2); margin:0 0 6px; font-size:14.5px; max-width:66ch">
+    Mor olanlar modele gidiyor, gri olanlar gitmiyor. <b style="color:var(--ink)">Beşin üçü yapay
+    zekâ kullanmıyor</b> — modele ne kadar az iş verirsen o kadar az saçmalıyor.
+  </p>
+
+  <div class="pipe">
+    <div class="pipe-step">
+      <div class="id">K0 · kural</div>
+      <div class="nm">Ölçüm</div>
+      <div class="ds">Yazım, uzunluk, karmaşıklık, kelime bandı. Düz kodla, bedava, her seferinde aynı.</div>
+    </div>
+    <div class="pipe-step model">
+      <div class="id">K1 · model</div>
+      <div class="nm">Hata çıkarımı</div>
+      <div class="ds">Sabit taksonomiye ve zorunlu şemaya yazmak zorunda. Serbest metin üretemiyor.</div>
+    </div>
+    <div class="pipe-step model">
+      <div class="id">K2 · model</div>
+      <div class="nm">İkinci geçiş</div>
+      <div class="ds">Her bulguya ayrıca "bu gerçekten hata mı" sorulur. Yanlış alarmı düşürür.</div>
+    </div>
+    <div class="pipe-step">
+      <div class="id">K3 · kural</div>
+      <div class="nm">Süzme</div>
+      <div class="ds">Seviyeye göre sıralanır ve <b>sayısı sınırlanır</b>. A1'e on hata gösterilmez.</div>
+    </div>
+    <div class="pipe-step">
+      <div class="id">K4 · kural</div>
+      <div class="nm">Kayıt</div>
+      <div class="ds">Metin + bulgular + model kimliği + prompt sürümü. Sürümsüz karşılaştırma yalan söyler.</div>
+    </div>
+  </div>
+
+  <div class="keyline">
+    <b>Ana ölçüt yakalama değil, yanlış alarm.</b> Bir hatayı kaçırırsan kullanıcı fark etmez.
+    Ama doğru olan cümlesini "düzeltirsen" güvenini anında kaybedersin ve uygulamayı bir daha açmaz.
+  </div>
+
+  <!-- ══ YOL HARİTASI ══ -->
+  <div class="section-head"><span class="section-num">02</span><h2 class="section-title">Ne yapacağız</h2></div>
+  <p class="section-lede">
+    Her aşama <b>çalışır ve yayınlanmış kodla</b> kapanır; bitiş kriteri karşılanmadan sonrakine
+    geçilmez. Kodu sen yazacaksın — ben ne yazılacağını anlatacağım.
+  </p>
+
+  <div class="road">
+
+    <!-- 00 -->
+    <article class="stage now">
+      <span class="pin">00</span>
+      <div class="stage-card">
+        <div class="stage-top"><h3>İskelet ve ilk yayın</h3><span class="hrs">~5 saat · 15 adım</span></div>
+        <p class="stage-what">Boş ama uçtan uca çalışan, canlıda duran bir temel. Kod yok — ama internette bir adres var.</p>
+        <ol class="steps">
+          <li>Terminali aç, doğru klasörde olduğunu doğrula</li>
+          <li><code>git init -b main</code> — klasörü bir depoya çevir</li>
+          <li><code>git status</code> — git şu an ne görüyor, çıktıyı okumayı öğren</li>
+          <li><code>.gitignore</code> — neyin takip edilmeyeceğine karar ver</li>
+          <li class="now"><code>git add</code> — <b>sahneleme alanı</b> nedir, neden iki ayrı komut <span class="here">şu an burada</span></li>
+          <li><code>git commit</code> — <b>Conventional Commits</b> biçimi ve iyi mesaj nasıl yazılır</li>
+          <li>GitHub'da boş depo aç — uzak depo (<b>remote</b>) nedir</li>
+          <li><code>git remote add origin</code> — yereli uzağa bağla</li>
+          <li><code>git push -u origin main</code> — ilk yükleme</li>
+          <li>Next.js'i kur — <b>paket yöneticisi</b> ve <code>package.json</code> nedir</li>
+          <li>TypeScript katı modunu aç — neyi yakalıyor</li>
+          <li><code>npm run dev</code> — yerel sunucu ve <code>localhost</code> nedir</li>
+          <li>Ortam değişkeni ve <code>.env.local</code> — gizli anahtar nasıl saklanır</li>
+          <li>PostgreSQL veritabanı aç, bağlantıyı test et</li>
+          <li>Vercel'e bağla — <b>ilk yayın</b>, canlı adres</li>
+        </ol>
+        <div class="stage-done"><b>biter</b>Canlı adreste açılan bir sayfa var, veritabanına bağlı, GitHub'da düzenli geçmiş duruyor.</div>
+      </div>
+    </article>
+
+    <!-- 01 -->
+    <article class="stage">
+      <span class="pin">01</span>
+      <div class="stage-card">
+        <div class="stage-top"><h3>Hesap ve oturum</h3><span class="hrs">~6 saat · 8 adım</span></div>
+        <p class="stage-what">Kayıt ol, giriş yap, çık. Korumalı sayfa.</p>
+        <ol class="steps">
+          <li>Kimlik doğrulama ile yetkilendirme farkı — <i>kimsin</i> ve <i>neye izinlisin</i></li>
+          <li><code>users</code> tablosunu tasarla</li>
+          <li>Göç (<b>migration</b>) nedir, ilk göçü çalıştır</li>
+          <li>Şifre neden düz saklanmaz — hash'leme</li>
+          <li>Kayıt formu + sunucu tarafı doğrulama</li>
+          <li>Giriş — oturum ve çerez nasıl çalışıyor</li>
+          <li>Çıkış</li>
+          <li>Korumalı sayfa: giriş yapmayan göremesin</li>
+        </ol>
+        <div class="stage-done"><b>biter</b>Giriş yapmayan kullanıcı korumalı sayfayı göremiyor.</div>
+      </div>
+    </article>
+
+    <!-- 02 -->
+    <article class="stage">
+      <span class="pin">02</span>
+      <div class="stage-card">
+        <div class="stage-top"><h3>Yazma, saklama, listeleme</h3><span class="hrs">~7 saat · 9 adım</span></div>
+        <p class="stage-what">Bağlam seç, görev al, yaz, kaydet, geçmişte gör. Henüz analiz yok.</p>
+        <ol class="steps">
+          <li><code>contexts</code>, <code>tasks</code>, <code>entries</code> tablolarını tasarla</li>
+          <li>Yabancı anahtar nedir — zinciri kur</li>
+          <li>Tohum veri: beş bağlam ve her seviyeye somut görevler</li>
+          <li><b>Yaz ekranı</b> — bağlam seç, görev al <span class="screen-tag">Yaz sekmesi</span></li>
+          <li>Metni kaydet — sunucu eylemi nedir</li>
+          <li>Kaydı <b>değiştirilemez</b> yapma kararı ve nedeni</li>
+          <li>Sahiplik kontrolü — başkasının kaydına erişilemesin</li>
+          <li><b>Geçmiş ekranı</b> — listele, ara, bağlama göre süz <span class="screen-tag">Geçmiş sekmesi</span></li>
+          <li>Tek kayıt detay sayfası</li>
+        </ol>
+        <div class="stage-done"><b>biter</b>Kayıt yazılıp saklanıyor, geçmişte bulunabiliyor, başkasının kaydına erişilemiyor.</div>
+      </div>
+    </article>
+
+    <!-- 03 -->
+    <article class="stage">
+      <span class="pin">03</span>
+      <div class="stage-card">
+        <div class="stage-top"><h3>Deterministik analiz — K0</h3><span class="chip t-plain">yapay zekâ yok</span><span class="hrs">~7 saat · 9 adım</span></div>
+        <p class="stage-what">Model çağırmadan ne kadar yol alınabildiğini görmek. Aşama 4'ten <b>önce</b> gelmesi bilinçli.</p>
+        <ol class="steps">
+          <li>Metni cümlelere ve kelimelere ayırma — göründüğü kadar kolay değil</li>
+          <li>Kelime sayısı, cümle uzunluğu, ortalama</li>
+          <li>Kelime çeşitliliği oranı</li>
+          <li>Yan cümle oranı — karmaşıklık nasıl ölçülür</li>
+          <li>A1–C1 kelime bandı listesini projeye al</li>
+          <li>Kullanılan kelimeleri bantlara eşle</li>
+          <li>Yazım denetimi — iki açık kaynak aracı dene ve <b>ölç</b>, tercihle seçme</li>
+          <li>Hepsi için birim testleri — burası test edilmeye en uygun yer</li>
+          <li>Analiz ekranına K0 şeridini koy</li>
+        </ol>
+        <div class="stage-done"><b>biter</b>Metin verildiğinde tek bir model çağrısı olmadan ölçüm çıkıyor.</div>
+      </div>
+    </article>
+
+    <!-- 04 -->
+    <article class="stage">
+      <span class="pin">04</span>
+      <div class="stage-card">
+        <div class="stage-top"><h3>Model katmanı — K1</h3><span class="chip t-model">model</span><span class="hrs">~8 saat · 10 adım</span></div>
+        <p class="stage-what">Yapay zekâ ilk kez devreye giriyor — ve sıkı bir kafese konuyor.</p>
+        <ol class="steps">
+          <li>Dil modeli nedir, <b>token</b> nedir, maliyet nasıl hesaplanır</li>
+          <li>Sağlayıcı soyutlaması — arayüzü tanımla, sağlayıcı değişimi bir günlük iş olsun</li>
+          <li>Hata taksonomisini kodda sabitle — beş aile, alt kategoriler</li>
+          <li><b>Yapılandırılmış çıktı</b> — modeli şemaya zorlama</li>
+          <li>İlk istemi (<b>prompt</b>) yaz ve <code>v1</code> diye numaralandır</li>
+          <li>Bulguyu metindeki tam konuma eşle</li>
+          <li>Hata ve yeniden deneme — model bazen bozuk cevap verir</li>
+          <li><code>analyses</code> ve <code>findings</code> tablolarını kur</li>
+          <li>Model kimliğini ve prompt sürümünü <b>her kayda</b> yaz</li>
+          <li><b>Analiz ekranı</b> gerçek bulguları göstersin <span class="screen-tag">Analiz sekmesi</span></li>
+        </ol>
+        <div class="stage-done"><b>biter</b>Metinden şemaya uygun, konumlu bulgular geliyor ve sürümüyle birlikte saklanıyor.</div>
+      </div>
+    </article>
+
+    <!-- 05 -->
+    <article class="stage">
+      <span class="pin">05</span>
+      <div class="stage-card">
+        <div class="stage-top"><h3>Doğrulama ve eval — K2</h3><span class="chip t-accent">projenin kalbi</span><span class="hrs">~10 saat · 11 adım</span></div>
+        <p class="stage-what">En uzun aşama, ve projenin bütün değeri burada. "Ekledim" değil, "çalıştığını ölçtüm".</p>
+        <ol class="steps">
+          <li>İkinci geçiş: her bulguya bağımsız olarak "bu <i>gerçekten</i> hata mı"</li>
+          <li>Geçemeyene <b>şüpheli</b> damgası — gösterilir ama istatistiğe girmez</li>
+          <li>Altın küme nedir — A1, B1, C1 için 30–40'ar örneği <b>elle etiketle</b></li>
+          <li><code>gold_items</code> tablosu</li>
+          <li>İsabet ve yakalama nasıl hesaplanır — birim testle doğrula</li>
+          <li><code>eval_runs</code> — her ölçüm koşumunu kaydet</li>
+          <li>Prompt sürümleme: v1 ve v2 aynı küme üzerinde kıyaslanabilsin</li>
+          <li>"Katılmıyorum" düğmesi → <code>finding_feedback</code></li>
+          <li>İtirazları altın kümeye akıt — küme kendiliğinden büyüsün</li>
+          <li><b>Doğruluk panosu</b> — seviye kırılımlı <span class="screen-tag">Doğruluk sekmesi</span></li>
+          <li>İki prompt sürümünü kıyasla ve <b>takası bilerek yap</b></li>
+        </ol>
+        <div class="stage-done"><b>biter</b>Prompt değiştiğinde iki sürüm sayılarla kıyaslanabiliyor ve karar gerekçeli veriliyor.</div>
+      </div>
+    </article>
+
+    <!-- 06 -->
+    <article class="stage">
+      <span class="pin">06</span>
+      <div class="stage-card">
+        <div class="stage-top"><h3>Seviye motoru — K3</h3><span class="hrs">~8 saat · 7 adım</span></div>
+        <p class="stage-what">Aynı hatanın önemi seviyeye göre değişiyor. Bu, seviyeyi sistemin merkezine koyuyor.</p>
+        <ol class="steps">
+          <li>K0 metriklerinden seviye tahmini — eşikleri belirle</li>
+          <li><code>level_estimates</code> — tahmini zaman serisi olarak sakla</li>
+          <li>Bulgu önceliklendirme kuralları</li>
+          <li>Seviyeye göre gösterilecek bulgu <b>sayısı sınırı</b></li>
+          <li>Görev önerisini seviyeye bağla</li>
+          <li>Aynı metin A1 ve C1 kullanıcısına farklı görünüyor mu — test et</li>
+          <li>Tahmini her yeni kayıttan sonra güncelle</li>
+        </ol>
+        <div class="stage-done"><b>biter</b>Aynı metin A1 ve C1 kullanıcısına farklı geri bildirim veriyor.</div>
+      </div>
+    </article>
+
+    <!-- 07 -->
+    <article class="stage">
+      <span class="pin">07</span>
+      <div class="stage-card">
+        <div class="stage-top"><h3>Geçmiş ve ilerleme</h3><span class="hrs">~6 saat · 7 adım</span></div>
+        <p class="stage-what">Altı aylık veriyi okunabilir hâle getirmek — ve hızlı açmak.</p>
+        <ol class="steps">
+          <li>Toplulaştırma sorguları — veritabanına saydırmak, koda değil</li>
+          <li><b>N+1 problemi</b> — ne olduğu, nasıl fark edilir, nasıl çözülür</li>
+          <li>Veritabanı indeksi — neden ve nereye</li>
+          <li>Seviye izi grafiği <span class="screen-tag">İlerleme sekmesi</span></li>
+          <li>Hata ailesi karşılaştırması — ilk ay ile bu ay</li>
+          <li>İnatçı kategori hesabı — hangi hata azalmıyor</li>
+          <li>Aynı görevin eski hâliyle yan yana karşılaştırması</li>
+        </ol>
+        <div class="stage-done"><b>biter</b>6 aylık veriyle sayfa hızlı açılıyor ve ilerleme okunabiliyor.</div>
+      </div>
+    </article>
+
+    <!-- 08 -->
+    <article class="stage">
+      <span class="pin">08</span>
+      <div class="stage-card">
+        <div class="stage-top"><h3>Cila, test, yayın</h3><span class="hrs">~5 saat · 7 adım</span></div>
+        <p class="stage-what">Gösterilebilir ve savunulabilir hâle getirmek.</p>
+        <ol class="steps">
+          <li>Ne test edilir, ne edilmez — modelin çıktısı test edilmez, <i>ölçülür</i></li>
+          <li>Kritik akışlar için testler</li>
+          <li>CI kur — her <code>push</code>'ta testler koşsun</li>
+          <li>Hata takibi ve günlükleme</li>
+          <li>Erişilebilirlik temelleri — klavye, kontrast, ekran okuyucu</li>
+          <li>Koyu/açık temanın son hâli</li>
+          <li>README + canlı demo bağlantısı</li>
+        </ol>
+        <div class="stage-done"><b>biter</b>Kritik akışlar testli, CI yeşil, README canlı bağlantıyla hazır.</div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="nextup">
+    <div class="k">sıradaki adım</div>
+    <h3>Aşama 00 · Adım 1</h3>
+    <p>
+      Terminali açıyoruz ve <code>git init -b main</code> yazıyoruz. Önce problem — <i>"dosyayı
+      bozdum, dünkü hâline dönmek istiyorum"</i> — sonra çözümün adı, sonra tek bir komut.
+      Komutu sen yazacaksın.
+    </p>
+  </div>
+
+  <footer class="foot">
+    <span>Rung · yol haritası</span>
+    <span><a href="product.html">ürünü gör</a> · <a href="../docs/plan.md">tam plan</a></span>
+    <span>12 Ağustos 2026</span>
+  </footer>
+
+</div>
+</body>
+</html>
