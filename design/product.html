@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rung — ürün</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<script src="theme.js"></script>
+<style>
+/* ── sayfa ────────────────────────────────────────────────────── */
+.page { max-width: 1120px; margin: 0 auto; padding: 44px 26px 96px; position: relative; z-index: 1; }
+
+.topline { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+.topline .mark { font-size: 20px; font-weight: 680; letter-spacing: -0.035em; }
+.topline .mark i { color: var(--accent); font-style: normal; }
+.topline .note { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+
+.footnote { font-size: 13px; color: var(--ink-3); margin: 24px 2px 0; max-width: 76ch; }
+.footnote a { color: var(--ink-3); }
+.footnote a:hover { color: var(--accent); }
+
+/* ── uygulama çerçevesi ───────────────────────────────────────── */
+.app {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--inner-hi), var(--shadow-lg);
+  min-height: 680px;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-bar {
+  display: flex; align-items: center; gap: 20px;
+  padding: 0 20px; height: 58px;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--surface-2);
+  flex: none;
+}
+.app-mark { font-size: 15.5px; font-weight: 680; letter-spacing: -0.035em; color: var(--ink); }
+.app-mark i { color: var(--accent); font-style: normal; }
+
+.tabs { display: flex; gap: 2px; margin-right: auto; }
+.tabs button {
+  font-family: var(--sans); font-size: 13.5px; font-weight: 500; letter-spacing: -0.005em;
+  color: var(--ink-3); background: transparent; border: 0;
+  padding: 7px 13px; border-radius: 8px; cursor: pointer;
+  transition: color 130ms ease, background-color 130ms ease;
+}
+.tabs button:hover { color: var(--ink-2); background: var(--surface-3); }
+.tabs button.is-on { color: var(--accent); background: var(--accent-wash); }
+
+.app-bar .theme-toggle { padding: 6px 11px; box-shadow: none; background: transparent; }
+
+@media (max-width: 780px) {
+  .app-bar { height: auto; flex-wrap: wrap; padding: 12px 14px; gap: 10px; }
+  .tabs { order: 3; width: 100%; overflow-x: auto; }
+}
+
+.view { display: none; padding: 28px; }
+.view.is-on { display: block; }
+
+.view-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 24px; }
+.view-bar .spacer { flex: 1 1 30px; }
+.provenance { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); }
+.provenance code { background: var(--model-wash); border: 1px solid var(--model-line); border-radius: 4px; padding: 2px 7px; color: var(--model); }
+
+/* ── 1 · yaz ──────────────────────────────────────────────────── */
+.compose { max-width: 760px; margin: 0 auto; }
+.compose-head { margin-bottom: 22px; }
+.task-title { font-family: var(--serif); font-weight: 400; font-size: 27px; letter-spacing: -0.015em; line-height: 1.16; }
+.task-meta { color: var(--ink-3); font-size: 13px; margin: 8px 0 0; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+
+.editor {
+  background: var(--surface-2); border: 1px solid var(--hairline); border-radius: var(--r-md);
+  padding: 28px 30px; min-height: 340px; font-size: 16.5px; line-height: 1.95; color: var(--ink);
+}
+.editor .faded { color: var(--ink-2); }
+.caret { display: inline-block; width: 1.5px; height: 1.05em; background: var(--accent); vertical-align: -0.18em; animation: blink 1.15s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.compose-foot { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-top: 18px; }
+.compose-foot .btns { display: flex; gap: 9px; }
+
+/* ── 2 · analiz ───────────────────────────────────────────────── */
+.split { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 26px; }
+@media (max-width: 940px) { .split { grid-template-columns: minmax(0,1fr); } }
+
+.entry-text {
+  background: var(--surface-2); border: 1px solid var(--hairline); border-radius: var(--r-md);
+  padding: 26px 28px; font-size: 16px; line-height: 2.15;
+}
+.u-err { text-decoration: underline wavy var(--error); text-decoration-thickness: 1px; text-underline-offset: 5px; }
+.u-sug { text-decoration: underline wavy var(--suggest); text-decoration-thickness: 1px; text-underline-offset: 5px; }
+.u-sus { text-decoration: underline dotted var(--suspect); text-decoration-thickness: 1px; text-underline-offset: 5px; color: var(--ink-2); }
+.u-focus { background: var(--error-wash); box-shadow: 0 0 0 3px var(--error-wash); border-radius: 3px; }
+
+.k0 {
+  margin-top: 15px; padding: 14px 17px;
+  border: 1px solid var(--hairline); border-radius: var(--r-md);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+}
+.k0 .t { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.k0 .m { font-size: 12.5px; color: var(--ink-2); }
+.k0 .m b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.k0 .sep { color: var(--hairline); }
+
+.findings-head { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 12px; }
+
+.finding {
+  border: 1px solid var(--hairline); border-left-width: 2px;
+  border-radius: var(--r-sm); background: var(--surface-2);
+  padding: 16px 18px; margin-bottom: 10px;
+}
+.finding.is-error { border-left-color: var(--error);   background: var(--error-wash); }
+.finding.is-sug   { border-left-color: var(--suggest); background: var(--suggest-wash); }
+.finding.is-sus   { border-left-color: var(--suspect); }
+.finding .kind { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 9px; }
+.fix { font-size: 15.5px; line-height: 1.5; margin-bottom: 8px; }
+.fix .was     { color: var(--error);   text-decoration: line-through; text-decoration-thickness: 1px; }
+.fix .was-sug { color: var(--suggest); text-decoration: line-through; text-decoration-thickness: 1px; }
+.fix .was-sus { color: var(--ink-3);   text-decoration: line-through; text-decoration-thickness: 1px; }
+.fix .arrow { color: var(--ink-3); margin: 0 7px; }
+.fix .now { color: var(--accent); font-weight: 620; }
+.finding .why { font-size: 13.5px; color: var(--ink-2); margin: 0 0 14px; }
+.finding .why em { color: var(--ink); font-style: italic; }
+.actions { display: flex; gap: 8px; }
+.act { font-family: var(--sans); font-size: 12px; padding: 5px 11px; border-radius: 5px; border: 1px solid var(--hairline); background: var(--surface); color: var(--ink-2); cursor: pointer; }
+.act:hover { border-color: var(--ink-3); }
+.act.affirm { border-color: var(--accent-line); color: var(--accent); background: var(--accent-wash); }
+
+/* ── 3 · geçmiş ───────────────────────────────────────────────── */
+.filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 22px; }
+.search {
+  display: flex; align-items: center; gap: 9px;
+  background: var(--surface-2); border: 1px solid var(--hairline);
+  border-radius: var(--r-sm); padding: 8px 13px; min-width: 250px; flex: 1 1 250px; max-width: 360px;
+}
+.search svg { flex: none; color: var(--ink-3); }
+.search input {
+  border: 0; background: transparent; color: var(--ink);
+  font-family: var(--sans); font-size: 13.5px; outline: none; width: 100%;
+}
+.search input::placeholder { color: var(--ink-3); }
+
+.pick {
+  font-family: var(--sans); font-size: 13px; color: var(--ink-2);
+  background: var(--surface-2); border: 1px solid var(--hairline);
+  border-radius: var(--r-sm); padding: 8px 11px; cursor: pointer;
+}
+
+.month {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-3); margin: 22px 0 8px; padding-bottom: 8px; border-bottom: 1px solid var(--hairline);
+  display: flex; justify-content: space-between;
+}
+.month:first-of-type { margin-top: 0; }
+
+.entry-row {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) 118px 86px 108px 56px;
+  gap: 16px; align-items: center;
+  padding: 13px 12px; margin: 0 -12px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+.entry-row:hover { background: var(--surface-2); }
+.entry-row + .entry-row { border-top: 1px solid var(--hairline); }
+.entry-row .day { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.entry-row .name { font-size: 14.5px; color: var(--ink); font-weight: 500; }
+.entry-row .again {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--accent); margin-top: 4px; display: inline-block;
+}
+.entry-row .num { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; text-align: right; }
+.entry-row .dens { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.entry-row .dens .bar { display: block; width: 44px; height: 4px; border-radius: 2px; background: var(--surface-3); overflow: hidden; flex: none; }
+.entry-row .dens .bar i { display: block; height: 100%; background: var(--suspect); border-radius: 2px; }
+.entry-row .lvl { justify-self: end; }
+@media (max-width: 900px) {
+  .entry-row { grid-template-columns: 56px minmax(0,1fr) 60px; }
+  .entry-row .ctx, .entry-row .words, .entry-row .dens { display: none; }
+}
+
+/* ── 4 / 5 · grafikler ────────────────────────────────────────── */
+.fig-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 24px; margin-top: 24px; }
+@media (max-width: 940px) { .fig-grid { grid-template-columns: minmax(0,1fr); } }
+
+.fig-note { font-size: 13px; color: var(--ink-2); margin: 20px 0 0; padding-left: 13px; border-left: 2px solid var(--error); }
+
+.meters { display: grid; gap: 20px; }
+.meter-row { display: grid; gap: 7px; }
+.meter-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.meter-name { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); }
+.meter-val { font-size: 15px; font-weight: 620; font-variant-numeric: tabular-nums; color: var(--ink); }
+.meter-flag { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--error); }
+.meter-track { display: block; height: 8px; border-radius: 4px; background: var(--ord-1); overflow: hidden; }
+.meter-fill { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+.meter-fill.warn { background: var(--error); }
+.meter-sub { font-size: 12px; color: var(--ink-3); }
+
+.verdict {
+  display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 24px;
+  padding: 16px 19px; border: 1px solid var(--accent-line); background: var(--accent-wash);
+  border-radius: var(--r-md); font-size: 13.5px; color: var(--ink-2);
+}
+.verdict .stamp {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.11em; text-transform: uppercase;
+  color: var(--accent); border: 1px solid var(--accent-line); border-radius: 5px; padding: 4px 9px; flex: none;
+}
+.verdict b { color: var(--ink); }
+</style>
+</head>
+<body>
+<div id="tip" role="status" aria-live="polite"></div>
+
+<div class="page">
+
+  <div class="topline">
+    <span class="mark">rung<i>.</i></span>
+    <span class="note">ürün önizlemesi · veriler uydurma</span>
+  </div>
+
+  <div class="app">
+
+    <div class="app-bar">
+      <span class="app-mark">rung<i>.</i></span>
+      <nav class="tabs" aria-label="Ekranlar">
+        <button type="button" data-view="write" class="is-on">Yaz</button>
+        <button type="button" data-view="analyze">Analiz</button>
+        <button type="button" data-view="history">Geçmiş</button>
+        <button type="button" data-view="progress">İlerleme</button>
+        <button type="button" data-view="eval">Doğruluk</button>
+      </nav>
+      <button class="theme-toggle" type="button"><span class="glyph">◐</span><span class="name">sistem</span></button>
+    </div>
+
+    <!-- ══ YAZ ══ -->
+    <section class="view is-on" id="v-write">
+      <div class="compose">
+        <div class="pills">
+          <span class="chip t-accent">Günlük hayat</span>
+          <span class="chip">İş</span>
+          <span class="chip">Teknik</span>
+          <span class="chip">Resmî</span>
+          <span class="chip">Serbest</span>
+        </div>
+
+        <div class="compose-head">
+          <h1 class="task-title">Ask your landlord about the deposit</h1>
+          <p class="task-meta">Resmî olmayan e-posta · Hedef 60–90 kelime · Seviyene göre seçildi</p>
+        </div>
+
+        <div class="editor">
+          Hi Mark,<br><br>
+          <span class="faded">I am writing about the deposit for the flat. I would like to know when…</span><span class="caret"></span>
+        </div>
+
+        <div class="compose-foot">
+          <span class="mono-label">31 kelime · otomatik kaydedildi</span>
+          <span class="btns">
+            <button class="btn" type="button">Görevi değiştir</button>
+            <button class="btn btn-primary" type="button">Analiz et</button>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ ANALİZ ══ -->
+    <section class="view" id="v-analyze">
+      <div class="view-bar">
+        <span class="chip t-accent">B1 için süzüldü</span>
+        <span class="chip t-error">4 hata</span>
+        <span class="chip t-suggest">2 öneri</span>
+        <span class="chip">1 şüpheli</span>
+        <span class="spacer"></span>
+        <span class="provenance">model <code>gpt-class-a</code> · prompt <code>v7</code></span>
+      </div>
+
+      <div class="split">
+        <div>
+          <div class="entry-text">
+            Dear Sarah,<br><br>
+            I am writing to inform you that I have <span class="u-err">made a research</span> about the pricing issue.
+            <span class="u-err u-focus">I am agree</span> with your suggestion, but I think we should to discuss the details in
+            <span class="u-err">the meeting of tomorrow</span>. <span class="u-sug">Please write me back soon.</span><br>
+            <span class="u-sus">Best regards,</span><br>
+            Mahmut
+          </div>
+
+          <div class="k0">
+            <span class="t">K0 · deterministik</span>
+            <span class="m"><b>49</b> kelime · <b>3</b> cümle</span><span class="sep">│</span>
+            <span class="m">ort. <b>14.7</b> kelime</span><span class="sep">│</span>
+            <span class="m">yan cümle <b>%33</b></span><span class="sep">│</span>
+            <span class="m">çeşitlilik <b>0.71</b></span><span class="sep">│</span>
+            <span class="m">yazım <b>temiz</b></span>
+          </div>
+        </div>
+
+        <div>
+          <div class="findings-head">Bulgular · önem sırası</div>
+
+          <div class="finding is-error">
+            <div class="kind">Türkçe kaynaklı · kalıp</div>
+            <div class="fix"><span class="was">I am agree</span><span class="arrow">→</span><span class="now">I agree</span></div>
+            <p class="why">"Katılıyorum" Türkçede sıfat gibi kurulur; İngilizcede <em>agree</em> zaten fiil.</p>
+            <div class="actions"><button class="act affirm" type="button">Anladım</button><button class="act" type="button">Katılmıyorum</button></div>
+          </div>
+
+          <div class="finding is-error">
+            <div class="kind">Sözcük · eşdizim</div>
+            <div class="fix"><span class="was">made a research</span><span class="arrow">→</span><span class="now">done some research</span></div>
+            <p class="why"><em>research</em> sayılamaz ve <em>make</em> ile eşdizim kurmaz.</p>
+            <div class="actions"><button class="act affirm" type="button">Anladım</button><button class="act" type="button">Katılmıyorum</button></div>
+          </div>
+
+          <div class="finding is-sug">
+            <div class="kind">Söylem · ton</div>
+            <div class="fix"><span class="was-sug">Please write me back soon.</span><span class="arrow">→</span><span class="now">I look forward to hearing from you.</span></div>
+            <p class="why">Resmî e-postada fazla doğrudan. Öneri — hata değil.</p>
+            <div class="actions"><button class="act affirm" type="button">Anladım</button><button class="act" type="button">Katılmıyorum</button></div>
+          </div>
+
+          <div class="finding is-sus">
+            <div class="kind">Şüpheli · düşük güven</div>
+            <div class="fix"><span class="was-sus">Best regards,</span><span class="arrow">→</span><span class="now">Kind regards,</span></div>
+            <p class="why">İkinci geçiş bunu doğrulamadı. Gösteriliyor ama istatistiğe girmiyor.</p>
+            <div class="actions"><button class="act affirm" type="button">Hata değil</button><button class="act" type="button">Hataymış</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ GEÇMİŞ ══ -->
+    <section class="view" id="v-history">
+      <div class="filters">
+        <label class="search">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"></circle>
+            <path d="M11 11 L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+          </svg>
+          <input type="search" placeholder="Metinlerde ara — örn. deposit" aria-label="Geçmişte ara">
+        </label>
+        <select class="pick" aria-label="Bağlam"><option>Bağlam: hepsi</option><option>Günlük hayat</option><option>İş</option><option>Teknik</option><option>Resmî</option><option>Serbest</option></select>
+        <select class="pick" aria-label="Sırala"><option>En yeni</option><option>En çok hata</option><option>En uzun</option></select>
+        <span class="spacer" style="flex:1"></span>
+        <span class="chip">142 kayıt</span>
+        <span class="chip">21.400 kelime</span>
+      </div>
+
+      <div class="month"><span>Ağustos 2026</span><span>6 kayıt · ort. 3.9 hata / 100 kelime</span></div>
+
+      <div class="entry-row">
+        <span class="day">12 Ağu</span>
+        <span><span class="name">Ask your landlord about the deposit</span><br><span class="again">şubatta da yazmıştın — karşılaştır</span></span>
+        <span class="ctx"><span class="chip">Günlük hayat</span></span>
+        <span class="num words">74 kelime</span>
+        <span class="dens"><span class="bar"><i style="width:23%"></i></span><span class="num">2.7</span></span>
+        <span class="lvl"><span class="chip t-accent">B1+</span></span>
+      </div>
+
+      <div class="entry-row">
+        <span class="day">11 Ağu</span>
+        <span class="name">Give a 60-second status update in a meeting</span>
+        <span class="ctx"><span class="chip">İş</span></span>
+        <span class="num words">96 kelime</span>
+        <span class="dens"><span class="bar"><i style="width:36%"></i></span><span class="num">4.2</span></span>
+        <span class="lvl"><span class="chip t-accent">B1+</span></span>
+      </div>
+
+      <div class="entry-row">
+        <span class="day">09 Ağu</span>
+        <span class="name">Explain a bug to a teammate</span>
+        <span class="ctx"><span class="chip">Teknik</span></span>
+        <span class="num words">118 kelime</span>
+        <span class="dens"><span class="bar"><i style="width:29%"></i></span><span class="num">3.4</span></span>
+        <span class="lvl"><span class="chip t-accent">B1+</span></span>
+      </div>
+
+      <div class="entry-row">
+        <span class="day">08 Ağu</span>
+        <span class="name">Decline an invitation politely</span>
+        <span class="ctx"><span class="chip">Resmî</span></span>
+        <span class="num words">62 kelime</span>
+        <span class="dens"><span class="bar"><i style="width:48%"></i></span><span class="num">5.6</span></span>
+        <span class="lvl"><span class="chip">B1</span></span>
+      </div>
+
+      <div class="entry-row">
+        <span class="day">06 Ağu</span>
+        <span class="name">Weekend plans with a friend</span>
+        <span class="ctx"><span class="chip">Günlük hayat</span></span>
+        <span class="num words">81 kelime</span>
+        <span class="dens"><span class="bar"><i style="width:26%"></i></span><span class="num">3.0</span></span>
+        <span class="lvl"><span class="chip t-accent">B1+</span></span>
+      </div>
+
+      <div class="entry-row">
+        <span class="day">05 Ağu</span>
+        <span class="name">Ask for a deadline extension</span>
+        <span class="ctx"><span class="chip">İş</span></span>
+        <span class="num words">88 kelime</span>
+        <span class="dens"><span class="bar"><i style="width:41%"></i></span><span class="num">4.8</span></span>
+        <span class="lvl"><span class="chip">B1</span></span>
+      </div>
+
+      <div class="month"><span>Temmuz 2026</span><span>19 kayıt · ort. 5.4 hata / 100 kelime</span></div>
+
+      <div class="entry-row">
+        <span class="day">31 Tem</span>
+        <span class="name">Describe your last project</span>
+        <span class="ctx"><span class="chip">Teknik</span></span>
+        <span class="num words">134 kelime</span>
+        <span class="dens"><span class="bar"><i style="width:44%"></i></span><span class="num">5.1</span></span>
+        <span class="lvl"><span class="chip">B1</span></span>
+      </div>
+
+      <div class="entry-row">
+        <span class="day">29 Tem</span>
+        <span class="name">Complain about a late delivery</span>
+        <span class="ctx"><span class="chip">Günlük hayat</span></span>
+        <span class="num words">70 kelime</span>
+        <span class="dens"><span class="bar"><i style="width:52%"></i></span><span class="num">6.0</span></span>
+        <span class="lvl"><span class="chip">B1</span></span>
+      </div>
+
+      <p class="footnote" style="margin-top:26px">
+        Kayıtlar <b>değiştirilemez</b>. Her satır kendi analizini, model kimliğini ve prompt sürümünü taşıyor —
+        altı ay sonraki karşılaştırmanın doğru olmasının tek yolu bu.
+      </p>
+    </section>
+
+    <!-- ══ İLERLEME ══ -->
+    <section class="view" id="v-progress">
+      <div class="view-bar">
+        <span class="chip">son 6 ay</span>
+        <span class="chip">142 kayıt</span>
+        <span class="chip">21.400 kelime</span>
+      </div>
+
+      <div class="kpi-row">
+        <div class="tile"><div class="label">Tahmini seviye</div><div class="value accent">B1+</div><div class="delta">Şubat'ta <span class="good">A2+</span></div></div>
+        <div class="tile"><div class="label">Hata / 100 kelime</div><div class="value">4.1</div><div class="delta">Şubat'ta 11.7 · <span class="good">−65%</span></div></div>
+        <div class="tile"><div class="label">En sık aile</div><div class="value" style="font-size:26px">TR kaynaklı</div><div class="delta">bu ay 2.3 / 100 kelime</div></div>
+        <div class="tile"><div class="label">İnatçı kategori</div><div class="value warn">Artikel</div><div class="delta">34 kez · <span class="bad">azalmıyor</span></div></div>
+      </div>
+
+      <div class="fig-grid">
+        <figure class="fig">
+          <div class="fig-head"><span class="fig-title">Seviye izi</span><button class="tbl-toggle" type="button" data-table="tbl-level">tablo</button></div>
+          <p class="fig-sub">Haftalık tahmin · Şubat → Ağustos</p>
+          <svg id="plot-level" class="plot" viewBox="0 0 540 200" role="img" aria-label="Seviye izi: Şubat'ta A2+ seviyesinden Ağustos'ta B1+ seviyesine yükselen haftalık tahmin."></svg>
+          <div class="data-table" id="tbl-level"></div>
+        </figure>
+
+        <figure class="fig">
+          <div class="fig-head"><span class="fig-title">Hata ailesi</span><button class="tbl-toggle" type="button" data-table="tbl-fam">tablo</button></div>
+          <p class="fig-sub">100 kelimede · ilk ay → bu ay</p>
+          <svg id="plot-fam" class="plot" viewBox="0 0 540 200" role="img" aria-label="Hata ailesi karşılaştırması: gramer, sözcük, söylem ve mekanik hataları belirgin düşmüş; Türkçe kaynaklı hatalar 3.1'den 2.3'e ancak inmiş."></svg>
+          <div class="legend">
+            <span class="item"><span class="swatch" id="sw-first"></span>İlk ay</span>
+            <span class="item"><span class="swatch" id="sw-now"></span>Bu ay</span>
+            <span class="item"><span class="swatch" id="sw-stuck"></span>Bu ay · azalmıyor</span>
+          </div>
+          <div class="data-table" id="tbl-fam"></div>
+        </figure>
+      </div>
+
+      <p class="fig-note">Türkçe kaynaklı hatalar azalmıyor — bir sonraki tekrar seti buradan üretilecek.</p>
+    </section>
+
+    <!-- ══ DOĞRULUK ══ -->
+    <section class="view" id="v-eval">
+      <div class="view-bar">
+        <span class="chip t-model">prompt v7</span>
+        <span class="chip">v6 ile karşılaştırma</span>
+        <span class="spacer"></span>
+        <span class="provenance">altın küme <code>312 örnek</code></span>
+      </div>
+
+      <div class="kpi-row">
+        <div class="tile"><div class="label">Yanlış alarm · ana ölçüt</div><div class="value accent">6.2%</div><div class="delta">v6'da 14.8% · <span class="good">−8.6 puan</span></div></div>
+        <div class="tile"><div class="label">Yakalama</div><div class="value">84.1%</div><div class="delta">v6'da 86.0% · <span class="bad">−1.9 puan</span></div></div>
+        <div class="tile"><div class="label">Altın küme</div><div class="value">312</div><div class="delta">+47 kullanıcı itirazından</div></div>
+        <div class="tile"><div class="label">Kayıt başı maliyet</div><div class="value">$0.011</div><div class="delta">ikinci geçiş dâhil</div></div>
+      </div>
+
+      <div class="fig-grid">
+        <div class="fig">
+          <div class="fig-head"><span class="fig-title">Seviye kırılımlı isabet</span></div>
+          <p class="fig-sub">Tek ortalama sayı gerçeği gizler — o yüzden kırılımlı</p>
+          <div class="meters">
+            <div class="meter-row">
+              <div class="meter-top"><span class="meter-name">A1</span><span class="meter-val">0.94</span></div>
+              <span class="meter-track"><span class="meter-fill" style="width:94%"></span></span>
+              <div class="meter-sub">yakalama 0.91</div>
+            </div>
+            <div class="meter-row">
+              <div class="meter-top"><span class="meter-name">B1</span><span class="meter-val">0.91</span></div>
+              <span class="meter-track"><span class="meter-fill" style="width:91%"></span></span>
+              <div class="meter-sub">yakalama 0.85</div>
+            </div>
+            <div class="meter-row">
+              <div class="meter-top"><span class="meter-name">C1 <span class="meter-flag">▲ zayıf</span></span><span class="meter-val">0.78</span></div>
+              <span class="meter-track"><span class="meter-fill warn" style="width:78%"></span></span>
+              <div class="meter-sub">yakalama 0.69 — nüans hataları modeller için gerçekten zor</div>
+            </div>
+          </div>
+        </div>
+
+        <figure class="fig">
+          <div class="fig-head"><span class="fig-title">Takas neydi</span></div>
+          <p class="fig-sub">v6 → v7 · her iki ölçüt aynı eksende, yüzde puanı</p>
+          <svg id="plot-tradeoff" class="plot" viewBox="0 0 540 164" role="img" aria-label="v6'dan v7'ye geçişte yanlış alarm yüzde 14.8'den 6.2'ye düştü, yakalama yüzde 86.0'dan 84.1'e düştü."></svg>
+          <div class="legend">
+            <span class="item"><span class="swatch bar" id="sw-v6"></span>v6</span>
+            <span class="item"><span class="swatch bar" id="sw-v7"></span>v7</span>
+          </div>
+        </figure>
+      </div>
+
+      <div class="verdict">
+        <span class="stamp">v7 kabul</span>
+        <span>Yakalama 1.9 puan düştü, yanlış alarm 8.6 puan düştü. Takas bilerek yapıldı — <b>güven, kapsamdan önemli</b>.</span>
+      </div>
+    </section>
+
+  </div>
+
+  <p class="footnote">
+    Bu bir maket: metinler ve sayılar uydurma, düğmeler bir şey yapmıyor. Sekmelerle ekranlar arasında
+    geçebilir, sağ üstten koyu/açık tema deneyebilirsin. · <a href="roadmap.html">ne yapacağız, adım adım →</a>
+  </p>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── sekmeler ─────────────────────────────────────────── */
+  var tabs = document.querySelectorAll('.tabs button');
+  var views = ['write', 'analyze', 'history', 'progress', 'eval'];
+
+  function show(name) {
+    if (views.indexOf(name) < 0) { name = 'write'; }
+    Array.prototype.forEach.call(tabs, function (o) {
+      var on = o.getAttribute('data-view') === name;
+      o.classList.toggle('is-on', on);
+      o.setAttribute('aria-current', on ? 'page' : 'false');
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.view'), function (v) {
+      v.classList.toggle('is-on', v.id === 'v-' + name);
+    });
+  }
+
+  Array.prototype.forEach.call(tabs, function (b) {
+    b.addEventListener('click', function () {
+      var name = b.getAttribute('data-view');
+      show(name);
+      history.replaceState(null, '', '#' + name);
+    });
+  });
+  window.addEventListener('hashchange', function () { show(location.hash.slice(1)); });
+  if (location.hash) { show(location.hash.slice(1)); }
+
+  /* ── grafikler ────────────────────────────────────────── */
+  var NS = 'http://www.w3.org/2000/svg';
+  var C = {};
+
+  function readColors() {
+    var s = getComputedStyle(document.documentElement);
+    ['--accent','--error','--suggest','--suspect','--grid','--hairline','--ink','--ink-2','--ink-3','--surface']
+      .forEach(function (k) { C[k] = s.getPropertyValue(k).trim(); });
+  }
+  function el(name, attrs) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) { n.setAttribute(k, attrs[k]); }
+    return n;
+  }
+  function text(x, y, str, o) {
+    o = o || {};
+    var t = el('text', {
+      x: x, y: y, fill: o.fill || C['--ink-3'], 'font-size': o.size || 9.5,
+      'font-family': o.family || 'ui-monospace, SFMono-Regular, Menlo, monospace',
+      'letter-spacing': o.ls || '0.08em', 'text-anchor': o.anchor || 'start'
+    });
+    if (o.weight) { t.setAttribute('font-weight', o.weight); }
+    t.textContent = str;
+    return t;
+  }
+
+  var tip = document.getElementById('tip');
+  function showTip(e, html) {
+    tip.innerHTML = html; tip.classList.add('is-on');
+    tip.style.left = e.clientX + 'px'; tip.style.top = e.clientY + 'px';
+  }
+  function hideTip() { tip.classList.remove('is-on'); }
+  document.addEventListener('scroll', hideTip, { passive: true });
+
+  function renderTable(host, head, rows) {
+    var h = '<table><thead><tr>';
+    head.forEach(function (c) { h += '<th>' + c + '</th>'; });
+    h += '</tr></thead><tbody>';
+    rows.forEach(function (r) {
+      h += '<tr>';
+      r.forEach(function (c) { h += '<td>' + c + '</td>'; });
+      h += '</tr>';
+    });
+    document.getElementById(host).innerHTML = h + '</tbody></table>';
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.tbl-toggle'), function (b) {
+    b.addEventListener('click', function () {
+      var t = document.getElementById(b.getAttribute('data-table'));
+      var open = t.classList.toggle('is-open');
+      b.textContent = open ? 'grafik' : 'tablo';
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  var LEVELS = [1.55,1.58,1.52,1.63,1.66,1.61,1.72,1.76,1.71,1.80,1.85,1.82,
+                1.90,1.94,1.98,1.95,2.03,2.07,2.04,2.11,2.16,2.19,2.15,2.24,2.29,2.34];
+  var WEEKS = ['Şub·1','Şub·2','Şub·3','Şub·4','Mar·1','Mar·2','Mar·3','Mar·4',
+               'Nis·1','Nis·2','Nis·3','Nis·4','May·1','May·2','May·3','May·4',
+               'Haz·1','Haz·2','Haz·3','Haz·4','Tem·1','Tem·2','Tem·3','Tem·4','Ağu·1','Ağu·2'];
+  function band(v) {
+    if (v < 1.5) { return 'A2'; }
+    if (v < 1.9) { return 'A2+'; }
+    if (v < 2.3) { return 'B1'; }
+    return 'B1+';
+  }
+
+  function buildLevel() {
+    var svg = document.getElementById('plot-level');
+    svg.innerHTML = '';
+    var L = 40, R = 508, T = 22, B = 150, lo = 1, hi = 3;
+    var xs = function (i) { return L + i * (R - L) / (LEVELS.length - 1); };
+    var ys = function (v) { return B - (v - lo) * (B - T) / (hi - lo); };
+
+    [[1,'A2'],[2,'B1'],[3,'B2']].forEach(function (g) {
+      var y = ys(g[0]);
+      svg.appendChild(el('line', { x1: L, y1: y, x2: R, y2: y, stroke: C['--grid'], 'stroke-width': 1 }));
+      svg.appendChild(text(L - 11, y + 3.5, g[1], { anchor: 'end' }));
+    });
+
+    var d = 'M' + xs(0) + ',' + B;
+    LEVELS.forEach(function (v, i) { d += ' L' + xs(i).toFixed(2) + ',' + ys(v).toFixed(2); });
+    d += ' L' + xs(LEVELS.length - 1) + ',' + B + ' Z';
+    svg.appendChild(el('path', { d: d, fill: C['--accent'], opacity: 0.10 }));
+
+    var dl = '';
+    LEVELS.forEach(function (v, i) { dl += (i ? ' L' : 'M') + xs(i).toFixed(2) + ',' + ys(v).toFixed(2); });
+    svg.appendChild(el('path', { d: dl, fill: 'none', stroke: C['--accent'], 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+
+    var lx = xs(LEVELS.length - 1), ly = ys(LEVELS[LEVELS.length - 1]);
+    svg.appendChild(el('circle', { cx: lx, cy: ly, r: 6, fill: C['--surface'] }));
+    svg.appendChild(el('circle', { cx: lx, cy: ly, r: 4, fill: C['--accent'] }));
+    svg.appendChild(text(lx - 4, ly - 13, 'B1+', { anchor: 'end', fill: C['--ink'], size: 12, weight: 650, family: 'Inter, system-ui, sans-serif', ls: '0' }));
+
+    svg.appendChild(el('line', { x1: L, y1: B, x2: R, y2: B, stroke: C['--hairline'], 'stroke-width': 1 }));
+    [[0,'Şub'],[4,'Mar'],[8,'Nis'],[12,'May'],[16,'Haz'],[20,'Tem'],[25,'Ağu']].forEach(function (t) {
+      svg.appendChild(text(xs(t[0]), B + 19, t[1], { anchor: t[0] === 25 ? 'end' : 'middle' }));
+    });
+
+    var cross = el('line', { y1: T, y2: B, stroke: C['--hairline'], 'stroke-width': 1, opacity: 0 });
+    var dot = el('circle', { r: 4.5, fill: C['--accent'], stroke: C['--surface'], 'stroke-width': 2, opacity: 0 });
+    svg.appendChild(cross); svg.appendChild(dot);
+
+    var hit = el('rect', { x: L, y: T, width: R - L, height: B - T, fill: 'transparent' });
+    svg.appendChild(hit);
+    hit.addEventListener('mousemove', function (e) {
+      var box = svg.getBoundingClientRect();
+      var px = (e.clientX - box.left) / box.width * 540;
+      var i = Math.round((px - L) / ((R - L) / (LEVELS.length - 1)));
+      i = Math.max(0, Math.min(LEVELS.length - 1, i));
+      cross.setAttribute('x1', xs(i)); cross.setAttribute('x2', xs(i)); cross.setAttribute('opacity', 1);
+      dot.setAttribute('cx', xs(i)); dot.setAttribute('cy', ys(LEVELS[i])); dot.setAttribute('opacity', 1);
+      showTip(e, '<span class="t-label">' + WEEKS[i] + '</span><span class="t-row"><span class="t-sw" style="background:' + C['--accent'] + '"></span>tahmin <b>' + band(LEVELS[i]) + '</b> · ' + LEVELS[i].toFixed(2) + '</span>');
+    });
+    hit.addEventListener('mouseleave', function () {
+      cross.setAttribute('opacity', 0); dot.setAttribute('opacity', 0); hideTip();
+    });
+
+    renderTable('tbl-level', ['Hafta','Tahmin','Ham'], LEVELS.map(function (v, i) { return [WEEKS[i], band(v), v.toFixed(2)]; }));
+  }
+
+  var FAM = [
+    { name: 'Gramer',      first: 4.2, now: 0.8, stuck: false },
+    { name: 'TR kaynaklı', first: 3.1, now: 2.3, stuck: true  },
+    { name: 'Sözcük',      first: 2.6, now: 0.6, stuck: false },
+    { name: 'Söylem',      first: 1.4, now: 0.3, stuck: false },
+    { name: 'Mekanik',     first: 0.4, now: 0.1, stuck: false }
+  ];
+
+  function buildFam() {
+    var svg = document.getElementById('plot-fam');
+    svg.innerHTML = '';
+    var L = 86, R = 504, T = 16, B = 146, max = 4.5;
+    var xs = function (v) { return L + v / max * (R - L); };
+    var step = (B - T) / FAM.length;
+
+    [0,1,2,3,4].forEach(function (v) {
+      svg.appendChild(el('line', { x1: xs(v), y1: T, x2: xs(v), y2: B, stroke: C['--grid'], 'stroke-width': 1 }));
+      svg.appendChild(text(xs(v), B + 19, String(v), { anchor: 'middle' }));
+    });
+    svg.appendChild(el('line', { x1: L, y1: B, x2: R, y2: B, stroke: C['--hairline'], 'stroke-width': 1 }));
+    svg.appendChild(text(R, B + 35, '100 kelimede hata', { anchor: 'end' }));
+
+    FAM.forEach(function (r, i) {
+      var y = T + step * i + step / 2;
+      var endCol = r.stuck ? C['--error'] : C['--accent'];
+
+      svg.appendChild(text(L - 13, y + 3.5, r.name, { anchor: 'end', fill: r.stuck ? C['--ink-2'] : C['--ink-3'] }));
+      svg.appendChild(el('line', {
+        x1: xs(r.now), y1: y, x2: xs(r.first), y2: y,
+        stroke: r.stuck ? C['--error'] : C['--suspect'], 'stroke-width': 3,
+        'stroke-linecap': 'round', opacity: r.stuck ? 0.7 : 0.55
+      }));
+      svg.appendChild(el('circle', { cx: xs(r.first), cy: y, r: 7, fill: C['--surface'] }));
+      svg.appendChild(el('circle', { cx: xs(r.first), cy: y, r: 4.5, fill: C['--suspect'] }));
+      svg.appendChild(el('circle', { cx: xs(r.now), cy: y, r: 7.5, fill: C['--surface'] }));
+      svg.appendChild(el('circle', { cx: xs(r.now), cy: y, r: 5, fill: endCol }));
+
+      if (r.stuck) {
+        svg.appendChild(text(xs(r.first) + 15, y + 3.5, '3.1 → 2.3 · azalmıyor', { fill: C['--error'], size: 10 }));
+      }
+
+      var hit = el('rect', { x: L, y: y - step / 2, width: R - L, height: step, fill: 'transparent' });
+      svg.appendChild(hit);
+      hit.addEventListener('mousemove', function (e) {
+        var drop = (r.first - r.now) / r.first * 100;
+        showTip(e, '<span class="t-label">' + r.name + '</span>'
+          + '<span class="t-row"><span class="t-sw" style="background:' + C['--suspect'] + '"></span>İlk ay <b>' + r.first.toFixed(1) + '</b></span>'
+          + '<span class="t-row"><span class="t-sw" style="background:' + endCol + '"></span>Bu ay <b>' + r.now.toFixed(1) + '</b> · %' + Math.round(drop) + ' düşüş</span>');
+      });
+      hit.addEventListener('mouseleave', hideTip);
+    });
+
+    document.getElementById('sw-first').style.background = C['--suspect'];
+    document.getElementById('sw-now').style.background = C['--accent'];
+    document.getElementById('sw-stuck').style.background = C['--error'];
+
+    renderTable('tbl-fam', ['Aile','İlk ay','Bu ay','Değişim'], FAM.map(function (r) {
+      return [r.name, r.first.toFixed(1), r.now.toFixed(1), '−%' + Math.round((r.first - r.now) / r.first * 100)];
+    }));
+  }
+
+  var TRADE = [
+    { name: 'Yanlış alarm', v6: 14.8, v7: 6.2 },
+    { name: 'Yakalama',     v6: 86.0, v7: 84.1 }
+  ];
+
+  function buildTrade() {
+    var svg = document.getElementById('plot-tradeoff');
+    svg.innerHTML = '';
+    var L = 108, R = 500, T = 16, B = 112, max = 100;
+    var xs = function (v) { return L + v / max * (R - L); };
+    var gh = (B - T) / TRADE.length, barH = 16, gap = 2;
+
+    [0,25,50,75,100].forEach(function (v) {
+      svg.appendChild(el('line', { x1: xs(v), y1: T, x2: xs(v), y2: B, stroke: C['--grid'], 'stroke-width': 1 }));
+      svg.appendChild(text(xs(v), B + 19, String(v), { anchor: 'middle' }));
+    });
+    svg.appendChild(el('line', { x1: L, y1: T, x2: L, y2: B, stroke: C['--hairline'], 'stroke-width': 1 }));
+    svg.appendChild(text(R, B + 35, 'yüzde', { anchor: 'end' }));
+
+    TRADE.forEach(function (g, i) {
+      var top = T + gh * i + (gh - (barH * 2 + gap)) / 2;
+      svg.appendChild(text(L - 13, top + barH + gap / 2 + 3, g.name, { anchor: 'end', fill: C['--ink-2'] }));
+
+      [['v6', g.v6, C['--suspect'], top], ['v7', g.v7, C['--accent'], top + barH + gap]].forEach(function (b) {
+        var w = xs(b[1]) - L;
+        svg.appendChild(el('rect', { x: L, y: b[3], width: Math.max(w, 3), height: barH, fill: b[2], rx: 4, ry: 4 }));
+        svg.appendChild(el('rect', { x: L, y: b[3], width: 4, height: barH, fill: b[2] }));
+        svg.appendChild(text(L + w + 10, b[3] + barH / 2 + 3.5, b[1].toFixed(1) + '%', { fill: C['--ink-2'], size: 10.5 }));
+
+        var hit = el('rect', { x: L, y: b[3] - 4, width: R - L, height: barH + 8, fill: 'transparent' });
+        svg.appendChild(hit);
+        hit.addEventListener('mousemove', function (e) {
+          showTip(e, '<span class="t-label">' + g.name + ' · prompt ' + b[0] + '</span><span class="t-row"><span class="t-sw" style="background:' + b[2] + '"></span><b>' + b[1].toFixed(1) + '%</b></span>');
+        });
+        hit.addEventListener('mouseleave', hideTip);
+      });
+    });
+
+    document.getElementById('sw-v6').style.background = C['--suspect'];
+    document.getElementById('sw-v7').style.background = C['--accent'];
+  }
+
+  function buildAll() { readColors(); buildLevel(); buildFam(); buildTrade(); }
+  document.addEventListener('rung:theme', buildAll);
+  buildAll();
+}());
+</script>
+</body>
+</html>

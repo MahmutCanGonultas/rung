@@ -1,0 +1,9 @@
+# macOS'un bıraktığı dosyalar
+.DS_Store
+
+# Gizli anahtarlar — asla depoya girmez
+.env
+.env.local
+
+# Günlük dosyaları
+*.log
