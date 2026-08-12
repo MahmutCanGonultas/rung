@@ -98,6 +98,16 @@
 .steps li code { font-family: var(--mono); font-size: 12.5px; background: var(--surface-2); border-radius: 4px; padding: 1px 6px; color: var(--ink); }
 .steps li.now::before { background: var(--accent); color: var(--plane); font-weight: 700; }
 .steps li.now { color: var(--ink); }
+.steps li.done { color: var(--ink-3); }
+.steps li.done::before { content: "✓"; background: var(--accent-wash); color: var(--accent); font-size: 11px; }
+.steps li.done b { color: var(--ink-3); font-weight: 500; }
+.steps li.done code { color: var(--ink-3); background: transparent; padding: 0; }
+
+.stage-progress { display: flex; align-items: center; gap: 13px; margin: 16px 0 0; }
+.stage-progress .track { flex: 1; display: block; height: 4px; border-radius: 2px; background: var(--surface-3); overflow: hidden; }
+.stage-progress .fill { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+.stage-progress .n { font-family: var(--mono); font-size: 10px; letter-spacing: 0.09em; color: var(--ink-3); white-space: nowrap; }
+
 .steps li .here {
   font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--accent); border: 1px solid var(--accent-line); border-radius: 4px;
@@ -143,14 +153,15 @@
     <div class="eyebrow">Rung · yol haritası · 12 Ağustos 2026</div>
     <h1>Sıfırdan finale,<br><em>adım adım.</em></h1>
     <p class="lede">
-      Önce projenin ne olduğu — beş kutuda. Sonra dokuz aşama ve <b>83 adım</b>: her biri tek
+      Önce projenin ne olduğu — beş kutuda. Sonra dokuz aşama ve <b>89 adım</b>: her biri tek
       oturumda bitecek büyüklükte, sırası bağlayıcı.
     </p>
     <div class="strip">
       <span class="chip">9 aşama</span>
-      <span class="chip">83 adım</span>
+      <span class="chip">89 adım</span>
       <span class="chip">~62 saat</span>
-      <span class="chip t-accent">şu an: aşama 00 · adım 5</span>
+      <span class="chip t-accent">13 / 89 adım tamam</span>
+      <span class="chip t-accent">şu an: aşama 00 · adım 14</span>
     </div>
   </header>
 
@@ -248,22 +259,32 @@
     <article class="stage now">
       <span class="pin">00</span>
       <div class="stage-card">
-        <div class="stage-top"><h3>İskelet ve ilk yayın</h3><span class="hrs">~5 saat · 15 adım</span></div>
+        <div class="stage-top"><h3>İskelet ve ilk yayın</h3><span class="hrs">~5 saat · 21 adım</span></div>
         <p class="stage-what">Boş ama uçtan uca çalışan, canlıda duran bir temel. Kod yok — ama internette bir adres var.</p>
+        <div class="stage-progress">
+          <span class="track"><span class="fill" style="width:61.9%"></span></span>
+          <span class="n">13 / 21 tamam</span>
+        </div>
         <ol class="steps">
-          <li>Terminali aç, doğru klasörde olduğunu doğrula</li>
-          <li><code>git init -b main</code> — klasörü bir depoya çevir</li>
-          <li><code>git status</code> — git şu an ne görüyor, çıktıyı okumayı öğren</li>
-          <li><code>.gitignore</code> — neyin takip edilmeyeceğine karar ver</li>
-          <li class="now"><code>git add</code> — <b>sahneleme alanı</b> nedir, neden iki ayrı komut <span class="here">şu an burada</span></li>
-          <li><code>git commit</code> — <b>Conventional Commits</b> biçimi ve iyi mesaj nasıl yazılır</li>
-          <li>GitHub'da boş depo aç — uzak depo (<b>remote</b>) nedir</li>
-          <li><code>git remote add origin</code> — yereli uzağa bağla</li>
-          <li><code>git push -u origin main</code> — ilk yükleme</li>
-          <li>Next.js'i kur — <b>paket yöneticisi</b> ve <code>package.json</code> nedir</li>
-          <li>TypeScript katı modunu aç — neyi yakalıyor</li>
-          <li><code>npm run dev</code> — yerel sunucu ve <code>localhost</code> nedir</li>
-          <li>Ortam değişkeni ve <code>.env.local</code> — gizli anahtar nasıl saklanır</li>
+          <li class="done">Terminali aç, doğru klasörde olduğunu doğrula</li>
+          <li class="done"><code>git init -b main</code> — klasörü bir depoya çevir</li>
+          <li class="done"><code>git status</code> — çıktı okumayı öğren</li>
+          <li class="done"><code>.gitignore</code> — neyin takip edilmeyeceği</li>
+          <li class="done"><code>git add</code> — sahneleme alanı</li>
+          <li class="done"><code>git commit</code> — Conventional Commits</li>
+          <li class="done">GitHub'da boş depo aç — uzak depo nedir</li>
+          <li class="done"><code>git remote add origin</code></li>
+          <li class="done"><code>git push</code> — kod artık iki yerde</li>
+          <li class="done">Node.js ve npm — JavaScript tarayıcının dışında</li>
+          <li class="done"><code>npm init</code> — <code>package.json</code> doğuyor</li>
+          <li class="done"><code>npm install next react react-dom</code> — bağımlılık, kilit dosyası</li>
+          <li class="done"><code>.gitignore</code>'u genişlet — <code>node_modules/</code>, <code>.next/</code></li>
+          <li class="now">İkinci commit — <b>her iş biriminde commit</b> kuralını uygula <span class="here">şu an burada</span></li>
+          <li><code>app/layout.tsx</code> — App Router ve kök şablon</li>
+          <li><code>app/page.tsx</code> — ilk sayfa, JSX nedir</li>
+          <li><code>npm run dev</code> — betik nedir, <code>localhost</code> nedir</li>
+          <li>TypeScript ve <b>katı mod</b> — neyi yakalıyor</li>
+          <li><code>.env.local</code> — gizli anahtar nasıl saklanır</li>
           <li>PostgreSQL veritabanı aç, bağlantıyı test et</li>
           <li>Vercel'e bağla — <b>ilk yayın</b>, canlı adres</li>
         </ol>
