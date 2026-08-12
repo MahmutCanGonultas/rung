@@ -66,6 +66,10 @@ Hiçbiri Aşama 0'ı bloke etmiyor.
 
 **12 Ağustos 2026 · Aşama 00 — 14 / 21 adım tamam.**
 
+> Tasarım sayfaları **kendi kendine yeter**: CSS ve JS her HTML'in içinde gömülü, paylaşılan dosya yok.
+> Bu yüzden bir renk/tipografi değişikliğinde **üç dosyanın üçü de** güncellenir:
+> `design/product.html`, `design/roadmap.html`, `design/lesson/stage-00.html`.
+
 Yapılanlar: git deposu kuruldu (`main` dalı), GitHub'a bağlandı ve push edildi, `.gitignore` yazıldı,
 üç commit atıldı, Node/npm doğrulandı, `npm init` ile `package.json` oluşturuldu,
 `next` + `react` + `react-dom` kuruldu.

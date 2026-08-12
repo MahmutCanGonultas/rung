@@ -345,6 +345,8 @@ Değişen kural, ve en önemlisi:
 | 2026-08-12 | **Veritabanı: Neon — bulut PostgreSQL.** Tek veritabanıyla başlanıyor; hem yerelden hem Vercel'den aynı bağlantı dizesi kullanılacak. **Gerekçe:** Aşama 00'ın bitiş kriteri *"canlı adreste açılan sayfa, veritabanına bağlı"* diyor — sadece yerel Postgres bunu karşılayamaz, çünkü Vercel laptopa ulaşamaz. Ayrıca kurulum yükü sıfır ve öğrenilecek tek bir kavram var. **Bedeli, bilerek kabul edildi:** internet olmadan geliştirilemez, ve bir süre geliştirme ortamı canlıyla aynı veritabanını kullanacak. **Elenenler:** sadece yerel Postgres (Vercel erişemez), SQLite (Vercel'de disk kalıcı değil), Supabase (şimdilik gereksiz kapsam), Vercel Postgres (zaten arka planda Neon). |
 | 2026-08-12 | Geliştirme ve canlı veritabanını ayırma işi ertelendi. Gerektiğinde **Neon'un dallanma özelliği** kullanılacak — veritabanının kopyasını git dalı gibi çıkarıyor. Muhtemelen Aşama 02, tablolarla oynamaya başlayınca. |
 
+| 2026-08-12 | **`theme.css` ve `theme.js` kaldırıldı; her sayfa kendi CSS ve JS'ini içinde taşıyor.** Kullanıcı kararı — sayfalar tek başına taşınabilir olsun diye. Her sayfaya *sadece kullandığı kurallar* gömüldü (416 / 329 / 342 satır), ölü kurallar atıldı. **Bedeli, bilerek kabul edildi:** jetonlar üç yerde duruyor, bir renk değişirse üç dosya da düzenlenmeli. Her dosyanın başında bunu hatırlatan bir uyarı var. |
+
 ### Hâlâ açık
 
 - **Yurtdışı hedefi** — Türkiye'den uzaktan yabancı şirkete mi, taşınmak mı, önce eğitim mi?
