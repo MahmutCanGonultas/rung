@@ -1,0 +1,28 @@
+{
+  "name": "rung",
+  "version": "0.1.0",
+  "description": "English diagnosis and progress tracker for Turkish speakers",
+  "homepage": "https://github.com/MahmutCanGonultas/rung#readme",
+  "bugs": {
+    "url": "https://github.com/MahmutCanGonultas/rung/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MahmutCanGonultas/rung.git"
+  },
+  "license": "MIT",
+  "author": "MCG",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "next": "^16.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  }
+}
