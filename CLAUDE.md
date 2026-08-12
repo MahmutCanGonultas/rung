@@ -49,7 +49,8 @@ HTML, CSS ve temel JavaScript yazabiliyor; benzetmeleri oraya bağlamak işe yar
 - **İsim: Rung.** Repo, klasör, veritabanı, commit'ler hep bu. Değişmez.
 - **Koyu + açık tema.** Koyu varsayılan, açık tema ek. Her iki paletin de renk körlüğü ve
   kontrast açısından ayrıca doğrulanması gerekiyor — göz kararı renk seçilmez.
-- **Teknoloji kararları kilitli değil.** `docs/plan.md` §10'daki liste öneridir. Her seçim sırası
+- **Veritabanı: Neon (bulut PostgreSQL).** Tek veritabanı; yerel kurulum yok. Dev/prod ayrımı gerektiğinde Neon dallanması.
+- **Kalan teknoloji kararları kilitli değil.** `docs/plan.md` §10'daki liste öneridir. Her seçim sırası
   geldiğinde dört soruyla açılır ve **kararı kullanıcı verir**: bu ne yapıyor · onsuz ne olurdu ·
   alternatifi neydi · neden bu.
 
@@ -63,6 +64,33 @@ Hiçbiri Aşama 0'ı bloke etmiyor.
 
 ## Durum
 
-**12 Ağustos 2026** — henüz uygulama kodu yok, git yok. Hazır olanlar: `design/product.html` (ürün, beş ekran), `design/roadmap.html` (kısa bilgi + 79 adım), `design/theme.css` + `theme.js` (tema jetonları), `docs/plan.md` (tam plan + karar günlüğü).
+**12 Ağustos 2026 · Aşama 00 — 14 / 21 adım tamam.**
 
-**Sıradaki adım: Aşama 0 — klasör ve git.** İlk konu: sürüm kontrolü ne işe yarar, `git init` ne yapıyor.
+Yapılanlar: git deposu kuruldu (`main` dalı), GitHub'a bağlandı ve push edildi, `.gitignore` yazıldı,
+üç commit atıldı, Node/npm doğrulandı, `npm init` ile `package.json` oluşturuldu,
+`next` + `react` + `react-dom` kuruldu.
+
+### SIRADAKİ ADIM — Aşama 00 · Adım 15: TypeScript
+
+```bash
+npm install -D typescript @types/react @types/node
+```
+
+Anlatılacaklar: TypeScript nedir (JavaScript + tip katmanı, yeni dil değil) · `@types/*` paketleri
+neden ayrı (React düz JS ile yazılmış, tipleri DefinitelyTyped'dan geliyor) · `-D` bayrağı ve
+`devDependencies` — ölçüt: *canlıdaki sunucu buna ihtiyaç duyuyor mu?* Sunucuya derlenmiş JS gidiyor,
+TypeScript derleyicisi orada yok.
+
+Kontrol sorusu hazır: *`react` neden `dependencies`'te ama `@types/react` `devDependencies`'te?*
+
+### Aşama 00'da kalanlar
+
+15 TypeScript · 16 `app/layout.tsx` (App Router, kök şablon) · 17 `app/page.tsx` (JSX) ·
+18 `npm run dev` (betik, localhost) · 19 `tsconfig.json` + katı mod · 20 `.env.local` + Neon
+bağlantısı · 21 Vercel ile ilk yayın.
+
+### Ders notları
+
+Her aşamanın notu `design/lesson/` altında, aynı kalıpta: hızlı bakış komut kartı → adım adım
+kavramlar → tuzaklar tek listede → sözlük. Aşama 00: [`design/lesson/stage-00.html`](design/lesson/stage-00.html).
+**Her adımdan sonra `design/roadmap.html` içindeki ilerleme işaretleri güncellenir.**

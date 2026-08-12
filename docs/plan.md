@@ -206,7 +206,7 @@ neydi · neden bu.*
 |---|---|---|
 | Çerçeve | Next.js | Tek uygulama, sunucu ve arayüz bir arada. Alternatif: ayrı API + arayüz — daha öğretici ama daha yavaş. |
 | Dil | TypeScript | Şema ve tip aynı yerden gelsin. Katı mod açık. |
-| Veritabanı | PostgreSQL | İlişkisel model gerçekten gerekiyor: kayıt → analiz → bulgu → geri bildirim zinciri. |
+| Veritabanı | **PostgreSQL · Neon** ✔ karar verildi | İlişkisel model gerçekten gerekiyor: kayıt → analiz → bulgu → geri bildirim zinciri. Barındırma Neon'da (bulut) — gerekçe karar günlüğünde. |
 | Model erişimi | Sağlayıcı soyutlaması | Sağlayıcıya özgü API yok, her şey ortam değişkeni. Sağlayıcı değiştirmek bir günlük iş olmalı. |
 | Deterministik katman | Açık kaynak dil aracı | Yazım ve temel kurallar için. Aşama 3'te iki alternatif denenip ölçülecek. |
 | Test | Birim testi | Özellikle K0 katmanı ve eval hesapları — deterministik, test edilmeye en uygun yer. |
@@ -341,6 +341,9 @@ Değişen kural, ve en önemlisi:
 | 2026-08-12 | **Beşinci ekran: Geçmiş.** Eski kayıtlara erişim, arama, bağlama göre süzme, aynı görevin tekrarını işaretleme. Aşama 02'nin kapsamına girdi. |
 | 2026-08-12 | **Tipografi:** arayüz **Inter**, büyük başlıklar **Instrument Serif**, veri ve etiketler sistem monospace. İkisi de indirilemezse sisteme düşer, düzen bozulmaz. |
 | 2026-08-12 | Yol haritası dokuz aşamadan **79 somut adıma** açıldı. |
+
+| 2026-08-12 | **Veritabanı: Neon — bulut PostgreSQL.** Tek veritabanıyla başlanıyor; hem yerelden hem Vercel'den aynı bağlantı dizesi kullanılacak. **Gerekçe:** Aşama 00'ın bitiş kriteri *"canlı adreste açılan sayfa, veritabanına bağlı"* diyor — sadece yerel Postgres bunu karşılayamaz, çünkü Vercel laptopa ulaşamaz. Ayrıca kurulum yükü sıfır ve öğrenilecek tek bir kavram var. **Bedeli, bilerek kabul edildi:** internet olmadan geliştirilemez, ve bir süre geliştirme ortamı canlıyla aynı veritabanını kullanacak. **Elenenler:** sadece yerel Postgres (Vercel erişemez), SQLite (Vercel'de disk kalıcı değil), Supabase (şimdilik gereksiz kapsam), Vercel Postgres (zaten arka planda Neon). |
+| 2026-08-12 | Geliştirme ve canlı veritabanını ayırma işi ertelendi. Gerektiğinde **Neon'un dallanma özelliği** kullanılacak — veritabanının kopyasını git dalı gibi çıkarıyor. Muhtemelen Aşama 02, tablolarla oynamaya başlayınca. |
 
 ### Hâlâ açık
 
