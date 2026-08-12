@@ -7,3 +7,10 @@
 
 # Günlük dosyaları
 *.log
+
+# Bağımlılıklar — package.json'dan her zaman geri gelir
+node_modules/
+
+# Next.js'in derleme çıktısı
+.next/
+out/
