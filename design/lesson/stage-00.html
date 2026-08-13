@@ -1086,8 +1086,12 @@ branch 'main' set up to track 'origin/main'.</span></code></pre>
       <p><b>Üst seviye <code>type</code></b> — modül sistemi. <code>commonjs</code> (varsayılan,
       <code>require()</code>) veya <code>module</code> (<code>import</code>).
       Meşhur <code>Cannot use import statement outside a module</code> hatası buradan çıkar.</p>
-      <p>Bizde <code>commonjs</code> kaldı: Next.js <code>.tsx</code> dosyalarını kendi derleyicisiyle
-      işliyor, bu alana bakmıyor. <code>module</code> seçersek yapılandırma dosyaları sorun çıkarır.</p>
+      <p><b>Burada hata yaptık.</b> <code>commonjs</code> bırakmıştık; gerekçem "Next.js
+      <code>.tsx</code>'i kendi derleyicisiyle işliyor, bu alana bakmıyor" idi. <b>Yanlıştı</b> —
+      Next.js 16'nın paketleyicisi (Turbopack) bu alanı okuyor ve <code>import/export</code> gören
+      dosyada <i>"Specified module format (CommonJs) is not matching..."</i> diye patlıyor.</p>
+      <p><b>Doğrusu:</b> <code>type</code> alanını <b>hiç yazmamak.</b> Next.js'in kendi kurulum aracı da
+      yazmıyor. Alan yoksa paketleyici dosya bazında karar veriyor, çakışacak bir beyan olmuyor.</p>
     </div>
 
     <div class="box tip">
