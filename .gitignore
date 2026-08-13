@@ -14,3 +14,7 @@ node_modules/
 # Next.js'in derleme çıktısı
 .next/
 out/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
