@@ -172,7 +172,7 @@ Renk sadece *anlam* taşıdığında — turuncu hata, sarı öneri, gri şüphe
 4. **Doğruluk panosu** — projenin vitrini. Yanlış alarm, yakalama, altın küme boyutu, kayıt başı
    maliyet, ve **seviye kırılımlı isabet**. Zayıf yer gizlenmez.
 
-Çalışan maket: [`../design/product.html`](../design/product.html)
+Çalışan maket: [`design/product.html`](design/product.html)
 
 ---
 
