@@ -347,6 +347,8 @@ Değişen kural, ve en önemlisi:
 
 | 2026-08-12 | **`theme.css` ve `theme.js` kaldırıldı; her sayfa kendi CSS ve JS'ini içinde taşıyor.** Kullanıcı kararı — sayfalar tek başına taşınabilir olsun diye. Her sayfaya *sadece kullandığı kurallar* gömüldü (416 / 329 / 342 satır), ölü kurallar atıldı. **Bedeli, bilerek kabul edildi:** jetonlar üç yerde duruyor, bir renk değişirse üç dosya da düzenlenmeli. Her dosyanın başında bunu hatırlatan bir uyarı var. |
 
+| 2026-08-14 | **Proje sonunda PDF çıkarılacak: "Sıfırdan Next.js".** Kullanıcı isteği. Kaynak malzeme aşama ders notları (`docs/lessons/stage-NN.html`) — her aşama bir bölüm. Şartlar: sıfırdan başlasın, detaylı olsun, **eğlenceli ve resimli** olsun, sıkıcı olmasın. **Bunun bugünden itibaren çalışma şekline etkisi:** her ders notuna en az bir diyagram girecek (Aşama 00'daki sahneleme alanı şeması gibi), biçim aşamalar arasında aynı kalacak, ve baskı için açık tema kullanılacak. Üretim: birleşik HTML → Chrome `--print-to-pdf`. **Zamanlama: bütün aşamalar bitince** (Aşama 08 sonu). |
+
 ### Hâlâ açık
 
 - **Yurtdışı hedefi** — Türkiye'den uzaktan yabancı şirkete mi, taşınmak mı, önce eğitim mi?
