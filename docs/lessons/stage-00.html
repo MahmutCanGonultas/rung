@@ -628,13 +628,13 @@ figure.diagram figcaption { font-size: 13px; color: var(--ink-3); margin-top: 12
     <div class="eyebrow">Rung · ders notları · aşama 00</div>
     <h1>İskelet ve ilk yayın</h1>
     <p class="lede">
-      Terminalden canlı yayına. Bu notta 14 adımın tamamı var: her adımın <b>neden</b> yapıldığı,
+      Terminalden canlı yayına. Bu notta 21 adımın tamamı var: her adımın <b>neden</b> yapıldığı,
       hangi komutun ne işe yaradığı, ve özellikle <b>nerede takılınıyor.</b>
     </p>
     <div class="strip">
-      <span class="chip t-accent">14 / 21 adım tamam</span>
-      <span class="chip">git · node · npm</span>
-      <span class="chip t-suggest">TypeScript'te ara verildi</span>
+      <span class="chip t-accent">21 / 21 adım tamam</span>
+      <span class="chip">git · node · npm · next · typescript</span>
+      <span class="chip t-accent">canlıda: rung-plum.vercel.app</span>
     </div>
   </header>
 
@@ -661,6 +661,11 @@ figure.diagram figcaption { font-size: 13px; color: var(--ink-3); margin-top: 12
       <tr><td><code>npm init</code></td><td><code>package.json</code> oluştur</td></tr>
       <tr><td><code>npm install &lt;paket&gt;</code></td><td>Paket kur → <code>dependencies</code></td></tr>
       <tr><td><code>npm install -D &lt;paket&gt;</code></td><td>Geliştirme paketi kur → <code>devDependencies</code></td></tr>
+      <tr><td><code>npm run dev</code></td><td>Geliştirme sunucusu. Durdurmak: <kbd>Ctrl</kbd>+<kbd>C</kbd></td></tr>
+      <tr><td><code>npm run build</code></td><td>Canlıya hazır derleme. <b>Tip hatasında durur</b></td></tr>
+      <tr><td><code>npx tsc --noEmit</code></td><td>Sadece tip kontrolü yap, dosya üretme</td></tr>
+      <tr><td><code>git check-ignore -v &lt;dosya&gt;</code></td><td>Bu dosyayı hangi kural yok sayıyor</td></tr>
+      <tr><td><code>git status -sb</code></td><td>İlk satır: <code>ahead N</code> = push edilmemiş N commit</td></tr>
     </table>
   </div>
 
@@ -1162,6 +1167,315 @@ branch 'main' set up to track 'origin/main'.</span></code></pre>
     </div>
   </section>
 
+
+  <!-- ══ 15 ══ -->
+  <section class="step">
+    <div class="step-head"><span class="step-n">15</span><h2>TypeScript</h2></div>
+    <p>
+      <code>"74" / 4</code> JavaScript'te <b>18.5</b> verir — çalışır ama yanlıştır, hata da fırlatmaz.
+      <b>Sessizce yanlış olan kod, gürültülü şekilde çöken koddan tehlikelidir.</b>
+    </p>
+
+    <h3>Yeni dil değil</h3>
+    <p>Her geçerli JavaScript, geçerli TypeScript. Üstüne tip işaretleri ekliyorsun.</p>
+
+    <div class="box term">
+      <span class="k">en önemli cümle</span>
+      <b>TypeScript çalışmaz.</b> Sunucuya ve tarayıcıya giden şey derlenmiş JavaScript;
+      tip işaretleri derlemede siliniyor.
+      <p>Yani TypeScript senin koduna ne yapıyorsa, <b>Rung senin İngilizcene onu yapıyor</b> —
+      okur, "burası yanlış" der, metnin kendisine dokunmaz. Denetleyici, çalıştırıcı değil.</p>
+    </div>
+
+    <h3>Üç paket</h3>
+    <table class="tbl">
+      <tr><td><code>typescript</code></td><td>Derleyicinin kendisi</td></tr>
+      <tr><td><code>@types/react</code></td><td>React'in tip tanımları</td></tr>
+      <tr><td><code>@types/node</code></td><td>Node yerleşiklerinin tip tanımları</td></tr>
+    </table>
+    <p style="font-size:14px">
+      <code>@types/…</code> paketlerinin içinde <b>çalışan tek satır kod yok</b> — sadece tanım.
+      React düz JavaScript ile yazılmış, tip bilgisi taşımıyor. Bu paketler onun
+      <b>kullanma kılavuzu</b>, <i>DefinitelyTyped</i> adlı topluluk projesinden geliyor.
+    </p>
+
+    <div class="box tip">
+      <span class="k">-D bayrağı</span>
+      <code>-D</code> = <code>--save-dev</code> → <code>devDependencies</code>.
+      Ölçüt tek soru: <b>canlıdaki sunucu buna ihtiyaç duyuyor mu?</b>
+      <p><code>react</code> <b>çalışıyor</b> → <code>dependencies</code>.
+      <code>@types/react</code> sadece <b>kılavuz</b> → <code>devDependencies</code>.
+      Kılavuz derleme bitince yerde kalıyor.</p>
+    </div>
+  </section>
+
+  <!-- ══ 16 ══ -->
+  <section class="step">
+    <div class="step-head"><span class="step-n">16</span><h2><code>app/layout.tsx</code></h2></div>
+    <p>
+      Her sitede iki tür parça var: <b>her sayfada tekrar eden</b> (üst bar, logo) ve
+      <b>o sayfaya özel</b> olan. Tekrar edeni her dosyaya kopyalarsan, logoyu değiştirmek
+      beş dosya düzenlemek olur.
+    </p>
+    <table class="tbl">
+      <tr><td><code>layout.tsx</code></td><td>Tekrar eden kabuk — <b>bir kere</b> yazılır</td></tr>
+      <tr><td><code>page.tsx</code></td><td>O adresin kendine özel içeriği</td></tr>
+    </table>
+
+    <h3>App Router</h3>
+    <p>Ayrı bir rota listesi yok — <b>klasör yapısı adresin kendisi.</b></p>
+    <table class="tbl">
+      <tr><td><code>app/page.tsx</code></td><td><code>/</code></td></tr>
+      <tr><td><code>app/gecmis/page.tsx</code></td><td><code>/gecmis</code></td></tr>
+      <tr><td><code>app/entries/[id]/page.tsx</code></td><td><code>/entries/42</code></td></tr>
+    </table>
+
+    <div class="box principle">
+      <span class="k">isimler neden sabit</span>
+      Next.js klasörü tarıyor ve "hangisi sayfa, hangisi kabuk" diye soruyor. İsimler serbest olsa
+      ya dosyaları açıp tahmin etmesi ya da sana bir liste yazdırması gerekirdi.
+      <p><b>Dosyanın adı, o listenin kendisidir.</b> Liste yok, çünkü liste klasör yapısının içinde.</p>
+    </div>
+
+    <div class="box term">
+      <span class="k">hangi isim zorunlu, hangisi serbest</span>
+      <p><code>export default</code> → <b>isim serbest.</b> Next.js "varsayılan"ı alıyor, adına bakmıyor.</p>
+      <p><code>export const metadata</code> → <b>isim zorunlu.</b> Next.js adıyla arıyor.
+      <code>sayfaBilgisi</code> deseydin sessizce görmezden gelirdi.</p>
+      <p>Sabit isimler: <code>app/</code>, <code>layout.tsx</code>, <code>page.tsx</code>,
+      <code>metadata</code>, <code>title</code>, <code>description</code>, <code>children</code>.
+      Serbest olan sadece fonksiyon adları.</p>
+    </div>
+
+    <h3>JSX</h3>
+    <p>JavaScript'in içinde HTML gibi görünen sözdizimi. Üç farkı var:</p>
+    <table class="tbl">
+      <tr><td><code>className</code></td><td><code>class</code> JavaScript'te ayrılmış kelime</td></tr>
+      <tr><td>Tek kök element</td><td>İki kardeş etiketi yan yana döndüremezsin</td></tr>
+      <tr><td><code>{ }</code></td><td>"Buraya JavaScript değeri koy"</td></tr>
+    </table>
+
+    <div class="box tip">
+      <span class="k">children — kabuğun içindeki boşluk</span>
+      Next.js önce <code>Page()</code>'i çalıştırıyor, çıkan sonucu <code>RootLayout</code>'a
+      <code>children</code> olarak veriyor, o da <code>{children}</code> yazan yere koyuyor.
+      <p><b>Layout hangi sayfada olduğunu bilmiyor</b> — sadece boş yer bırakıyor. Resim çerçevesi gibi.</p>
+    </div>
+
+    <div class="box term">
+      <span class="k">iki farklı süslü parantez</span>
+      <pre style="margin:8px 0 0; background:none; border:0; padding:0; font-size:12.5px"><code>function RootLayout({ children }: { children: ReactNode })
+                    └─ JavaScript ─┘  └─── TypeScript ───┘</code></pre>
+      <p>Soldaki <b>destructuring</b> — gelen nesneden <code>children</code>'ı çıkarıyor.
+      Sağdaki o nesnenin <b>tipi</b>. Sağdakini silersen kod yine çalışır; soldakini silersen bozulur.</p>
+    </div>
+  </section>
+
+  <!-- ══ 17 ══ -->
+  <section class="step">
+    <div class="step-head"><span class="step-n">17</span><h2><code>app/page.tsx</code></h2></div>
+    <p>
+      <code>page.tsx</code> = "bu klasörün sayfası". <code>app/</code> içinde durduğu için adresi <code>/</code>.
+    </p>
+    <ul>
+      <li><b>Parametre yok</b> — layout <code>children</code> alıyordu çünkü içine bir şey konacaktı.
+        Sayfa <b>en içteki</b> şey, içine bir şey konmuyor.</li>
+      <li><code>&lt;main&gt;</code> tek kök element olarak var, çünkü <code>&lt;h1&gt;</code> ve
+        <code>&lt;p&gt;</code>'yi saran bir şey gerekiyordu.</li>
+    </ul>
+  </section>
+
+  <!-- ══ 18 ══ -->
+  <section class="step">
+    <div class="step-head"><span class="step-n">18</span><h2><code>npm run dev</code></h2></div>
+
+    <h3>Betik nedir</h3>
+    <p>
+      <code>package.json</code>'daki <code>scripts</code> bölümü, projeye özel komut kısayolları.
+      <code>npx next dev</code> de yazabilirdin — ama betik olarak yazınca hatırlaman gerekmiyor,
+      projeye gelen herkes aynı komutu kullanıyor, ve seçenek eklersen tek yerden değişiyor.
+    </p>
+    <table class="tbl">
+      <tr><td><code>dev</code></td><td>Geliştirme sunucusu. Kaydettiğinde tarayıcı yenileniyor</td></tr>
+      <tr><td><code>build</code></td><td>Canlıya hazır derleme — <b>tip hatasında durur</b></td></tr>
+      <tr><td><code>start</code></td><td>Derlenmiş hâli çalıştırır</td></tr>
+    </table>
+
+    <div class="box term">
+      <span class="k">localhost</span>
+      "Bu bilgisayar" anlamına gelen özel adres. <code>3000</code> ise <b>port</b> — aynı makinede
+      birden fazla program ağı dinleyebilsin diye numaralanmış kapılar.
+      <p>Komut bitmiyor, terminal sana dönmüyor: <b>sunucu ayakta ve dinliyor.</b>
+      Durdurmak için <kbd>Ctrl</kbd>+<kbd>C</kbd>.</p>
+    </div>
+
+    <div class="box tip">
+      <span class="k">buradaki keşif — Server Component</span>
+      <code>console.log</code> koyduk ve mesaj <b>tarayıcı konsolunda değil, terminalde</b> çıktı.
+      <p>Çünkü bu bileşen <b>sunucuda</b> çalışıyor. HTML üretiyor, tarayıcıya sadece o HTML gidiyor;
+      fonksiyonun kendisi tarayıcıya hiç ulaşmıyor.</p>
+      <p><b>Sonucu:</b> sunucuda çalışan koda veritabanı şifresi koyabilirsin.
+      İkinci kanıt: sayfa kaynağına bakınca içerik <b>hazır</b> duruyor — klasik React'ta boş bir
+      <code>&lt;div id="root"&gt;</code> görürdün.</p>
+    </div>
+
+    <div class="box term">
+      <span class="k">.next/ klasörü nedir</span>
+      Klasik React'ta <code>import</code> edip <code>render()</code> çağırarak bağlantıyı <b>sen</b> kurardın.
+      Next.js o kodu <b>kendisi üretip</b> <code>.next/</code> içine yazıyor.
+      <p><code>.next/</code> = senin elle yazacağın bağlantı kodunun durduğu yer.
+      Adım 13'te "üretilen şey depoya girmez" diye yok saymıştık — üretilen şey tam olarak buymuş.</p>
+      <p>Adının da bir karşılığı var: <b>kütüphaneyi sen çağırırsın, çerçeve seni çağırır.</b></p>
+    </div>
+  </section>
+
+  <!-- ══ 19 ══ -->
+  <section class="step">
+    <div class="step-head"><span class="step-n">19</span><h2>Katı mod</h2></div>
+    <p>
+      <code>tsconfig.json</code>'ı da Next.js üretti. Önemli dört satır:
+    </p>
+    <table class="tbl">
+      <tr><td><code>include</code> / <code>exclude</code></td><td>Hangi dosyalara bakacağı. <code>node_modules</code> hariç</td></tr>
+      <tr><td><code>jsx: "react-jsx"</code></td><td>JSX'i nasıl anlayacağı</td></tr>
+      <tr><td><code>noEmit: true</code></td><td><b>TypeScript hiç dosya üretmeyecek</b></td></tr>
+      <tr><td><code>strict</code></td><td>Next.js <code>false</code> koyuyor — biz <code>true</code> yaptık</td></tr>
+    </table>
+
+    <div class="box term">
+      <span class="k">kim çeviriyor, kim kontrol ediyor</span>
+      <table class="tbl" style="margin-top:4px">
+        <tr><td><b>Çeviri</b></td><td>Next.js (<b>Turbopack</b>) — tip işaretlerini <b>siler</b>. Aptal iş, milisaniye</td></tr>
+        <tr><td><b>Kontrol</b></td><td><code>typescript</code> — tipleri <b>inceler</b>. Zeki iş, saniye</td></tr>
+      </table>
+      <p>Bu yüzden <code>noEmit: true</code>: <i>"dosya üretme, o iş sende değil — sen sadece kontrol et."</i></p>
+      <p><b>Ne zaman hangisi:</b> editörde sürekli kontrol · <code>npm run dev</code> hata engellemez ·
+      <code>npm run build</code> <b>durdurur</b>.</p>
+    </div>
+
+    <div class="box tip">
+      <span class="k">katı mod ne yakalıyor</span>
+      <p><b>Tipsiz parametre:</b> <code>function f(x)</code> → <i>"x implicitly has an 'any' type"</i></p>
+      <p><b>null kontrolü:</b> <code>el.textContent</code> → <i>"el is possibly null"</i>.
+      JavaScript'te en sık çökme sebebi buydu; katı mod onu <b>sen yazarken</b> yakalıyor.</p>
+      <p>Next.js neden <code>false</code> koyuyor: mevcut bir projeye eklendiğinde yüzlerce hata
+      fırlatabilir. Aracın güvenli varsayılanı — <b>yeni proje için doğru varsayılan değil.</b></p>
+    </div>
+
+    <div class="box term">
+      <span class="k">Turbopack — paketleyici</span>
+      Tarayıcı senin <code>.tsx</code> dosyalarını çalıştıramaz, <code>import</code> zincirini de
+      tek tek indiremez. <b>Paketleyici</b> hepsini çevirip birleştiriyor.
+      <p>Somut olarak: <code>&lt;h1&gt;Rung&lt;/h1&gt;</code> yazdığın şey
+      <code>jsx("h1", { children: "Rung" })</code> hâline geliyor.
+      <b>JSX diye bir şey aslında yok</b> — fonksiyon çağrısının güzel görünen hâli.</p>
+    </div>
+  </section>
+
+  <!-- ══ 20 ══ -->
+  <section class="step">
+    <div class="step-head"><span class="step-n">20</span><h2>Neon ve <code>.env.local</code></h2></div>
+
+    <h3>Bağlantı dizesi</h3>
+    <pre><code class="c">postgresql://kullanıcı:ŞİFRE@ep-xxxx.eu-central-1.aws.neon.tech/neondb?sslmode=require</code></pre>
+    <p style="font-size:14px">Tek satırda <b>adres + kullanıcı adı + şifre</b>. Region Frankfurt seçildi —
+    veritabanı ile onu sorgulayan sunucu arasındaki mesafe her sorguya gecikme olarak ekleniyor.</p>
+
+    <div class="box trap">
+      <span class="k">bu satır bir şifre</span>
+      Depoya girerse dört şey ters gider: <b>1</b> botlar GitHub'ı tarayıp dakikalar içinde bulur ·
+      <b>2</b> sonraki commit'te silsen de geçmişte kalır · <b>3</b> istemci tarafına sürüklenirse
+      her ziyaretçinin F12'sinde görünür · <b>4</b> ortam değiştiremezsin.
+    </div>
+
+    <div class="box tip">
+      <span class="k">NEXT_PUBLIC_ kuralı</span>
+      Next.js ortam değişkenlerini <b>varsayılan olarak sadece sunucuda</b> gösteriyor.
+      Adı <code>NEXT_PUBLIC_</code> ile başlıyorsa derleme sırasında <b>kodun içine metin olarak
+      yapıştırıyor</b> ve tarayıcıya yolluyor.
+      <p>Yani ön ek, bilinçli bir <b>"yayınla" onayı</b>. Kazara sızdıramazsın, ancak isteyerek sızdırırsın.</p>
+    </div>
+
+    <div class="box term">
+      <span class="k">neden özel sürücü</span>
+      Klasik sürücü (<code>pg</code>) TCP bağlantısı açıp <b>açık tutuyor</b> — sürekli çalışan
+      sunucuda ideal. Ama Vercel kodu <b>sunucusuz işlev</b> olarak çalıştırıyor: istek gelir,
+      kod kalkar, cevabı verir, <b>kapanır</b>.
+      <p><code>@neondatabase/serverless</code> TCP yerine <b>HTTP</b> üzerinden konuşuyor.
+      Kalıcı bağlantı yok, dolayısıyla tükenecek havuz da yok.</p>
+    </div>
+
+    <h3>Server Component olduğu için <code>async</code> olabiliyor</h3>
+    <p>
+      Sunucu, HTML'i göndermeden önce bekleyebiliyor — bu yüzden bileşenin içinde veritabanı
+      sorgusunu <code>await</code> edebiliyorsun. Tarayıcıda çalışan bir bileşen bekleseydi
+      kullanıcı boş ekrana bakardı.
+    </p>
+
+    <div class="box tip">
+      <span class="k">daraltma — narrowing</span>
+      <code>process.env.X</code>'in tipi <b>her zaman</b> <code>string | undefined</code>, çünkü
+      TypeScript <code>.env.local</code>'in içini bilmiyor.
+      <pre style="margin:8px 0; background:none; border:0; padding:0; font-size:12.5px"><code>const url = process.env.DATABASE_URL;   <span class="c">// string | undefined</span>
+if (!url) throw new Error("...");        <span class="c">// boşsa program burada duruyor</span>
+const sql = neon(url);                   <span class="c">// string</span></code></pre>
+      <p>TypeScript kodun <b>akışını</b> takip ediyor: "boş olsaydı üstte durmuştu, demek ki dolu."</p>
+      <p><code>!</code> koyup susturmak da mümkündü — <b>yapmadık.</b> Katı modu açıp susturmak anlamsız.
+      Yan fayda: değişken eksikse anlamsız çökme yerine <b>"<code>.env.local</code>'i kontrol et"</b> yazan hata alıyorsun.</p>
+    </div>
+  </section>
+
+  <!-- ══ 21 ══ -->
+  <section class="step">
+    <div class="step-head"><span class="step-n">21</span><h2>Vercel — ilk yayın</h2></div>
+    <p>
+      <code>localhost</code> = "bu bilgisayar". Laptop kapanınca site yok. Başkasının görmesi için
+      7/24 açık, adresi ve HTTPS sertifikası olan, Node çalıştırabilen bir makine gerekiyor.
+    </p>
+    <p style="font-size:14px">
+      Eskiden: sunucu kirala, Linux kur, nginx ayarla, sertifika al, kod değişince elle güncelle.
+      <b>Vercel</b> bunu devralıyor: GitHub'ı izliyor, her push'ta <code>npm run build</code>
+      çalıştırıyor, sonucu dağıtıyor.
+    </p>
+
+    <div class="box principle">
+      <span class="k">tek cümle</span>
+      <b><code>git push</code> = yayın.</b> Ve tersi de doğru: <code>git commit</code> <b>yayın değil</b> —
+      commit sadece senin diskinde bir kayıt noktası.
+    </div>
+
+    <div class="box tip">
+      <span class="k">ortam değişkeni ayrıca girilir</span>
+      <code>.env.local</code> <code>.gitignore</code>'da → GitHub'a gitmedi → Vercel görmedi.
+      <b>Bu bir eksiklik değil, tam olarak istediğimiz şey.</b>
+      <p><b>Kural:</b> gizli bilgi kodla değil, <b>her ortamla ayrı ayrı</b> taşınır.
+      Senin makinende <code>.env.local</code>, Vercel'de panel. Kod ikisinde de aynı:
+      <code>process.env.DATABASE_URL</code>.</p>
+      <p>Değeri değiştirmek yetmiyor — <b>redeploy</b> şart, çünkü değer derleme anında koda giriyor.</p>
+    </div>
+
+    <div class="box trap">
+      <span class="k">statik mi dinamik mi — bizi yakalayan yer</span>
+      Next.js varsayılan olarak sayfayı <b>derlemede bir kez</b> üretiyor (<code>○ Static</code>).
+      Yani sorgu bir kere çalışıp sonucu HTML'e gömülüyor — saat <b>donuyor.</b>
+      <p>Bir de yan etkisi var: sorgu derlemede çalıştığı için <code>DATABASE_URL</code>
+      <b>build anında</b> gerekiyor. Yoksa derleme çöküyor ve Vercel bir öncekini servis etmeye devam ediyor.</p>
+      <p><b>Çözüm:</b> <code>export const dynamic = "force-dynamic";</code> → her istekte baştan çalış.</p>
+      <table class="tbl" style="margin-top:8px">
+        <tr><td><b>Statik</b></td><td>Sorgu derlemede bir kez · tanıtım sayfası, belge için doğru</td></tr>
+        <tr><td><b>Dinamik</b></td><td>Sorgu her istekte · <b>kullanıcı verisi için doğru</b></td></tr>
+      </table>
+      <p>Rung'ın bütün ekranları dinamik olacak — hepsi senin verini gösteriyor.</p>
+    </div>
+
+    <div class="box tip">
+      <span class="k">nasıl doğrulanır</span>
+      Sayfayı iki kez yenile, saat değişmeli. Ya da yanıt başlıklarına bak:
+      <code>x-vercel-cache: HIT</code> + <code>x-nextjs-prerender: 1</code> → statik.
+      <code>MISS</code> → dinamik.
+    </div>
+  </section>
+
   <!-- ══ TUZAKLAR ══ -->
   <div class="section-head"><span class="kicker">özet</span><h2 class="section-title">Tuzaklar, tek listede</h2></div>
   <p class="section-lede">Bu aşamada karşımıza çıkan veya çıkabilecek olanlar. Sonradan düzeltmesi pahalı olanlar üstte.</p>
@@ -1198,6 +1512,39 @@ branch 'main' set up to track 'origin/main'.</span></code></pre>
       <p class="fix"><b>Çözüm:</b> Personal Access Token üret, <code>repo</code> yetkisi ver, şifre yerine onu yapıştır.</p>
     </div>
     <div class="cell">
+      <h4><code>"type": "commonjs"</code> bırakmak</h4>
+      <p><code>npm init</code> bunu soruyor. Bırakırsan Turbopack <code>import/export</code> gördüğünde
+      <i>"Specified module format (CommonJs) is not matching…"</i> diye patlıyor.</p>
+      <p class="fix"><b>Çözüm:</b> <code>type</code> satırını <b>tamamen sil</b>. Next.js'in kendi
+      kurulum aracı da yazmıyor — alan yoksa paketleyici dosya bazında karar veriyor.</p>
+    </div>
+    <div class="cell">
+      <h4>Commit'leyip push etmemek</h4>
+      <p>Vercel <b>GitHub'dan</b> yayınlıyor, senin diskinden değil. Push etmediğin şey canlıya çıkmıyor —
+      ve eski sayfa servis edilmeye devam ettiği için "neden değişmedi" diye şaşırıyorsun.</p>
+      <p class="fix"><b>Teşhis:</b> <code>git status</code>'un <b>ilk satırı</b>. <code>ahead 2</code> =
+      GitHub senden iki adım geride.</p>
+    </div>
+    <div class="cell">
+      <h4>Vercel'e tırnaklı değer yapıştırmak</h4>
+      <p><code>.env.local</code>'de <code>DATABASE_URL="postgres://…"</code> yazıyor. O tırnaklar
+      <b>dosya biçiminin parçası</b>, Next.js onları soyuyor. Vercel'in paneli bir dosya değil —
+      ne yapıştırdıysan harfi harfine alıyor.</p>
+      <p class="fix"><b>Belirti:</b> <code>password authentication failed</code>. <b>Çözüm:</b> tırnaksız yapıştır, sonra <b>redeploy</b>.</p>
+    </div>
+    <div class="cell">
+      <h4>JSX içinde <code>//</code> yazmak</h4>
+      <p>JSX'in içinde <code>//</code> <b>yorum değildir</b> — etiketler arasındaki her şey metin sayılır
+      ve <b>sayfada görünür.</b></p>
+      <p class="fix"><b>Doğrusu:</b> <code>{/* böyle */}</code>. JavaScript kısmındaki <code>//</code> normal çalışır.</p>
+    </div>
+    <div class="cell">
+      <h4>Sayfanın sessizce statik kalması</h4>
+      <p>Veri derlemede bir kez çekilip donuyor. Sayfa çalışıyor gibi görünüyor ama gösterdiği şey eski.</p>
+      <p class="fix"><b>Teşhis:</b> iki kez yenile, değişmiyorsa statik. Ya da <code>npm run build</code>
+      çıktısında <code>○ (Static)</code> ara. <b>Çözüm:</b> <code>export const dynamic = "force-dynamic"</code>.</p>
+    </div>
+    <div class="cell">
       <h4><code>-m</code> olmadan commit</h4>
       <p>vim açılır, çıkmayı bilmezsen sıkışırsın.</p>
       <p class="fix"><b>Çözüm:</b> <code>:q!</code> + Enter. <b>Önlem:</b> hep <code>-m</code> kullan.</p>
@@ -1221,22 +1568,35 @@ branch 'main' set up to track 'origin/main'.</span></code></pre>
     <dt>devDependency</dt><dd>Sadece geliştirirken gereken paket. Ölçüt: <i>canlıdaki sunucu buna ihtiyaç duyuyor mu?</i></dd>
     <dt>framework</dt><dd>Çözülmüş problemlerin hazır geldiği yapı. Kütüphaneyi sen çağırırsın, çerçeve seni çağırır</dd>
     <dt>PAT</dt><dd>Personal Access Token — GitHub'da şifre yerine kullanılan geçici anahtar</dd>
+    <dt>Server Component</dt><dd>Sunucuda çalışan, HTML üreten bileşen. App Router'da <b>varsayılan</b>. Kodu tarayıcıya hiç gitmez</dd>
+    <dt>Client Component</dt><dd>Tarayıcıda da çalışan bileşen. Dosyanın başına <code>"use client"</code> yazılarak seçilir</dd>
+    <dt>App Router</dt><dd>Klasör yapısının adres yapısı olduğu yönlendirme modeli</dd>
+    <dt>JSX</dt><dd>JavaScript içinde HTML gibi yazılan sözdizimi. Aslında fonksiyon çağrısı</dd>
+    <dt>paketleyici</dt><dd><i>bundler</i> — dosyaları çevirip birleştiren program. Next.js'inki <b>Turbopack</b></dd>
+    <dt>daraltma</dt><dd><i>narrowing</i> — TypeScript'in kod akışına bakarak tipi kesinleştirmesi</dd>
+    <dt>ortam değişkeni</dt><dd>Kodun dışında duran, ortama göre değişen ayar. <code>process.env</code> ile okunur</dd>
+    <dt>sunucusuz</dt><dd><i>serverless</i> — istek geldiğinde çalışıp kapanan kod. Kalıcı sunucu tutulmuyor</dd>
+    <dt>statik / dinamik</dt><dd>Sayfa derlemede mi bir kez üretiliyor, yoksa her istekte mi</dd>
   </dl>
 
   <!-- ══ NEREDE KALDIK ══ -->
-  <div class="stopline">
-    <div class="k">ara verildi</div>
-    <h3>Adım 15 — TypeScript</h3>
+  <div class="stopline" style="border-color:var(--accent-line); background:var(--accent-wash)">
+    <div class="k" style="color:var(--accent)">aşama tamamlandı</div>
+    <h3>Boş klasörden canlı adrese</h3>
     <p>
-      Sıradaki komut <code>npm install -D typescript @types/react @types/node</code> idi.
-      Konu: TypeScript nedir, <code>@types/*</code> paketleri neden ayrı, ve <code>-D</code>
-      bayrağının <code>devDependencies</code> ile ilişkisi. Buradan devam edeceğiz.
+      21 adım. Elinde şu var: <b>internette bir adres</b>, açınca sayfa geliyor, sayfadaki saat
+      <b>her istekte</b> Frankfurt'taki veritabanından geliyor. GitHub'da yedi commit, hepsi bir iş yapıyor.
+    </p>
+    <p style="margin-top:12px">
+      <b>Sıradaki: Aşama 01 — Hesap ve oturum.</b> Kayıt, giriş, çıkış, korumalı sayfa.
+      Öğrenilecekler: kimlik doğrulama ile yetkilendirme farkı · oturum ve çerez ·
+      şifre neden düz saklanmaz · veritabanı göçü.
     </p>
   </div>
 
   <footer class="foot">
     <span>Rung · aşama 00 ders notları</span>
-    <span><a href="../roadmap.html">yol haritası</a> · <a href="../product.html">ürün</a></span>
+    <span><a href="../design/roadmap.html">yol haritası</a> · <a href="../design/product.html">ürün</a></span>
     <span>12 Ağustos 2026</span>
   </footer>
 

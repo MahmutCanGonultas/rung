@@ -9,8 +9,8 @@ Rung, Türkçe konuşanlar için bir **İngilizce ölçüm aleti** — kurs değ
 denetleyicisi değil. Kullanıcının yazdığı İngilizceye bakıp hatayı sabit bir taksonomiye yazar,
 aylar boyunca izler, ve **kendi doğruluğunu ölçer**.
 
-Ürün önizlemesi: [`design/product.html`](design/product.html) — beş ekran (Yaz · Analiz · Geçmiş · İlerleme · Doğruluk), çalışan sekmeler, koyu/açık tema.
-Plan: [`docs/plan.md`](docs/plan.md) (yazılı, karar günlüğü dâhil) · [`design/roadmap.html`](design/roadmap.html) (görsel, adım adım).
+Ürün önizlemesi: [`docs/design/product.html`](docs/design/product.html) — beş ekran (Yaz · Analiz · Geçmiş · İlerleme · Doğruluk), çalışan sekmeler, koyu/açık tema.
+Plan: [`docs/plan.md`](docs/plan.md) (yazılı, karar günlüğü dâhil) · [`docs/design/roadmap.html`](docs/design/roadmap.html) (görsel, adım adım).
 
 ## EN ÖNEMLİ KURAL — kodu Claude yazmaz
 
@@ -64,37 +64,25 @@ Hiçbiri Aşama 0'ı bloke etmiyor.
 
 ## Durum
 
-**12 Ağustos 2026 · Aşama 00 — 14 / 21 adım tamam.**
+**14 Ağustos 2026 · Aşama 00 TAMAMLANDI — 21 / 21 adım.**
 
-> Tasarım sayfaları **kendi kendine yeter**: CSS ve JS her HTML'in içinde gömülü, paylaşılan dosya yok.
-> Bu yüzden bir renk/tipografi değişikliğinde **üç dosyanın üçü de** güncellenir:
-> `design/product.html`, `design/roadmap.html`, `design/lesson/stage-00.html`.
+Canlı: **https://rung-plum.vercel.app** · Her istekte Neon'a (Frankfurt) sorgu atıyor, saat değişiyor.
+Kurulu: git + GitHub + Vercel · Next.js 16 · TypeScript katı mod · `@neondatabase/serverless`.
 
-Yapılanlar: git deposu kuruldu (`main` dalı), GitHub'a bağlandı ve push edildi, `.gitignore` yazıldı,
-üç commit atıldı, Node/npm doğrulandı, `npm init` ile `package.json` oluşturuldu,
-`next` + `react` + `react-dom` kuruldu.
+### SIRADAKİ — Aşama 01: Hesap ve oturum (~6 sa, 8 adım)
 
-### SIRADAKİ ADIM — Aşama 00 · Adım 15: TypeScript
+Kayıt, giriş, çıkış, korumalı sayfa. Adımlar:
+kimlik doğrulama ile yetkilendirme farkı · `users` tablosu · **göç (migration) nedir** ·
+şifre neden düz saklanmaz (hash) · kayıt formu + sunucu tarafı doğrulama ·
+giriş, oturum ve çerez · çıkış · korumalı sayfa.
 
-```bash
-npm install -D typescript @types/react @types/node
-```
+**Biter:** giriş yapmayan kullanıcı korumalı sayfayı göremiyor.
 
-Anlatılacaklar: TypeScript nedir (JavaScript + tip katmanı, yeni dil değil) · `@types/*` paketleri
-neden ayrı (React düz JS ile yazılmış, tipleri DefinitelyTyped'dan geliyor) · `-D` bayrağı ve
-`devDependencies` — ölçüt: *canlıdaki sunucu buna ihtiyaç duyuyor mu?* Sunucuya derlenmiş JS gidiyor,
-TypeScript derleyicisi orada yok.
-
-Kontrol sorusu hazır: *`react` neden `dependencies`'te ama `@types/react` `devDependencies`'te?*
-
-### Aşama 00'da kalanlar
-
-15 TypeScript · 16 `app/layout.tsx` (App Router, kök şablon) · 17 `app/page.tsx` (JSX) ·
-18 `npm run dev` (betik, localhost) · 19 `tsconfig.json` + katı mod · 20 `.env.local` + Neon
-bağlantısı · 21 Vercel ile ilk yayın.
+**İlk konuşulacak karar:** kimlik doğrulamayı hangi araçla yapacağız — dört soruyla açılacak,
+kararı kullanıcı verecek.
 
 ### Ders notları
 
-Her aşamanın notu `design/lesson/` altında, aynı kalıpta: hızlı bakış komut kartı → adım adım
-kavramlar → tuzaklar tek listede → sözlük. Aşama 00: [`design/lesson/stage-00.html`](design/lesson/stage-00.html).
-**Her adımdan sonra `design/roadmap.html` içindeki ilerleme işaretleri güncellenir.**
+`docs/lessons/stage-NN.html`, hepsi aynı kalıpta: hızlı bakış komut kartı → adım adım kavramlar →
+tuzaklar tek listede → sözlük. Aşama 00: [`docs/lessons/stage-00.html`](docs/lessons/stage-00.html) — 21 adım, 12 tuzak, 24 terim.
+**Her adımdan sonra `docs/design/roadmap.html` ilerleme işaretleri güncellenir; aşama bitince ders notu yazılır.**
