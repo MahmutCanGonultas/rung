@@ -1,0 +1,1227 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Sıfırdan Next.js</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   SIFIRDAN NEXT.JS — kitap
+   Tek tema: açık. Kitap basılacak, koyu tema yok.
+   Palet doğrulanmış açık paletten geliyor.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --plane:   #f3f1ec;
+  --paper:   #faf9f6;
+  --paper-2: #f0eee8;
+  --paper-3: #e7e4dc;
+  --line:    #ded9cf;
+  --ink:     #14171a;
+  --ink-2:   #4f5a60;
+  --ink-3:   #78838a;
+
+  --accent:  #0e9b6c;
+  --model:   #5b4bd6;
+  --error:   #8f2418;
+  --gold:    #b08a12;
+
+  --accent-w:  rgba(14,155,108,0.10);
+  --model-w:   rgba(91,75,214,0.07);
+  --error-w:   rgba(143,36,24,0.06);
+  --gold-w:    rgba(176,138,18,0.09);
+  --accent-l:  rgba(14,155,108,0.34);
+  --model-l:   rgba(91,75,214,0.30);
+  --error-l:   rgba(143,36,24,0.28);
+  --gold-l:    rgba(176,138,18,0.34);
+
+  --sans:  "Inter", system-ui, -apple-system, sans-serif;
+  --serif: "Instrument Serif", ui-serif, "New York", Georgia, serif;
+  --mono:  ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--plane);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.68;
+  letter-spacing: -0.006em;
+  -webkit-font-smoothing: antialiased;
+}
+
+.sheet {
+  max-width: 780px;
+  margin: 0 auto;
+  background: var(--paper);
+  padding: 0 62px 90px;
+}
+
+h1, h2, h3, h4 { margin: 0; font-weight: 400; letter-spacing: -0.022em; }
+p { margin: 0 0 15px; }
+b, strong { font-weight: 620; color: var(--ink); }
+em, i { font-style: italic; }
+code {
+  font-family: var(--mono); font-size: 0.855em;
+  background: var(--paper-2); border-radius: 4px; padding: 1px 5px;
+}
+a { color: var(--accent); }
+
+/* ── kapak ─────────────────────────────────────────────────── */
+.cover { padding: 130px 0 90px; border-bottom: 1px solid var(--line); }
+.cover .kick {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-3); margin-bottom: 26px;
+}
+.cover h1 {
+  font-family: var(--serif); font-size: 76px; line-height: 0.94;
+  letter-spacing: -0.035em; margin-bottom: 4px;
+}
+.cover h1 .g { color: var(--accent); }
+.cover .sub {
+  font-family: var(--serif); font-style: italic; font-size: 27px;
+  color: var(--ink-2); margin: 22px 0 0;
+}
+.cover .blurb { font-size: 16px; color: var(--ink-2); max-width: 46ch; margin: 34px 0 0; }
+.cover .meta {
+  display: flex; flex-wrap: wrap; gap: 9px; margin-top: 38px;
+}
+.tag {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-3);
+  border: 1px solid var(--line); border-radius: 5px; padding: 5px 9px;
+}
+.tag.a { color: var(--accent); border-color: var(--accent-l); background: var(--accent-w); }
+
+/* ── içindekiler ───────────────────────────────────────────── */
+.toc { padding: 54px 0 10px; }
+.toc h2 { font-family: var(--serif); font-size: 34px; margin-bottom: 22px; }
+.toc ol { list-style: none; counter-reset: c; padding: 0; margin: 0; }
+.toc li {
+  counter-increment: c; display: flex; align-items: baseline; gap: 14px;
+  padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15.5px;
+}
+.toc li::before {
+  content: counter(c, decimal-leading-zero);
+  font-family: var(--mono); font-size: 11px; color: var(--accent);
+  min-width: 24px;
+}
+.toc li .t { color: var(--ink); font-weight: 550; }
+.toc li .d { color: var(--ink-3); font-size: 13.5px; margin-left: auto; text-align: right; }
+
+/* ── bölüm ─────────────────────────────────────────────────── */
+.chapter { padding-top: 66px; }
+.chapter-head { margin-bottom: 34px; }
+.chapter-n {
+  display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.08em; color: var(--paper); background: var(--accent);
+  border-radius: 8px; padding: 8px 11px; line-height: 1; margin-bottom: 18px;
+}
+.chapter-head h2 {
+  font-family: var(--serif); font-size: 46px; line-height: 1.02; letter-spacing: -0.03em;
+}
+.chapter-head .lede { font-size: 17px; color: var(--ink-2); margin: 16px 0 0; max-width: 58ch; }
+
+h3 {
+  display: flex; align-items: baseline; gap: 12px;
+  font-family: var(--serif); font-style: italic; font-size: 25px;
+  color: var(--ink); margin: 42px 0 14px;
+}
+h3::before {
+  content: ""; width: 20px; height: 2px; border-radius: 1px;
+  background: var(--accent); flex: none; position: relative; top: -7px;
+}
+
+h4 { font-size: 16.5px; font-weight: 620; margin: 26px 0 9px; }
+
+/* ── kod ───────────────────────────────────────────────────── */
+pre {
+  background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px;
+  padding: 15px 17px; overflow-x: auto; margin: 14px 0;
+  font-family: var(--mono); font-size: 12.5px; line-height: 1.72; color: var(--ink);
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+pre .c { color: var(--ink-3); }
+pre .in { display: block; font-weight: 500; }
+pre .in::before { content: "$ "; color: var(--accent); font-weight: 700; }
+pre.file { padding: 0; }
+pre.file .name {
+  display: block; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--model); background: var(--model-w);
+  padding: 9px 17px; border-bottom: 1px solid var(--line);
+}
+pre.file .body { display: block; padding: 15px 17px; }
+
+/* ── kutular ───────────────────────────────────────────────── */
+.box {
+  border-radius: 10px; padding: 16px 19px 16px 21px; margin: 20px 0;
+  font-size: 14.5px; color: var(--ink-2); position: relative; overflow: hidden;
+}
+.box::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+.box .k {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.13em;
+  text-transform: uppercase; margin-bottom: 9px;
+}
+.box .k::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex: none; }
+.box p:last-child { margin-bottom: 0; }
+.box code { background: var(--paper); }
+
+.tip  { border: 1px solid var(--accent-l); background: var(--accent-w); }
+.tip::before { background: var(--accent); } .tip .k { color: var(--accent); }
+.trap { border: 1px solid var(--error-l); background: var(--error-w); }
+.trap::before { background: var(--error); } .trap .k { color: var(--error); }
+.term { border: 1px solid var(--model-l); background: var(--model-w); }
+.term::before { background: var(--model); } .term .k { color: var(--model); }
+.law  { border: 1px solid var(--gold-l); background: var(--gold-w); }
+.law::before { background: var(--gold); } .law .k { color: var(--gold); }
+
+.oops { border: 1px solid var(--error-l); background: var(--error-w); border-radius: 10px; padding: 18px 21px; margin: 22px 0; }
+.oops .k {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--error); margin-bottom: 10px;
+}
+.oops h4 { margin: 0 0 9px; font-family: var(--serif); font-weight: 400; font-size: 21px; color: var(--ink); }
+.oops p { font-size: 14.5px; color: var(--ink-2); }
+.oops pre { background: var(--paper); margin: 10px 0; }
+
+/* ── tablo ─────────────────────────────────────────────────── */
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; margin: 14px 0; }
+th {
+  text-align: left; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-3); font-weight: 400;
+  padding: 0 13px 9px 0; border-bottom: 1px solid var(--line);
+}
+td { padding: 10px 13px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { color: var(--ink); font-weight: 550; }
+
+/* ── şekil ─────────────────────────────────────────────────── */
+figure { margin: 26px 0; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption {
+  font-size: 13px; color: var(--ink-3); margin-top: 12px;
+  padding-left: 13px; border-left: 2px solid var(--line);
+}
+figcaption b { color: var(--ink-2); }
+
+.quote {
+  font-family: var(--serif); font-size: 24px; line-height: 1.34; color: var(--ink);
+  border-left: 3px solid var(--accent); padding-left: 22px; margin: 30px 0;
+}
+
+ul { margin: 12px 0; padding-left: 21px; color: var(--ink-2); }
+li { margin-bottom: 7px; }
+
+.end {
+  margin-top: 60px; padding-top: 28px; border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--ink-3);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+
+/* ── BASKI ─────────────────────────────────────────────────── */
+@page { size: A4; margin: 17mm 15mm 19mm; }
+
+@media print {
+  body { background: #fff; font-size: 10.5pt; line-height: 1.6; }
+  .sheet { max-width: none; padding: 0; background: #fff; }
+  .cover { padding: 40mm 0 0; border: 0; height: 100vh; }
+  .cover h1 { font-size: 54pt; }
+  .chapter { page-break-before: always; padding-top: 0; }
+  .toc { page-break-after: always; }
+  figure, .box, .oops, pre, table, .quote { page-break-inside: avoid; }
+  h2, h3, h4 { page-break-after: avoid; }
+  a { color: inherit; text-decoration: none; }
+  .chapter-head h2 { font-size: 30pt; }
+  .cover .blurb { max-width: none; }
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<!-- ══════════════ KAPAK ══════════════ -->
+<header class="cover">
+  <div class="kick">Rung · saha notları · 14 Ağustos 2026</div>
+  <h1>Sıfırdan<br>Next.js<span class="g">.</span></h1>
+  <p class="sub">Boş bir klasörden canlı yayına, yirmi bir adımda.</p>
+  <p class="blurb">
+    Bu kitap bir eğitim serisinden değil, <b>gerçek bir projeden</b> çıktı. Buradaki her komut
+    yazıldı, her hata gerçekten alındı, her tuzağa gerçekten düşüldü. Düşülen yerler
+    <b>kırmızı kutularda</b> duruyor — çünkü en çok orada öğrendik.
+  </p>
+  <div class="meta">
+    <span class="tag a">21 adım</span>
+    <span class="tag">6 bölüm</span>
+    <span class="tag">9 şekil</span>
+    <span class="tag">12 tuzak</span>
+    <span class="tag">git · node · typescript · next.js · postgres · vercel</span>
+  </div>
+</header>
+
+<!-- ══════════════ İÇİNDEKİLER ══════════════ -->
+<section class="toc">
+  <h2>İçindekiler</h2>
+  <ol>
+    <li><span class="t">Nasıl okunur</span><span class="d">iki dakika</span></li>
+    <li><span class="t">Terminal ve Git</span><span class="d">klasörden depoya</span></li>
+    <li><span class="t">Node, npm ve paketler</span><span class="d">JavaScript tarayıcının dışında</span></li>
+    <li><span class="t">TypeScript</span><span class="d">yazarken yakalayan katman</span></li>
+    <li><span class="t">Next.js'in iskeleti</span><span class="d">klasör, adres, JSX</span></li>
+    <li><span class="t">Sunucu tarafı ve veritabanı</span><span class="d">Server Components</span></li>
+    <li><span class="t">Yayın</span><span class="d">git push = canlı</span></li>
+  </ol>
+  <p style="margin-top:22px; font-size:14px; color:var(--ink-3)">
+    Ekler: komut sözlüğü · terim sözlüğü · on iki tuzak
+  </p>
+</section>
+
+<!-- ══════════════ 0 · NASIL OKUNUR ══════════════ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="chapter-n">00</span>
+    <h2>Nasıl okunur</h2>
+    <p class="lede">Bu kitabı okuyarak öğrenemezsin. Yazarak öğrenirsin.</p>
+  </div>
+
+  <p>
+    Kitabın çıktığı projede tek bir kural vardı: <b>kavramı anlatan başkası, kodu yazan sen.</b>
+    Sebebi basit — izleyerek öğrenilmiyor, çünkü takılan sen olmuyorsun.
+  </p>
+  <p>
+    O yüzden her komutu kendin yaz. Kopyala-yapıştır bile yapma, harfleri tuşla. Yavaş, sinir bozucu,
+    ve öğrenmenin gerçekten olduğu tek yer.
+  </p>
+
+  <h3>Kutuların anlamı</h3>
+
+  <div class="box tip"><span class="k">ipucu</span>İşe yarayan bir detay, bir alışkanlık, ya da bilinen bir gelenek.</div>
+  <div class="box trap"><span class="k">tuzak</span>Buraya düşülüyor. Bu kitaptaki tuzakların hepsine <b>gerçekten düşüldü</b>.</div>
+  <div class="box term"><span class="k">tanım</span>Bir terim ilk geçtiğinde burada tanımlanıyor. "Bunu zaten biliyorsundur" cümlesi yok.</div>
+  <div class="box law"><span class="k">kural</span>Ezberlenecek değil, anlaşılacak ilke. Genelde bir cümle.</div>
+
+  <h3>Varsayımlar</h3>
+  <p>
+    HTML, CSS ve JavaScript biliyorsun. <b>Başka hiçbir şey varsayılmıyor</b> — terminal, git, npm,
+    TypeScript, React, veritabanı, dağıtım; hepsi sıfırdan.
+  </p>
+  <p>
+    Bilgisayarında Node.js kurulu olmalı. Bir de GitHub hesabı. Gerisi yol boyunca.
+  </p>
+
+  <div class="quote">
+    Sessizce yanlış olan kod, gürültülü şekilde çöken koddan çok daha tehlikelidir.
+  </div>
+</section>
+
+<!-- ══════════════ 1 · TERMİNAL VE GİT ══════════════ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="chapter-n">01</span>
+    <h2>Terminal ve Git</h2>
+    <p class="lede">Klasörden depoya, depodan GitHub'a. Kod yazmadan önceki her şey.</p>
+  </div>
+
+  <h3>Neden terminal</h3>
+  <p>
+    Kullanacağın araçların çoğunun düğmesi yok — git'in yok, npm'in yok, veritabanı bağlantısının yok.
+    Bu bir eksiklik değil, tercih.
+  </p>
+  <p>
+    Sebebi şu: <b>tıklamayı kimseye gönderemezsin.</b> "Şuraya tıkla, sonra oraya" diye anlatmak
+    zorunda kalırsın. Ama <code>git init -b main</code> satırını kopyalayıp yapıştırabilirsin — ve altı ay
+    sonra kendine de yapıştırabilirsin.
+  </p>
+
+  <div class="box term">
+    <span class="k">terminal</span>
+    Bilgisayara yazıyla komut verdiğin pencere. <i>Komut satırı</i> veya <i>konsol</i> da deniyor.
+    <p>Tarayıcıda F12 → Console'a <code>document.title</code> yazarsın, cevap verir. Terminal aynı şey —
+    ama tek bir sayfayla değil, <b>bütün bilgisayarla</b> konuşuyorsun.</p>
+  </div>
+
+  <h3>Çalışma klasörü</h3>
+  <p>
+    Terminal her an <b>bir klasörün içinde duruyor.</b> Yazdığın komutlar oraya uygulanıyor.
+    Bir odada durmak gibi: "ışığı aç" dediğinde bulunduğun odanın ışığı açılır.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 700 250" role="img" aria-label="Terminal doğru klasördeyse sadece proje takibe girer; bir üst klasördeyse masaüstündeki her şey takibe girer.">
+      <rect x="0" y="0" width="330" height="240" rx="12" fill="rgba(14,155,108,0.06)" stroke="rgba(14,155,108,0.34)"/>
+      <text x="20" y="30" font-family="ui-monospace,monospace" font-size="10" letter-spacing="1.4" fill="#0e9b6c">DOĞRU</text>
+      <text x="20" y="62" font-family="ui-monospace,monospace" font-size="12.5" fill="#4f5a60">Desktop/</text>
+      <text x="36" y="86" font-family="ui-monospace,monospace" font-size="12.5" fill="#14171a">└── rung/</text>
+      <rect x="150" y="72" width="120" height="20" rx="5" fill="#0e9b6c"/>
+      <text x="210" y="86" font-family="ui-monospace,monospace" font-size="9.5" fill="#faf9f6" text-anchor="middle">terminal burada</text>
+      <text x="60" y="110" font-family="ui-monospace,monospace" font-size="12.5" fill="#4f5a60">├── app/</text>
+      <text x="60" y="130" font-family="ui-monospace,monospace" font-size="12.5" fill="#4f5a60">└── docs/</text>
+      <line x1="20" y1="150" x2="310" y2="150" stroke="#ded9cf"/>
+      <text x="20" y="175" font-family="ui-monospace,monospace" font-size="11" fill="#0e9b6c">$ git init -b main</text>
+      <text x="20" y="200" font-size="12.5" fill="#4f5a60">Sadece proje takibe girer.</text>
+      <text x="20" y="220" font-size="12.5" fill="#4f5a60">İstediğimiz bu.</text>
+
+      <rect x="370" y="0" width="330" height="240" rx="12" fill="rgba(143,36,24,0.05)" stroke="rgba(143,36,24,0.28)"/>
+      <text x="390" y="30" font-family="ui-monospace,monospace" font-size="10" letter-spacing="1.4" fill="#8f2418">YANLIŞ</text>
+      <text x="390" y="62" font-family="ui-monospace,monospace" font-size="12.5" fill="#14171a">Desktop/</text>
+      <rect x="500" y="48" width="120" height="20" rx="5" fill="#8f2418"/>
+      <text x="560" y="62" font-family="ui-monospace,monospace" font-size="9.5" fill="#faf9f6" text-anchor="middle">terminal burada</text>
+      <text x="406" y="86" font-family="ui-monospace,monospace" font-size="12.5" fill="#4f5a60">├── rung/</text>
+      <text x="406" y="106" font-family="ui-monospace,monospace" font-size="12.5" fill="#4f5a60">├── ekran-goruntusu.png</text>
+      <text x="406" y="126" font-family="ui-monospace,monospace" font-size="12.5" fill="#4f5a60">└── vergi-belgesi.pdf</text>
+      <line x1="390" y1="150" x2="680" y2="150" stroke="#ded9cf"/>
+      <text x="390" y="175" font-family="ui-monospace,monospace" font-size="11" fill="#8f2418">$ git init -b main</text>
+      <text x="390" y="200" font-size="12.5" fill="#4f5a60">Masaüstündeki <tspan font-weight="600" fill="#14171a">her şey</tspan> takibe girer.</text>
+      <text x="390" y="220" font-size="12.5" fill="#4f5a60">Geri almak için <tspan font-family="ui-monospace,monospace">.git</tspan>'i elle sil.</text>
+    </svg>
+    <figcaption><b>Şekil 1.</b> Aynı komut, iki farklı klasör, iki farklı sonuç. Git komutu yazmadan önce <code>pwd</code> yaz.</figcaption>
+  </figure>
+
+  <pre><code><span class="in">pwd</span><span class="c">/Users/adin/Desktop/rung</span></code></pre>
+  <p style="font-size:14px; color:var(--ink-3)"><code>pwd</code> = <b>p</b>rint <b>w</b>orking <b>d</b>irectory</p>
+
+  <h3>Sürüm kontrolü</h3>
+  <p>Herkesin ilk çözümü aynıdır:</p>
+  <pre><code>style.css
+style-yedek.css
+style-son.css
+style-son-GERCEK.css</code></pre>
+  <p>
+    Bu çalışmıyor. Üç şeyi bilmiyorsun: hangisi neydi, <b>neyi neden</b> değiştirdin, ve iki dosyada
+    birden çalıştıysan hangi ikisinin uyumlu olduğunu.
+  </p>
+  <p>
+    <b>Sürüm kontrolü</b>, projenin zaman içindeki her hâlini notuyla birlikte saklayan sistem.
+    En yaygını <b>Git</b>. Oyunlardaki kayıt noktası gibi — ama kayıtların hepsi duruyor, her birinin
+    notu var, ve aralarındaki farkı satır satır görebiliyorsun.
+  </p>
+
+  <pre><code><span class="in">git init -b main</span><span class="c">Initialized empty Git repository in .../rung/.git/</span></code></pre>
+
+  <table>
+    <tr><td><code>init</code></td><td><i>initialize</i> — bu klasörü depoya çevir</td></tr>
+    <tr><td><code>-b main</code></td><td><i>branch</i> — ana dalın adı <code>main</code> olsun</td></tr>
+  </table>
+
+  <div class="box tip">
+    <span class="k">neden -b main</span>
+    Yazmazsan Git dalı <code>master</code> diye adlandırır ve bir uyarı basar. <code>main</code> bugün
+    standart; sonradan değiştirmek fazladan iş. Baştan doğrusunu yaz.
+  </div>
+
+  <h3>Git'in üç bölgesi</h3>
+  <p>
+    Git'te "kaydet" tek komut değil, iki. Sebebi şu: bir öğleden sonra iki iş yapmış olabilirsin —
+    bir hata düzelttin <b>ve</b> renkleri değiştirdin. Tek komut olsaydı ikisi aynı kayda girerdi,
+    birini geri alırken diğeri de giderdi.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 700 150" role="img" aria-label="Git'in üç bölgesi: çalışma klasörü, git add ile sahneleme alanı, git commit ile depo.">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#78838a"/></marker></defs>
+      <rect x="0" y="34" width="200" height="66" rx="10" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="100" y="62" text-anchor="middle" font-size="14" font-weight="600" fill="#14171a">çalışma klasörü</text>
+      <text x="100" y="82" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#78838a">dosyaların</text>
+
+      <rect x="250" y="34" width="200" height="66" rx="10" fill="rgba(14,155,108,0.10)" stroke="rgba(14,155,108,0.34)"/>
+      <text x="350" y="62" text-anchor="middle" font-size="14" font-weight="600" fill="#0e9b6c">sahneleme alanı</text>
+      <text x="350" y="82" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#78838a">tepsideki fotoğraflar</text>
+
+      <rect x="500" y="34" width="200" height="66" rx="10" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="600" y="62" text-anchor="middle" font-size="14" font-weight="600" fill="#14171a">depo</text>
+      <text x="600" y="82" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#78838a">albüm · commit'ler</text>
+
+      <line x1="204" y1="67" x2="242" y2="67" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar)"/>
+      <text x="223" y="24" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#78838a">git add</text>
+      <line x1="454" y1="67" x2="492" y2="67" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar)"/>
+      <text x="473" y="24" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#78838a">git commit</text>
+      <text x="350" y="132" text-anchor="middle" font-size="12.5" fill="#78838a">commit = fotoğraf · add = kareye kimin gireceğine karar vermek</text>
+    </svg>
+    <figcaption><b>Şekil 2.</b> Sahneleme alanı bir liste değil, <b>bir yer</b> — içinde dosya adları değil, dosya <i>içerikleri</i> duruyor.</figcaption>
+  </figure>
+
+  <div class="box trap">
+    <span class="k">tuzak · burada takıldık</span>
+    <b><code>git add</code> bir işaret koymuyor.</b> Dosyanın o andaki <b>içeriğinin kopyasını</b> alıyor.
+    <p>Sonuç: <code>git add</code> yaptıktan sonra dosyayı tekrar düzenlersen, o düzeltme commit'e
+    <b>girmez</b>. Tepsideki fotoğrafta hâlâ eski hâli var. Tekrar <code>git add</code> gerekiyor.</p>
+    <p>Böyle bir durumda <code>git status</code> aynı dosyayı <b>iki bölümde birden</b> gösterir.</p>
+  </div>
+
+  <h3>Ne kaydedilmez</h3>
+  <p>
+    <code>.DS_Store</code> dosyasını sen oluşturmadın — macOS Finder her klasörü açtığında bırakıyor.
+    Depoya koyarsan iki sorun: <b>her açışta değiştiği için</b> gerçek değişikliklerin arasında gürültü
+    yapar, ve ikinci bir kişi katılırsa kimsenin umursamadığı bir dosya için çakışma çıkar.
+  </p>
+
+  <div class="box law">
+    <span class="k">kural</span>
+    Depo, projenin <b>ne olduğunu</b> tutar — senin bilgisayarının arkasında bıraktığı izleri değil.
+    Genellemesi: <b>üretilen şey depoya girmez, üreten şey girer.</b>
+  </div>
+
+  <pre class="file"><span class="name">.gitignore</span><code class="body"><span class="c"># macOS'un bıraktığı dosyalar</span>
+.DS_Store
+
+<span class="c"># Gizli anahtarlar — asla depoya girmez</span>
+.env
+.env.local
+
+<span class="c"># Bağımlılıklar — package.json'dan geri gelir</span>
+node_modules/
+
+<span class="c"># Next.js'in derleme çıktısı</span>
+.next/
+out/</code></pre>
+
+  <div class="box trap">
+    <span class="k">en pahalı tuzak</span>
+    <code>.gitignore</code> <b>sadece takip edilmeyen</b> dosyalara uygulanır. Bir dosya bir kez takibe
+    girdiyse, sonradan eklemek onu <b>durdurmaz</b> — <code>git rm -r --cached</code> gerekir.
+    <p>Ve geçmiş yine dolu kalır: her <code>git clone</code> o veriyi indirmeye devam eder. Gerçekten
+    silmek geçmişi yeniden yazmayı gerektirir, bütün commit kimlikleri değişir.</p>
+    <p><b><code>.gitignore</code> koruma, tedavi değil.</b> Bu yüzden <code>.env</code> satırı, o dosya
+    daha <i>doğmadan önce</i> yazılır. Bir anahtar bir kez commit edilirse yanmıştır.</p>
+  </div>
+
+  <h3>Commit mesajı</h3>
+  <p>
+    Commit atmak kolay, zor olan mesajı yazmak. Altı ay sonra <code>update</code>, <code>fix</code>,
+    <code>son hali</code>, <code>asdasd</code> gibi bir liste sana hiçbir şey söylemez. Ve bir işverenin
+    repona bakınca gördüğü ilk şey bu liste.
+  </p>
+  <p><b>Conventional Commits</b> bir yazım standardı. Kural tek satır: <code>tip: ne yaptığın</code></p>
+
+  <table>
+    <tr><td><code>feat</code></td><td>Yeni bir özellik eklendi</td></tr>
+    <tr><td><code>fix</code></td><td>Bir hata düzeltildi</td></tr>
+    <tr><td><code>docs</code></td><td>Sadece belge değişti</td></tr>
+    <tr><td><code>refactor</code></td><td>Davranış aynı, kod yeniden düzenlendi</td></tr>
+    <tr><td><code>test</code></td><td>Test eklendi veya değişti</td></tr>
+    <tr><td><code>chore</code></td><td>Yapılandırma, araç, kurulum</td></tr>
+  </table>
+
+  <div class="box law">
+    <span class="k">kural</span>
+    Mesaj İngilizce, küçük harfle başlar, <b>emir kipiyle</b> yazılır. "added" değil <code>add</code>.
+    Sebebi: commit, <i>"bu commit uygulandığında ne olur"</i> sorusunun cevabıdır.
+    <p><b>Ve bir commit bir iş yapar.</b> İki iş varsa hedefli <code>git add dosya-adı</code> ile ikiye böl —
+    sonra birini geri almak isteyince diğeri yerinde kalır.</p>
+  </div>
+
+  <div class="box trap">
+    <span class="k">tuzak</span>
+    <code>-m</code> yazmazsan git bir metin editörü açar — muhtemelen <b>vim</b>, ve çıkmayı bilmezsen
+    orada sıkışırsın. Kurtuluş: <code>:q!</code> + Enter.
+  </div>
+
+  <h3>Uzak depo</h3>
+  <p>
+    Bütün geçmişin tek bir diskte duruyor. İki sıkıntı: <b>disk ölürse aylar uçar</b>, ve
+    <b>kimse göremez</b> — kimsenin göremediği portfolyo, portfolyo değil.
+  </p>
+
+  <div class="box term">
+    <span class="k">git ≠ github</span>
+    <b>Git</b> bilgisayarında çalışan program, internet gerektirmez. <b>GitHub</b> git depolarını
+    barındıran bir şirket — git'in parçası değil, sadece en popüler ev sahibi.
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 190" role="img" aria-label="Yerel depo ve GitHub'daki uzak depo arasında push ve pull ile senkronizasyon.">
+      <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#0e9b6c"/></marker>
+      <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#78838a"/></marker></defs>
+      <rect x="20" y="40" width="240" height="100" rx="12" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="140" y="72" text-anchor="middle" font-size="15" font-weight="600" fill="#14171a">senin bilgisayarın</text>
+      <text x="140" y="95" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11" fill="#78838a">.git/ — bütün geçmiş</text>
+      <text x="140" y="118" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#0e9b6c">TAM KOPYA</text>
+
+      <rect x="440" y="40" width="240" height="100" rx="12" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="560" y="72" text-anchor="middle" font-size="15" font-weight="600" fill="#14171a">GitHub</text>
+      <text x="560" y="95" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11" fill="#78838a">origin — bütün geçmiş</text>
+      <text x="560" y="118" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#0e9b6c">TAM KOPYA</text>
+
+      <line x1="266" y1="70" x2="432" y2="70" stroke="#0e9b6c" stroke-width="1.8" marker-end="url(#ar2)"/>
+      <text x="349" y="60" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11" fill="#0e9b6c">git push</text>
+      <line x1="432" y1="112" x2="266" y2="112" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar3)"/>
+      <text x="349" y="132" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11" fill="#78838a">git pull</text>
+
+      <text x="350" y="175" text-anchor="middle" font-size="12.5" fill="#78838a">Biri "asıl", diğeri "kopya" değil — <tspan font-weight="600" fill="#14171a">ikisi de tam.</tspan> Git dağıtıktır.</text>
+    </svg>
+    <figcaption><b>Şekil 3.</b> GitHub hesabın silinse projen kaybolmaz. Bütün geçmiş <code>.git</code> klasöründe de duruyor.</figcaption>
+  </figure>
+
+  <div class="box tip">
+    <span class="k">-u bayrağı</span>
+    <code>git push -u origin main</code> — <code>-u</code> = <code>--set-upstream</code>:
+    <i>"yereldeki <code>main</code>, <code>origin</code>'deki <code>main</code>'i takip etsin."</i>
+    <p><b>Dal başına bir kez.</b> Sonra <code>git push</code> yeter. Ama yeni bir dal açarsan onun için
+    tekrar gerekir.</p>
+  </div>
+
+  <div class="oops">
+    <div class="k">gerçekten başımıza geldi</div>
+    <h4>"Deploy ettim ama site değişmedi"</h4>
+    <p>
+      Kod yazıldı, commit atıldı, Vercel'de deploy tetiklendi — ama canlıda eski sayfa duruyordu.
+      Yarım saat kaybettik.
+    </p>
+    <p>Cevap <code>git status</code>'un <b>ilk satırındaydı</b>:</p>
+    <pre><code><span class="c">## main...origin/main [ahead 2]</span></code></pre>
+    <p>
+      <b><code>ahead 2</code></b> = "yerelde iki commit var, GitHub'da yok." Vercel GitHub'dan
+      yayınlıyor, senin diskinden değil.
+    </p>
+    <p style="margin-top:12px"><b>Ders: <code>git commit</code> ≠ yayın. <code>git push</code> = yayın.</b>
+    Ve <code>git status</code>'un ilk satırı bunu her zaman söylüyor.</p>
+  </div>
+</section>
+
+<!-- ══════════════ 2 · NODE VE NPM ══════════════ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="chapter-n">02</span>
+    <h2>Node, npm ve paketler</h2>
+    <p class="lede">JavaScript'i tarayıcının dışına çıkarmak — ve neden mecburuz.</p>
+  </div>
+
+  <h3>Neden sunucu gerekiyor</h3>
+  <p>Bir web uygulamasının üç işi tarayıcıda yapılamaz:</p>
+  <ul>
+    <li>Veritabanına bağlanmak — şifre gerekiyor</li>
+    <li>Bir API'ye anahtarla istek atmak — anahtar gerekiyor</li>
+    <li>Başka kullanıcıların verisini gizlemek — "gizle" diyen kodun kullanıcıda olmaması gerekiyor</li>
+  </ul>
+  <p>Ortak nokta: hepsinde <b>kullanıcının görmemesi gereken bir şey</b> var.</p>
+
+  <div class="box trap">
+    <span class="k">tuzak</span>
+    Tarayıcıya gönderdiğin her satır kodu kullanıcı okuyabilir — F12 yeter. Bir API anahtarını oraya
+    koyarsan biri kopyalar, senin hesabından binlerce istek atar, fatura sana gelir.
+    <p><b>Kodu karıştırıp gizlemek işe yaramaz:</b> tarayıcı o anahtarı kullanabiliyorsa, bir insan da
+    onu çıkarabilir. Tek çözüm anahtarın tarayıcıya hiç gitmemesi.</p>
+  </div>
+
+  <h3>Node.js</h3>
+  <p>JavaScript'i tarayıcının dışına çıkarıp doğrudan bilgisayarda çalıştıran program.</p>
+
+  <table>
+    <tr><th>Tarayıcıda</th><th>Node'da</th></tr>
+    <tr><td><code>document</code>, <code>window</code> var</td><td><b>yok</b> — sayfa diye bir şey yok</td></tr>
+    <tr><td>Dosya okuyamazsın</td><td><b>okursun</b></td></tr>
+    <tr><td>Veritabanına bağlanamazsın</td><td><b>bağlanırsın</b></td></tr>
+    <tr><td>Kodun herkese açık</td><td><b>kodun kimseye görünmez</b></td></tr>
+  </table>
+
+  <p><b>Yeni bir dil değil</b> — bildiğin JavaScript, farklı bir yerde.</p>
+
+  <h3>npm ve paketler</h3>
+  <p>
+    <b>Paket</b> = başkasının yazıp paylaştığı, kurup kullanabileceğin kod parçası.
+    <code>npm install &lt;paket&gt;</code> yazınca npm onu internetten indirip
+    <code>node_modules/</code> klasörüne koyuyor ve <code>package.json</code>'a bir satır yazıyor.
+  </p>
+  <p><b>Kurmak = başkasının kodunu projenin içine indirmek.</b> Sihir yok.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 210" role="img" aria-label="package.json alışveriş listesi, package-lock.json fiş, node_modules poşetler. İlk ikisi depoya girer, üçüncüsü girmez.">
+      <rect x="0" y="30" width="215" height="120" rx="12" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="107" y="58" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11.5" fill="#14171a">package.json</text>
+      <text x="107" y="86" text-anchor="middle" font-family="Instrument Serif,serif" font-size="21" fill="#14171a">alışveriş listesi</text>
+      <text x="107" y="108" text-anchor="middle" font-size="12" fill="#78838a">"süt al"</text>
+      <rect x="60" y="120" width="95" height="20" rx="5" fill="rgba(14,155,108,0.12)" stroke="rgba(14,155,108,0.34)"/>
+      <text x="107" y="134" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9.5" fill="#0e9b6c">DEPOYA GİRER</text>
+
+      <rect x="242" y="30" width="215" height="120" rx="12" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="349" y="58" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11.5" fill="#14171a">package-lock.json</text>
+      <text x="349" y="86" text-anchor="middle" font-family="Instrument Serif,serif" font-size="21" fill="#14171a">fiş</text>
+      <text x="349" y="108" text-anchor="middle" font-size="12" fill="#78838a">"Pınar 1L, 15.5.4, barkod"</text>
+      <rect x="302" y="120" width="95" height="20" rx="5" fill="rgba(14,155,108,0.12)" stroke="rgba(14,155,108,0.34)"/>
+      <text x="349" y="134" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9.5" fill="#0e9b6c">DEPOYA GİRER</text>
+
+      <rect x="484" y="30" width="215" height="120" rx="12" fill="rgba(143,36,24,0.05)" stroke="rgba(143,36,24,0.28)"/>
+      <text x="591" y="58" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11.5" fill="#14171a">node_modules/</text>
+      <text x="591" y="86" text-anchor="middle" font-family="Instrument Serif,serif" font-size="21" fill="#14171a">poşetler</text>
+      <text x="591" y="108" text-anchor="middle" font-size="12" fill="#78838a">317 MB · 19 klasör</text>
+      <rect x="537" y="120" width="108" height="20" rx="5" fill="rgba(143,36,24,0.10)" stroke="rgba(143,36,24,0.28)"/>
+      <text x="591" y="134" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9.5" fill="#8f2418">GİRMEZ</text>
+
+      <text x="350" y="190" text-anchor="middle" font-size="13" fill="#78838a">Listeyi ve fişi saklarsın. Poşetleri değil — <tspan font-family="ui-monospace,monospace" font-size="12">npm install</tspan> onları her zaman yeniden doldurur.</text>
+    </svg>
+    <figcaption><b>Şekil 4.</b> Üç paket istedik, <b>19 klasör</b> geldi — bağımlılıkların bağımlılıkları. Kilit dosyası hangi sürümün kurulduğunu tam olarak yazıyor; "bende çalışıyordu" problemi böyle çözülüyor.</figcaption>
+  </figure>
+
+  <div class="box term">
+    <span class="k">dependencies vs devDependencies</span>
+    Ölçüt tek soru: <b>canlıdaki sunucu buna ihtiyaç duyuyor mu?</b>
+    <p><code>react</code> <b>çalışıyor</b> → <code>dependencies</code>.
+    <code>typescript</code> sadece <b>kontrol ediyor</b>, derleme bitince yerde kalıyor →
+    <code>devDependencies</code> (<code>npm install -D</code>).</p>
+  </div>
+
+  <h3>Neden hazır kurulum aracı kullanmadık</h3>
+  <p>
+    Next.js'in <code>create-next-app</code> aracı tek komutla otuz dosyalık çalışan bir uygulama üretiyor.
+    Bu kitapta <b>kullanmadık.</b>
+  </p>
+  <p>
+    Sebep: o otuz dosyayı anlamazsın. Çalışan bir şeyin olur ama içinde ne olduğunu bilmezsin, bir şey
+    bozulduğunda nereye bakacağını da bilmezsin. Beş adım daha uzun sürüyor; karşılığında her satırın
+    neden orada olduğunu biliyorsun.
+  </p>
+
+  <div class="oops">
+    <div class="k">gerçekten başımıza geldi</div>
+    <h4><code>"type": "commonjs"</code></h4>
+    <p><code>npm init</code> bir soru soruyor: <code>type (commonjs)</code>. Enter'a bastık, kaldı.</p>
+    <p>İlk <code>.tsx</code> dosyasını yazdığımızda:</p>
+    <pre><code><span class="c">Error: Specified module format (CommonJs) is not matching
+the module format of the source code (EcmaScript Modules)</span></code></pre>
+    <p>
+      <code>package.json</code> "bu proje CommonJS" diye beyan etmişti; dosyada ise
+      <code>import</code> vardı. Paketleyici itiraz etti.
+    </p>
+    <p style="margin-top:12px">
+      <b>Çözüm:</b> <code>type</code> satırını <b>tamamen sil.</b> Next.js'in kendi kurulum aracı da
+      yazmıyor — alan yoksa paketleyici dosya bazında karar veriyor, çakışacak bir beyan olmuyor.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════ 3 · TYPESCRIPT ══════════════ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="chapter-n">03</span>
+    <h2>TypeScript</h2>
+    <p class="lede">Çalışmayan, sadece bakan bir katman. Ve tam da bu yüzden değerli.</p>
+  </div>
+
+  <h3>Sessiz yanlış</h3>
+  <pre><code>const density = entry.errors / entry.wordCount * 100;</code></pre>
+  <p>
+    <code>entry.wordCount</code> bir sayı mı? Veritabanından string olarak gelmiş olabilir.
+    Öyleyse <code>"74" / 4</code> → <b>18.5</b>. Çalışır, hata fırlatmaz, ve yanlıştır.
+  </p>
+  <p>
+    Çöken kodu düzeltirsin. <b>Sessizce yanlış olan sayıyı aylarca fark etmezsin.</b>
+  </p>
+
+  <h3>Ne olduğu, ne olmadığı</h3>
+  <p>
+    TypeScript, JavaScript'in üzerine <b>tip</b> ekleyen katman. Yeni bir dil değil — her geçerli
+    JavaScript, geçerli TypeScript.
+  </p>
+
+  <div class="box law">
+    <span class="k">en önemli cümle</span>
+    <b>TypeScript çalışmaz.</b> Sunucuya ve tarayıcıya giden şey derlenmiş JavaScript; tip işaretleri
+    derlemede siliniyor. Tek satırı bile canlıya gitmiyor.
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 220" role="img" aria-label="Bir tsx dosyası iki ayrı yola gidiyor: paketleyici tipleri silip çalışan JavaScript üretiyor, TypeScript ise sadece kontrol edip rapor veriyor.">
+      <defs><marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#78838a"/></marker></defs>
+      <rect x="0" y="82" width="150" height="52" rx="10" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="75" y="105" text-anchor="middle" font-family="ui-monospace,monospace" font-size="12" fill="#14171a">page.tsx</text>
+      <text x="75" y="122" text-anchor="middle" font-size="11" fill="#78838a">senin yazdığın</text>
+
+      <path d="M154,100 L215,58" fill="none" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar4)"/>
+      <path d="M154,116 L215,158" fill="none" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar4)"/>
+
+      <rect x="222" y="24" width="215" height="62" rx="10" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="329" y="46" text-anchor="middle" font-size="13.5" font-weight="600" fill="#14171a">Turbopack — çeviri</text>
+      <text x="329" y="66" text-anchor="middle" font-size="11.5" fill="#78838a">tip işaretlerini <tspan font-weight="600" fill="#14171a">siler</tspan> · milisaniye</text>
+
+      <rect x="222" y="130" width="215" height="62" rx="10" fill="rgba(91,75,214,0.07)" stroke="rgba(91,75,214,0.30)"/>
+      <text x="329" y="152" text-anchor="middle" font-size="13.5" font-weight="600" fill="#5b4bd6">typescript — kontrol</text>
+      <text x="329" y="172" text-anchor="middle" font-size="11.5" fill="#78838a">tipleri <tspan font-weight="600" fill="#14171a">inceler</tspan> · saniye</text>
+
+      <line x1="441" y1="55" x2="486" y2="55" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar4)"/>
+      <line x1="441" y1="161" x2="486" y2="161" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar4)"/>
+
+      <rect x="492" y="24" width="208" height="62" rx="10" fill="rgba(14,155,108,0.10)" stroke="rgba(14,155,108,0.34)"/>
+      <text x="596" y="46" text-anchor="middle" font-family="ui-monospace,monospace" font-size="12" fill="#0e9b6c">page.js</text>
+      <text x="596" y="66" text-anchor="middle" font-size="11.5" fill="#78838a">çalışan kod</text>
+
+      <rect x="492" y="130" width="208" height="62" rx="10" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="596" y="152" text-anchor="middle" font-size="13.5" font-weight="600" fill="#14171a">hata raporu</text>
+      <text x="596" y="172" text-anchor="middle" font-size="11.5" fill="#78838a">hiçbir dosya üretmez</text>
+    </svg>
+    <figcaption><b>Şekil 5.</b> İki iş, iki araç. Tip <b>silmek</b> aptal ve hızlı bir iş; tip <b>kontrol etmek</b> zeki ve yavaş. Her tuşa bastığında ikincisini beklemek istemezsin — o yüzden ayrılmışlar.</figcaption>
+  </figure>
+
+  <p>
+    Ne zaman hangisi devreye giriyor: editörde sürekli kontrol · <code>npm run dev</code> tip hatasında
+    <b>durmaz</b>, sadece uyarır · <code>npm run build</code> <b>durur</b>. Yani bozuk tiple canlıya çıkamıyorsun.
+  </p>
+
+  <div class="box term">
+    <span class="k">@types/… paketleri</span>
+    React düz JavaScript ile yazılmış, içinde tip bilgisi yok. <code>@types/react</code> onun
+    <b>kullanma kılavuzu</b> — içinde çalışan tek satır kod yok, sadece tanım.
+    <p>Bu yüzden <code>react</code> <code>dependencies</code>'te ama <code>@types/react</code>
+    <code>devDependencies</code>'te: biri çalışıyor, diğeri sadece anlatıyor.</p>
+  </div>
+
+  <h3>Katı mod</h3>
+  <p>
+    <code>tsconfig.json</code>'da <code>"strict": true</code>. Next.js varsayılan olarak
+    <code>false</code> koyuyor — mevcut bir projeye eklendiğinde yüzlerce hata fırlatmasın diye.
+    <b>Yeni bir proje için doğru varsayılan değil.</b>
+  </p>
+  <p>İki şeyi yakalıyor:</p>
+  <ul>
+    <li><b>Tipsiz parametre.</b> <code>function f(x)</code> → <i>"x implicitly has an 'any' type"</i></li>
+    <li><b>null kontrolü.</b> <code>el.textContent</code> → <i>"el is possibly null"</i>. JavaScript'te en sık
+      çökme sebebi buydu; katı mod onu <b>sen yazarken</b> yakalıyor.</li>
+  </ul>
+
+  <div class="box tip">
+    <span class="k">daraltma — narrowing</span>
+    <code>process.env.X</code>'in tipi <b>her zaman</b> <code>string | undefined</code>, çünkü TypeScript
+    <code>.env</code> dosyasının içini bilmiyor.
+    <pre style="margin:10px 0"><code>const url = process.env.DATABASE_URL;   <span class="c">// string | undefined</span>
+if (!url) throw new Error("...");        <span class="c">// boşsa burada duruyor</span>
+const sql = neon(url);                   <span class="c">// string</span></code></pre>
+    <p>TypeScript kodun <b>akışını</b> takip ediyor: "boş olsaydı üstte durmuştu, demek ki dolu."</p>
+    <p><code>!</code> koyup susturmak da mümkündü — <b>yapma.</b> Katı modu açıp susturmak anlamsız.
+    Yan fayda: değişken eksikse anlamsız çökme yerine <i>"<code>.env.local</code>'i kontrol et"</i>
+    yazan bir hata alıyorsun.</p>
+  </div>
+</section>
+
+<!-- ══════════════ 4 · NEXT.JS'İN İSKELETİ ══════════════ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="chapter-n">04</span>
+    <h2>Next.js'in iskeleti</h2>
+    <p class="lede">Klasör yapısının adres olduğu yer, ve neden dosya adları sabit.</p>
+  </div>
+
+  <h3>Kütüphane ve çerçeve</h3>
+  <p>
+    HTTP sunucusu, yönlendirme, HTML üretme, derleme — hepsi <b>çözülmüş</b> problemler.
+    <b>Çerçeve</b> bunların hazır geldiği yapı.
+  </p>
+
+  <div class="box law">
+    <span class="k">tek cümlelik fark</span>
+    <b>Kütüphaneyi sen çağırırsın, çerçeve seni çağırır.</b> Sen kuralına göre dosya koyarsın, o ne
+    zaman çalıştıracağını bilir.
+  </div>
+
+  <p>
+    Klasik React'ta <code>index.js</code>'i sen yazar, <code>ReactDOM.render()</code>'ı sen çağırırdın.
+    Next.js'te o kodu Next.js üretiyor ve <code>.next/</code> klasörüne yazıyor.
+  </p>
+  <p>
+    <b><code>.next/</code> = senin elle yazacağın bağlantı kodunun durduğu yer.</b> Zaten bu yüzden
+    <code>.gitignore</code>'da: üretilen şey depoya girmez.
+  </p>
+
+  <h3>App Router — klasör adresin kendisi</h3>
+  <p>Ayrı bir rota listesi yok. Klasör yapısı zaten liste.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 200" role="img" aria-label="app klasöründeki dosya yapısı doğrudan URL adreslerine karşılık geliyor.">
+      <defs><marker id="ar5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#0e9b6c"/></marker></defs>
+      <text x="0" y="20" font-family="ui-monospace,monospace" font-size="10" letter-spacing="1.4" fill="#78838a">KLASÖR</text>
+      <text x="420" y="20" font-family="ui-monospace,monospace" font-size="10" letter-spacing="1.4" fill="#78838a">ADRES</text>
+
+      <text x="0" y="48" font-family="ui-monospace,monospace" font-size="13" fill="#14171a">app/</text>
+      <text x="18" y="72" font-family="ui-monospace,monospace" font-size="13" fill="#4f5a60">├── layout.tsx</text>
+      <rect x="180" y="58" width="100" height="19" rx="5" fill="rgba(176,138,18,0.12)" stroke="rgba(176,138,18,0.34)"/>
+      <text x="230" y="71" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9" fill="#b08a12">HER SAYFADA</text>
+
+      <text x="18" y="98" font-family="ui-monospace,monospace" font-size="13" fill="#4f5a60">├── page.tsx</text>
+      <line x1="290" y1="94" x2="410" y2="94" stroke="#0e9b6c" stroke-width="1.4" marker-end="url(#ar5)"/>
+      <text x="420" y="98" font-family="ui-monospace,monospace" font-size="13" fill="#0e9b6c">/</text>
+
+      <text x="18" y="126" font-family="ui-monospace,monospace" font-size="13" fill="#4f5a60">├── gecmis/page.tsx</text>
+      <line x1="290" y1="122" x2="410" y2="122" stroke="#0e9b6c" stroke-width="1.4" marker-end="url(#ar5)"/>
+      <text x="420" y="126" font-family="ui-monospace,monospace" font-size="13" fill="#0e9b6c">/gecmis</text>
+
+      <text x="18" y="154" font-family="ui-monospace,monospace" font-size="13" fill="#4f5a60">└── kayit/[id]/page.tsx</text>
+      <line x1="290" y1="150" x2="410" y2="150" stroke="#0e9b6c" stroke-width="1.4" marker-end="url(#ar5)"/>
+      <text x="420" y="154" font-family="ui-monospace,monospace" font-size="13" fill="#0e9b6c">/kayit/42</text>
+
+      <text x="0" y="188" font-size="12.5" fill="#78838a">Rota listesi yok — <tspan font-weight="600" fill="#14171a">liste klasör yapısının içinde.</tspan></text>
+    </svg>
+    <figcaption><b>Şekil 6.</b> <code>page.tsx</code> ve <code>layout.tsx</code> özel isimler. Bu altı isim dışındaki her dosya Next.js için görünmez — onlar senin, kendin import edersin.</figcaption>
+  </figure>
+
+  <div class="box term">
+    <span class="k">neden isimler sabit</span>
+    Next.js klasörü tarıyor ve "hangisi sayfa, hangisi kabuk" diye soruyor. İsimler serbest olsa ya
+    dosyaları açıp tahmin etmesi ya da sana bir liste yazdırması gerekirdi.
+    <p><b>Dosyanın adı, o listenin kendisidir.</b></p>
+    <p style="margin-top:10px">Özel isimler: <code>page</code> · <code>layout</code> ·
+    <code>loading</code> · <code>error</code> · <code>not-found</code> · <code>route</code>.</p>
+  </div>
+
+  <div class="box tip">
+    <span class="k">hangi isim zorunlu, hangisi serbest</span>
+    <p><code>export default</code> → <b>isim serbest.</b> Next.js "varsayılan"ı alıyor, adına bakmıyor.</p>
+    <p><code>export const metadata</code> → <b>isim zorunlu.</b> Adıyla arıyor.
+    <code>sayfaBilgisi</code> deseydin sessizce görmezden gelirdi.</p>
+  </div>
+
+  <h3>Kabuk ve içerik</h3>
+  <p>
+    Her sitede iki tür parça var: her sayfada <b>tekrar eden</b> (üst bar, logo) ve o sayfaya
+    <b>özel</b> olan. Tekrar edeni her dosyaya kopyalarsan, logoyu değiştirmek beş dosya düzenlemek olur.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 700 250" role="img" aria-label="layout.tsx ve page.tsx birleşip tarayıcıya giden tek bir HTML üretiyor.">
+      <defs><marker id="ar6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#78838a"/></marker></defs>
+      <rect x="0" y="14" width="240" height="86" rx="10" fill="rgba(176,138,18,0.09)" stroke="rgba(176,138,18,0.34)"/>
+      <text x="16" y="36" font-family="ui-monospace,monospace" font-size="11" fill="#b08a12">layout.tsx — kabuk</text>
+      <text x="16" y="58" font-family="ui-monospace,monospace" font-size="11.5" fill="#4f5a60">&lt;html&gt;&lt;body&gt;</text>
+      <text x="32" y="76" font-family="ui-monospace,monospace" font-size="11.5" fill="#0e9b6c">{children}</text>
+      <text x="16" y="94" font-family="ui-monospace,monospace" font-size="11.5" fill="#4f5a60">&lt;/body&gt;&lt;/html&gt;</text>
+
+      <rect x="0" y="120" width="240" height="86" rx="10" fill="rgba(14,155,108,0.10)" stroke="rgba(14,155,108,0.34)"/>
+      <text x="16" y="142" font-family="ui-monospace,monospace" font-size="11" fill="#0e9b6c">page.tsx — içerik</text>
+      <text x="16" y="164" font-family="ui-monospace,monospace" font-size="11.5" fill="#4f5a60">&lt;main&gt;</text>
+      <text x="32" y="182" font-family="ui-monospace,monospace" font-size="11.5" fill="#4f5a60">&lt;h1&gt;Rung&lt;/h1&gt;</text>
+      <text x="16" y="200" font-family="ui-monospace,monospace" font-size="11.5" fill="#4f5a60">&lt;/main&gt;</text>
+
+      <path d="M246,57 C300,57 300,110 340,110" fill="none" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar6)"/>
+      <path d="M246,163 C300,163 300,110 340,110" fill="none" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar6)"/>
+
+      <rect x="360" y="30" width="340" height="160" rx="10" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="378" y="52" font-family="ui-monospace,monospace" font-size="11" fill="#78838a">tarayıcıya giden HTML</text>
+      <text x="378" y="76" font-family="ui-monospace,monospace" font-size="11.5" fill="#4f5a60">&lt;html lang="tr"&gt;</text>
+      <text x="394" y="94" font-family="ui-monospace,monospace" font-size="11.5" fill="#4f5a60">&lt;body&gt;</text>
+      <text x="410" y="112" font-family="ui-monospace,monospace" font-size="11.5" fill="#0e9b6c">&lt;main&gt;</text>
+      <text x="426" y="130" font-family="ui-monospace,monospace" font-size="11.5" fill="#0e9b6c">&lt;h1&gt;Rung&lt;/h1&gt;</text>
+      <text x="410" y="148" font-family="ui-monospace,monospace" font-size="11.5" fill="#0e9b6c">&lt;/main&gt;</text>
+      <text x="394" y="166" font-family="ui-monospace,monospace" font-size="11.5" fill="#4f5a60">&lt;/body&gt;&lt;/html&gt;</text>
+
+      <text x="350" y="232" text-anchor="middle" font-size="12.5" fill="#78838a">Layout hangi sayfada olduğunu bilmiyor — sadece <tspan font-weight="600" fill="#14171a">boş yer</tspan> bırakıyor.</text>
+    </svg>
+    <figcaption><b>Şekil 7.</b> Next.js önce <code>Page()</code>'i çalıştırıyor, çıkan sonucu <code>children</code> olarak layout'a veriyor. Resim çerçevesi gibi: çerçeve içine hangi fotoğrafın geleceğini bilmiyor.</figcaption>
+  </figure>
+
+  <h3>JSX</h3>
+  <p>JavaScript'in içinde HTML gibi görünen sözdizimi. Üç farkı var:</p>
+  <table>
+    <tr><td><code>className</code></td><td><code>class</code> JavaScript'te ayrılmış kelime</td></tr>
+    <tr><td>Tek kök element</td><td>İki kardeş etiketi yan yana döndüremezsin</td></tr>
+    <tr><td><code>{ }</code></td><td>"Buraya JavaScript değeri koy"</td></tr>
+  </table>
+
+  <div class="box term">
+    <span class="k">JSX aslında yok</span>
+    Paketleyici <code>&lt;h1&gt;Rung&lt;/h1&gt;</code> yazdığın şeyi
+    <code>jsx("h1", { children: "Rung" })</code> hâline getiriyor.
+    <b>JSX, fonksiyon çağrısının güzel görünen hâli.</b>
+  </div>
+
+  <div class="oops">
+    <div class="k">gerçekten başımıza geldi</div>
+    <h4>Yorumun sayfada görünmesi</h4>
+    <p>Canlıdaki sayfada şu yazı duruyordu:</p>
+    <pre><code><span class="c">Veritabanı saati: Fri Aug 14 2026 ... // ← 3. ekrana bas</span></code></pre>
+    <p>
+      Açıklama yorumu JSX'in içine yazılmıştı. <b>JSX'in içinde <code>//</code> yorum değildir</b> —
+      etiketlerin arasındaki her şey metin sayılır ve ekranda görünür.
+    </p>
+    <p style="margin-top:12px">
+      <b>Doğrusu:</b> <code>{/* böyle */}</code>. JavaScript kısmındaki <code>//</code> normal çalışır —
+      fark, JSX'in içinde mi dışında mı olduğu.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════ 5 · SUNUCU VE VERİTABANI ══════════════ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="chapter-n">05</span>
+    <h2>Sunucu tarafı ve veritabanı</h2>
+    <p class="lede">Backend ve frontend nasıl tek dosyada birleşti — ve neyi kaybettik.</p>
+  </div>
+
+  <h3>Server Components</h3>
+  <p>
+    Klasik React'ta <b>her şey tarayıcıda</b> çalışır. Veritabanına bağlanmak isteseydin ayrı bir arka
+    uç yazman, ondan API açman, tarayıcıdan ona istek atman gerekirdi. Üç parça.
+  </p>
+  <p>
+    Next.js App Router'da bileşenler <b>varsayılan olarak sunucuda</b> çalışıyor.
+  </p>
+
+  <div class="box tip">
+    <span class="k">nasıl kanıtlanır — otuz saniye</span>
+    Bir sayfa bileşenine <code>console.log("merhaba")</code> koy ve sayfayı aç.
+    <p>Mesaj <b>tarayıcı konsolunda değil, terminalde</b> çıkıyor. Çünkü fonksiyon sunucuda çalıştı,
+    HTML üretti, ve tarayıcıya <b>sadece HTML</b> gitti.</p>
+    <p>İkinci kanıt: sayfa kaynağına bak — içerik <b>hazır</b> duruyor. Klasik React'ta boş bir
+    <code>&lt;div id="root"&gt;</code> görürdün.</p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 260" role="img" aria-label="Bir isteğin yolculuğu: tarayıcıdan sunucuya, sunucudan veritabanına, ve hazır HTML olarak geri.">
+      <defs><marker id="ar7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#78838a"/></marker>
+      <marker id="ar8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#0e9b6c"/></marker></defs>
+
+      <rect x="0" y="80" width="170" height="76" rx="11" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="85" y="108" text-anchor="middle" font-size="14.5" font-weight="600" fill="#14171a">tarayıcı</text>
+      <text x="85" y="130" text-anchor="middle" font-size="11.5" fill="#78838a">sadece HTML görür</text>
+
+      <rect x="255" y="66" width="190" height="104" rx="11" fill="rgba(14,155,108,0.10)" stroke="rgba(14,155,108,0.34)"/>
+      <text x="350" y="94" text-anchor="middle" font-size="14.5" font-weight="600" fill="#0e9b6c">sunucu</text>
+      <text x="350" y="116" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11" fill="#4f5a60">page.tsx çalışıyor</text>
+      <text x="350" y="136" text-anchor="middle" font-size="11.5" fill="#78838a">şifreyi burada tutabilir</text>
+      <text x="350" y="156" text-anchor="middle" font-size="11.5" fill="#78838a">HTML üretir</text>
+
+      <rect x="530" y="80" width="170" height="76" rx="11" fill="rgba(91,75,214,0.07)" stroke="rgba(91,75,214,0.30)"/>
+      <text x="615" y="108" text-anchor="middle" font-size="14.5" font-weight="600" fill="#5b4bd6">veritabanı</text>
+      <text x="615" y="130" text-anchor="middle" font-size="11.5" fill="#78838a">Neon · Frankfurt</text>
+
+      <line x1="174" y1="96" x2="249" y2="96" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar7)"/>
+      <text x="211" y="86" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9.5" fill="#78838a">1 · istek</text>
+      <line x1="449" y1="96" x2="524" y2="96" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar7)"/>
+      <text x="486" y="86" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9.5" fill="#78838a">2 · sorgu</text>
+      <line x1="524" y1="140" x2="449" y2="140" stroke="#78838a" stroke-width="1.5" marker-end="url(#ar7)"/>
+      <text x="486" y="158" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9.5" fill="#78838a">3 · veri</text>
+      <line x1="249" y1="140" x2="174" y2="140" stroke="#0e9b6c" stroke-width="1.8" marker-end="url(#ar8)"/>
+      <text x="211" y="158" text-anchor="middle" font-family="ui-monospace,monospace" font-size="9.5" fill="#0e9b6c">4 · hazır HTML</text>
+
+      <text x="350" y="212" text-anchor="middle" font-size="13" fill="#78838a">Tarayıcı veritabanıyla <tspan font-weight="600" fill="#14171a">hiç konuşmadı.</tspan></text>
+      <text x="350" y="234" text-anchor="middle" font-size="13" fill="#78838a">Bileşenin kodu tarayıcıya <tspan font-weight="600" fill="#14171a">hiç ulaşmadı.</tspan></text>
+    </svg>
+    <figcaption><b>Şekil 8.</b> Ara katman kaybolmadı — <b>onu yazma işi kayboldu.</b> Eskiden <code>/api/entries</code> rotasını, JSON'u, <code>fetch</code>'i ve yükleniyor durumunu sen yazardın.</figcaption>
+  </figure>
+
+  <div class="box term">
+    <span class="k">sunucu mu, tarayıcı mı</span>
+    Next.js "her şey sunucuda" demiyor — <b>varsayılanı</b> sunucu yapıyor. Tarayıcıda çalışması
+    gereken dosyanın başına <code>"use client"</code> yazıyorsun.
+    <p><b>Ölçüt:</b> kullanıcının etkileşimi gerekiyor mu? Tıklama, yazma, sekme değiştirme → tarayıcı.
+    Veri çekme, gizli anahtar, HTML üretme → sunucu.</p>
+  </div>
+
+  <h3>Ne kazandık, ne kaybettik</h3>
+  <table>
+    <tr><th>Kazanç</th><th>Kayıp</th></tr>
+    <tr>
+      <td style="font-weight:400; color:var(--ink-2)">Sözleşme senkronu bitti — eskiden bir alan eklemek dört yeri güncellemekti</td>
+      <td>Ayrı ölçekleme yok — ikisi birlikte büyüyor</td>
+    </tr>
+    <tr>
+      <td style="font-weight:400; color:var(--ink-2)">İlk yüklemede boş ekran ve spinner yok</td>
+      <td>Mobil uygulama gelirse gerçek bir API yine lazım</td>
+    </tr>
+    <tr>
+      <td style="font-weight:400; color:var(--ink-2)">Tipler uçtan uca akıyor</td>
+      <td><b>Sınır görünmezleşti</b> — eskiden bir URL'di, şimdi bir satır</td>
+    </tr>
+  </table>
+  <p style="font-size:14px; color:var(--ink-3)">
+    Sonuncusu en önemlisi: sınır ucuzladı ama görünmezleşti. Gizli bir anahtarı istemci tarafına
+    sürüklemek eskisinden kolay. Çerçeve seni koruyor, ama disiplin sende.
+  </p>
+
+  <h3>Gizli bilgi</h3>
+  <p>
+    Bağlantı dizesi tek satırda <b>adres + kullanıcı adı + şifre</b> taşıyor.
+    <code>.env.local</code> dosyasında duruyor ve <code>.gitignore</code>'da.
+  </p>
+
+  <div class="box law">
+    <span class="k">kural</span>
+    Gizli bilgi kodla değil, <b>her ortamla ayrı ayrı</b> taşınır. Senin makinende
+    <code>.env.local</code>, sunucuda panel. Kod ikisinde de aynı: <code>process.env.DATABASE_URL</code>.
+  </div>
+
+  <div class="box tip">
+    <span class="k">NEXT_PUBLIC_ ön eki</span>
+    Next.js ortam değişkenlerini <b>varsayılan olarak sadece sunucuda</b> gösteriyor. Adı
+    <code>NEXT_PUBLIC_</code> ile başlıyorsa derleme sırasında <b>kodun içine metin olarak yapıştırıp</b>
+    tarayıcıya yolluyor.
+    <p>Yani ön ek, bilinçli bir <b>"yayınla" onayı</b>. Kazara sızdıramazsın, ancak isteyerek sızdırırsın.</p>
+  </div>
+</section>
+
+<!-- ══════════════ 6 · YAYIN ══════════════ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="chapter-n">06</span>
+    <h2>Yayın</h2>
+    <p class="lede">localhost'tan internete. Ve sondaki iki tuzak.</p>
+  </div>
+
+  <p>
+    <code>localhost</code> = "bu bilgisayar". Laptop kapanınca site yok. Başkasının görmesi için 7/24
+    açık, adresi ve HTTPS sertifikası olan, Node çalıştırabilen bir makine gerekiyor.
+  </p>
+  <p>
+    Eskiden: sunucu kirala, Linux kur, nginx ayarla, sertifika al, kod değişince elle güncelle.
+    Günler süren, ayrı bir uzmanlık isteyen iş.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 700 160" role="img" aria-label="Deploy hattı: git push, GitHub, Vercel build, ve dünya çapında dağıtım.">
+      <defs><marker id="ar9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#0e9b6c"/></marker></defs>
+      <rect x="0" y="46" width="140" height="62" rx="10" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="70" y="72" text-anchor="middle" font-size="13" font-weight="600" fill="#14171a">bilgisayarın</text>
+      <text x="70" y="92" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10.5" fill="#0e9b6c">git push</text>
+
+      <rect x="186" y="46" width="140" height="62" rx="10" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="256" y="72" text-anchor="middle" font-size="13" font-weight="600" fill="#14171a">GitHub</text>
+      <text x="256" y="92" text-anchor="middle" font-size="10.5" fill="#78838a">kaynak kod</text>
+
+      <rect x="372" y="46" width="140" height="62" rx="10" fill="rgba(14,155,108,0.10)" stroke="rgba(14,155,108,0.34)"/>
+      <text x="442" y="72" text-anchor="middle" font-size="13" font-weight="600" fill="#0e9b6c">Vercel</text>
+      <text x="442" y="92" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10.5" fill="#4f5a60">npm run build</text>
+
+      <rect x="558" y="46" width="142" height="62" rx="10" fill="#f0eee8" stroke="#ded9cf"/>
+      <text x="629" y="72" text-anchor="middle" font-size="13" font-weight="600" fill="#14171a">dünya</text>
+      <text x="629" y="92" text-anchor="middle" font-size="10.5" fill="#78838a">adres + HTTPS</text>
+
+      <line x1="144" y1="77" x2="180" y2="77" stroke="#0e9b6c" stroke-width="1.6" marker-end="url(#ar9)"/>
+      <line x1="330" y1="77" x2="366" y2="77" stroke="#0e9b6c" stroke-width="1.6" marker-end="url(#ar9)"/>
+      <line x1="516" y1="77" x2="552" y2="77" stroke="#0e9b6c" stroke-width="1.6" marker-end="url(#ar9)"/>
+
+      <text x="350" y="140" text-anchor="middle" font-family="Instrument Serif,serif" font-size="20" fill="#14171a">git push = yayın</text>
+    </svg>
+    <figcaption><b>Şekil 9.</b> Vercel depoyu izliyor. Push'u görünce kodu çekiyor, derliyor, dağıtıyor. Başka hiçbir şey yapmıyorsun.</figcaption>
+  </figure>
+
+  <div class="oops">
+    <div class="k">gerçekten başımıza geldi</div>
+    <h4><code>password authentication failed</code></h4>
+    <p>Ortam değişkeni panele girilmişti, ama derleme çöküyordu:</p>
+    <pre><code><span class="c">Error [NeonDbError]: password authentication failed
+for user 'neondb_owner'</span></code></pre>
+    <p>
+      Hata çok şey söylüyordu: değişken <b>vardı</b> (yoksa bizim <code>throw</code>'umuz çalışırdı),
+      adres <b>doğruydu</b>, kullanıcı adı <b>tanınmıştı</b>. Sadece şifre yanlıştı.
+    </p>
+    <p>
+      Sebep: <code>.env.local</code>'de değer tırnak içinde yazılıyor —
+      <code>DATABASE_URL="postgres://…"</code>. O tırnaklar <b>dosya biçiminin parçası</b>, Next.js
+      onları soyuyor. Panelin form kutusu ise dosya değil: ne yapıştırdıysan harfi harfine alıyor.
+    </p>
+    <p style="margin-top:12px"><b>Aynı metin, iki farklı kural.</b> Dosyada tırnak gerekir, panelde gerekmez.</p>
+  </div>
+
+  <h3>Statik mi, dinamik mi</h3>
+  <p>
+    Next.js varsayılan olarak sayfayı <b>derlemede bir kez</b> üretiyor. Çoğu sayfa için doğru: bir kez
+    üret, dağıt, veritabanına hiç dokunma. Çok hızlı.
+  </p>
+  <p>Ama kullanıcı verisi gösteren sayfada bu yanlış — veri donuyor.</p>
+
+  <table>
+    <tr><th></th><th>Statik</th><th>Dinamik</th></tr>
+    <tr><td>Sorgu ne zaman</td><td style="font-weight:400;color:var(--ink-2)">Derlemede, bir kez</td><td style="font-weight:400;color:var(--ink-2)">Her istekte</td></tr>
+    <tr><td>Doğru olduğu yer</td><td style="font-weight:400;color:var(--ink-2)">Tanıtım sayfası, belge</td><td style="font-weight:400;color:var(--ink-2)"><b>Kullanıcı verisi</b></td></tr>
+  </table>
+
+  <div class="box trap">
+    <span class="k">sinsi tuzak</span>
+    Statik sayfa <b>çalışıyor gibi görünür</b> — veri var, sayfa açılıyor. Ama gösterdiği şey derleme
+    anından kalma.
+    <p><b>Teşhis:</b> sayfayı iki kez yenile. Değişmiyorsa statik. Ya da <code>npm run build</code>
+    çıktısında <code>○ (Static)</code> ara. Ya da yanıt başlığına bak:
+    <code>x-vercel-cache: HIT</code> → statik, <code>MISS</code> → dinamik.</p>
+    <p><b>Çözüm:</b> <code>export const dynamic = "force-dynamic";</code></p>
+    <p>Bir yan etkisi daha var: statikken sorgu derlemede çalıştığı için ortam değişkeni
+    <b>build anında</b> gerekiyor. Yoksa derleme çöküyor ve eski sürüm servis edilmeye devam ediyor.</p>
+  </div>
+
+  <div class="quote">
+    Boş bir klasörden başladın. Şimdi internette bir adres var, açınca sayfa geliyor,
+    ve sayfadaki sayı her istekte başka bir kıtadaki veritabanından geliyor.
+  </div>
+</section>
+
+<!-- ══════════════ EKLER ══════════════ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="chapter-n">EK</span>
+    <h2>Sözlükler ve tuzaklar</h2>
+    <p class="lede">Kavramı unutursan bölüme dön; komutu unutursan buraya.</p>
+  </div>
+
+  <h3>Komutlar</h3>
+  <table>
+    <tr><td><code>pwd</code></td><td>Hangi klasördeyim</td></tr>
+    <tr><td><code>cd ~/Desktop/rung</code></td><td>Klasör değiştir · <code>~</code> = kullanıcı klasörün</td></tr>
+    <tr><td><code>git init -b main</code></td><td>Klasörü depoya çevir, ana dal <code>main</code></td></tr>
+    <tr><td><code>git status</code></td><td>Git ne görüyor. Zararsız, istediğin kadar yaz</td></tr>
+    <tr><td><code>git status -sb</code></td><td>İlk satır: <code>ahead N</code> = push edilmemiş N commit</td></tr>
+    <tr><td><code>git add .</code> / <code>git add a b</code></td><td>Hepsini / sadece belirtilenleri sahnele</td></tr>
+    <tr><td><code>git commit -m "tip: mesaj"</code></td><td>Kayıt noktası oluştur</td></tr>
+    <tr><td><code>git remote add origin &lt;url&gt;</code></td><td>Uzak depoyu tanıt</td></tr>
+    <tr><td><code>git push -u origin main</code></td><td>İlk gönderim — dal başına bir kez</td></tr>
+    <tr><td><code>git check-ignore -v &lt;dosya&gt;</code></td><td>Bu dosyayı hangi kural yok sayıyor</td></tr>
+    <tr><td><code>git revert &lt;kimlik&gt;</code></td><td>O commit'in tersini yapan yeni commit</td></tr>
+    <tr><td><code>node --version</code></td><td>Node kurulu mu, hangi sürüm</td></tr>
+    <tr><td><code>npm init</code></td><td><code>package.json</code> oluştur</td></tr>
+    <tr><td><code>npm install &lt;paket&gt;</code></td><td>Paket kur → <code>dependencies</code></td></tr>
+    <tr><td><code>npm install -D &lt;paket&gt;</code></td><td>Geliştirme paketi → <code>devDependencies</code></td></tr>
+    <tr><td><code>npm run dev</code></td><td>Geliştirme sunucusu · durdur: <b>Ctrl+C</b></td></tr>
+    <tr><td><code>npm run build</code></td><td>Canlıya hazır derleme · <b>tip hatasında durur</b></td></tr>
+    <tr><td><code>npx tsc --noEmit</code></td><td>Sadece tip kontrolü, dosya üretme</td></tr>
+  </table>
+
+  <h3>Terimler</h3>
+  <table>
+    <tr><td>repository</td><td style="font-weight:400;color:var(--ink-2)">Git'in takip ettiği klasör. Kısaca <b>repo</b></td></tr>
+    <tr><td>commit</td><td style="font-weight:400;color:var(--ink-2)">Kayıt noktası — fotoğraf + neden çekildiğini anlatan not</td></tr>
+    <tr><td>branch</td><td style="font-weight:400;color:var(--ink-2)">Paralel çalışma hattı</td></tr>
+    <tr><td>staging area</td><td style="font-weight:400;color:var(--ink-2)">Commit'e girecek içeriklerin toplandığı ara bölge</td></tr>
+    <tr><td>untracked</td><td style="font-weight:400;color:var(--ink-2)">Git'in gördüğü ama takip etmediği dosya</td></tr>
+    <tr><td>remote</td><td style="font-weight:400;color:var(--ink-2)">Deponun başka makinedeki kopyası. Genelde <code>origin</code></td></tr>
+    <tr><td>upstream</td><td style="font-weight:400;color:var(--ink-2)">Yerel dalın takip ettiği uzak dal. <code>-u</code> ile kurulur</td></tr>
+    <tr><td>package</td><td style="font-weight:400;color:var(--ink-2)">Başkasının yazıp paylaştığı kod parçası</td></tr>
+    <tr><td>dependency</td><td style="font-weight:400;color:var(--ink-2)">Projenin <b>çalışmak için</b> ihtiyaç duyduğu paket</td></tr>
+    <tr><td>framework</td><td style="font-weight:400;color:var(--ink-2)">Çözülmüş problemlerin hazır geldiği yapı</td></tr>
+    <tr><td>App Router</td><td style="font-weight:400;color:var(--ink-2)">Klasör yapısının adres yapısı olduğu model</td></tr>
+    <tr><td>JSX</td><td style="font-weight:400;color:var(--ink-2)">JavaScript içinde HTML gibi yazılan sözdizimi</td></tr>
+    <tr><td>Server Component</td><td style="font-weight:400;color:var(--ink-2)">Sunucuda çalışıp HTML üreten bileşen. <b>Varsayılan</b></td></tr>
+    <tr><td>Client Component</td><td style="font-weight:400;color:var(--ink-2)">Tarayıcıda da çalışan bileşen. <code>"use client"</code></td></tr>
+    <tr><td>paketleyici</td><td style="font-weight:400;color:var(--ink-2)"><i>bundler</i> — dosyaları çevirip birleştiren program</td></tr>
+    <tr><td>daraltma</td><td style="font-weight:400;color:var(--ink-2)"><i>narrowing</i> — TypeScript'in akışa bakarak tipi kesinleştirmesi</td></tr>
+    <tr><td>ortam değişkeni</td><td style="font-weight:400;color:var(--ink-2)">Kodun dışında duran ayar. <code>process.env</code></td></tr>
+    <tr><td>sunucusuz</td><td style="font-weight:400;color:var(--ink-2)"><i>serverless</i> — istek geldiğinde çalışıp kapanan kod</td></tr>
+  </table>
+
+  <h3>On iki tuzak</h3>
+  <table>
+    <tr><th>Tuzak</th><th>Belirti · çözüm</th></tr>
+    <tr><td>Gizli anahtarı commit'lemek</td><td style="font-weight:400;color:var(--ink-2)">Geçmişte kalır. <b>Anahtarı iptal et, yenisini al</b></td></tr>
+    <tr><td><code>node_modules</code>'ü commit'lemek</td><td style="font-weight:400;color:var(--ink-2)">Her klonda indirilir. <code>git rm -r --cached</code></td></tr>
+    <tr><td>Yanlış klasörde <code>git init</code></td><td style="font-weight:400;color:var(--ink-2)">Masaüstü depo olur. <code>.git</code>'i sil · önlem: <code>pwd</code></td></tr>
+    <tr><td>GitHub deposunu README ile açmak</td><td style="font-weight:400;color:var(--ink-2)"><code>unrelated histories</code> · depoyu boş aç</td></tr>
+    <tr><td><code>git add</code>'den sonra düzenlemek</td><td style="font-weight:400;color:var(--ink-2)">Yeni hâli commit'e girmez · tekrar <code>git add</code></td></tr>
+    <tr><td>Push'ta şifre yazmak</td><td style="font-weight:400;color:var(--ink-2)">GitHub 2021'de kapattı · <b>token</b> üret</td></tr>
+    <tr><td><code>-m</code> olmadan commit</td><td style="font-weight:400;color:var(--ink-2)">vim açılır · <code>:q!</code></td></tr>
+    <tr><td><code>"type": "commonjs"</code> bırakmak</td><td style="font-weight:400;color:var(--ink-2)">Modül biçimi hatası · <b>satırı sil</b></td></tr>
+    <tr><td>Commit'leyip push etmemek</td><td style="font-weight:400;color:var(--ink-2)">Canlı değişmez · <code>git status</code> ilk satır</td></tr>
+    <tr><td>Panele tırnaklı değer yapıştırmak</td><td style="font-weight:400;color:var(--ink-2)"><code>authentication failed</code> · tırnaksız + redeploy</td></tr>
+    <tr><td>JSX içinde <code>//</code></td><td style="font-weight:400;color:var(--ink-2)">Yorum ekranda görünür · <code>{/* */}</code></td></tr>
+    <tr><td>Sayfanın statik kalması</td><td style="font-weight:400;color:var(--ink-2)">Veri donar · <code>force-dynamic</code></td></tr>
+  </table>
+
+  <div class="end">
+    <span>Sıfırdan Next.js</span>
+    <span>Rung projesinin saha notlarından</span>
+    <span>14 Ağustos 2026</span>
+  </div>
+</section>
+
+</div>
+</body>
+</html>
