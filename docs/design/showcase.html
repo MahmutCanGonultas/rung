@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="tr" class="nojs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RUNG — ölçüm aleti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script>document.documentElement.className="js";</script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   RUNG · showcase
+   İki renk: #000 · #FFF. Kütüphane yok.
+   Bütün hareket ya shader'dan ya da KAYDIRMA KONUMUNDAN geliyor —
+   video yok, kare dizisi yok. Kaydırdıkça değerler sürekli değişiyor.
+   ═══════════════════════════════════════════════════════════════ */
+
+*,*::before,*::after{box-sizing:border-box}
+:root{--ease:cubic-bezier(.16,1,.3,1);--pad:clamp(20px,4.4vw,64px)}
+html{-webkit-text-size-adjust:100%}
+html,body{margin:0;padding:0;background:#000;color:#fff}
+body{
+  font-family:"Inter",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.5;letter-spacing:-.011em;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+body.lock{overflow:hidden;height:100vh}
+::selection{background:#fff;color:#000}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,p{margin:0}
+img{max-width:100%}
+
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase}
+
+/* ── imleç ─────────────────────────────────────────────────── */
+.cursor{position:fixed;top:0;left:0;width:13px;height:13px;border-radius:50%;background:#fff;
+  pointer-events:none;z-index:9999;mix-blend-mode:difference;transform:translate(-50%,-50%);
+  transition:width .45s var(--ease),height .45s var(--ease);will-change:transform}
+.cursor.big{width:74px;height:74px}
+.curlbl{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;mix-blend-mode:difference;
+  font-family:ui-monospace,monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  transform:translate(-50%,-50%);opacity:0;transition:opacity .3s var(--ease);will-change:transform}
+.curlbl.on{opacity:1}
+@media (hover:none){.cursor,.curlbl{display:none}}
+
+/* ── yükleyici ─────────────────────────────────────────────── */
+.loader{position:fixed;inset:0;z-index:9000;background:#000;display:flex;
+  align-items:flex-end;justify-content:space-between;padding:var(--pad);
+  transition:transform 1.05s cubic-bezier(.7,0,.2,1)}
+.loader.done{transform:translateY(-101%)}
+.loader .num{font-size:clamp(72px,17vw,220px);font-weight:700;letter-spacing:-.055em;
+  line-height:.82;font-variant-numeric:tabular-nums}
+.lbar{position:absolute;left:var(--pad);right:var(--pad);bottom:calc(var(--pad) - 1px);height:1px;background:rgba(255,255,255,.18)}
+.lbar i{display:block;height:100%;width:0;background:#fff}
+
+/* ── nav ───────────────────────────────────────────────────── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;
+  justify-content:space-between;padding:var(--pad);mix-blend-mode:difference}
+.nav .brand{font-size:15px;font-weight:700;letter-spacing:-.04em}
+.nav .links{display:flex;gap:26px}
+@media(max-width:680px){.nav .links{display:none}}
+
+/* ── hero ──────────────────────────────────────────────────── */
+.hero{position:relative;height:100svh;min-height:560px;overflow:hidden}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;will-change:transform}
+.fb{position:absolute;inset:0;display:none;
+  background:radial-gradient(130% 95% at 50% 105%,#4a4a4a 0%,#000 62%)}
+.hero::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(to top,#000 6%,rgba(0,0,0,.97) 44%,rgba(0,0,0,.72) 68%,rgba(0,0,0,.18) 90%,transparent 100%)}
+.hero-in{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
+  justify-content:flex-end;padding:var(--pad);pointer-events:none;will-change:transform}
+.hero h1{font-size:clamp(60px,15.5vw,258px);font-weight:800;letter-spacing:-.055em;
+  line-height:.8;text-transform:uppercase}
+.hero h1 .ln{display:block;overflow:hidden}
+.hero h1 .ln>span{display:block;transition:transform 1.15s var(--ease)}
+.js .hero h1 .ln>span{transform:translateY(105%)}
+.ready .hero h1 .ln>span{transform:translateY(0)}
+.ready .hero h1 .ln:nth-child(2)>span{transition-delay:.09s}
+.ready .hero h1 .ln:nth-child(3)>span{transition-delay:.18s}
+.hmeta{display:flex;justify-content:space-between;align-items:flex-end;gap:22px;
+  margin-top:clamp(18px,3.2vw,38px);flex-wrap:wrap}
+.hmeta p{max-width:38ch;font-size:clamp(13px,1.1vw,16px);line-height:1.45;transition:all 1s var(--ease) .55s}
+.js .hmeta p{opacity:0;transform:translateY(14px)}
+.ready .hmeta p{opacity:1;transform:none}
+.hmeta .mono{transition:opacity 1s var(--ease) .75s}
+.js .hmeta .mono{opacity:0}
+.ready .hmeta .mono{opacity:1}
+.cue{position:absolute;left:50%;bottom:calc(var(--pad) + 4px);z-index:4;transform:translateX(-50%);
+  mix-blend-mode:difference;display:flex;flex-direction:column;align-items:center;gap:9px;
+  transition:opacity 1s var(--ease) 1s}
+.js .cue{opacity:0}
+.ready .cue{opacity:1}
+.cue i{display:block;width:1px;height:44px;background:#fff;transform-origin:top;
+  animation:cue 1.9s cubic-bezier(.7,0,.2,1) infinite}
+@keyframes cue{0%{transform:scaleY(0)}45%{transform:scaleY(1)}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ── şerit ─────────────────────────────────────────────────── */
+.tick{border-block:1px solid rgba(255,255,255,.16);overflow:hidden;padding:15px 0}
+.tick-in{display:flex;width:max-content;will-change:transform}
+.tick span{font-size:clamp(22px,4.4vw,60px);font-weight:700;letter-spacing:-.045em;
+  text-transform:uppercase;padding-right:.5em;white-space:nowrap}
+.tick span em{font-style:normal;-webkit-text-stroke:1px #fff;color:transparent}
+
+/* ── bölüm ─────────────────────────────────────────────────── */
+.wrap{padding:clamp(88px,12.5vw,180px) var(--pad)}
+.eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:clamp(24px,3.8vw,50px);opacity:.55}
+.eyebrow::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.22)}
+.big{font-size:clamp(29px,5.4vw,84px);font-weight:600;letter-spacing:-.042em;line-height:1.03;max-width:19ch}
+.big .w{display:inline-block;overflow:hidden;vertical-align:top}
+.big .w>span{display:inline-block;will-change:transform}
+.dim{opacity:.4}
+.rv{transition:opacity .95s var(--ease),transform .95s var(--ease)}
+.js .rv{opacity:0;transform:translateY(24px)}
+.in .rv{opacity:1;transform:none}
+.in .rv[data-d="1"]{transition-delay:.07s}.in .rv[data-d="2"]{transition-delay:.14s}
+.in .rv[data-d="3"]{transition-delay:.21s}.in .rv[data-d="4"]{transition-delay:.28s}
+
+/* ── KAYDIRMAYLA DEĞİŞEN GÖRSEL ────────────────────────────── */
+.morph{height:340vh;position:relative}
+.morph-sticky{position:sticky;top:0;height:100svh;overflow:hidden}
+#gl2{position:absolute;inset:0;width:100%;height:100%;display:block}
+.morph-txt{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
+  justify-content:center;padding:var(--pad);mix-blend-mode:difference;pointer-events:none}
+.morph-txt h2{font-size:clamp(30px,6.4vw,104px);font-weight:700;letter-spacing:-.05em;line-height:.94;max-width:14ch}
+.morph-state{position:absolute;left:var(--pad);bottom:var(--pad);z-index:4;mix-blend-mode:difference;display:flex;gap:22px}
+.morph-state b{font-weight:500;opacity:.35;transition:opacity .4s var(--ease)}
+.morph-state b.on{opacity:1}
+.mprog{position:absolute;right:var(--pad);bottom:var(--pad);z-index:4;mix-blend-mode:difference;
+  font-variant-numeric:tabular-nums;font-size:clamp(30px,5vw,72px);font-weight:700;letter-spacing:-.05em;line-height:1}
+
+/* ── çizilen çizgi ─────────────────────────────────────────── */
+.draw{padding:clamp(70px,10vw,140px) var(--pad)}
+.draw svg{width:100%;height:auto;display:block;overflow:visible}
+.draw .pth{fill:none;stroke:#fff;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.draw .grid{stroke:rgba(255,255,255,.14);stroke-width:1}
+.draw .lbl{fill:rgba(255,255,255,.45);font-family:ui-monospace,monospace;font-size:9px;letter-spacing:.14em}
+.draw .hd{fill:#fff;font-family:"Inter",sans-serif;font-size:13px;font-weight:600}
+
+/* ── hat ───────────────────────────────────────────────────── */
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.16);margin-top:clamp(38px,5.6vw,76px)}
+@media(max-width:900px){.pipe{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.pipe{grid-template-columns:1fr}}
+.cel{background:#000;padding:clamp(20px,2.4vw,32px);min-height:clamp(186px,19vw,262px);
+  display:flex;flex-direction:column;position:relative;overflow:hidden}
+.cel::before{content:"";position:absolute;inset:0;background:#fff;transform:translateY(101%);
+  transition:transform .6s var(--ease)}
+.cel:hover::before{transform:translateY(0)}
+.cel>*{position:relative;z-index:2;transition:color .45s var(--ease)}
+.cel:hover>*{color:#000}
+.cel .id{opacity:.5;margin-bottom:auto}
+.cel h3{font-size:clamp(18px,1.7vw,25px);font-weight:600;letter-spacing:-.03em;margin:24px 0 8px}
+.cel p{font-size:13.5px;line-height:1.5;opacity:.62}
+.cel .ai{position:absolute;top:clamp(20px,2.4vw,32px);right:clamp(20px,2.4vw,32px);z-index:2;
+  border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:4px 9px;transition:border-color .45s var(--ease)}
+.cel:hover .ai{border-color:rgba(0,0,0,.3)}
+
+/* ── yatay ray ─────────────────────────────────────────────── */
+.rail{height:420vh;position:relative}
+.rail-st{position:sticky;top:0;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.rail-hd{padding:0 var(--pad);margin-bottom:clamp(22px,3.2vw,42px)}
+.rail-tr{display:flex;gap:clamp(14px,1.6vw,26px);padding:0 var(--pad);will-change:transform}
+.card{flex:0 0 clamp(276px,33vw,460px);border:1px solid rgba(255,255,255,.2);
+  padding:clamp(20px,2.2vw,32px);min-height:clamp(310px,41vh,450px);display:flex;
+  flex-direction:column;justify-content:space-between;transition:border-color .5s var(--ease)}
+.card:hover{border-color:#fff}
+.card .n{font-size:clamp(44px,5.8vw,90px);font-weight:700;letter-spacing:-.06em;line-height:.8;
+  opacity:.2;transition:opacity .5s var(--ease)}
+.card:hover .n{opacity:1}
+.card h3{font-size:clamp(20px,2vw,31px);font-weight:600;letter-spacing:-.032em;margin-bottom:10px}
+.card p{font-size:14px;line-height:1.5;opacity:.6;max-width:34ch}
+.rbar{margin:clamp(22px,2.8vw,38px) var(--pad) 0;height:1px;background:rgba(255,255,255,.18)}
+.rbar i{display:block;height:100%;width:0;background:#fff}
+
+/* ── sayılar ───────────────────────────────────────────────── */
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.16);
+  border-block:1px solid rgba(255,255,255,.16)}
+@media(max-width:820px){.nums{grid-template-columns:1fr 1fr}}
+.num{background:#000;padding:clamp(26px,3.3vw,48px) clamp(18px,2.2vw,30px)}
+.num .v{font-size:clamp(40px,6.2vw,100px);font-weight:700;letter-spacing:-.055em;line-height:.86;
+  font-variant-numeric:tabular-nums}
+.num .k{margin-top:13px;opacity:.5}
+
+/* ── ayak ──────────────────────────────────────────────────── */
+.foot{border-top:1px solid rgba(255,255,255,.16);padding:var(--pad);display:flex;
+  justify-content:space-between;align-items:flex-end;gap:22px;flex-wrap:wrap}
+.foot .lg{font-size:clamp(50px,12.5vw,196px);font-weight:800;letter-spacing:-.06em;line-height:.78;text-transform:uppercase}
+.foot .cols{display:flex;gap:clamp(24px,5vw,76px);flex-wrap:wrap}
+.foot .col{display:flex;flex-direction:column;gap:8px}
+.lnk{position:relative;display:inline-block;padding-bottom:2px}
+.lnk::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:#fff;
+  transform:scaleX(0);transform-origin:right;transition:transform .55s var(--ease)}
+.lnk:hover::after{transform:scaleX(1);transform-origin:left}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
+  .hero h1 .ln>span{transform:none!important}
+  .rv{opacity:1!important;transform:none!important}
+}
+</style>
+</head>
+<body class="lock">
+
+<div class="cursor" id="cur"></div>
+<div class="curlbl" id="curLbl"></div>
+
+<div class="loader" id="loader">
+  <div class="num" id="lnum">00</div>
+  <div class="mono" style="padding-bottom:.9em">Rung · ölçüm aleti</div>
+  <div class="lbar"><i id="lbar"></i></div>
+</div>
+
+<nav class="nav">
+  <div class="brand">RUNG®</div>
+  <div class="links mono">
+    <a href="#morph" class="lnk" data-c="kaos">Ölçüm</a>
+    <a href="#hat" class="lnk" data-c="hat">Hat</a>
+    <a href="#ekran" class="lnk" data-c="ekran">Ekranlar</a>
+  </div>
+  <div class="mono">TR · 2026</div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<header class="hero" id="hero">
+  <div class="fb" id="fb"></div>
+  <canvas id="gl"></canvas>
+  <div class="hero-in" id="heroIn">
+    <h1>
+      <span class="ln"><span>Ölçme-</span></span>
+      <span class="ln"><span>diğin şeye</span></span>
+      <span class="ln"><span>güvenme.</span></span>
+    </h1>
+    <div class="hmeta">
+      <p>Rung bir kurs değil, bir <b>ölçüm aleti</b>. İngilizce öğretmiyor — yazdığın İngilizceye bakıp nerede, neden ve ne sıklıkla hata yaptığını çıkarıyor. Ve kendi doğruluğunu da ölçüyor.</p>
+      <div class="mono">Türkçe konuşanlar için · A1 → C1</div>
+    </div>
+  </div>
+  <div class="cue"><span class="mono">Kaydır</span><i></i></div>
+</header>
+
+<!-- ══ ŞERİT ══ -->
+<div class="tick"><div class="tick-in" id="tick"></div></div>
+
+<!-- ══ KAYDIRMAYLA MORFLANAN GÖRSEL ══ -->
+<section class="morph" id="morph">
+  <div class="morph-sticky">
+    <canvas id="gl2"></canvas>
+    <div class="morph-txt">
+      <div class="mono" style="margin-bottom:18px;opacity:.7">02 — Ne yapıyor</div>
+      <h2 id="mtitle">Gürültüden ölçüme.</h2>
+    </div>
+    <div class="morph-state mono">
+      <b id="s1" class="on">Kaos</b><b id="s2">Örüntü</b><b id="s3">Ölçüm</b>
+    </div>
+    <div class="mprog" id="mprog">00</div>
+  </div>
+</section>
+
+<!-- ══ ÇİZİLEN ÇİZGİ ══ -->
+<section class="draw" id="draw">
+  <div class="mono eyebrow">03 — Altı ay</div>
+  <svg viewBox="0 0 1000 300" role="img" aria-label="Altı ay boyunca yükselen seviye tahmini ve düşen hata yoğunluğu.">
+    <line class="grid" x1="0" y1="40"  x2="1000" y2="40"/>
+    <line class="grid" x1="0" y1="130" x2="1000" y2="130"/>
+    <line class="grid" x1="0" y1="220" x2="1000" y2="220"/>
+    <text class="lbl" x="0" y="32">B2</text>
+    <text class="lbl" x="0" y="122">B1</text>
+    <text class="lbl" x="0" y="212">A2</text>
+    <path class="pth" id="p1" d="M40,214 C160,206 250,190 340,172 C440,152 520,138 620,116 C720,94 820,74 960,52"/>
+    <path class="pth" id="p2" style="opacity:.34" d="M40,66 C170,92 260,120 350,142 C450,166 540,186 640,206 C740,226 840,238 960,246"/>
+    <circle id="d1" r="5" fill="#fff" cx="40" cy="214"/>
+    <circle id="d2" r="3.5" fill="#fff" opacity=".5" cx="40" cy="66"/>
+    <text class="hd" id="t1" x="40" y="200">seviye</text>
+    <text class="hd" id="t2" x="40" y="84" opacity=".5">hata / 100 kelime</text>
+  </svg>
+  <p class="rv" style="max-width:46ch;margin-top:34px;opacity:.62;font-size:15px;line-height:1.55">
+    Yeşil çizgi yok, kutlama yok. İki eğri: seviyen yukarı, hata yoğunluğun aşağı.
+    Kaydırdıkça çiziliyor — çünkü altı ay da böyle geçti.
+  </p>
+</section>
+
+<!-- ══ HAT ══ -->
+<section class="wrap obs" id="hat">
+  <div class="mono eyebrow">04 — Analiz hattı</div>
+  <h2 class="big" data-split>Beş katmanın <span class="dim">üçü yapay zekâ kullanmıyor.</span></h2>
+  <p class="rv" style="max-width:52ch;margin-top:24px;opacity:.62;font-size:15px;line-height:1.55">Modele ne kadar az iş verirsen o kadar az saçmalıyor. Neyin modele verilmeyeceğini bilmek, "yapay zekâ kullanabiliyorum"dan güçlü bir sinyal.</p>
+  <div class="pipe">
+    <div class="cel"><div class="mono id">K0</div><span class="mono ai">kural</span><h3>Ölçüm</h3><p>Yazım, uzunluk, karmaşıklık, kelime bandı. Bedava, anlık, her seferinde aynı.</p></div>
+    <div class="cel"><div class="mono id">K1</div><span class="mono ai">model</span><h3>Çıkarım</h3><p>Sabit taksonomiye ve zorunlu şemaya yazmak zorunda. Serbest metin üretemiyor.</p></div>
+    <div class="cel"><div class="mono id">K2</div><span class="mono ai">model</span><h3>İkinci geçiş</h3><p>Her bulguya ayrıca "bu gerçekten hata mı" sorulur. Yanlış alarmı düşürür.</p></div>
+    <div class="cel"><div class="mono id">K3</div><span class="mono ai">kural</span><h3>Süzme</h3><p>Seviyeye göre sıralanır ve sayısı sınırlanır. A1'e on hata gösterilmez.</p></div>
+    <div class="cel"><div class="mono id">K4</div><span class="mono ai">kural</span><h3>Kayıt</h3><p>Metin + bulgular + model kimliği + prompt sürümü. Sürümsüz karşılaştırma yalan söyler.</p></div>
+  </div>
+</section>
+
+<!-- ══ YATAY RAY ══ -->
+<section class="rail" id="ekran">
+  <div class="rail-st">
+    <div class="rail-hd">
+      <div class="mono eyebrow" style="margin-bottom:16px">05 — Beş ekran</div>
+      <h2 class="big" style="font-size:clamp(25px,3.6vw,52px);max-width:24ch">Yaz, analiz et, geçmişe bak, ilerlemeyi gör, <span class="dim">ve aletin kendisini ölç.</span></h2>
+    </div>
+    <div class="rail-tr" id="railTr">
+      <article class="card"><div class="n">01</div><div><h3>Yaz</h3><p>Bağlam seç, seviyene uygun görev al, yaz. Boş sayfa en büyük caydırıcı.</p></div></article>
+      <article class="card"><div class="n">02</div><div><h3>Analiz</h3><p>Solda metnin, sağda bulgular. Önem sırasında, seviyeye göre sayısı sınırlı.</p></div></article>
+      <article class="card"><div class="n">03</div><div><h3>Geçmiş</h3><p>Aylara göre her kayıt. Aynı görevi tekrar yazdığında sistem bunu biliyor.</p></div></article>
+      <article class="card"><div class="n">04</div><div><h3>İlerleme</h3><p>Seviye izi, hata ailesi, inatçı kategori. Bir sonraki tekrar buradan üretiliyor.</p></div></article>
+      <article class="card"><div class="n">05</div><div><h3>Doğruluk</h3><p>Yanlış alarm, yakalama, seviye kırılımlı isabet. Zayıf yer gizlenmiyor.</p></div></article>
+    </div>
+    <div class="rbar"><i id="rbar"></i></div>
+  </div>
+</section>
+
+<!-- ══ ÖLÇÜM ══ -->
+<section class="wrap obs">
+  <div class="mono eyebrow">06 — Doğruluk</div>
+  <h2 class="big" data-split>Asıl problem hangi hatayı kaçırdığın değil. <span class="dim">Doğru cümleni "düzeltirsen" güveni anında kaybedersin.</span></h2>
+</section>
+
+<div class="nums" id="nums">
+  <div class="num"><div class="v"><span data-c="6.2" data-dec="1">0</span>%</div><div class="mono k">Yanlış alarm · ana ölçüt</div></div>
+  <div class="num"><div class="v"><span data-c="84.1" data-dec="1">0</span>%</div><div class="mono k">Yakalama</div></div>
+  <div class="num"><div class="v"><span data-c="312">0</span></div><div class="mono k">Altın küme</div></div>
+  <div class="num"><div class="v">$<span data-c="0.011" data-dec="3">0</span></div><div class="mono k">Kayıt başı maliyet</div></div>
+</div>
+
+<section class="wrap obs">
+  <h2 class="big" data-split style="font-size:clamp(25px,4vw,62px)">"Kesinlikle doğru" değil. <span class="dim">Doğruluğu ölçülmüş — ve her seviye için ayrı ölçülmüş.</span></h2>
+</section>
+
+<footer class="foot">
+  <div class="lg">RUNG®</div>
+  <div class="cols mono">
+    <div class="col" style="opacity:.5">
+      <span>Türkçe konuşanlar için</span><span>İngilizce teşhis sistemi</span><span>A1 → C1</span>
+    </div>
+    <div class="col">
+      <a class="lnk" href="product.html" data-c="ürün">Ürün ↗</a>
+      <a class="lnk" href="roadmap.html" data-c="plan">Yol haritası ↗</a>
+      <a class="lnk" href="../lessons/stage-00.html" data-c="ders">Ders notları ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+var lerp=function(a,b,t){return a+(b-a)*t;};
+var clamp=function(v,a,b){return Math.min(b,Math.max(a,v));};
+var $=function(id){return document.getElementById(id);};
+
+/* ════ ORTAK SHADER PARÇALARI ════ */
+var VS="attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
+var LIB=[
+"precision highp float;",
+"float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}",
+"float noise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);",
+"return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);}",
+"float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*noise(p);p*=2.02;a*=.5;}return v;}"
+].join("\n");
+
+/* hero: fare tepkili organik alan, yarım ton noktalarla */
+var FS1=LIB+[
+"uniform vec2 u_res;uniform float u_time;uniform vec2 u_m;uniform float u_p;",
+"void main(){",
+" vec2 uv=gl_FragCoord.xy/u_res;float asp=u_res.x/u_res.y;vec2 p=vec2(uv.x*asp,uv.y);",
+" float t=u_time*.055;",
+" vec2 q=vec2(fbm(p*2.1+t),fbm(p*2.1+vec2(5.2,1.3)-t));",
+" vec2 r=vec2(fbm(p*2.1+3.*q+vec2(1.7,9.2)+t*1.4),fbm(p*2.1+3.*q+vec2(8.3,2.8)-t*1.1));",
+" float f=fbm(p*2.1+3.*r);",
+" vec2 m=vec2(u_m.x*asp,u_m.y);float d=distance(p,m);float rip=smoothstep(.62,0.,d);",
+" f+=rip*(.22+u_p*.4);f+=sin(d*24.-u_time*2.1)*.045*rip;",
+" f*=smoothstep(0.04,0.78,uv.y);f=pow(clamp(f,0.,1.),1.18);",
+" vec2 g=fract(gl_FragCoord.xy/7.0)-.5;float rad=f*.66;",
+" float dt=smoothstep(rad+.06,rad-.06,length(g));",
+" float gr=(hash(gl_FragCoord.xy+fract(u_time))-.5)*.05;",
+" gl_FragColor=vec4(vec3(dt+gr),1.);}"
+].join("\n");
+
+/* morph: KAYDIRMA ilerlemesi kaosu ölçüme dönüştürüyor */
+var FS2=LIB+[
+"uniform vec2 u_res;uniform float u_time;uniform float u_prog;",
+"void main(){",
+" vec2 uv=gl_FragCoord.xy/u_res;float asp=u_res.x/u_res.y;vec2 p=vec2(uv.x*asp,uv.y);",
+" float t=u_time*.045;",
+" vec2 q=vec2(fbm(p*3.0+t),fbm(p*3.0+vec2(3.1,7.7)-t));",
+" float chaos=fbm(p*3.0+2.6*q);",
+" float base=.18+uv.x*.52;",
+" float band=smoothstep(.085,.0,abs(uv.y-base));",
+" float ruler=smoothstep(.9,1.,fract(uv.x*26.))*step(uv.y,.09);",
+" float order=max(band,ruler*.85);",
+" float e=u_prog*u_prog*(3.-2.*u_prog);",
+" float f=mix(chaos,order,e);",
+" f=mix(f,f*mix(.45,1.15,uv.y),1.-e);",
+" f=clamp(f,0.,1.);",
+" float cs=mix(10.0,5.0,e);",
+" vec2 g=fract(gl_FragCoord.xy/cs)-.5;float rad=f*.68;",
+" float dt=smoothstep(rad+.06,rad-.06,length(g));",
+" float gr=(hash(gl_FragCoord.xy+fract(u_time))-.5)*.06*(1.-e*.6);",
+" gl_FragColor=vec4(vec3(dt+gr),1.);}"
+].join("\n");
+
+function mk(cv,fs,names){
+  var gl=null;
+  try{gl=cv.getContext("webgl",{antialias:false,alpha:false,preserveDrawingBuffer:true})||cv.getContext("experimental-webgl");}catch(e){}
+  if(!gl)return null;
+  function sh(t,s){var o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);
+    if(!gl.getShaderParameter(o,gl.COMPILE_STATUS)){console.warn(gl.getShaderInfoLog(o));return null;}return o;}
+  var v=sh(gl.VERTEX_SHADER,VS),f=sh(gl.FRAGMENT_SHADER,fs);
+  if(!v||!f)return null;
+  var pr=gl.createProgram();gl.attachShader(pr,v);gl.attachShader(pr,f);gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr,gl.LINK_STATUS))return null;
+  gl.useProgram(pr);
+  var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  var l=gl.getAttribLocation(pr,"a");gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,2,gl.FLOAT,false,0,0);
+  var U={};names.forEach(function(n){U[n]=gl.getUniformLocation(pr,n);});
+  return {gl:gl,U:U,cv:cv,size:function(){
+    var d=Math.min(devicePixelRatio||1,1.7),w=cv.clientWidth,h=cv.clientHeight;
+    if(!w||!h)return false;
+    var W=Math.floor(w*d),H=Math.floor(h*d);
+    if(cv.width===W&&cv.height===H)return true;
+    cv.width=W;cv.height=H;
+    gl.viewport(0,0,W,H);gl.useProgram(pr);gl.uniform2f(U.u_res,W,H);
+    return true;
+  },draw:function(){gl.useProgram(pr);gl.drawArrays(gl.TRIANGLES,0,3);}};
+}
+
+var S1=mk($("gl"),FS1,["u_res","u_time","u_m","u_p"]);
+var S2=mk($("gl2"),FS2,["u_res","u_time","u_prog"]);
+if(!S1){$("fb").style.display="block";$("gl").style.display="none";}
+if(!S2){$("gl2").style.display="none";}
+function sizeAll(){if(S1)S1.size();if(S2)S2.size();}
+sizeAll();addEventListener("resize",sizeAll,{passive:true});
+
+/* ════ İŞARETÇİ ════ */
+var mx=.5,my=.5,tmx=.5,tmy=.5,pr=0,tpr=0;
+var cur=$("cur"),curLbl=$("curLbl");
+var cx=innerWidth/2,cy=innerHeight/2,tcx=cx,tcy=cy;
+addEventListener("pointermove",function(e){
+  tcx=e.clientX;tcy=e.clientY;
+  var r=$("gl").getBoundingClientRect();
+  if(r.width){tmx=(e.clientX-r.left)/r.width;tmy=1-(e.clientY-r.top)/r.height;}
+},{passive:true});
+addEventListener("pointerdown",function(){tpr=1;});
+addEventListener("pointerup",function(){tpr=0;});
+document.querySelectorAll("a,.card,.cel,.num").forEach(function(el){
+  el.addEventListener("pointerenter",function(){
+    cur.classList.add("big");
+    var c=el.getAttribute("data-c");
+    if(c){curLbl.textContent=c;curLbl.classList.add("on");}
+  });
+  el.addEventListener("pointerleave",function(){cur.classList.remove("big");curLbl.classList.remove("on");});
+});
+
+/* ════ KAYDIRMA MOTORU ════
+   Her kayıtlı öğe için 0→1 arası SÜREKLİ bir ilerleme hesaplanıyor
+   ve her karede uygulanıyor. Aç/kapa değil — kaydırdıkça akıyor. */
+var items=[];
+function reg(el,fn,o){if(el)items.push({el:el,fn:fn,o:o||{}});}
+function prog(el,o){
+  var r=el.getBoundingClientRect(),vh=innerHeight;
+  if(o.pin){ var tot=el.offsetHeight-vh; return clamp(-r.top/(tot||1),0,1); }
+  var s=o.start!==undefined?o.start:vh, e=o.end!==undefined?o.end:-r.height;
+  return clamp((s-r.top)/((s-e)||1),0,1);
+}
+
+/* hero: kaydırınca görsel uzaklaşıyor, başlık kayıyor */
+reg($("hero"),function(p){
+  var g=$("gl"),h=$("heroIn");
+  if(g)g.style.transform="scale("+(1+p*0.16)+") translateY("+(p*-40)+"px)";
+  if(h){h.style.transform="translateY("+(p*-90)+"px)";h.style.opacity=String(1-p*1.05);}
+},{pin:false});
+
+/* şerit: kaydırma yönüne göre kayıyor */
+var tickX=0;
+reg($("tick"),function(p,r){ tickX=-p*520; },{});
+
+/* morph: shader'ın u_prog'u doğrudan kaydırmadan */
+var mp=0;
+reg($("morph"),function(p){ mp=p; },{pin:true});
+
+/* çizgi: stroke-dashoffset kaydırmayla azalıyor */
+var p1=$("p1"),p2=$("p2"),L1=0,L2=0;
+if(p1&&p1.getTotalLength){L1=p1.getTotalLength();L2=p2.getTotalLength();
+  p1.style.strokeDasharray=L1;p2.style.strokeDasharray=L2;}
+reg($("draw"),function(p){
+  if(!L1)return;
+  var e=clamp((p-0.12)/0.62,0,1);
+  p1.style.strokeDashoffset=L1*(1-e);
+  p2.style.strokeDashoffset=L2*(1-e);
+  var a=p1.getPointAtLength(L1*e),b=p2.getPointAtLength(L2*e);
+  $("d1").setAttribute("cx",a.x);$("d1").setAttribute("cy",a.y);
+  $("d2").setAttribute("cx",b.x);$("d2").setAttribute("cy",b.y);
+  $("t1").setAttribute("x",a.x+12);$("t1").setAttribute("y",a.y-12);
+  $("t2").setAttribute("x",b.x+12);$("t2").setAttribute("y",b.y+22);
+},{start:innerHeight*0.95,end:0});
+
+/* yatay ray */
+var rx=0,rt=0;
+reg($("ekran"),function(p){
+  var tr=$("railTr");if(!tr)return;
+  var max=Math.max(0,tr.scrollWidth-innerWidth+40);
+  rt=-p*max;
+  var bar=$("rbar");if(bar)bar.style.width=(p*100)+"%";
+},{pin:true});
+
+/* sayılar: kaydırmaya bağlı, ileri geri gidiyor */
+reg($("nums"),function(p){
+  var e=clamp((p-0.1)/0.5,0,1); e=1-Math.pow(1-e,3);
+  document.querySelectorAll("#nums [data-c]").forEach(function(s){
+    var to=parseFloat(s.getAttribute("data-c")),d=parseInt(s.getAttribute("data-dec")||"0",10);
+    s.textContent=(to*e).toFixed(d);
+  });
+},{start:innerHeight,end:innerHeight*0.25});
+
+/* başlıklarda kelime kelime maskeli açılış — kaydırmayla sürekli */
+document.querySelectorAll("[data-split]").forEach(function(el){
+  (function walk(node){
+    Array.prototype.slice.call(node.childNodes).forEach(function(n){
+      if(n.nodeType===3){
+        var fr=document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(function(w){
+          if(!w.trim()){fr.appendChild(document.createTextNode(w));return;}
+          var o=document.createElement("span");o.className="w";
+          var i=document.createElement("span");i.textContent=w;
+          o.appendChild(i);fr.appendChild(o);
+        });
+        node.replaceChild(fr,n);
+      }else if(n.nodeType===1)walk(n);
+    });
+  })(el);
+  var ws=el.querySelectorAll(".w>span");
+  reg(el,function(p){
+    var n=ws.length;
+    for(var i=0;i<n;i++){
+      var t=clamp((p-0.12-(i/n)*0.26)/0.3,0,1);
+      t=1-Math.pow(1-t,3);
+      ws[i].style.transform="translateY("+((1-t)*102)+"%)";
+    }
+  },{start:innerHeight*0.92,end:innerHeight*0.15});
+});
+
+/* ════ İKİLİ GÖRÜNÜRLÜK (basit açılışlar) ════ */
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});
+},{threshold:.16});
+document.querySelectorAll(".obs,.draw").forEach(function(el){io.observe(el);});
+
+/* ════ ŞERİT İÇERİĞİ ════ */
+(function(){
+  var w=["Ölç","Kaydet","Karşılaştır","Doğrula","İtiraz et","Tekrar ölç"];
+  var one=w.map(function(x,i){return "<span>"+(i%2?"<em>"+x+"</em>":x)+" ·</span>";}).join("");
+  $("tick").innerHTML=one+one+one;
+})();
+
+/* ════ MIKNATIS ════ */
+document.querySelectorAll(".nav a,.foot a").forEach(function(el){
+  var ex=0,ey=0,tx=0,ty=0;
+  el.addEventListener("pointermove",function(e){
+    var r=el.getBoundingClientRect();
+    tx=(e.clientX-(r.left+r.width/2))*.32;ty=(e.clientY-(r.top+r.height/2))*.32;
+  });
+  el.addEventListener("pointerleave",function(){tx=0;ty=0;});
+  (function lp(){ex=lerp(ex,tx,.16);ey=lerp(ey,ty,.16);
+    el.style.transform="translate("+ex+"px,"+ey+"px)";requestAnimationFrame(lp);})();
+});
+
+/* ════ ANA DÖNGÜ ════ */
+var t0=performance.now(),tickCur=0,mpS=0;
+function frame(now){
+  var t=(now-t0)/1000;
+  for(var i=0;i<items.length;i++)items[i].fn(prog(items[i].el,items[i].o),0);
+
+  if(S1)S1.size(); if(S2)S2.size();
+  mx=lerp(mx,tmx,.07);my=lerp(my,tmy,.07);pr=lerp(pr,tpr,.09);
+  if(S1){S1.gl.useProgram;S1.gl.uniform1f(S1.U.u_time,RM?0:t);
+    S1.gl.uniform2f(S1.U.u_m,mx,my);S1.gl.uniform1f(S1.U.u_p,pr);S1.draw();}
+  if(S2){mpS=lerp(mpS,mp,.18);
+    S2.gl.uniform1f(S2.U.u_time,RM?0:t);S2.gl.uniform1f(S2.U.u_prog,mpS);S2.draw();
+    var v=Math.round(mpS*100);$("mprog").textContent=(v<10?"0":"")+v;
+    $("s1").classList.toggle("on",mpS<.34);
+    $("s2").classList.toggle("on",mpS>=.34&&mpS<.72);
+    $("s3").classList.toggle("on",mpS>=.72);
+    $("mtitle").textContent=mpS<.34?"Gürültüden ölçüme.":(mpS<.72?"Örüntü beliriyor.":"Ölçülmüş güven.");
+  }
+  tickCur=lerp(tickCur,tickX,.08);
+  $("tick").style.transform="translate3d("+(tickCur-((now*0.028)%600))+"px,0,0)";
+  rx=lerp(rx,rt,.1);
+  var tr=$("railTr");if(tr)tr.style.transform="translate3d("+rx+"px,0,0)";
+  cx=lerp(cx,tcx,.18);cy=lerp(cy,tcy,.18);
+  cur.style.transform="translate("+cx+"px,"+cy+"px) translate(-50%,-50%)";
+  curLbl.style.transform="translate("+cx+"px,"+cy+"px) translate(-50%,-50%)";
+  requestAnimationFrame(frame);
+}
+
+/* ════ YÜKLEYİCİ — takılırsa bile açılıyor ════ */
+(function(){
+  var n=$("lnum"),b=$("lbar"),ld=$("loader"),v=0,fin=false;
+  function open(){
+    if(fin)return;fin=true;
+    n.textContent="100";b.style.width="100%";
+    setTimeout(function(){
+      ld.classList.add("done");
+      document.body.classList.remove("lock");
+      document.body.classList.add("ready");
+      sizeAll();
+    },220);
+  }
+  var st=performance.now();
+  (function tk(now){
+    if(fin)return;
+    var p=clamp((now-st)/1300,0,1)*100;
+    v=lerp(v,p,.14);
+    n.textContent=(v<10?"0":"")+Math.round(v);
+    b.style.width=v+"%";
+    if(v>99.2){open();return;}
+    requestAnimationFrame(tk);
+  })(performance.now());
+  setTimeout(open,2600);   /* güvenlik ağı: ne olursa olsun aç */
+})();
+
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
