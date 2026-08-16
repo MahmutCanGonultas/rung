@@ -42,7 +42,9 @@ HTML, CSS ve temel JavaScript yazabiliyor; benzetmeleri oraya bağlamak işe yar
 | **Terim** | Bir terim ilk geçtiğinde tanımlanır. "Bunu zaten biliyorsundur" cümlesi kurulmaz. |
 | **Hata** | Hata mesajı görülünce doğrudan düzeltmeye geçilmez. Önce: hangi satır, hangi tür, ne bekliyordu, ne buldu. |
 | **Git** | Her iş biriminde commit — aşama sonu beklenmez. Conventional Commits, İngilizce. `main` daima çalışır durumda. |
-| **Hız** | Yavaş git. Bir anda çok satır verme. Kullanıcı "anlamadım" derse geri dön. |
+| **Hız** | Yavaş git. **Mesaj başına tek hareket** — rutin git komutları bile olsa. |
+| **Kontrol** | **Kontrol sorusu doğru cevaplanmadan sonraki adıma geçilmez.** Cevap yarımsa aynı kavram *başka bir yoldan* tekrar anlatılır. "Anladım, devam" yeterli değil — cevabın kendisi gerekiyor. |
+| **Tekrar** | Aynı şeyi tekrar anlatmak başarısızlık değil, **yöntem**. Kullanıcı istediği kadar tekrar isteyebilir; sıkılma, kısaltma, "bunu konuşmuştuk" deme. |
 
 ## Kilitli kararlar
 
@@ -80,6 +82,12 @@ giriş, oturum ve çerez · çıkış · korumalı sayfa.
 
 **İlk konuşulacak karar:** kimlik doğrulamayı hangi araçla yapacağız — dört soruyla açılacak,
 kararı kullanıcı verecek.
+
+### Öğrenme günlüğü — ÖNCE BUNU OKU
+
+[`docs/learning-log.md`](docs/learning-log.md) — hangi kavram ilk seferde oturmadı, hangi anlatım tuttu,
+hangi yöntem işe yaramadı. Yeni bir aşamaya başlamadan önce okunur; aynı duvara ikinci kez toslamamak için.
+Her aşama sonunda güncellenir.
 
 ### Ders notları
 
