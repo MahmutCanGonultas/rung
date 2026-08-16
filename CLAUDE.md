@@ -89,6 +89,14 @@ kararı kullanıcı verecek.
 hangi yöntem işe yaramadı. Yeni bir aşamaya başlamadan önce okunur; aynı duvara ikinci kez toslamamak için.
 Her aşama sonunda güncellenir.
 
+### Kitap — Sıfırdan Next.js
+
+[`docs/book/nextjs-from-zero.html`](docs/book/nextjs-from-zero.html) (ekranda şekiller kaydırınca oynuyor)
+ve aynı içeriğin baskıya hazır hâli `nextjs-from-zero.pdf` — 38 sayfa, 8 bölüm, 15 şekil,
+bölüm sonlarında 21 kontrol sorusu, cevapları arkada.
+Aşama 00'ın tamamı ile Next.js'in bütün temel kavramları (yönlendirme, iç içe layout,
+`"use client"` sınırı, statik/dinamik render) içinde. **Sonraki aşamalar bittikçe bölüm eklenir.**
+
 ### Ders notları
 
 `docs/lessons/stage-NN.html`, hepsi aynı kalıpta: hızlı bakış komut kartı → adım adım kavramlar →
