@@ -682,10 +682,14 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
       <div class="stage-card">
         <div class="stage-top"><h3>Hesap ve oturum</h3><span class="hrs">~6 saat · 8 adım</span></div>
         <p class="stage-what">Kayıt ol, giriş yap, çık. Korumalı sayfa.</p>
+        <div class="stage-progress">
+          <span class="track"><span class="fill" style="width:37.5%"></span></span>
+          <span class="n">3 / 8 · sürüyor</span>
+        </div>
         <ol class="steps">
-          <li>Kimlik doğrulama ile yetkilendirme farkı — <i>kimsin</i> ve <i>neye izinlisin</i></li>
-          <li><code>users</code> tablosunu tasarla</li>
-          <li>Göç (<b>migration</b>) nedir, ilk göçü çalıştır</li>
+          <li class="done">Kimlik doğrulama ile yetkilendirme farkı — <i>kimsin</i> ve <i>neye izinlisin</i></li>
+          <li class="done"><code>users</code> tablosunu tasarla</li>
+          <li class="done">Göç (<b>migration</b>) nedir, ilk göçü çalıştır</li>
           <li>Şifre neden düz saklanmaz — hash'leme</li>
           <li>Kayıt formu + sunucu tarafı doğrulama</li>
           <li>Giriş — oturum ve çerez nasıl çalışıyor</li>

@@ -349,6 +349,8 @@ Değişen kural, ve en önemlisi:
 
 | 2026-08-14 | **Proje sonunda PDF çıkarılacak: "Sıfırdan Next.js".** Kullanıcı isteği. Kaynak malzeme aşama ders notları (`docs/lessons/stage-NN.html`) — her aşama bir bölüm. Şartlar: sıfırdan başlasın, detaylı olsun, **eğlenceli ve resimli** olsun, sıkıcı olmasın. **Bunun bugünden itibaren çalışma şekline etkisi:** her ders notuna en az bir diyagram girecek (Aşama 00'daki sahneleme alanı şeması gibi), biçim aşamalar arasında aynı kalacak, ve baskı için açık tema kullanılacak. Üretim: birleşik HTML → Chrome `--print-to-pdf`. **Zamanlama: bütün aşamalar bitince** (Aşama 08 sonu). |
 
+| 2026-08-16 | **Kimlik doğrulama elle yazılacak — hazır kütüphane yok.** Kullanıcı kararı. Dört parça da elle kurulacak: şifre saklama (hash), oturum, çerez, sayfa koruma. **Gerekçe:** projenin ikinci hedefi işe alınabilir geliştirici, ve oturumun nasıl çalıştığı tam olarak burada öğreniliyor; ayrıca Rung'ın ihtiyacı basit — e-posta + şifre, tek oturum. **Sınır:** şifreleme algoritması elle yazılmayacak, hash işi denenmiş bir pakete verilecek. **Elenenler:** Auth.js (ihtiyacımız olmayan sağlayıcı akışlarını getiriyor, şifre saklama ve oturum kapalı kutu kalıyor), Clerk (en hızlısı ama en az öğreteni, üstelik belli kullanıcı sayısından sonra ücretli). |
+
 ### Hâlâ açık
 
 - **Yurtdışı hedefi** — Türkiye'den uzaktan yabancı şirkete mi, taşınmak mı, önce eğitim mi?
