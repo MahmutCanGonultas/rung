@@ -88,6 +88,62 @@ Beşi de gerçekten yaşandı, hepsi ders notunda tuzak olarak kayıtlı:
 
 ---
 
-## Aşama 01 — Hesap ve oturum
+## Aşama 01 — Hesap ve oturum · 16 Ağustos 2026'da başladı
 
-*(henüz başlanmadı)*
+*(sürüyor — 3 / 8)*
+
+### İlk seferde oturanlar
+
+- **authentication / authorization ayrımı.** Turnike + asansör benzetmesi tek seferde tuttu.
+  Adres çubuğunda `42` → `43` senaryosunu doğru teşhis etti ve gerekçesini kendi kurdu.
+- **unique constraint neden kodda değil veritabanında olmalı.** İpucu verildi ("aynı anda
+  birden fazla istek"), gerisini kendi çıkardı. Zamanlama fikrini yakaladı.
+- **Silinen veri migration ile geri gelmez.** Tek cümlede doğru.
+
+### İlk seferde oturmayanlar
+
+**`await` var ama `async` yok.** Kendi fark etti, iki mesaj boyunca oturmadı.
+Tutmayan anlatım: "top-level await diye bir ekleme geldi, modüllerde çalışıyor" — *ne olduğunu*
+söylüyor, *neden gerekmediğini* söylemiyor. Kullanıcının kafasındaki soru "async **nerede**"ydi,
+yani bir yerde olması gerektiğini varsayıyordu.
+**Tutan anlatım:** "hiçbir yerde, çünkü yazılacak yer yok — `async` fonksiyonun önüne yazılan bir
+işaret, dosyanın önü diye bir yer yok." Ardından `async`'in gerçek işi: **çağırana** "sana ürün değil
+kargo takip numarası vereceğim" ilanı. Dosyayı çağıran ve ondan değer bekleyen kimse olmadığı için
+ilan edilecek bir şey yok.
+Ders: "bu özellik var" demek yetmiyor; **eski kuralın neden var olduğunu** söylemeden yeni kural
+havada kalıyor.
+
+**migration çalıştırıcısının mekanizması.** "Dört adım" listesi (not defteri oluştur → oku →
+klasörü sırala → farkı çalıştır) tek başına tutmadı. Kullanıcının sorusu *"tamam da nasıl
+yapacağım"* oldu — yani **kavram anlaşıldı, mekanizma anlaşılmadı.** İki soru ayrı şeyler.
+
+### İşe yaramayan yöntemler — tekrar aynı hata
+
+**Gereksiz makine kurmak.** Çalıştırıcıyı en baştan tam hâliyle tasarladım: `schema_migrations`
+tablosu, `Set` ile karşılaştırma, `readdir` + `sort`, `Client`'a sürücü değişikliği. Kullanıcı:
+*"şıraları en baştan alalım daha açık ol… yine gaza bastın."*
+**Kök sebep:** çözümü, problemi hissettirmeden önce sundum. İkinci migration yokken not defterine
+ihtiyaç yok; `Client`'a geçmeye tek komutta hiç gerek yok. Plan kuralı "önce problem, sonra çözüm"
+diyor — burada tersini yaptım.
+**Düzeltme:** yedi satırlık tek dosyaya indirdim (`readFile` + `neon()` + `sql.query`), sadece
+**iki** yeni kavram kaldı. Ondan sonra ilerledi. Not defteri ve transaction, gerçekten gerektiğinde
+eklenecek — ve o zaman gerekçesi kendiliğinden ortaya çıkacak.
+
+**Ders notlarını/roadmap'i güncellemeyi atlamak.** Üç adım boyunca `roadmap.html` güncellenmedi;
+kullanıcı hatırlattı (*"roadmap ve diğer şeyleri neden güncellemiyorsun"*). Kural CLAUDE.md'de yazılı
+ama uygulanmadı. **Her adım sonunda roadmap + CLAUDE.md durumu, istisnasız.**
+
+### Kullanıcının kendi getirdiği sorular — hepsi seviye üstü
+
+Bunlar sorulmadı, **kullanıcı sordu**; ikisi de mimari seviyesinde:
+
+1. *"`neon(...)` satırında sql bağlantısı mı açılıyor, kim açıyor kapıları?"* → `neon(url)` ağa hiç
+   dokunmuyor, sadece adresi hatırlayan bir fonksiyon üretiyor. Bağlantı `sql.query()`'de kuruluyor
+   ve klasik TCP/5432 değil, HTTPS/443 + Neon tarafında bir gateway.
+2. *"5-6 kullanıcı olsa bağlantı açık kalması gerekmez mi?"* → connection pool'u kendi kendine
+   buldu. Cevap: havuz var ama bizim tarafta değil, Neon'un geçidinde; serverless'te kod istekler
+   arasında yaşamadığı için havuzu tutacak sürekli bir program yok.
+
+Buradan çıkan yöntem, kullanıcıya ad koyarak verildi — **her yeni kütüphaneye dört soru:**
+hangi problemi çözüyor (olmasaydı ne olurdu) · bu satır ne zaman çalışıyor · bu iş nerede oluyor ·
+sınırı ne. Kullanıcı bunları zaten soruyordu; adı konulunca bilerek tekrarlanabilir hâle geldi.

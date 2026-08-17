@@ -39,7 +39,7 @@ HTML, CSS ve temel JavaScript yazabiliyor; benzetmeleri oraya bağlamak işe yar
 | **Tempo** | Tek adım, sonra dur. Kullanıcı "tamam" demeden sonraki adıma geçilmez. Mesaj başına **tek dosya veya tek komut**. |
 | **Kavram sırası** | Önce problem ("şu sıkıntı var, bunun için X icat edilmiş") → benzetme → projedeki yeri → kod → kontrol sorusu. |
 | **Dil** | Anlatım **Türkçe**. Kod, dosya adı, tablo adı, değişken adı, commit mesajı, dal adı **İngilizce** — istisnasız. |
-| **Terim** | Bir terim ilk geçtiğinde tanımlanır. "Bunu zaten biliyorsundur" cümlesi kurulmaz. |
+| **Terim** | Bir terim ilk geçtiğinde tanımlanır. "Bunu zaten biliyorsundur" cümlesi kurulmaz. **Yazım kalıbı: `migration (göç)`** — İngilizcesi asıl, Türkçesi parantezde. Sonraki geçişlerde İngilizcesi kullanılır. Sadece Türkçesini yazmak yasak: mülakatta, belgede, hata mesajında karşısına İngilizcesi çıkacak. |
 | **Hata** | Hata mesajı görülünce doğrudan düzeltmeye geçilmez. Önce: hangi satır, hangi tür, ne bekliyordu, ne buldu. |
 | **Git** | Her iş biriminde commit — aşama sonu beklenmez. Conventional Commits, İngilizce. `main` daima çalışır durumda. |
 | **Hız** | Yavaş git. **Mesaj başına tek hareket** — rutin git komutları bile olsa. |
@@ -66,22 +66,35 @@ Hiçbiri Aşama 0'ı bloke etmiyor.
 
 ## Durum
 
-**14 Ağustos 2026 · Aşama 00 TAMAMLANDI — 21 / 21 adım.**
+**16 Ağustos 2026 · Aşama 00 tamam (21/21) · Aşama 01 SÜRÜYOR — 3 / 8 adım.**
 
 Canlı: **https://rung-plum.vercel.app** · Her istekte Neon'a (Frankfurt) sorgu atıyor, saat değişiyor.
 Kurulu: git + GitHub + Vercel · Next.js 16 · TypeScript katı mod · `@neondatabase/serverless`.
 
-### SIRADAKİ — Aşama 01: Hesap ve oturum (~6 sa, 8 adım)
+### Aşama 01: Hesap ve oturum (~6 sa, 8 adım) — 3 / 8
 
-Kayıt, giriş, çıkış, korumalı sayfa. Adımlar:
-kimlik doğrulama ile yetkilendirme farkı · `users` tablosu · **göç (migration) nedir** ·
-şifre neden düz saklanmaz (hash) · kayıt formu + sunucu tarafı doğrulama ·
-giriş, oturum ve çerez · çıkış · korumalı sayfa.
+**Karar verildi:** kimlik doğrulama **elle yazılıyor**, hazır kütüphane yok (gerekçe `docs/plan.md` §15).
+Sınır: şifreleme algoritması elle yazılmayacak, hash denenmiş bir pakete verilecek.
+
+| # | Adım | Durum |
+|---|---|---|
+| 1 | authentication (kimlik doğrulama) ile authorization (yetkilendirme) farkı | ✔ |
+| 2 | `users` tablosunu tasarla | ✔ |
+| 3 | migration (göç) nedir, ilk migration'ı çalıştır | ✔ |
+| 4 | şifre neden düz saklanmaz — hash | **← SIRADAKİ** |
+| 5 | kayıt formu + sunucu tarafı doğrulama | |
+| 6 | giriş — session (oturum) ve cookie (çerez) | |
+| 7 | çıkış | |
+| 8 | korumalı sayfa: giriş yapmayan göremesin | |
+
+Şu an gerçekten duran şeyler: `migrations/0001_create_users.sql` ·
+`scripts/migrate.mjs` (`node --env-file=.env.local scripts/migrate.mjs` ile çalışıyor) ·
+Neon'da **`users` tablosu oluşmuş durumda**.
+
+Bilerek ertelenenler: `schema_migrations` not defteri (ikinci migration gelince) ·
+transaction (ilk çok komutlu migration'da) · `npm run migrate` kısayolu.
 
 **Biter:** giriş yapmayan kullanıcı korumalı sayfayı göremiyor.
-
-**İlk konuşulacak karar:** kimlik doğrulamayı hangi araçla yapacağız — dört soruyla açılacak,
-kararı kullanıcı verecek.
 
 ### Öğrenme günlüğü — ÖNCE BUNU OKU
 
