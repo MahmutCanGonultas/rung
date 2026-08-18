@@ -351,6 +351,8 @@ Değişen kural, ve en önemlisi:
 
 | 2026-08-16 | **Kimlik doğrulama elle yazılacak — hazır kütüphane yok.** Kullanıcı kararı. Dört parça da elle kurulacak: şifre saklama (hash), oturum, çerez, sayfa koruma. **Gerekçe:** projenin ikinci hedefi işe alınabilir geliştirici, ve oturumun nasıl çalıştığı tam olarak burada öğreniliyor; ayrıca Rung'ın ihtiyacı basit — e-posta + şifre, tek oturum. **Sınır:** şifreleme algoritması elle yazılmayacak, hash işi denenmiş bir pakete verilecek. **Elenenler:** Auth.js (ihtiyacımız olmayan sağlayıcı akışlarını getiriyor, şifre saklama ve oturum kapalı kutu kalıyor), Clerk (en hızlısı ama en az öğreteni, üstelik belli kullanıcı sayısından sonra ücretli). |
 
+| 2026-08-18 | **Şifre hash'leme: `bcryptjs`.** Kullanıcı kararı. Salt üretimi, kasıtlı yavaş hash ve karşılaştırma bu pakete veriliyor; `password_hash` sütununa bcrypt'in tek parça çıktısı yazılıyor (salt zaten onun içinde, ayrı sütun yok). **Gerekçe:** saf JavaScript olduğu için Vercel'de native derleme sorunu çıkmıyor — `main` daima çalışır kalsın kuralı; salt'ı kendi yönetiyor; öğrenilecek yüzey iki fonksiyon (`hash`, `compare`). **Bilerek yapılan takas:** argon2 bugün saf teknik olarak daha güçlü (GPU'ya karşı daha dirençli, güncel tavsiye listelerinde önce geliyor) ama native derleme gerektiriyor. Güç değil, dağıtım kolaylığı seçildi. **Elenenler:** argon2 (derleme riski), `node:crypto` `scrypt` (paket yok ama salt üretimi, saklama biçimi ve zamanlama sızdırmayan karşılaştırma elle yazılır — en çok hata yapılabilecek yer). |
+
 ### Hâlâ açık
 
 - **Yurtdışı hedefi** — Türkiye'den uzaktan yabancı şirkete mi, taşınmak mı, önce eğitim mi?

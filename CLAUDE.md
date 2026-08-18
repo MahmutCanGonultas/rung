@@ -66,7 +66,7 @@ Hiçbiri Aşama 0'ı bloke etmiyor.
 
 ## Durum
 
-**16 Ağustos 2026 · Aşama 00 tamam (21/21) · Aşama 01 SÜRÜYOR — 3 / 8 adım.**
+**18 Ağustos 2026 · Aşama 00 tamam (21/21) · Aşama 01 SÜRÜYOR — 4 / 8 adım.**
 
 Canlı: **https://rung-plum.vercel.app** · Her istekte Neon'a (Frankfurt) sorgu atıyor, saat değişiyor.
 Kurulu: git + GitHub + Vercel · Next.js 16 · TypeScript katı mod · `@neondatabase/serverless`.
@@ -81,15 +81,17 @@ Sınır: şifreleme algoritması elle yazılmayacak, hash denenmiş bir pakete v
 | 1 | authentication (kimlik doğrulama) ile authorization (yetkilendirme) farkı | ✔ |
 | 2 | `users` tablosunu tasarla | ✔ |
 | 3 | migration (göç) nedir, ilk migration'ı çalıştır | ✔ |
-| 4 | şifre neden düz saklanmaz — hash | **← SIRADAKİ** |
-| 5 | kayıt formu + sunucu tarafı doğrulama | |
+| 4 | şifre neden düz saklanmaz — hash, salt, kasıtlı yavaşlık | ✔ |
+| 5 | kayıt formu + sunucu tarafı doğrulama | **← SIRADAKİ** |
 | 6 | giriş — session (oturum) ve cookie (çerez) | |
 | 7 | çıkış | |
 | 8 | korumalı sayfa: giriş yapmayan göremesin | |
 
 Şu an gerçekten duran şeyler: `migrations/0001_create_users.sql` ·
 `scripts/migrate.mjs` (`node --env-file=.env.local scripts/migrate.mjs` ile çalışıyor) ·
-Neon'da **`users` tablosu oluşmuş durumda**.
+Neon'da **`users` tablosu oluşmuş durumda** · `bcryptjs` kurulu (`dependencies`, kendi tiplerini
+getiriyor — `@types/bcryptjs` gerekmiyor). Öğrenilen iki fonksiyon: `bcrypt.hash(sifre, 10)` ve
+`bcrypt.compare(sifre, saklananHash)`; salt, cost ve hash tek bir 60 karakterlik metnin içinde.
 
 Bilerek ertelenenler: `schema_migrations` not defteri (ikinci migration gelince) ·
 transaction (ilk çok komutlu migration'da) · `npm run migrate` kısayolu.
