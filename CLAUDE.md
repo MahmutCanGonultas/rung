@@ -83,6 +83,11 @@ Sınır: şifreleme algoritması elle yazılmayacak, hash denenmiş bir pakete v
 | 3 | migration (göç) nedir, ilk migration'ı çalıştır | ✔ |
 | 4 | şifre neden düz saklanmaz — hash, salt, kasıtlı yavaşlık | ✔ |
 | 5 | kayıt formu + sunucu tarafı doğrulama | **← SIRADAKİ** |
+| — | └ 5a `/register` adresi — boş sayfa, `app/register/page.tsx` | **← TAM BURADAN DEVAM** |
+| — | └ 5b forma tek alan ekle — `name` özniteliği | |
+| — | └ 5c ikinci alan + tarayıcı kontrolleri (`required`, `minLength`) | |
+| — | └ 5d gönder'e bas, ne olduğuna bak (şifre adres çubuğunda) | |
+| — | └ 5e sunucuya gerçekten yollamak — **karar:** Server Action mı Route Handler mı | |
 | 6 | giriş — session (oturum) ve cookie (çerez) | |
 | 7 | çıkış | |
 | 8 | korumalı sayfa: giriş yapmayan göremesin | |

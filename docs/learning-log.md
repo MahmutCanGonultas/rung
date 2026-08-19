@@ -133,6 +133,20 @@ eklenecek — ve o zaman gerekçesi kendiliğinden ortaya çıkacak.
 kullanıcı hatırlattı (*"roadmap ve diğer şeyleri neden güncellemiyorsun"*). Kural CLAUDE.md'de yazılı
 ama uygulanmadı. **Her adım sonunda roadmap + CLAUDE.md durumu, istisnasız.**
 
+### Tempo — 18 Ağustos'ta iki kez daha uyarı geldi
+
+**1 · Ders ortasında paralel iş yapmak.** Kullanıcı `product.html`'in güncellenmesini istemişti, ben
+bunu öğrenme hattının **ortasında** yaptım ve üstüne uzun uzun anlattım. Sonuç: *"biz ne yaptık ki
+bunları yazdın, ben hiçbir şey anlamadım, başka bir şey yapıyorduk."*
+**Kural:** kullanıcının katılmadığı işler (maket, belge, ekran görüntüsü kontrolü) ya sessizce
+yapılır ve **tek cümleyle** rapor edilir, ya da ders bittikten sonra yapılır. Ders hattı bölünmez.
+
+**2 · Dosyayı tek parça vermek.** Kayıt formunun tamamını (form + iki input + öznitelikler + JSX
+kuralları) tek mesajda verdim. Kullanıcı durdurdu: *"her dosyayı daha açık ve daha net anlatacaksın,
+yavaş yavaş gidecez dedik."*
+**Kural:** bir adım "bir dosya" değil. Dosya da bölünür — önce boş sayfa çalışsın, sonra tek alan,
+sonra öznitelikler. Adım 5 bu yüzden 5a–5e diye beşe bölündü ve **5a'da tek dosya, dört satır** var.
+
 ### Kullanıcının kendi getirdiği sorular — hepsi seviye üstü
 
 Bunlar sorulmadı, **kullanıcı sordu**; ikisi de mimari seviyesinde:
