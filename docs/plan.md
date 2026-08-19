@@ -161,16 +161,21 @@ Doğru mühendislik cevabı "umarız doğrudur" değil, beş şeyi birden yapmak
 
 ## 08 · Ekranlar
 
-Dört ekran, dört iş. Koyu ve sakin bir arayüz: ölçüm aleti gibi görünmeli, dil uygulaması gibi değil.
-Renk sadece *anlam* taşıdığında — turuncu hata, sarı öneri, gri şüpheli, yeşil onay.
+Beş ekran, beş iş. Koyu ve sakin bir arayüz: ölçüm aleti gibi görünmeli, dil uygulaması gibi değil.
+Renk sadece *anlam* taşıdığında — turuncu hata, sarı öneri, gri şüpheli, yeşil onay, mor "modelden geldi".
 
 1. **Yazma** — bağlamı seç, görevi al, yaz. Görev seviyene göre öneriliyor; boş sayfa en büyük caydırıcı.
 2. **Analiz** — ana ekran. Bulgular önem sırasında, seviyeye göre sayısı sınırlı, her birinde
    "katılmıyorum", ikinci geçişi geçemeyen bulgu **şüpheli** olarak işaretli ve istatistiğe girmiyor.
-3. **İlerleme** — "ilerliyor muyum?" sorusunun veriyle cevabı. İnatçı kategori, bir sonraki tekrar
-   setinin hangi hatadan üretileceğini belirliyor.
-4. **Doğruluk panosu** — projenin vitrini. Yanlış alarm, yakalama, altın küme boyutu, kayıt başı
-   maliyet, ve **seviye kırılımlı isabet**. Zayıf yer gizlenmez.
+   Ekranın altında **analiz hattının kendisi** duruyor: K0'dan K4'e beş katman, hangisinde model
+   çalıştığı renkle işaretli. "Yapay zekâ nerede devreye giriyor" sorusu ürünün içinden cevaplanıyor.
+3. **Geçmiş** — eski kayıtlara erişim, arama, bağlama göre süzme, aynı görevin tekrarını işaretleme.
+   (12 Ağustos 2026'da eklendi — karar günlüğünde.)
+4. **İlerleme** — "ilerliyor muyum?" sorusunun veriyle cevabı. Seviye tahmininin **neye dayandığı**
+   açıkça gösteriliyor (§06'daki dört K0 ölçüsü). İnatçı kategori, bir sonraki tekrar setinin hangi
+   hatadan üretileceğini belirliyor.
+5. **Doğruluk panosu** — projenin vitrini. Yanlış alarm, yakalama, altın küme boyutu, kayıt başı
+   maliyet, ve **seviye kırılımlı isabet**. Zayıf yer gizlenmez. Altta §07'deki beş savunma.
 
 Çalışan maket: [`design/product.html`](design/product.html)
 

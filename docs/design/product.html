@@ -685,6 +685,65 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
   color: var(--accent); border: 1px solid var(--accent-line); border-radius: 5px; padding: 4px 9px; flex: none;
 }
 .verdict b { color: var(--ink); }
+
+/* ── 2 · analiz hattı: K0…K4 ──────────────────────────────────
+   Ürünün ayırt edici iddiası "yapay zekâ nerede devreye giriyor"
+   olduğu için hattın kendisi ekranda görünüyor. Mor = modelden
+   gelen; nötr = model yok. Jetonlar yukarıdaki bloktan. */
+.pipeline {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px;
+  background: var(--hairline); border: 1px solid var(--hairline);
+  border-radius: var(--r-sm); overflow: hidden; margin-top: 15px;
+}
+.stage { background: var(--surface); padding: 11px 12px 12px; display: grid; gap: 4px; align-content: start; }
+.stage.ai { background: var(--model-wash); }
+.stage .code { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; color: var(--ink-3); }
+.stage .nm { font-size: 12.5px; font-weight: 600; color: var(--ink); line-height: 1.25; }
+.stage .did { font-size: 11.5px; color: var(--ink-3); line-height: 1.4; }
+.stage .tag {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-top: 3px; color: var(--ink-3);
+}
+.stage.ai .tag { color: var(--model); }
+@media (max-width: 780px) { .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* güven göstergesi — bulgu başlığının sağında */
+.finding .kind { display: flex; align-items: center; gap: 10px; }
+.conf { display: inline-flex; align-items: center; gap: 3px; margin-left: auto; flex: none; }
+.conf i { display: block; width: 11px; height: 3px; border-radius: 2px; background: var(--surface-3); }
+.conf i.on { background: var(--suspect); }
+.finding.is-error .conf i.on { background: var(--error); }
+.finding.is-sug   .conf i.on { background: var(--suggest); }
+.conf .n { font-variant-numeric: tabular-nums; margin-left: 4px; color: var(--ink-3); }
+
+/* seviyeye göre süzülenler */
+.filtered { margin-top: 16px; border: 1px dashed var(--hairline); border-radius: var(--r-sm); padding: 12px 14px; }
+.filtered .top { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+.filtered .lbl { font-size: 12.5px; color: var(--ink-3); }
+.fold { display: none; }
+.fold.is-open { display: grid; gap: 11px; margin-top: 12px; }
+.hidden-find { display: grid; gap: 3px; padding-left: 11px; border-left: 2px solid var(--surface-3); }
+.hidden-find .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+.hidden-find .s { font-size: 13px; color: var(--ink-2); }
+.hidden-find .s b { color: var(--ink); font-weight: 600; }
+
+/* ── 4 · inatçı kategoriler ───────────────────────────────────── */
+.stubborn { display: grid; gap: 14px; }
+.stubborn-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: center; }
+.stubborn-row .cat { font-size: 13.5px; color: var(--ink); }
+.stubborn-row .cat span { display: block; font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+.stubborn-row .n { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; }
+.stubborn-row .n b { display: block; font-size: 15px; color: var(--ink); font-weight: 620; }
+
+/* ── 5 · beş savunma ──────────────────────────────────────────── */
+.defenses {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px;
+  margin-top: 24px; padding-top: 21px; border-top: 1px solid var(--hairline);
+}
+.defense .d-n { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; color: var(--accent); }
+.defense .d-t { font-size: 13px; font-weight: 620; color: var(--ink); margin-top: 5px; }
+.defense .d-w { font-size: 11.5px; color: var(--ink-3); line-height: 1.45; margin-top: 4px; }
+@media (max-width: 780px) { .defenses { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 </style>
 </head>
 <body>
@@ -746,9 +805,10 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
     <section class="view" id="v-analyze">
       <div class="view-bar">
         <span class="chip t-accent">B1 için süzüldü</span>
-        <span class="chip t-error">4 hata</span>
-        <span class="chip t-suggest">2 öneri</span>
+        <span class="chip t-error">3 hata</span>
+        <span class="chip t-suggest">1 öneri</span>
         <span class="chip">1 şüpheli</span>
+        <span class="chip t-plain">3 gizlendi</span>
         <span class="spacer"></span>
         <span class="provenance">model <code>gpt-class-a</code> · prompt <code>v7</code></span>
       </div>
@@ -772,38 +832,101 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
             <span class="m">çeşitlilik <b>0.71</b></span><span class="sep">│</span>
             <span class="m">yazım <b>temiz</b></span>
           </div>
+
         </div>
 
         <div>
           <div class="findings-head">Bulgular · önem sırası</div>
 
           <div class="finding is-error">
-            <div class="kind">Türkçe kaynaklı · kalıp</div>
+            <div class="kind">Türkçe kaynaklı · kalıp<span class="conf" title="güven 0.96"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><span class="n">0.96</span></span></div>
             <div class="fix"><span class="was">I am agree</span><span class="arrow">→</span><span class="now">I agree</span></div>
             <p class="why">"Katılıyorum" Türkçede sıfat gibi kurulur; İngilizcede <em>agree</em> zaten fiil.</p>
             <div class="actions"><button class="act affirm" type="button">Anladım</button><button class="act" type="button">Katılmıyorum</button></div>
           </div>
 
           <div class="finding is-error">
-            <div class="kind">Sözcük · eşdizim</div>
+            <div class="kind">Sözcük · eşdizim<span class="conf" title="güven 0.91"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><span class="n">0.91</span></span></div>
             <div class="fix"><span class="was">made a research</span><span class="arrow">→</span><span class="now">done some research</span></div>
             <p class="why"><em>research</em> sayılamaz ve <em>make</em> ile eşdizim kurmaz.</p>
             <div class="actions"><button class="act affirm" type="button">Anladım</button><button class="act" type="button">Katılmıyorum</button></div>
           </div>
 
+          <div class="finding is-error">
+            <div class="kind">Gramer · sözcük sırası<span class="conf" title="güven 0.88"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><span class="n">0.88</span></span></div>
+            <div class="fix"><span class="was">the meeting of tomorrow</span><span class="arrow">→</span><span class="now">tomorrow's meeting</span></div>
+            <p class="why">Türkçedeki "yarınki toplantı" tamlaması birebir çevrilmiş. İngilizcede iyelik yapısı doğal olan.</p>
+            <div class="actions"><button class="act affirm" type="button">Anladım</button><button class="act" type="button">Katılmıyorum</button></div>
+          </div>
+
           <div class="finding is-sug">
-            <div class="kind">Söylem · ton</div>
+            <div class="kind">Söylem · ton<span class="conf" title="güven 0.74"><i class="on"></i><i class="on"></i><i></i><i></i><span class="n">0.74</span></span></div>
             <div class="fix"><span class="was-sug">Please write me back soon.</span><span class="arrow">→</span><span class="now">I look forward to hearing from you.</span></div>
             <p class="why">Resmî e-postada fazla doğrudan. Öneri — hata değil.</p>
             <div class="actions"><button class="act affirm" type="button">Anladım</button><button class="act" type="button">Katılmıyorum</button></div>
           </div>
 
           <div class="finding is-sus">
-            <div class="kind">Şüpheli · düşük güven</div>
+            <div class="kind">Şüpheli · ikinci geçiş doğrulamadı<span class="conf" title="güven 0.38"><i class="on"></i><i></i><i></i><i></i><span class="n">0.38</span></span></div>
             <div class="fix"><span class="was-sus">Best regards,</span><span class="arrow">→</span><span class="now">Kind regards,</span></div>
-            <p class="why">İkinci geçiş bunu doğrulamadı. Gösteriliyor ama istatistiğe girmiyor.</p>
+            <p class="why">K1 hata dedi, K2 doğrulamadı. Gösteriliyor ama <b>istatistiğe girmiyor</b> — ne hata sayılıyor ne yanlış alarm.</p>
             <div class="actions"><button class="act affirm" type="button">Hata değil</button><button class="act" type="button">Hataymış</button></div>
           </div>
+
+          <div class="filtered">
+            <div class="top">
+              <span class="lbl">K3 · <b>3 bulgu</b> B1 seviyesi için gizlendi</span>
+              <button class="tbl-toggle" type="button" data-fold="fold-hidden" aria-expanded="false">göster</button>
+            </div>
+            <div class="fold" id="fold-hidden">
+              <div class="hidden-find">
+                <span class="k">Mekanik · büyük harf</span>
+                <span class="s"><b>i think</b> → I think — A1'de ders, B1'de dalgınlık</span>
+              </div>
+              <div class="hidden-find">
+                <span class="k">Gramer · artikel</span>
+                <span class="s"><b>in a meeting</b> → in the meeting — bu bağlamda ikisi de kabul edilebilir</span>
+              </div>
+              <div class="hidden-find">
+                <span class="k">Mekanik · noktalama</span>
+                <span class="s">Selamlamadan sonra virgül — tarz farkı, hata değil</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="findings-head" style="margin-top:26px">Bu sonuç nereden geldi · analiz hattı</div>
+      <div class="pipeline" aria-label="Analiz hattı: beş katman">
+        <div class="stage det">
+          <span class="code">K0</span>
+          <span class="nm">Deterministik</span>
+          <span class="did">Yazım, temel kurallar, kelime bandı, karmaşıklık</span>
+          <span class="tag">yapay zekâ yok</span>
+        </div>
+        <div class="stage ai">
+          <span class="code">K1</span>
+          <span class="nm">Model çıkarımı</span>
+          <span class="did">Sabit taksonomiye yazmak zorunda · <b>11 aday</b> bulgu</span>
+          <span class="tag">model · gpt-class-a</span>
+        </div>
+        <div class="stage ai">
+          <span class="code">K2</span>
+          <span class="nm">İkinci geçiş</span>
+          <span class="did">Her bulguya bağımsız "bu gerçekten hata mı" · <b>3 eledi</b>, 1'ini şüpheli bıraktı</span>
+          <span class="tag">model · bağımsız</span>
+        </div>
+        <div class="stage det">
+          <span class="code">K3</span>
+          <span class="nm">Seviyeye göre süzme</span>
+          <span class="did">B1 için önemsiz <b>3 bulgu</b> gizlendi</span>
+          <span class="tag">yapay zekâ yok</span>
+        </div>
+        <div class="stage det">
+          <span class="code">K4</span>
+          <span class="nm">Sürümlü kayıt</span>
+          <span class="did">Model kimliği ve prompt sürümü kayda yazıldı</span>
+          <span class="tag">yapay zekâ yok</span>
         </div>
       </div>
     </section>
@@ -943,6 +1066,58 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
         </figure>
       </div>
 
+      <div class="fig-grid">
+        <div class="fig">
+          <div class="fig-head"><span class="fig-title">Seviye tahmini neye dayanıyor</span></div>
+          <p class="fig-sub">Sana sorulmadı — <b>ölçüldü</b>. Dördü de K0'dan, model kullanılmadan</p>
+          <div class="meters">
+            <div class="meter-row">
+              <div class="meter-top"><span class="meter-name">Kelime bandı</span><span class="meter-val">B1</span></div>
+              <span class="meter-track"><span class="meter-fill" style="width:62%"></span></span>
+              <div class="meter-sub">Kelimelerin %38'i ilk 2000 bandın dışında</div>
+            </div>
+            <div class="meter-row">
+              <div class="meter-top"><span class="meter-name">Cümle karmaşıklığı</span><span class="meter-val">B1+</span></div>
+              <span class="meter-track"><span class="meter-fill" style="width:70%"></span></span>
+              <div class="meter-sub">Yan cümle %33 · ortalama 14.7 kelime</div>
+            </div>
+            <div class="meter-row">
+              <div class="meter-top"><span class="meter-name">Hata yoğunluğu</span><span class="meter-val">B1</span></div>
+              <span class="meter-track"><span class="meter-fill" style="width:58%"></span></span>
+              <div class="meter-sub">100 kelimede 4.1 bulgu</div>
+            </div>
+            <div class="meter-row">
+              <div class="meter-top"><span class="meter-name">Hata <em>türü</em> <span class="meter-flag">▲ en belirleyici</span></span><span class="meter-val">B1+</span></div>
+              <span class="meter-track"><span class="meter-fill" style="width:74%"></span></span>
+              <div class="meter-sub">Temel gramer değil, nüans hataları baskın</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fig">
+          <div class="fig-head"><span class="fig-title">İnatçı kategoriler</span></div>
+          <p class="fig-sub">Bir sonraki tekrar seti buradan üretilecek</p>
+          <div class="stubborn">
+            <div class="stubborn-row">
+              <span class="cat">Artikel düşürme<span>Türkçede artikel yok — en karakteristik hata</span></span>
+              <span class="n"><b>34</b>son 6 ayda</span>
+            </div>
+            <div class="stubborn-row">
+              <span class="cat">Birebir çeviri kalıpları<span><em>the meeting of tomorrow</em>, <em>I am agree</em></span></span>
+              <span class="n"><b>21</b>son 6 ayda</span>
+            </div>
+            <div class="stubborn-row">
+              <span class="cat">Eşdizim<span><em>make a research</em>, <em>do a mistake</em></span></span>
+              <span class="n"><b>17</b>son 6 ayda</span>
+            </div>
+            <div class="stubborn-row">
+              <span class="cat">Kayıt uyumu<span>Resmî metinde fazla doğrudan ton</span></span>
+              <span class="n"><b>12</b>son 6 ayda</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <p class="fig-note">Türkçe kaynaklı hatalar azalmıyor — bir sonraki tekrar seti buradan üretilecek.</p>
     </section>
 
@@ -999,6 +1174,34 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
       <div class="verdict">
         <span class="stamp">v7 kabul</span>
         <span>Yakalama 1.9 puan düştü, yanlış alarm 8.6 puan düştü. Takas bilerek yapıldı — <b>güven, kapsamdan önemli</b>.</span>
+      </div>
+
+      <div class="defenses">
+        <div class="defense">
+          <div class="d-n">01 · ölç</div>
+          <div class="d-t">Altın küme</div>
+          <div class="d-w">Hataları önceden bilinen paragraflar. İki sayı: isabet ve yakalama.</div>
+        </div>
+        <div class="defense">
+          <div class="d-n">02 · daralt</div>
+          <div class="d-t">Şema zorlaması</div>
+          <div class="d-w">Modele açık uçlu soru sorulmaz. Sabit kategori, zorunlu şema.</div>
+        </div>
+        <div class="defense">
+          <div class="d-n">03 · ayır</div>
+          <div class="d-t">Deterministik önce</div>
+          <div class="d-w">Yazım ve temel kurallar için model gerekmez. Modele sadece yorum gerektiren kısım gider.</div>
+        </div>
+        <div class="defense">
+          <div class="d-n">04 · doğrula</div>
+          <div class="d-t">İkinci geçiş</div>
+          <div class="d-w">Her bulguya bağımsız olarak "bu gerçekten hata mı?" sorulur.</div>
+        </div>
+        <div class="defense">
+          <div class="d-n">05 · dinle</div>
+          <div class="d-t">İtiraz döngüsü</div>
+          <div class="d-w">Kullanıcının katılmadığı düzeltmeler altın kümeyi kendiliğinden büyütür.</div>
+        </div>
       </div>
     </section>
 
@@ -1087,11 +1290,21 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
     document.getElementById(host).innerHTML = h + '</tbody></table>';
   }
 
-  Array.prototype.forEach.call(document.querySelectorAll('.tbl-toggle'), function (b) {
+  Array.prototype.forEach.call(document.querySelectorAll('.tbl-toggle[data-table]'), function (b) {
     b.addEventListener('click', function () {
       var t = document.getElementById(b.getAttribute('data-table'));
       var open = t.classList.toggle('is-open');
       b.textContent = open ? 'grafik' : 'tablo';
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* Aynı düğme biçimi, açılır bir blok için — grafik/tablo değil, göster/gizle. */
+  Array.prototype.forEach.call(document.querySelectorAll('.tbl-toggle[data-fold]'), function (b) {
+    b.addEventListener('click', function () {
+      var t = document.getElementById(b.getAttribute('data-fold'));
+      var open = t.classList.toggle('is-open');
+      b.textContent = open ? 'gizle' : 'göster';
       b.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
   });
