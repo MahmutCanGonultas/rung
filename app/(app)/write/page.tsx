@@ -1,0 +1,101 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+
+import { Composer } from "../../components/Composer";
+import {
+  DEFAULT_LEVEL,
+  findContextBySlug,
+  findTaskById,
+  listContexts,
+  pickTask,
+} from "../../lib/content";
+import { saveEntryAction } from "../../lib/entry-actions";
+import { requireUser } from "../../lib/guard";
+
+export const metadata: Metadata = { title: "Yaz · Rung" };
+
+type Search = { context?: string; task?: string; skip?: string };
+
+/*
+ * Görev rastgele seçiliyor — ama seçim adresin İÇİNE yazılıyor.
+ *
+ * Yazılmasaydı sayfa her çizilişte başka bir görev gösterirdi: kullanıcı
+ * metnini yazar, doğrulama hatası alır, sayfa yeniden çizilir ve karşısında
+ * bambaşka bir görev bulurdu. `/write?context=daily&task=12` ile sayfa
+ * belirli hâle geliyor; yenilemek de paylaşmak da aynı görevi veriyor.
+ */
+export default async function WritePage({
+  searchParams,
+}: {
+  searchParams: Promise<Search>;
+}) {
+  await requireUser();
+
+  const params = await searchParams;
+  const contexts = await listContexts();
+  if (contexts.length === 0) {
+    throw new Error("Hiç bağlam yok — `npm run seed` çalıştırıldı mı?");
+  }
+
+  const context =
+    (params.context ? await findContextBySlug(params.context) : null) ??
+    contexts[0];
+
+  const chosen = params.task ? await findTaskById(params.task) : null;
+
+  // Görev yoksa, ya da adresteki görev bu bağlama ait değilse: yeniden seç.
+  if (!chosen || chosen.contextId !== context.id) {
+    const picked = await pickTask(context.id, DEFAULT_LEVEL, params.skip);
+    if (!picked) {
+      throw new Error(
+        `${context.name} bağlamında ${DEFAULT_LEVEL} seviyesinde görev yok.`
+      );
+    }
+    redirect(`/write?context=${context.slug}&task=${picked.id}`);
+  }
+
+  return (
+    <section className="panel">
+      <nav className="chips" aria-label="Bağlam">
+        {contexts.map((c) => (
+          <Link
+            key={c.id}
+            className={c.id === context.id ? "chip is-on" : "chip"}
+            href={`/write?context=${c.slug}`}
+          >
+            {c.name}
+          </Link>
+        ))}
+      </nav>
+
+      <p className="context-note">{context.description}</p>
+
+      <div className="task">
+        <h1 className="task-title">{chosen.prompt}</h1>
+        <p className="task-meta">
+          {chosen.hint} · Hedef {chosen.minWords}–{chosen.maxWords} kelime ·
+          Seviye {chosen.level}
+        </p>
+        <Link
+          className="task-swap"
+          href={`/write?context=${context.slug}&skip=${chosen.id}`}
+        >
+          Başka görev ver
+        </Link>
+      </div>
+
+      <Composer
+        action={saveEntryAction}
+        taskId={chosen.id}
+        minWords={chosen.minWords}
+        maxWords={chosen.maxWords}
+      />
+
+      <p className="panel-next">
+        Analiz henüz yok — Aşama 03 ve 04'te geliyor. Şimdilik yazdığın metin
+        olduğu gibi, değiştirilemez şekilde saklanıyor.
+      </p>
+    </section>
+  );
+}

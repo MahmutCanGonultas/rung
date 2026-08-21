@@ -23,7 +23,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate": "node --env-file=.env.local scripts/migrate.mjs",
     "typecheck": "tsc --noEmit",
-    "smoke": "node --env-file=.env.local scripts/smoke.mjs"
+    "smoke": "node --env-file=.env.local scripts/smoke.mjs",
+    "seed": "node --env-file=.env.local scripts/seed.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

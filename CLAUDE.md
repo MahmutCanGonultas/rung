@@ -77,7 +77,7 @@ Hiçbiri Aşama 0'ı bloke etmiyor.
 
 ## Durum
 
-**21 Ağustos 2026 · Aşama 00 tamam (21/21) · Aşama 01 TAMAM (8/8).**
+**21 Ağustos 2026 · Aşama 00 ✔ · Aşama 01 ✔ · Aşama 02 ✔ — sıradaki Aşama 03.**
 
 Canlı: **https://rung-plum.vercel.app**
 Kurulu: git + GitHub + Vercel · Next.js 16 (Turbopack) · TypeScript katı mod ·
@@ -91,49 +91,47 @@ Kurulu: git + GitHub + Vercel · Next.js 16 (Turbopack) · TypeScript katı mod 
 | `npm run build` | Üretim derlemesi — tip hatasında durur |
 | `npm run typecheck` | Sadece tip kontrolü |
 | `npm run migrate` | Bekleyen migration'ları sırayla uygular |
-| `npm run smoke` | Uçtan uca duman testi (dev sunucusu açıkken) |
+| `npm run seed` | Bağlam ve görevleri yazar (idempotent) |
+| `npm run smoke` | Uçtan uca duman testi, 43 kontrol (dev sunucusu açıkken) |
 | `npm run smoke -- --base=https://rung-plum.vercel.app` | Aynı testi canlıya karşı |
 
 ### Aşama 01 · Hesap ve oturum — TAMAM
 
-Bitiş kriteri karşılandı: giriş yapmayan kullanıcı `/dashboard`'u göremiyor, `/login`'e düşüyor.
-Duman testi 17 kontrolün 17'sini geçiyor.
+Giriş yapmayan `/dashboard`'u göremiyor. Kimlik doğrulama elle yazıldı: `bcryptjs` cost 12,
+oturum veritabanında opak jeton (çerezde jeton, veritabanında SHA-256 özeti), `server-only` ile
+veritabanı modülü istemciye sızarsa derleme kırılıyor.
+
+### Aşama 02 · Yazma, saklama, listeleme — TAMAM
+
+Kayıt yazılıp saklanıyor, geçmişte bulunuyor, **başkasının kaydına erişilemiyor**.
 
 | Dosya | İşi |
 |---|---|
-| `migrations/0002_create_sessions.sql` | `sessions` tablosu, `users`'a foreign key ile bağlı |
-| `scripts/migrate.mjs` | `schema_migrations` defteri + dosya başına transaction |
-| `app/lib/db.ts` | `server-only` işaretli Neon erişimi |
-| `app/lib/validation.ts` | Sunucu tarafı doğrulama, e-posta normalizasyonu |
-| `app/lib/auth.ts` | `bcryptjs` cost 12, sahte hash ile sabit zamanlı giriş |
-| `app/lib/session.ts` | Jeton üretimi, çerez, `cache`'li oturum okuma |
-| `app/lib/actions.ts` | `"use server"` — kayıt, giriş, çıkış |
-| `app/lib/guard.ts` | `requireUser()` — korumalı sayfaların kapısı |
-| `app/components/AuthForm.tsx` | Tek istemci bileşeni; sınır yaprakta |
-| `app/register` `app/login` `app/dashboard` | Sayfalar |
-| `app/globals.css` | Doğrulanmış paletin uygulamaya taşınmış hâli |
+| `migrations/0003_create_content_tables.sql` | `contexts`, `tasks`, `entries` + değiştirilemezlik trigger'ı + GIN arama indeksi |
+| `scripts/seed.mjs` · `scripts/seed-data.mjs` | 5 bağlam, 50 görev; idempotent |
+| `app/lib/content.ts` | Bağlam ve görev okuma, rastgele görev seçimi |
+| `app/lib/entries.ts` | Kayıt yazma/okuma — **her fonksiyon `userId`'yi WHERE'e koyuyor** |
+| `app/lib/entry-actions.ts` | Kaydetme; bağlam istemciden değil görevden okunuyor |
+| `app/lib/words.ts` | Kelime sayma — istemci ve sunucu aynı fonksiyonu kullanıyor |
+| `app/(app)/layout.tsx` | Giriş yapmışın kabuğu; `(app)` adrese girmeyen grup |
+| `app/(app)/write` `history` `entries/[id]` | Üç ekran |
 
-**Güvenlik notları** (hepsi kodda yorumlu): şifre asla düz saklanmıyor · oturum jetonunun sadece
-özeti veritabanında · çerez `httpOnly` + `sameSite=lax` + üretimde `secure` · giriş hatası hangi
-alanın yanlış olduğunu söylemiyor · var olmayan e-postada da bcrypt çalışıyor (zamanlama sızıntısı
-yok) · benzersizlik kodda değil veritabanı kısıtında · `server-only` paketi veritabanı modülünün
-istemciye sızmasını derleme zamanında engelliyor.
+**Kilit kararlar** (gerekçeleri `docs/plan.md` §15'te): kayıtlar veritabanı trigger'ıyla
+değiştirilemez · görev seçimi adrese yazılıyor · sahiplik sorgunun içinde, bulunamayınca 404 ·
+arama `tsvector` + GIN.
 
-**Bilerek ertelenenler:** oran sınırlama (rate limiting) · e-posta doğrulama · şifre sıfırlama ·
-süresi geçmiş oturumların düzenli temizliği (`purgeExpiredSessions` yazıldı, çağıran yok).
+### Sıradaki — Aşama 03 · Deterministik analiz · **YAPAY ZEKÂ YOK**
 
-### Sıradaki — Aşama 02 · Yazma, saklama, listeleme
-
-`contexts`, `tasks`, `entries` tabloları · yabancı anahtar · tohum veri · Yaz ekranı · kaydı
-değiştirilemez yapma · sahiplik kontrolü · Geçmiş ekranı.
+K0 katmanı: yazım, temel kurallar, kelime seviyesi dağılımı, cümle karmaşıklığı, çeşitlilik.
+**Biter:** metin verildiğinde model çağrısı olmadan ölçüm çıkıyor.
 
 ### Kullanıcıdan bekleyenler
 
 | Ne zaman | Ne gerekiyor |
 |---|---|
-| **Aşama 04'e girerken** | Dil modeli API anahtarı. Öneri: Anthropic Console'dan bir anahtar; `ANTHROPIC_API_KEY` adıyla hem `.env.local`'e hem Vercel paneline girilecek. Vercel paneline **tırnaksız** yapıştırılır — Aşama 00'da bu tuzağa bir kez düşüldü. |
+| **Aşama 04'e girerken** | Dil modeli API anahtarı. Anthropic Console'dan alınıp `ANTHROPIC_API_KEY` adıyla hem `.env.local`'e hem Vercel paneline girilecek — panele **tırnaksız**. |
 | **Aşama 04'te** | Aylık maliyet tavanı kararı (kayıt başı ~$0.01 hedefleniyor). |
-| Şimdilik başka bir şey yok | Neon ve Vercel zaten bağlı. |
+| Şimdilik | Başka bir şey yok. |
 
 ### Öğrenme günlüğü — ÖNCE BUNU OKU
 
