@@ -26,6 +26,7 @@ const PASSWORD = "duman-testi-9182";
 
 let passed = 0;
 const failures = [];
+const extraAccounts = [];
 
 function check(name, condition, detail = "") {
   if (condition) {
@@ -56,7 +57,9 @@ async function cleanUp() {
   await client.connect();
   try {
     // sessions.user_id ON DELETE CASCADE — oturumlar da gider.
-    const r = await client.query("DELETE FROM users WHERE email = $1", [EMAIL]);
+    const r = await client.query("DELETE FROM users WHERE email = ANY($1)", [
+      [EMAIL, ...extraAccounts],
+    ]);
     console.log(`\ntemizlik · silinen test hesabı: ${r.rowCount}`);
   } finally {
     await client.end();
@@ -153,7 +156,38 @@ async function main() {
     check("kısa şifre reddedildi", Boolean(weakError), String(weakError));
     check("hâlâ /register", page2.url().includes("/register"), page2.url());
 
-    console.log("\n9 · bozuk e-posta reddi");
+    console.log("\n9 · Türkçe İ ile kayıt, küçük harfle giriş");
+    /*
+     * Regresyon testi. "İ".toLowerCase() tek harf değil "i" + U+0307 üretiyor;
+     * düzeltilmeden önce telefonda otomatik büyük harfle kayıt olan biri
+     * ertesi gün küçük harfle giriş yapamıyordu.
+     */
+    const trBase = `ismail-${stamp}@rung.test`;
+    const trTyped = `İsmail-${stamp}@Rung.test`;
+    const ctx = await browser.createBrowserContext();
+    const page3 = await ctx.newPage();
+    await page3.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
+    await submitAuthForm(page3, trTyped, PASSWORD);
+    check("İ'li adresle kayıt oldu", page3.url().includes("/dashboard"), page3.url());
+
+    await page3.goto(`${BASE}/dashboard`, { waitUntil: "networkidle0" });
+    check(
+      "kayıt küçük harfli hâliyle saklandı",
+      (await page3.content()).includes(trBase)
+    );
+
+    const ctx2 = await browser.createBrowserContext();
+    const page4 = await ctx2.newPage();
+    await page4.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
+    await submitAuthForm(page4, trBase, PASSWORD);
+    check(
+      "küçük harfle giriş yapılabiliyor",
+      page4.url().includes("/dashboard"),
+      page4.url()
+    );
+    extraAccounts.push(trBase);
+
+    console.log("\n10 · bozuk e-posta reddi");
     await page2.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
     await submitAuthForm(page2, "bu-bir-eposta-degil", PASSWORD);
     const mailError = await page2

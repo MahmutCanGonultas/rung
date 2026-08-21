@@ -66,23 +66,33 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
     WHERE s.token_hash = ${hashToken(token)}
       AND s.expires_at > now()
     LIMIT 1
-  `) as Array<{ id: string; email: string; created_at: string }>;
+  `) as Array<{ id: string; email: string; created_at: Date }>;
 
   const row = rows[0];
   if (!row) return null;
 
-  return { id: row.id, email: row.email, createdAt: new Date(row.created_at) };
+  // Sürücü timestamptz'yi Date olarak veriyor — denenerek doğrulandı, metin değil.
+  return { id: row.id, email: row.email, createdAt: row.created_at };
 });
 
 export async function destroySession(): Promise<void> {
   const jar = await cookies();
   const token = jar.get(COOKIE_NAME)?.value;
 
+  /*
+   * Sıra önemli: önce çerez düşer, sonra satır silinir.
+   *
+   * Tersi olsaydı ve veritabanı o an cevap vermeseydi, "çıkış yap" hata verir
+   * ve kullanıcı hâlâ giriş yapmış olarak kalırdı — çıkışın kesinlikle
+   * başarısız olmaması gereken tek yönü bu. Bu sırayla en kötü ihtimalde
+   * kullanılamaz bir satır süresi dolana kadar bekler; jeton zaten tarayıcıdan
+   * gitmiştir.
+   */
+  jar.delete(COOKIE_NAME);
+
   if (token) {
     await db()`DELETE FROM sessions WHERE token_hash = ${hashToken(token)}`;
   }
-
-  jar.delete(COOKIE_NAME);
 }
 
 /** Şifre değişince veya "her yerden çık" denince. */

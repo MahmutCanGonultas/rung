@@ -36,12 +36,18 @@ export async function registerAction(
   const passwordError = validatePassword(password);
   if (passwordError) return { error: passwordError, email };
 
-  const created = await createUser(email, password);
-  if (!created.ok) {
-    return { error: "Bu e-posta zaten kayıtlı. Giriş yapmayı dene.", email };
+  let userId: string;
+  try {
+    const created = await createUser(email, password);
+    if (!created.ok) {
+      return { error: "Bu e-posta zaten kayıtlı. Giriş yapmayı dene.", email };
+    }
+    userId = created.userId;
+    await createSession(userId);
+  } catch (error) {
+    return { error: reportUnexpected("kayıt", error), email };
   }
 
-  await createSession(created.userId);
   redirect("/dashboard");
 }
 
@@ -56,20 +62,54 @@ export async function loginAction(
     return { error: "E-posta ve şifre gerekli.", email };
   }
 
-  const verified = await verifyCredentials(email, password);
-  if (!verified.ok) {
-    /*
-     * Tek ve aynı mesaj. "Böyle bir kullanıcı yok" ile "şifre yanlış" ayrı
-     * yazılırsa, hangi e-postaların kayıtlı olduğu tek tek öğrenilebilir.
-     */
-    return { error: "E-posta veya şifre hatalı.", email };
+  /*
+   * Giriş yolunda da uzunluk sınırı var. Kayıt yolundaki `validateEmail` /
+   * `validatePassword` burada çalışmıyor — kurallar zamanla sıkılaşabilir ve
+   * eski hesaplar kilitlenmemeli. Ama saçma uzunlukta bir girdi için bcrypt
+   * çalıştırmanın da anlamı yok: sadece boyuta bakıp erken dönüyoruz.
+   */
+  if (email.length > 254 || password.length > 400) {
+    return { error: "E-posta veya şifre hatalı.", email: "" };
   }
 
-  await createSession(verified.userId);
+  let userId: string;
+  try {
+    const verified = await verifyCredentials(email, password);
+    if (!verified.ok) {
+      /*
+       * Tek ve aynı mesaj. "Böyle bir kullanıcı yok" ile "şifre yanlış" ayrı
+       * yazılırsa, hangi e-postaların kayıtlı olduğu tek tek öğrenilebilir.
+       */
+      return { error: "E-posta veya şifre hatalı.", email };
+    }
+    userId = verified.userId;
+    await createSession(userId);
+  } catch (error) {
+    return { error: reportUnexpected("giriş", error), email };
+  }
+
   redirect("/dashboard");
 }
 
 export async function logoutAction(): Promise<void> {
-  await destroySession();
+  try {
+    await destroySession();
+  } catch (error) {
+    // Çerez `destroySession` içinde en başta düşüyor; buraya gelmişsek
+    // tarayıcı tarafı zaten temiz, sadece satır silinememiş olabilir.
+    console.error("[rung] çıkışta veritabanı hatası:", error);
+  }
+
   redirect("/");
+}
+
+/*
+ * Beklenmeyen hatanın kullanıcıya dönen yüzü.
+ *
+ * Sunucu günlüğüne tam hata, ekrana sabit bir cümle. Hata metnini olduğu gibi
+ * göstermek tablo adlarını, sürücü sürümünü, bazen bağlantı bilgisini sızdırır.
+ */
+function reportUnexpected(where: string, error: unknown): string {
+  console.error(`[rung] ${where} sırasında beklenmeyen hata:`, error);
+  return "Beklenmeyen bir hata oldu. Biraz sonra tekrar dener misin?";
 }

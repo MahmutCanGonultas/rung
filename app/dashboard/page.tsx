@@ -1,17 +1,26 @@
+import type { Metadata } from "next";
 import { logoutAction } from "../lib/actions";
 import { requireUser } from "../lib/guard";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Pano · Rung",
 };
 
 export default async function DashboardPage() {
   const user = await requireUser();
 
+  /*
+   * Saat dilimi açıkça yazılıyor. Yazılmasaydı biçimlendirme sunucunun
+   * dilimine göre yapılırdı — Vercel'de bu UTC. İstanbul'da akşam 01:00'de
+   * kayıt olan biri "katılım" tarihini bir gün geride görürdü. Ürün Türkçe
+   * konuşanlar için, o yüzden sabit bir dilim doğru cevap: hem sunucuda hem
+   * tarayıcıda aynı metin çıkıyor, uyuşmazlık uyarısı da olmuyor.
+   */
   const joined = new Intl.DateTimeFormat("tr-TR", {
     day: "numeric",
     month: "long",
     year: "numeric",
+    timeZone: "Europe/Istanbul",
   }).format(user.createdAt);
 
   return (
