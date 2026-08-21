@@ -20,7 +20,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test \"app/lib/**/*.test.ts\"",
     "migrate": "node --env-file=.env.local scripts/migrate.mjs",
     "typecheck": "tsc --noEmit",
     "smoke": "node --env-file=.env.local scripts/smoke.mjs",
@@ -29,13 +29,16 @@
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
     "bcryptjs": "^3.0.3",
+    "dictionary-en": "^4.0.0",
     "next": "^16.3.0",
+    "nspell": "^2.1.5",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
+    "@types/nspell": "^2.1.6",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "puppeteer-core": "^25.8.0",

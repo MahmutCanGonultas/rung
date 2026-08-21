@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { K0Panel } from "../../../components/K0Panel";
 import { findEntryForUser, previousAttempts } from "../../../lib/entries";
 import { requireUser } from "../../../lib/guard";
 
@@ -56,7 +57,7 @@ export default async function EntryPage({
       <h1 className="panel-title">{entry.taskPrompt ?? "Serbest yazı"}</h1>
       {entry.taskHint ? <p className="panel-lede">{entry.taskHint}</p> : null}
 
-      <article className="entry-body">{entry.body}</article>
+      <K0Panel text={entry.body} />
 
       <dl className="facts">
         <div>
@@ -87,8 +88,9 @@ export default async function EntryPage({
       ) : null}
 
       <p className="panel-next">
-        Bu metin bir daha değiştirilemez. Analiz Aşama 03 ve 04'te bu sayfaya
-        eklenecek — bulgular, taksonomi ve ikinci geçiş.
+        Bu metin bir daha değiştirilemez. Yukarıdaki ölçüm <b>modelsiz</b>
+        yapıldı — aynı metin her zaman aynı sonucu verir. Yorum gerektiren
+        hatalar (zaman, ton, eşdizim) model katmanında gelecek.
       </p>
 
       <p className="auth-alt">
