@@ -357,3 +357,290 @@ h3 {
   font-size: 13px;
   color: var(--ink-3);
 }
+
+/* ── uygulama gezinme ─────────────────────────────────────────────── */
+.shell-nav {
+  display: flex;
+  gap: 2px;
+}
+.nav-link {
+  font-size: 14px;
+  font-weight: 550;
+  color: var(--ink-3);
+  text-decoration: none;
+  padding: 7px 13px;
+  border-radius: var(--r-sm);
+}
+.nav-link:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+.nav-link.is-on {
+  color: var(--accent);
+  background: var(--accent-wash);
+}
+.btn-quiet {
+  background: transparent;
+  border-color: transparent;
+  padding: 7px 11px;
+}
+.btn-quiet:hover {
+  border-color: var(--hairline);
+}
+a.btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+.cta-row .btn-primary {
+  width: auto;
+  padding: 11px 20px;
+}
+
+/* ── bağlam rozetleri ─────────────────────────────────────────────── */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 5px 11px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.chip:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+.chip.is-on {
+  color: var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+.context-note {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin: 0 0 26px;
+}
+
+/* ── görev ────────────────────────────────────────────────────────── */
+.task {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 20px;
+}
+.task-title {
+  font-size: 25px;
+  letter-spacing: -0.03em;
+}
+.task-meta {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin: 9px 0 0;
+}
+.task-swap {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.task-swap:hover {
+  color: var(--accent);
+}
+
+/* ── yazma alanı ──────────────────────────────────────────────────── */
+.composer {
+  display: grid;
+  gap: 14px;
+}
+.editor {
+  font-family: var(--sans);
+  font-size: 16.5px;
+  line-height: 1.85;
+  width: 100%;
+  min-height: 300px;
+  resize: vertical;
+  padding: 18px 20px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--hairline);
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.editor:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+  border-color: var(--accent-line);
+}
+.editor::placeholder {
+  color: var(--ink-3);
+}
+.composer-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+.composer-count {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.composer-count b {
+  color: var(--ink);
+  font-size: 13px;
+}
+.composer-target {
+  color: var(--ink-3);
+}
+.composer-flag {
+  margin-left: 9px;
+  color: var(--error);
+  border: 1px solid var(--error-line);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+.composer .btn-primary {
+  width: auto;
+  padding: 11px 24px;
+}
+
+/* ── geçmiş ───────────────────────────────────────────────────────── */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 20px 0 18px;
+}
+.filters .input {
+  width: auto;
+  flex: 1 1 220px;
+}
+.pick {
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+.totals {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin: 0 0 8px;
+}
+.totals b {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.empty {
+  padding: 28px 0;
+  color: var(--ink-3);
+  font-size: 14.5px;
+}
+.month {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+  margin: 26px 0 4px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.entry-row {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) auto auto;
+  gap: 14px;
+  align-items: center;
+  padding: 13px 10px;
+  margin: 0 -10px;
+  border-radius: var(--r-sm);
+  text-decoration: none;
+  color: inherit;
+}
+.entry-row:hover {
+  background: var(--surface-2);
+}
+.entry-row + .entry-row {
+  border-top: 1px solid var(--hairline);
+}
+.entry-row .day {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.entry-row .name {
+  font-size: 14.5px;
+  color: var(--ink);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.entry-row .num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media (max-width: 720px) {
+  .entry-row {
+    grid-template-columns: 56px minmax(0, 1fr);
+  }
+  .entry-row .chip,
+  .entry-row .num {
+    display: none;
+  }
+}
+
+/* ── tek kayıt ────────────────────────────────────────────────────── */
+.entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.entry-stamp {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.entry-body {
+  white-space: pre-wrap;
+  font-size: 16.5px;
+  line-height: 1.85;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  padding: 22px 24px;
+  margin: 22px 0;
+}
+.earlier {
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--hairline);
+}
+.earlier-title {
+  font-size: 15px;
+  margin-bottom: 6px;
+}

@@ -38,6 +38,42 @@ function check(name, condition, detail = "") {
   }
 }
 
+/*
+ * Sunucu yönlendirmesi bitene kadar bekle.
+ *
+ * `/write?...&skip=N` adresi sunucuda `redirect()` ile kalıcı adrese
+ * gidiyor — iki hoplama var. `waitForNavigation` ilkini yakalayıp dönüyor,
+ * ikincisi sırasında DOM değiştiği için hemen okumak boşa düşüyordu.
+ */
+async function waitForUrl(page, predicate, timeout = 15000) {
+  const started = Date.now();
+  while (Date.now() - started < timeout) {
+    if (predicate(page.url())) return true;
+    await new Promise((r) => setTimeout(r, 150));
+  }
+  return false;
+}
+
+/*
+ * Öğeyi oku, olmazsa tekrar dene.
+ *
+ * Yönlendirme sırasında Puppeteer bazen eski belgeye bakıp "öğe yok" diyor.
+ * Sayfa oturana kadar birkaç kez denemek, testin kendi yarışını çözüyor —
+ * uygulamada bir sorun yok, ölçüm aracında var.
+ */
+async function readText(page, selector, tries = 20) {
+  for (let i = 0; i < tries; i += 1) {
+    try {
+      const value = await page.$eval(selector, (el) => el.textContent);
+      if (value !== null) return value;
+    } catch {
+      /* henüz yok, tekrar dene */
+    }
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  return null;
+}
+
 async function submitAuthForm(page, email, password) {
   await page.waitForSelector('input[name="email"]');
   await page.type('input[name="email"]', email);
@@ -133,7 +169,7 @@ async function main() {
     await page.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
     await submitAuthForm(page, EMAIL, "kesinlikle-yanlis");
     check("hâlâ /login", page.url().includes("/login"), page.url());
-    const errorText = await page.$eval('[role="alert"]', (el) => el.textContent).catch(() => null);
+    const errorText = await readText(page, '[role="alert"]', 6);
     check("hata mesajı gösteriliyor", Boolean(errorText), String(errorText));
     check(
       "mesaj hangi alanın yanlış olduğunu söylemiyor",
@@ -150,9 +186,7 @@ async function main() {
     const page2 = await browser.createBrowserContext().then((c) => c.newPage());
     await page2.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
     await submitAuthForm(page2, `weak-${stamp}@rung.test`, "kisa");
-    const weakError = await page2
-      .$eval('[role="alert"]', (el) => el.textContent)
-      .catch(() => null);
+    const weakError = await readText(page2, '[role="alert"]', 6);
     check("kısa şifre reddedildi", Boolean(weakError), String(weakError));
     check("hâlâ /register", page2.url().includes("/register"), page2.url());
 
@@ -190,10 +224,146 @@ async function main() {
     console.log("\n10 · bozuk e-posta reddi");
     await page2.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
     await submitAuthForm(page2, "bu-bir-eposta-degil", PASSWORD);
-    const mailError = await page2
-      .$eval('[role="alert"]', (el) => el.textContent)
-      .catch(() => null);
+    const mailError = await readText(page2, '[role="alert"]', 6);
     check("bozuk e-posta reddedildi", Boolean(mailError), String(mailError));
+
+    // ══════════ AŞAMA 02 · yazma, saklama, listeleme ══════════
+    console.log("\n11 · yaz ekranı");
+    await page.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
+    const writeUrl = new URL(page.url());
+    check(
+      "/write kendini kalıcı adrese yönlendiriyor",
+      writeUrl.searchParams.has("context") && writeUrl.searchParams.has("task"),
+      page.url()
+    );
+
+    const firstTask = await readText(page, ".task-title");
+    check("görev gösteriliyor", Boolean(firstTask && firstTask.length > 5), String(firstTask));
+
+    const contextCount = await page.$$eval(".chips .chip", (els) => els.length);
+    check("beş bağlam listeleniyor", contextCount === 5, `${contextCount} bağlam`);
+
+    console.log("\n12 · başka görev ver");
+    /*
+     * "Başka görev ver" bağlantısı /write?context=..&skip=.. adresine gidiyor,
+     * orası da kalıcı adrese YÖNLENDİRİYOR. İki hoplama var, o yüzden
+     * navigation olayını değil doğrudan öğeyi bekliyoruz.
+     */
+    /*
+     * Adresin "task=" içermesini beklemek yetmiyor — tıklamadan ÖNCE de
+     * içeriyordu, bekleme anında dönüyordu. Beklenecek şey adresin
+     * DEĞİŞMESİ.
+     */
+    const beforeSwap = page.url();
+    await page.click(".task-swap");
+    const swapped = await waitForUrl(
+      page,
+      (u) => u !== beforeSwap && u.includes("task=")
+    );
+    check("başka görev adresi oturdu", swapped, `${beforeSwap} → ${page.url()}`);
+    const secondTask = await readText(page, ".task-title");
+    check("görev değişti", secondTask !== firstTask, `${firstTask} → ${secondTask}`);
+
+    console.log("\n13 · kısa metin reddi");
+    await page.waitForSelector(".composer button[type=submit]", { timeout: 15000 });
+    await page.type(".editor", "too short");
+    // DİKKAT: sayfadaki ilk submit düğmesi kabuktaki "Çıkış". Yazma alanının
+    // düğmesi mutlaka `.composer` altından seçilmeli.
+    const disabled = await page.$eval(
+      ".composer button[type=submit]",
+      (el) => el.disabled
+    );
+    check("on kelimenin altında kaydet kapalı", disabled === true);
+
+    console.log("\n14 · kayıt kaydetme");
+    const BODY =
+      "I am writing to ask about the deposit for the flat that I rented last year. " +
+      "The agreement said the money would be returned within thirty days, but nothing " +
+      "has arrived yet and nobody answers the office phone. Could you please tell me " +
+      "when the transfer will be made, and to which account it will be sent.";
+    await page.$eval(".editor", (el) => { el.value = ""; });
+    await page.type(".editor", BODY);
+    const shownWords = await readText(page, ".composer-count b");
+    check(
+      "kelime sayacı doğru",
+      Number(shownWords) === BODY.trim().split(/\s+/).length,
+      `sayaç ${shownWords}, gerçek ${BODY.trim().split(/\s+/).length}`
+    );
+
+    await page.click(".composer button[type=submit]");
+    await waitForUrl(page, (u) => /\/entries\/\d+$/.test(u), 20000);
+    await new Promise((r) => setTimeout(r, 500));
+    const entryUrl = page.url();
+    check("kaydettikten sonra kayıt sayfası", /\/entries\/\d+$/.test(entryUrl), entryUrl);
+    const entryId = entryUrl.split("/").pop();
+
+    const entryText = await page.content();
+    check("metin olduğu gibi duruyor", entryText.includes("thirty days"));
+
+    console.log("\n15 · geçmiş");
+    await page.goto(`${BASE}/history`, { waitUntil: "networkidle0" });
+    check("kayıt listede", (await page.content()).includes("deposit"), "");
+    const rows = await page.$$eval(".entry-row", (els) => els.length);
+    check("bir satır var", rows === 1, `${rows} satır`);
+
+    console.log("\n16 · arama");
+    await page.goto(`${BASE}/history?q=deposit`, { waitUntil: "networkidle0" });
+    check("eşleşen arama sonuç veriyor", (await page.$$(".entry-row")).length === 1);
+    await page.goto(`${BASE}/history?q=elephants`, { waitUntil: "networkidle0" });
+    check("eşleşmeyen arama boş", (await page.$$(".entry-row")).length === 0);
+    await page.goto(`${BASE}/history?q=agreements`, { waitUntil: "networkidle0" });
+    check(
+      "arama kök buluyor (agreements → agreement)",
+      (await page.$$(".entry-row")).length === 1
+    );
+
+    console.log("\n17 · bağlama göre süzme");
+    await page.goto(`${BASE}/history?context=technical`, { waitUntil: "networkidle0" });
+    check("başka bağlamda kayıt yok", (await page.$$(".entry-row")).length === 0);
+
+    console.log("\n18 · SAHİPLİK — başkasının kaydı görünmemeli");
+    const otherEmail = `other-${stamp}@rung.test`;
+    const otherCtx = await browser.createBrowserContext();
+    const otherPage = await otherCtx.newPage();
+    await otherPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
+    await submitAuthForm(otherPage, otherEmail, PASSWORD);
+    check("ikinci hesap açıldı", otherPage.url().includes("/dashboard"), otherPage.url());
+    extraAccounts.push(otherEmail);
+
+    const stolen = await otherPage.goto(`${BASE}/entries/${entryId}`, {
+      waitUntil: "networkidle0",
+    });
+    check(
+      "başkasının kaydı 404 dönüyor",
+      stolen?.status() === 404,
+      `HTTP ${stolen?.status()}`
+    );
+    check(
+      "kaydın metni sızmıyor",
+      !(await otherPage.content()).includes("thirty days")
+    );
+
+    await otherPage.goto(`${BASE}/history`, { waitUntil: "networkidle0" });
+    check(
+      "ikinci hesabın geçmişi boş",
+      (await otherPage.$$(".entry-row")).length === 0
+    );
+
+    console.log("\n19 · olmayan ve bozuk kayıt kimlikleri");
+    const missing = await page.goto(`${BASE}/entries/99999999`, {
+      waitUntil: "networkidle0",
+    });
+    check("olmayan kayıt 404", missing?.status() === 404, `HTTP ${missing?.status()}`);
+    const junk = await page.goto(`${BASE}/entries/abc`, { waitUntil: "networkidle0" });
+    check("sayı olmayan kimlik 404 (çökme değil)", junk?.status() === 404, `HTTP ${junk?.status()}`);
+
+    console.log("\n20 · giriş yapmadan yazma ekranı");
+    const anonCtx = await browser.createBrowserContext();
+    const anonPage = await anonCtx.newPage();
+    await anonPage.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
+    check("/write → /login", anonPage.url().includes("/login"), anonPage.url());
+    await anonPage.goto(`${BASE}/history`, { waitUntil: "networkidle0" });
+    check("/history → /login", anonPage.url().includes("/login"), anonPage.url());
   } finally {
     await browser.close();
     await cleanUp();

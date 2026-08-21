@@ -364,6 +364,12 @@ Değişen kural, ve en önemlisi:
 
 | 2026-08-21 | **Bağımsız denetimde bulunan gerçek hata: Türkçe İ.** JavaScript'te `"İ".toLowerCase()` tek harf değil **iki kod noktası** üretiyor: `i` + U+0307. Yani `İsmail@x.com` ile `ismail@x.com` normalize edildiğinde eşit çıkmıyordu; telefonda otomatik büyük harfle kayıt olan biri ertesi gün giriş yapamayacaktı. **Düzeltme:** `normalizeEmail` artık birleşen noktayı atıyor (`replace(/\u0307/g, "")` + NFKC). `scripts/smoke.mjs`'e regresyon testi eklendi — İ'li adresle kayıt, küçük harfle giriş. Türkçe konuşanlar için yazılan bir üründe bu hatanın canlıya çıkması ciddi olurdu; denetim tam da bunun için yapıldı. |
 
+| 2026-08-21 | **Kayıtlar veritabanı seviyesinde değiştirilemez.** `entries` tablosuna `BEFORE UPDATE` trigger'ı kondu; UPDATE denemesi hata veriyor. DELETE serbest — kullanıcı hesabını silebilmeli. **Gerekçe:** kural kodda dursaydı unutulur, ikinci bir yazma yolu açılır, ve altı ay sonraki "ilerledim" karşılaştırması sessizce yalan söylerdi. Trigger her yoldan geçeni yakalıyor. |
+| 2026-08-21 | **Görev seçimi adrese yazılıyor** (`/write?context=daily&task=12`). Rastgele seçim her render'da tekrarlanırsa, doğrulama hatası sonrası kullanıcı karşısında başka bir görev bulur. Adres kalıcı olunca sayfa belirli hâle geliyor; yenilemek ve paylaşmak aynı görevi veriyor. |
+| 2026-08-21 | **Sahiplik kontrolü sorgunun içinde.** `WHERE id = ... AND user_id = ...` — önce satırı çekip sonra sahibini kontrol etmek değil. Bulunamayınca 403 değil **404** dönülüyor: hangi kayıt kimliklerinin var olduğu da sızmıyor. Server action'da bağlam istemciden alınmıyor, görevden okunuyor. |
+| 2026-08-21 | **Arama `tsvector` + GIN indeksi ile**, `ILIKE '%x%'` değil. Kök buluyor ("agreements" → "agreement") ve kayıt sayısı büyüdükçe yavaşlamıyor. Plan §11 indeksleri Aşama 07'ye bırakmıştı; arama Aşama 02'nin bitiş kriterinde olduğu için indeks de burada geldi. |
+| 2026-08-21 | **Tohum veri betikle, migration'la değil** (`npm run seed`). Migration'lar bir kez çalışıp donuyor; içerik ise zamanla değişecek. Betik idempotent: doğal anahtara göre var olanı güncelliyor, olmayanı ekliyor. 5 bağlam × 5 seviye × 2 görev = 50 görev. |
+
 ### Hâlâ açık
 
 - **Yurtdışı hedefi** — Türkiye'den uzaktan yabancı şirkete mi, taşınmak mı, önce eğitim mi?
