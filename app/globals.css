@@ -1,0 +1,354 @@
+/* ═══════════════════════════════════════════════════════════════
+   Rung · tema jetonları
+   Renkler göz kararı seçilmedi. Her iki palet de renk körlüğü ayrımı,
+   normal görüş ayrımı ve yüzeye karşı kontrast testinden geçirildi —
+   ölçümler docs/plan.md §15 karar günlüğünde.
+   DİKKAT: aynı jetonlar docs/design/*.html içinde de duruyor.
+   Bir renk değişirse orası da güncellenmeli.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  color-scheme: light;
+
+  --plane: #f3f1ec;
+  --surface: #faf9f6;
+  --surface-2: #f0eee8;
+  --surface-3: #e7e4dc;
+  --hairline: #ded9cf;
+
+  --ink: #14171a;
+  --ink-2: #4f5a60;
+  --ink-3: #78838a;
+
+  --accent: #0e9b6c;
+  --model: #5b4bd6;
+  --error: #8f2418;
+
+  --accent-wash: rgba(14, 155, 108, 0.1);
+  --error-wash: rgba(143, 36, 24, 0.06);
+  --accent-line: rgba(14, 155, 108, 0.34);
+  --error-line: rgba(143, 36, 24, 0.28);
+
+  --ring: rgba(14, 155, 108, 0.45);
+  --shadow: 0 28px 56px -34px rgba(20, 23, 26, 0.3);
+
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --r-md: 11px;
+  --r-sm: 7px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --plane: #0b0e11;
+  --surface: #12161a;
+  --surface-2: #171c21;
+  --surface-3: #1f262c;
+  --hairline: #262f36;
+
+  --ink: #e8edf1;
+  --ink-2: #9aa7b1;
+  --ink-3: #6c7984;
+
+  --accent: #35d39b;
+  --model: #9a8cf5;
+  --error: #f2764a;
+
+  --accent-wash: rgba(53, 211, 155, 0.11);
+  --error-wash: rgba(242, 118, 74, 0.1);
+  --accent-line: rgba(53, 211, 155, 0.38);
+  --error-line: rgba(242, 118, 74, 0.36);
+
+  --ring: rgba(53, 211, 155, 0.5);
+  --shadow: 0 28px 64px -36px rgba(0, 0, 0, 0.92);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    color-scheme: dark;
+
+    --plane: #0b0e11;
+    --surface: #12161a;
+    --surface-2: #171c21;
+    --surface-3: #1f262c;
+    --hairline: #262f36;
+
+    --ink: #e8edf1;
+    --ink-2: #9aa7b1;
+    --ink-3: #6c7984;
+
+    --accent: #35d39b;
+    --model: #9a8cf5;
+    --error: #f2764a;
+
+    --accent-wash: rgba(53, 211, 155, 0.11);
+    --error-wash: rgba(242, 118, 74, 0.1);
+    --accent-line: rgba(53, 211, 155, 0.38);
+    --error-line: rgba(242, 118, 74, 0.36);
+
+    --ring: rgba(53, 211, 155, 0.5);
+    --shadow: 0 28px 64px -36px rgba(0, 0, 0, 0.92);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--plane);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.65;
+  letter-spacing: -0.006em;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 620;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.mark {
+  font-size: 17px;
+  font-weight: 680;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+}
+.mark i {
+  color: var(--accent);
+  font-style: normal;
+}
+
+/* ── düğmeler ─────────────────────────────────────────────────── */
+.btn {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  padding: 9px 15px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.btn:hover {
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.btn-primary {
+  width: 100%;
+  padding: 11px 15px;
+  border-color: var(--accent-line);
+  background: var(--accent);
+  color: var(--plane);
+}
+.btn-primary:hover {
+  border-color: var(--accent);
+  color: var(--plane);
+  filter: brightness(1.06);
+}
+.btn-primary:disabled {
+  cursor: progress;
+  filter: saturate(0.5);
+}
+
+/* ── giriş / kayıt ────────────────────────────────────────────── */
+.auth {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 32px 22px;
+}
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+  padding: 32px 30px 28px;
+}
+.auth-title {
+  font-size: 26px;
+}
+.auth-lede {
+  color: var(--ink-2);
+  font-size: 14px;
+  margin: 10px 0 24px;
+}
+.auth-alt {
+  margin: 20px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+.form {
+  display: grid;
+  gap: 16px;
+}
+.field {
+  display: grid;
+  gap: 6px;
+}
+.field-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.field-hint {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.input {
+  font: inherit;
+  font-size: 15px;
+  padding: 10px 12px;
+  width: 100%;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--hairline);
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+  border-color: var(--accent-line);
+}
+.form-error {
+  margin: 0;
+  padding: 11px 13px;
+  font-size: 13.5px;
+  color: var(--error);
+  background: var(--error-wash);
+  border: 1px solid var(--error-line);
+  border-radius: var(--r-sm);
+}
+
+/* ── uygulama kabuğu ──────────────────────────────────────────── */
+.shell {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 28px 22px 80px;
+}
+.shell-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--hairline);
+}
+.shell-user {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.panel {
+  margin-top: 30px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  padding: 28px 26px;
+}
+.panel-title {
+  font-size: 24px;
+}
+.panel-lede {
+  color: var(--ink-2);
+  font-size: 14.5px;
+  margin: 10px 0 22px;
+  max-width: 56ch;
+}
+.panel-next {
+  margin: 22px 0 0;
+  padding-left: 13px;
+  border-left: 2px solid var(--accent);
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin: 0;
+}
+.facts dt {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.facts dd {
+  margin: 5px 0 0;
+  font-size: 15.5px;
+  color: var(--ink);
+}
+
+/* ── anasayfa ─────────────────────────────────────────────────── */
+.home {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 40px 22px;
+}
+.home-inner {
+  width: 100%;
+  max-width: 520px;
+}
+.home h1 {
+  font-size: 44px;
+  letter-spacing: -0.04em;
+}
+.home h1 i {
+  color: var(--accent);
+  font-style: normal;
+}
+.home-lede {
+  color: var(--ink-2);
+  font-size: 16.5px;
+  margin: 18px 0 30px;
+  max-width: 46ch;
+}
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.home-actions .btn-primary {
+  width: auto;
+  padding: 11px 22px;
+}
+.home-note {
+  margin: 34px 0 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}

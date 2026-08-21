@@ -683,20 +683,20 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
         <div class="stage-top"><h3>Hesap ve oturum</h3><span class="hrs">~6 saat · 8 adım</span></div>
         <p class="stage-what">Kayıt ol, giriş yap, çık. Korumalı sayfa.</p>
         <div class="stage-progress">
-          <span class="track"><span class="fill" style="width:50%"></span></span>
-          <span class="n">4 / 8 · sürüyor</span>
+          <span class="track"><span class="fill" style="width:100%"></span></span>
+          <span class="n">8 / 8 · tamamlandı</span>
         </div>
         <ol class="steps">
           <li class="done">Kimlik doğrulama ile yetkilendirme farkı — <i>kimsin</i> ve <i>neye izinlisin</i></li>
           <li class="done"><code>users</code> tablosunu tasarla</li>
           <li class="done">Göç (<b>migration</b>) nedir, ilk göçü çalıştır</li>
           <li class="done">Şifre neden düz saklanmaz — <b>salt</b>, kasıtlı yavaşlık, <code>bcryptjs</code></li>
-          <li>Kayıt formu + sunucu tarafı doğrulama</li>
-          <li>Giriş — oturum ve çerez nasıl çalışıyor</li>
-          <li>Çıkış</li>
-          <li>Korumalı sayfa: giriş yapmayan göremesin</li>
+          <li class="done">Kayıt formu + sunucu tarafı doğrulama — <b>Server Action</b></li>
+          <li class="done">Giriş — oturum veritabanında, çerezde jeton</li>
+          <li class="done">Çıkış — oturum satırı silinir, çerez düşer</li>
+          <li class="done">Korumalı sayfa: <code>requireUser()</code> ile <code>/dashboard</code></li>
         </ol>
-        <div class="stage-done"><b>biter</b>Giriş yapmayan kullanıcı korumalı sayfayı göremiyor.</div>
+        <div class="stage-done"><b>biter</b>Giriş yapmayan kullanıcı korumalı sayfayı göremiyor. &nbsp;·&nbsp; <span style="color:var(--accent)">uçtan uca test: 17/17</span></div>
       </div>
     </article>
 
