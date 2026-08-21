@@ -644,3 +644,198 @@ a.chip:hover {
   font-size: 15px;
   margin-bottom: 6px;
 }
+
+/* ── K0 şeridi ────────────────────────────────────────────────────── */
+.k0 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: baseline;
+  padding: 13px 16px;
+  margin: 20px 0 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+}
+.k0-tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.k0-m {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.k0-m b {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.k0-sep {
+  color: var(--hairline);
+}
+.k0-warn {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  padding-left: 12px;
+  border-left: 2px solid var(--hairline);
+}
+
+.mark-finding {
+  background: var(--error-wash);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 2px;
+  text-decoration: underline wavy var(--error);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.mark-finding sup {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--error);
+  margin-left: 2px;
+  text-decoration: none;
+  display: inline-block;
+  vertical-align: super;
+}
+
+/* ── kelime bandı çubuğu ──────────────────────────────────────────── */
+.bands {
+  margin: 24px 0;
+}
+.bands-head {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 9px;
+}
+.bands-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--surface-3);
+}
+.bands-slice {
+  display: block;
+  height: 100%;
+}
+/* Doğrulanmış sıralı rampa: A1 en soluk, C1 en baskın. */
+.band-A1 { background: #4dc09a; }
+.band-A2 { background: #2ba884; }
+.band-B1 { background: #149069; }
+.band-B2 { background: #0a7454; }
+.band-C1 { background: #04543c; }
+:root[data-theme="dark"] .band-A1 { background: #1d5c48; }
+:root[data-theme="dark"] .band-A2 { background: #22785e; }
+:root[data-theme="dark"] .band-B1 { background: #289675; }
+:root[data-theme="dark"] .band-B2 { background: #2fb48c; }
+:root[data-theme="dark"] .band-C1 { background: #4ad3a5; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .band-A1 { background: #1d5c48; }
+  :root:not([data-theme="light"]) .band-A2 { background: #22785e; }
+  :root:not([data-theme="light"]) .band-B1 { background: #289675; }
+  :root:not([data-theme="light"]) .band-B2 { background: #2fb48c; }
+  :root:not([data-theme="light"]) .band-C1 { background: #4ad3a5; }
+}
+.bands-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 11px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.bands-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.bands-item b {
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.bands-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  display: block;
+}
+.bands-above {
+  margin-left: auto;
+}
+
+/* ── bulgular ─────────────────────────────────────────────────────── */
+.findings {
+  margin-top: 28px;
+}
+.findings-head {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 12px;
+}
+.finding {
+  border: 1px solid var(--error-line);
+  border-left-width: 3px;
+  background: var(--error-wash);
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.finding-kind {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 9px;
+}
+.finding-no {
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 4px;
+  border: 1px solid var(--error-line);
+  color: var(--error);
+  font-size: 10px;
+}
+.finding-conf {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+.finding-fix {
+  font-size: 15.5px;
+  line-height: 1.5;
+  margin-bottom: 7px;
+}
+.finding-fix .was {
+  color: var(--error);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.finding-fix .arrow {
+  color: var(--ink-3);
+  margin: 0 8px;
+}
+.finding-fix .now {
+  color: var(--accent);
+  font-weight: 620;
+}
+.finding-why {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  margin: 0;
+}

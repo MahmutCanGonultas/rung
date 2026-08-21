@@ -77,7 +77,7 @@ Hiçbiri Aşama 0'ı bloke etmiyor.
 
 ## Durum
 
-**21 Ağustos 2026 · Aşama 00 ✔ · Aşama 01 ✔ · Aşama 02 ✔ — sıradaki Aşama 03.**
+**22 Ağustos 2026 · Aşama 00 ✔ · 01 ✔ · 02 ✔ · 03 ✔ — sıradaki Aşama 04 (model katmanı).**
 
 Canlı: **https://rung-plum.vercel.app**
 Kurulu: git + GitHub + Vercel · Next.js 16 (Turbopack) · TypeScript katı mod ·
@@ -92,7 +92,125 @@ Kurulu: git + GitHub + Vercel · Next.js 16 (Turbopack) · TypeScript katı mod 
 | `npm run typecheck` | Sadece tip kontrolü |
 | `npm run migrate` | Bekleyen migration'ları sırayla uygular |
 | `npm run seed` | Bağlam ve görevleri yazar (idempotent) |
-| `npm run smoke` | Uçtan uca duman testi, 43 kontrol (dev sunucusu açıkken) |
+| `npm test` | Birim testleri — 91 test, model gerektirmez |
+| `npm run smoke` | Uçtan uca duman testi, 53 kontrol (dev sunucusu açıkken) |
+| `npm run smoke -- --base=https://rung-plum.vercel.app` | Aynı testi canlıya karşı |
+
+### Aşama 01 · Hesap ve oturum — TAMAM
+
+Giriş yapmayan `/dashboard`'u göremiyor. Kimlik doğrulama elle yazıldı: `bcryptjs` cost 12,
+oturum veritabanında opak jeton (çerezde jeton, veritabanında SHA-256 özeti), `server-only` ile
+veritabanı modülü istemciye sızarsa derleme kırılıyor.
+
+### Aşama 02 · Yazma, saklama, listeleme — TAMAM
+
+Kayıt yazılıp saklanıyor, geçmişte bulunuyor, **başkasının kaydına erişilemiyor**.
+
+| Dosya | İşi |
+|---|---|
+| `migrations/0003_create_content_tables.sql` | `contexts`, `tasks`, `entries` + değiştirilemezlik trigger'ı + GIN arama indeksi |
+| `scripts/seed.mjs` · `scripts/seed-data.mjs` | 5 bağlam, 50 görev; idempotent |
+| `app/lib/content.ts` | Bağlam ve görev okuma, rastgele görev seçimi |
+| `app/lib/entries.ts` | Kayıt yazma/okuma — **her fonksiyon `userId`'yi WHERE'e koyuyor** |
+| `app/lib/entry-actions.ts` | Kaydetme; bağlam istemciden değil görevden okunuyor |
+| `app/lib/words.ts` | Kelime sayma — istemci ve sunucu aynı fonksiyonu kullanıyor |
+| `app/(app)/layout.tsx` | Giriş yapmışın kabuğu; `(app)` adrese girmeyen grup |
+| `app/(app)/write` `history` `entries/[id]` | Üç ekran |
+
+**Kilit kararlar** (gerekçeleri `docs/plan.md` §15'te): kayıtlar veritabanı trigger'ıyla
+değiştirilemez · görev seçimi adrese yazılıyor · sahiplik sorgunun içinde, bulunamayınca 404 ·
+arama `tsvector` + GIN.
+
+### Aşama 03 · Deterministik analiz (K0) — TAMAM · **YAPAY ZEKÂ YOK**
+
+Metin verildiğinde model çağrısı olmadan ölçüm çıkıyor. **91 birim testi.**
+
+| Dosya | İşi |
+|---|---|
+| `app/lib/taxonomy.ts` | Plan §05'in sabit hata taksonomisi — K0 ve K1 ortak kullanıyor |
+| `app/lib/k0/tokenize.ts` | Cümle ve kelime ayırma; kısaltmalar iki sınıfa ayrılmış |
+| `app/lib/k0/metrics.ts` | Sayılar, ortalama, **MATTR** çeşitlilik, yan cümle oranı |
+| `app/lib/k0/word-bands.ts` · `bands.ts` | ~2.900 kelimelik A1–B2 bantları, çekim soyma |
+| `app/lib/k0/spelling.ts` | `nspell` + `dictionary-en`; özel isim ve kısaltma ayıklama |
+| `app/lib/k0/rules.ts` | Deterministik kurallar + Türkçe kaynaklı sabit kalıplar |
+| `app/lib/k0/index.ts` | Birleştirici; çakışan bulguları tek bulguya indiriyor |
+| `app/components/K0Panel.tsx` | K0 şeridi, işaretli metin, bant çubuğu, bulgu kartları |
+| `scripts/bench/spell-bench.mjs` | Araç seçiminin dayandığı ölçüm |
+
+### Sıradaki — Aşama 04 · Model katmanı (K1)
+
+Taksonomiye zorlanmış hata çıkarımı. **Burası API anahtarı gerektiriyor.**
+
+### Kullanıcıdan bekleyenler` başlığında toplanır. |
+| **Değişmeyen** | Kalite. Kararlar `docs/plan.md` §15'e yazılmaya devam eder, her iş biriminde commit atılır, `main` daima çalışır durumda kalır. |
+
+Eski kural (kavramı Claude anlatır, kodu kullanıcı yazar) Aşama 00 ve Aşama 01'in ilk dört adımında
+geçerliydi; o dönemin izi `docs/learning-log.md` ve `docs/book/` içinde duruyor ve **silinmiyor** —
+kullanıcı kendi projesini yaparken oraya dönecek.
+
+## Kullanıcının seviyesi
+
+**Hiçbir teknolojiyi bilmediğini varsay.** HTML, CSS ve temel JavaScript yazabiliyor; gerisi
+(terminal, git, npm, TypeScript, React, Next.js, SQL, PostgreSQL, ortam değişkeni, deploy, dil
+modeli API'si, eval) sıfırdan öğrenilmekteydi.
+
+Kodu artık Claude yazdığı için bu bir **anlatım** kuralı değil, bir **rapor** kuralı: aşama sonunda
+ne yapıldığı özetlenirken terim tanımsız bırakılmaz, "bunu bilirsin" varsayılmaz. Özet kısa olur ama
+anlaşılır olur.
+
+## Kurallar
+
+| | |
+|---|---|
+| **Teslim** | Aşama aşama. Bir aşama **çalışır ve doğrulanmış** hâlde kapanır; bitiş kriteri karşılanmadan sonrakine geçilmez. |
+| **Doğrulama** | İddia edilen her şey çalıştırılarak gösterilir: `npm run typecheck`, `npm run build`, `npm run smoke`, ve ekran görüntüsüyle **gözle** bakmak. "Çalışıyor olmalı" cümlesi kurulmaz. |
+| **Dil** | Anlatım ve yorum satırları **Türkçe**. Kod, dosya adı, tablo adı, değişken adı, commit mesajı, dal adı **İngilizce** — istisnasız. |
+| **Terim** | **Yazım kalıbı: `migration (göç)`** — İngilizcesi asıl, Türkçesi parantezde, ilk geçişte. Sonraki geçişlerde İngilizcesi. Sadece Türkçesini yazmak yasak. |
+| **Yorum** | Kod yorumları **neden**i anlatır, neyi değil. `docs/plan.md` §15'teki kararın gerekçesi, kararın uygulandığı dosyada bir cümleyle tekrar edilir. |
+| **Git** | Her iş biriminde commit. Conventional Commits, İngilizce. `main` daima çalışır durumda. |
+| **Karar** | Teknoloji seçimi dört soruyla açılır — bu ne yapıyor · onsuz ne olurdu · alternatifi neydi · neden bu — ve `docs/plan.md` §15'e **elenenlerle birlikte** yazılır. Kararı Claude verir; kullanıcı sonradan itiraz edebilsin diye gerekçe eksiksiz yazılır. |
+| **Kullanıcıya soru** | Sadece Claude'un yapamayacağı işler: API anahtarı almak, Vercel paneline gizli değer girmek, ürün zevki kararları. Bunun dışında onay beklenmez. |
+
+## Kilitli kararlar
+
+- **İsim: Rung.** Repo, klasör, veritabanı, commit'ler hep bu. Değişmez.
+- **Koyu + açık tema.** Koyu varsayılan, açık tema ek. Her iki paletin de renk körlüğü ve
+  kontrast açısından ayrıca doğrulanması gerekiyor — göz kararı renk seçilmez.
+- **Veritabanı: Neon (bulut PostgreSQL).** Tek veritabanı; yerel kurulum yok. Dev/prod ayrımı gerektiğinde Neon dallanması.
+- **Kimlik doğrulama elle yazıldı**, hazır kütüphane yok. Şifre `bcryptjs` (cost 12), oturum
+  veritabanında opak jeton — çerezde jeton, veritabanında SHA-256 özeti.
+- **Form gönderimi Server Action.** Route Handler yok; gerçekten dışarıdan çağrılan bir uç
+  gerekirse açılacak.
+- **Kalan teknoloji kararları kilitli değil.** `docs/plan.md` §10'daki liste öneridir. Her seçim
+  sırası geldiğinde dört soruyla açılır ve gerekçesiyle §15'e yazılır.
+
+## Hâlâ açık
+
+- Yurtdışı hedefi ne (uzaktan çalışma / taşınma / eğitim) — hedef seviyeyi ve IELTS gereğini belirliyor.
+- Haftalık gerçek çalışma saati — plan aynı kalır, takvim değişir.
+- Başlangıç İngilizce seviyesi — ilk hafta birkaç kayıtla **ölçülecek**, tahmin edilmeyecek.
+
+Hiçbiri Aşama 0'ı bloke etmiyor.
+
+## Durum
+
+**22 Ağustos 2026 · Aşama 00 ✔ · 01 ✔ · 02 ✔ · 03 ✔ — sıradaki Aşama 04 (model katmanı).**
+
+Canlı: **https://rung-plum.vercel.app**
+Kurulu: git + GitHub + Vercel · Next.js 16 (Turbopack) · TypeScript katı mod ·
+`@neondatabase/serverless` · `bcryptjs` · `server-only` · `puppeteer-core` (test).
+
+### Komutlar
+
+| | |
+|---|---|
+| `npm run dev` | Geliştirme sunucusu |
+| `npm run build` | Üretim derlemesi — tip hatasında durur |
+| `npm run typecheck` | Sadece tip kontrolü |
+| `npm run migrate` | Bekleyen migration'ları sırayla uygular |
+| `npm run seed` | Bağlam ve görevleri yazar (idempotent) |
+| `npm test` | Birim testleri — 91 test, model gerektirmez |
+| `npm run smoke` | Uçtan uca duman testi, 53 kontrol (dev sunucusu açıkken) |
 | `npm run smoke -- --base=https://rung-plum.vercel.app` | Aynı testi canlıya karşı |
 
 ### Aşama 01 · Hesap ve oturum — TAMAM

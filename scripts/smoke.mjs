@@ -364,6 +364,48 @@ async function main() {
     check("/write → /login", anonPage.url().includes("/login"), anonPage.url());
     await anonPage.goto(`${BASE}/history`, { waitUntil: "networkidle0" });
     check("/history → /login", anonPage.url().includes("/login"), anonPage.url());
+
+    // ══════════ AŞAMA 03 · deterministik analiz (K0) ══════════
+    console.log("\n21 · K0 şeridi ve bulgular");
+    await page.goto(entryUrl, { waitUntil: "networkidle0" });
+    const k0 = await readText(page, ".k0");
+    check("K0 şeridi görünüyor", Boolean(k0 && k0.includes("kelime")), String(k0).slice(0, 60));
+    check("kelime bandı çubuğu var", (await page.$$(".bands-slice")).length > 0);
+    check(
+      "temiz metinde bulgu yok",
+      (await page.$$(".finding")).length === 0,
+      `${(await page.$$(".finding")).length} bulgu`
+    );
+
+    console.log("\n22 · hatalı metin gerçekten bulgu üretiyor");
+    await page.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
+    await page.waitForSelector(".composer button[type=submit]", { timeout: 15000 });
+    const BAD =
+      "i am agree with your suggestion about the meeting of tomorrow. " +
+      "Thanks for the informations you sent me , i recieved them yesterday. " +
+      "We should discuss about the the details when you are free next week.";
+    await page.type(".editor", BAD);
+    await page.click(".composer button[type=submit]");
+    await waitForUrl(page, (u) => /\/entries\/\d+$/.test(u) && u !== entryUrl, 20000);
+    await new Promise((r) => setTimeout(r, 600));
+
+    const kinds = await page.$$eval(".finding-kind", (els) =>
+      els.map((el) => el.textContent ?? "")
+    );
+    const joined = kinds.join(" | ");
+    check("bulgu üretildi", kinds.length >= 6, `${kinds.length} bulgu`);
+    check("Türkçe kaynaklı kalıp yakalandı", /Türkçe kaynaklı/.test(joined), joined);
+    check("sayılabilirlik yakalandı", /Sayılabilirlik|sayılabilirlik/i.test(joined), joined);
+    check("yazım hatası yakalandı", /Yazım|yazım/.test(joined), joined);
+    check("tekrar yakalandı", /tekrar/i.test(joined), joined);
+
+    const marks = await page.$$eval(".mark-finding", (els) => els.length);
+    check("metinde işaretler var", marks >= 6, `${marks} işaret`);
+
+    const suggestions = await page.$$eval(".finding-fix .now", (els) =>
+      els.map((el) => el.textContent)
+    );
+    check("düzeltme önerisi veriliyor", suggestions.includes("I agree"), suggestions.join(", "));
   } finally {
     await browser.close();
     await cleanUp();
