@@ -12,39 +12,47 @@ aylar boyunca izler, ve **kendi doğruluğunu ölçer**.
 Ürün önizlemesi: [`docs/design/product.html`](docs/design/product.html) — beş ekran (Yaz · Analiz · Geçmiş · İlerleme · Doğruluk), çalışan sekmeler, koyu/açık tema.
 Plan: [`docs/plan.md`](docs/plan.md) (yazılı, karar günlüğü dâhil) · [`docs/design/roadmap.html`](docs/design/roadmap.html) (görsel, adım adım).
 
-## EN ÖNEMLİ KURAL — kodu Claude yazmaz
+## EN ÖNEMLİ KURAL — 21 Ağustos 2026'da DEĞİŞTİ
 
-**Kavramı Claude anlatır, kodu kullanıcı yazar.**
+**Kodu artık Claude yazıyor.** Kullanıcı kararı:
+*"Bu projeyi sen bitir, ben ilerde başka bir Next.js projesi yapacağım. Full özenle bitir.
+Benim yapmam gereken kısımlara gelince haber ver."*
 
-Ne yazılacağı söylenir; satırı kullanıcı kurar, hatayı kullanıcı alır, hatayı beraber okuruz.
-Claude'un kod yazması bu projede kural ihlalidir — kullanıcı açıkça "sen yaz" demedikçe.
+### Bunun pratik anlamı
 
-Sebebi: proje iki hedefli — çalışan bir ürün *ve* işe alınabilir bir geliştirici. Kodu Claude yazarsa
-kullanıcı sadece izler. İzleyerek öğrenilmiyor, çünkü takılan o olmuyor.
+| | |
+|---|---|
+| **Kod** | Claude yazar, çalıştırır, doğrular, commit'ler. Onay beklemez. |
+| **Tempo** | Adım adım anlatım **bitti**. Aşama aşama teslim edilir, sonunda ne yapıldığı özetlenir. |
+| **Kullanıcıya sorulacak tek şey** | Claude'un yapamayacağı işler — API anahtarı almak, Vercel paneline gizli değer girmek, ürünle ilgili zevk kararları. Bunlar `### Kullanıcıdan bekleyenler` başlığında toplanır. |
+| **Değişmeyen** | Kalite. Kararlar `docs/plan.md` §15'e yazılmaya devam eder, her iş biriminde commit atılır, `main` daima çalışır durumda kalır. |
 
-İstisna: tasarım maketleri, tek seferlik yardımcı script'ler, ve kullanıcının açıkça istediği şeyler.
+Eski kural (kavramı Claude anlatır, kodu kullanıcı yazar) Aşama 00 ve Aşama 01'in ilk dört adımında
+geçerliydi; o dönemin izi `docs/learning-log.md` ve `docs/book/` içinde duruyor ve **silinmiyor** —
+kullanıcı kendi projesini yaparken oraya dönecek.
 
 ## Kullanıcının seviyesi
 
-**Hiçbir teknolojiyi bilmediğini varsay.** Terminal, git, npm, TypeScript, React, Next.js, SQL,
-PostgreSQL, ortam değişkeni, deploy, dil modeli API'si, eval — hepsi sıfırdan anlatılacak.
+**Hiçbir teknolojiyi bilmediğini varsay.** HTML, CSS ve temel JavaScript yazabiliyor; gerisi
+(terminal, git, npm, TypeScript, React, Next.js, SQL, PostgreSQL, ortam değişkeni, deploy, dil
+modeli API'si, eval) sıfırdan öğrenilmekteydi.
 
-HTML, CSS ve temel JavaScript yazabiliyor; benzetmeleri oraya bağlamak işe yarar. Ama bu bile
-"bunu bilirsin" demek için gerekçe değil.
+Kodu artık Claude yazdığı için bu bir **anlatım** kuralı değil, bir **rapor** kuralı: aşama sonunda
+ne yapıldığı özetlenirken terim tanımsız bırakılmaz, "bunu bilirsin" varsayılmaz. Özet kısa olur ama
+anlaşılır olur.
 
 ## Kurallar
 
 | | |
 |---|---|
-| **Tempo** | Tek adım, sonra dur. Kullanıcı "tamam" demeden sonraki adıma geçilmez. Mesaj başına **tek dosya veya tek komut**. |
-| **Kavram sırası** | Önce problem ("şu sıkıntı var, bunun için X icat edilmiş") → benzetme → projedeki yeri → kod → kontrol sorusu. |
-| **Dil** | Anlatım **Türkçe**. Kod, dosya adı, tablo adı, değişken adı, commit mesajı, dal adı **İngilizce** — istisnasız. |
-| **Terim** | Bir terim ilk geçtiğinde tanımlanır. "Bunu zaten biliyorsundur" cümlesi kurulmaz. **Yazım kalıbı: `migration (göç)`** — İngilizcesi asıl, Türkçesi parantezde. Sonraki geçişlerde İngilizcesi kullanılır. Sadece Türkçesini yazmak yasak: mülakatta, belgede, hata mesajında karşısına İngilizcesi çıkacak. |
-| **Hata** | Hata mesajı görülünce doğrudan düzeltmeye geçilmez. Önce: hangi satır, hangi tür, ne bekliyordu, ne buldu. |
-| **Git** | Her iş biriminde commit — aşama sonu beklenmez. Conventional Commits, İngilizce. `main` daima çalışır durumda. |
-| **Hız** | Yavaş git. **Mesaj başına tek hareket** — rutin git komutları bile olsa. |
-| **Kontrol** | **Kontrol sorusu doğru cevaplanmadan sonraki adıma geçilmez.** Cevap yarımsa aynı kavram *başka bir yoldan* tekrar anlatılır. "Anladım, devam" yeterli değil — cevabın kendisi gerekiyor. |
-| **Tekrar** | Aynı şeyi tekrar anlatmak başarısızlık değil, **yöntem**. Kullanıcı istediği kadar tekrar isteyebilir; sıkılma, kısaltma, "bunu konuşmuştuk" deme. |
+| **Teslim** | Aşama aşama. Bir aşama **çalışır ve doğrulanmış** hâlde kapanır; bitiş kriteri karşılanmadan sonrakine geçilmez. |
+| **Doğrulama** | İddia edilen her şey çalıştırılarak gösterilir: `npm run typecheck`, `npm run build`, `npm run smoke`, ve ekran görüntüsüyle **gözle** bakmak. "Çalışıyor olmalı" cümlesi kurulmaz. |
+| **Dil** | Anlatım ve yorum satırları **Türkçe**. Kod, dosya adı, tablo adı, değişken adı, commit mesajı, dal adı **İngilizce** — istisnasız. |
+| **Terim** | **Yazım kalıbı: `migration (göç)`** — İngilizcesi asıl, Türkçesi parantezde, ilk geçişte. Sonraki geçişlerde İngilizcesi. Sadece Türkçesini yazmak yasak. |
+| **Yorum** | Kod yorumları **neden**i anlatır, neyi değil. `docs/plan.md` §15'teki kararın gerekçesi, kararın uygulandığı dosyada bir cümleyle tekrar edilir. |
+| **Git** | Her iş biriminde commit. Conventional Commits, İngilizce. `main` daima çalışır durumda. |
+| **Karar** | Teknoloji seçimi dört soruyla açılır — bu ne yapıyor · onsuz ne olurdu · alternatifi neydi · neden bu — ve `docs/plan.md` §15'e **elenenlerle birlikte** yazılır. Kararı Claude verir; kullanıcı sonradan itiraz edebilsin diye gerekçe eksiksiz yazılır. |
+| **Kullanıcıya soru** | Sadece Claude'un yapamayacağı işler: API anahtarı almak, Vercel paneline gizli değer girmek, ürün zevki kararları. Bunun dışında onay beklenmez. |
 
 ## Kilitli kararlar
 
@@ -52,9 +60,12 @@ HTML, CSS ve temel JavaScript yazabiliyor; benzetmeleri oraya bağlamak işe yar
 - **Koyu + açık tema.** Koyu varsayılan, açık tema ek. Her iki paletin de renk körlüğü ve
   kontrast açısından ayrıca doğrulanması gerekiyor — göz kararı renk seçilmez.
 - **Veritabanı: Neon (bulut PostgreSQL).** Tek veritabanı; yerel kurulum yok. Dev/prod ayrımı gerektiğinde Neon dallanması.
-- **Kalan teknoloji kararları kilitli değil.** `docs/plan.md` §10'daki liste öneridir. Her seçim sırası
-  geldiğinde dört soruyla açılır ve **kararı kullanıcı verir**: bu ne yapıyor · onsuz ne olurdu ·
-  alternatifi neydi · neden bu.
+- **Kimlik doğrulama elle yazıldı**, hazır kütüphane yok. Şifre `bcryptjs` (cost 12), oturum
+  veritabanında opak jeton — çerezde jeton, veritabanında SHA-256 özeti.
+- **Form gönderimi Server Action.** Route Handler yok; gerçekten dışarıdan çağrılan bir uç
+  gerekirse açılacak.
+- **Kalan teknoloji kararları kilitli değil.** `docs/plan.md` §10'daki liste öneridir. Her seçim
+  sırası geldiğinde dört soruyla açılır ve gerekçesiyle §15'e yazılır.
 
 ## Hâlâ açık
 
@@ -66,42 +77,63 @@ Hiçbiri Aşama 0'ı bloke etmiyor.
 
 ## Durum
 
-**18 Ağustos 2026 · Aşama 00 tamam (21/21) · Aşama 01 SÜRÜYOR — 4 / 8 adım.**
+**21 Ağustos 2026 · Aşama 00 tamam (21/21) · Aşama 01 TAMAM (8/8).**
 
-Canlı: **https://rung-plum.vercel.app** · Her istekte Neon'a (Frankfurt) sorgu atıyor, saat değişiyor.
-Kurulu: git + GitHub + Vercel · Next.js 16 · TypeScript katı mod · `@neondatabase/serverless`.
+Canlı: **https://rung-plum.vercel.app**
+Kurulu: git + GitHub + Vercel · Next.js 16 (Turbopack) · TypeScript katı mod ·
+`@neondatabase/serverless` · `bcryptjs` · `server-only` · `puppeteer-core` (test).
 
-### Aşama 01: Hesap ve oturum (~6 sa, 8 adım) — 3 / 8
+### Komutlar
 
-**Karar verildi:** kimlik doğrulama **elle yazılıyor**, hazır kütüphane yok (gerekçe `docs/plan.md` §15).
-Sınır: şifreleme algoritması elle yazılmayacak, hash denenmiş bir pakete verilecek.
+| | |
+|---|---|
+| `npm run dev` | Geliştirme sunucusu |
+| `npm run build` | Üretim derlemesi — tip hatasında durur |
+| `npm run typecheck` | Sadece tip kontrolü |
+| `npm run migrate` | Bekleyen migration'ları sırayla uygular |
+| `npm run smoke` | Uçtan uca duman testi (dev sunucusu açıkken) |
+| `npm run smoke -- --base=https://rung-plum.vercel.app` | Aynı testi canlıya karşı |
 
-| # | Adım | Durum |
-|---|---|---|
-| 1 | authentication (kimlik doğrulama) ile authorization (yetkilendirme) farkı | ✔ |
-| 2 | `users` tablosunu tasarla | ✔ |
-| 3 | migration (göç) nedir, ilk migration'ı çalıştır | ✔ |
-| 4 | şifre neden düz saklanmaz — hash, salt, kasıtlı yavaşlık | ✔ |
-| 5 | kayıt formu + sunucu tarafı doğrulama | **← SIRADAKİ** |
-| — | └ 5a `/register` adresi — boş sayfa, `app/register/page.tsx` | **← TAM BURADAN DEVAM** |
-| — | └ 5b forma tek alan ekle — `name` özniteliği | |
-| — | └ 5c ikinci alan + tarayıcı kontrolleri (`required`, `minLength`) | |
-| — | └ 5d gönder'e bas, ne olduğuna bak (şifre adres çubuğunda) | |
-| — | └ 5e sunucuya gerçekten yollamak — **karar:** Server Action mı Route Handler mı | |
-| 6 | giriş — session (oturum) ve cookie (çerez) | |
-| 7 | çıkış | |
-| 8 | korumalı sayfa: giriş yapmayan göremesin | |
+### Aşama 01 · Hesap ve oturum — TAMAM
 
-Şu an gerçekten duran şeyler: `migrations/0001_create_users.sql` ·
-`scripts/migrate.mjs` (`node --env-file=.env.local scripts/migrate.mjs` ile çalışıyor) ·
-Neon'da **`users` tablosu oluşmuş durumda** · `bcryptjs` kurulu (`dependencies`, kendi tiplerini
-getiriyor — `@types/bcryptjs` gerekmiyor). Öğrenilen iki fonksiyon: `bcrypt.hash(sifre, 10)` ve
-`bcrypt.compare(sifre, saklananHash)`; salt, cost ve hash tek bir 60 karakterlik metnin içinde.
+Bitiş kriteri karşılandı: giriş yapmayan kullanıcı `/dashboard`'u göremiyor, `/login`'e düşüyor.
+Duman testi 17 kontrolün 17'sini geçiyor.
 
-Bilerek ertelenenler: `schema_migrations` not defteri (ikinci migration gelince) ·
-transaction (ilk çok komutlu migration'da) · `npm run migrate` kısayolu.
+| Dosya | İşi |
+|---|---|
+| `migrations/0002_create_sessions.sql` | `sessions` tablosu, `users`'a foreign key ile bağlı |
+| `scripts/migrate.mjs` | `schema_migrations` defteri + dosya başına transaction |
+| `app/lib/db.ts` | `server-only` işaretli Neon erişimi |
+| `app/lib/validation.ts` | Sunucu tarafı doğrulama, e-posta normalizasyonu |
+| `app/lib/auth.ts` | `bcryptjs` cost 12, sahte hash ile sabit zamanlı giriş |
+| `app/lib/session.ts` | Jeton üretimi, çerez, `cache`'li oturum okuma |
+| `app/lib/actions.ts` | `"use server"` — kayıt, giriş, çıkış |
+| `app/lib/guard.ts` | `requireUser()` — korumalı sayfaların kapısı |
+| `app/components/AuthForm.tsx` | Tek istemci bileşeni; sınır yaprakta |
+| `app/register` `app/login` `app/dashboard` | Sayfalar |
+| `app/globals.css` | Doğrulanmış paletin uygulamaya taşınmış hâli |
 
-**Biter:** giriş yapmayan kullanıcı korumalı sayfayı göremiyor.
+**Güvenlik notları** (hepsi kodda yorumlu): şifre asla düz saklanmıyor · oturum jetonunun sadece
+özeti veritabanında · çerez `httpOnly` + `sameSite=lax` + üretimde `secure` · giriş hatası hangi
+alanın yanlış olduğunu söylemiyor · var olmayan e-postada da bcrypt çalışıyor (zamanlama sızıntısı
+yok) · benzersizlik kodda değil veritabanı kısıtında · `server-only` paketi veritabanı modülünün
+istemciye sızmasını derleme zamanında engelliyor.
+
+**Bilerek ertelenenler:** oran sınırlama (rate limiting) · e-posta doğrulama · şifre sıfırlama ·
+süresi geçmiş oturumların düzenli temizliği (`purgeExpiredSessions` yazıldı, çağıran yok).
+
+### Sıradaki — Aşama 02 · Yazma, saklama, listeleme
+
+`contexts`, `tasks`, `entries` tabloları · yabancı anahtar · tohum veri · Yaz ekranı · kaydı
+değiştirilemez yapma · sahiplik kontrolü · Geçmiş ekranı.
+
+### Kullanıcıdan bekleyenler
+
+| Ne zaman | Ne gerekiyor |
+|---|---|
+| **Aşama 04'e girerken** | Dil modeli API anahtarı. Öneri: Anthropic Console'dan bir anahtar; `ANTHROPIC_API_KEY` adıyla hem `.env.local`'e hem Vercel paneline girilecek. Vercel paneline **tırnaksız** yapıştırılır — Aşama 00'da bu tuzağa bir kez düşüldü. |
+| **Aşama 04'te** | Aylık maliyet tavanı kararı (kayıt başı ~$0.01 hedefleniyor). |
+| Şimdilik başka bir şey yok | Neon ve Vercel zaten bağlı. |
 
 ### Öğrenme günlüğü — ÖNCE BUNU OKU
 
