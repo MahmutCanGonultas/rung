@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -5,7 +6,7 @@ import { AuthForm } from "../components/AuthForm";
 import { loginAction } from "../lib/actions";
 import { getSessionUser } from "../lib/session";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Giriş · Rung",
 };
 

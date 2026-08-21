@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -6,7 +7,7 @@ import { registerAction } from "../lib/actions";
 import { getSessionUser } from "../lib/session";
 import { PASSWORD_MIN } from "../lib/validation";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Hesap oluştur · Rung",
 };
 

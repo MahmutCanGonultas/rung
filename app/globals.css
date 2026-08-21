@@ -32,7 +32,12 @@
   --ring: rgba(14, 155, 108, 0.45);
   --shadow: 0 28px 56px -34px rgba(20, 23, 26, 0.3);
 
-  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /*
+   * `next/font` bu değişkeni <html> üzerine koyuyor ve içine kendi ölçü
+   * uyumlu yedeğini de yazıyor: "Inter", "Inter Fallback". Doğrudan "Inter"
+   * yazsaydık o yedek boşta kalır, font inerken satırlar oynardı.
+   */
+  --sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --r-md: 11px;

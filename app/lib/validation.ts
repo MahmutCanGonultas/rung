@@ -6,9 +6,22 @@
  * burada bir daha kontrol edilir.
  */
 
-/** Aynı hesabın "Ali@X.com" ve "ali@x.com" diye ikiye bölünmemesi için. */
+/*
+ * Aynı hesabın "Ali@X.com" ve "ali@x.com" diye ikiye bölünmemesi için.
+ *
+ * Sondaki `replace` süs değil. JavaScript'te Türkçe büyük İ'nin küçüğü tek harf
+ * değil, İKİ kod noktası: "i" + U+0307 (birleşen üstteki nokta).
+ *
+ *   "İsmail@x.com".toLowerCase()  →  "i̇smail@x.com"   17 kod noktası
+ *   "ismail@x.com"                →  "ismail@x.com"    16 kod noktası
+ *
+ * İkisi eşit değil. Telefonda otomatik büyük harfle "İsmail@x.com" yazıp kayıt
+ * olan biri, ertesi gün "ismail@x.com" yazınca hesabını bulamazdı — kalıcı
+ * olarak dışarıda kalırdı. Birleşen noktayı atınca ikisi aynı metne düşüyor.
+ * U+0307'nin e-posta adresinde anlamlı bir işi yok, atmak güvenli.
+ */
 export function normalizeEmail(raw: string): string {
-  return raw.trim().toLowerCase();
+  return raw.trim().toLowerCase().replace(/\u0307/g, "").normalize("NFKC");
 }
 
 /*

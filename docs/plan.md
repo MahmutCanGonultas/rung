@@ -362,6 +362,8 @@ Değişen kural, ve en önemlisi:
 | 2026-08-21 | **Oturum: veritabanında saklanan opak jeton (stateful session).** İmzalı çerez (JWT benzeri) elendi. **Gerekçe:** oturum iptal edilebilir olmalı — "her yerden çık" ve şifre değişince oturumları düşürme imzalı çerezle yapılamaz; ayrıca imza anahtarı Vercel paneline ayrıca girilmesi gereken ikinci bir sır demek, jetonla buna gerek kalmıyor. **Ayrıntı:** jetonun kendisi çereze yazılıyor, veritabanına **SHA-256 özeti** yazılıyor — veritabanı sızarsa jetonlar kullanılamaz. Jeton 32 rastgele bayt olduğu için burada yavaş hash gerekmiyor; bcrypt sadece insan seçimi şifreler için. |
 | 2026-08-21 | **Form gönderimi: Server Action.** Route Handler (`app/api/.../route.ts`) elendi. **Gerekçe:** kayıt/giriş formu için ayrı bir HTTP ucu tanımlamak, JSON'a çevirip geri okumak gereksiz katman; Server Action aynı işi tek fonksiyonla yapıyor ve JavaScript kapalıyken de çalışıyor (aşamalı iyileştirme). Route Handler'lar ileride gerçekten dışarıdan çağrılan bir uç gerektiğinde açılacak. |
 
+| 2026-08-21 | **Bağımsız denetimde bulunan gerçek hata: Türkçe İ.** JavaScript'te `"İ".toLowerCase()` tek harf değil **iki kod noktası** üretiyor: `i` + U+0307. Yani `İsmail@x.com` ile `ismail@x.com` normalize edildiğinde eşit çıkmıyordu; telefonda otomatik büyük harfle kayıt olan biri ertesi gün giriş yapamayacaktı. **Düzeltme:** `normalizeEmail` artık birleşen noktayı atıyor (`replace(/\u0307/g, "")` + NFKC). `scripts/smoke.mjs`'e regresyon testi eklendi — İ'li adresle kayıt, küçük harfle giriş. Türkçe konuşanlar için yazılan bir üründe bu hatanın canlıya çıkması ciddi olurdu; denetim tam da bunun için yapıldı. |
+
 ### Hâlâ açık
 
 - **Yurtdışı hedefi** — Türkiye'den uzaktan yabancı şirkete mi, taşınmak mı, önce eğitim mi?

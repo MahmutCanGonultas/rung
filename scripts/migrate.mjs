@@ -7,6 +7,12 @@
  *
  * Çalıştırma:  npm run migrate
  *
+ * Not: `schema_migrations` defteri projeye sonradan geldi. Defterden önce elle
+ * uygulanmış bir migration varsa (bu projede 0001), o dosya adı deftere bir
+ * kez elle işlenir — yoksa çalıştırıcı onu tekrar uygulamaya kalkar ve "zaten
+ * var" hatasıyla durur. Boş bir veritabanında böyle bir sorun yok, dosyalar
+ * baştan sırayla çalışır.
+ *
  * Sürücü olarak `neon()` değil `Client` kullanılıyor. Sebep: HTTP sürücüsü
  * tek seferde tek komut kabul ediyor ("cannot insert multiple commands into
  * a prepared statement") ve transaction açamıyor. `Client` kalıcı bir
@@ -28,6 +34,23 @@ function requireDatabaseUrl() {
     );
   }
   return url;
+}
+
+/*
+ * Aynı anda iki `npm run migrate` çalışırsa ikisi de "bekleyen" listesini aynı
+ * görür ve aynı dosyayı uygulamaya kalkar. Postgres'in danışma kilidi (advisory
+ * lock) bunu tek satırla çözüyor: kilidi ilk alan çalışır, ikincisi bekler.
+ * Sayı rastgele ama sabit — aynı sayıyı kullanan herkes aynı kuyruğa girer.
+ */
+const LOCK_ID = 8123407;
+
+async function withLock(client, work) {
+  await client.query("SELECT pg_advisory_lock($1)", [LOCK_ID]);
+  try {
+    return await work();
+  } finally {
+    await client.query("SELECT pg_advisory_unlock($1)", [LOCK_ID]);
+  }
 }
 
 async function ensureLedger(client) {
@@ -75,22 +98,24 @@ async function main() {
   await client.connect();
 
   try {
-    await ensureLedger(client);
+    await withLock(client, async () => {
+      await ensureLedger(client);
 
-    const applied = await appliedFilenames(client);
-    const pending = await pendingFiles(applied);
+      const applied = await appliedFilenames(client);
+      const pending = await pendingFiles(applied);
 
-    if (pending.length === 0) {
-      console.log(`güncel · ${applied.size} migration zaten uygulanmış`);
-      return;
-    }
+      if (pending.length === 0) {
+        console.log(`güncel · ${applied.size} migration zaten uygulanmış`);
+        return;
+      }
 
-    for (const filename of pending) {
-      await applyOne(client, filename);
-      console.log(`uygulandı  ${filename}`);
-    }
+      for (const filename of pending) {
+        await applyOne(client, filename);
+        console.log(`uygulandı  ${filename}`);
+      }
 
-    console.log(`bitti · ${pending.length} yeni migration`);
+      console.log(`bitti · ${pending.length} yeni migration`);
+    });
   } finally {
     await client.end();
   }
