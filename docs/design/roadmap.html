@@ -752,16 +752,20 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
       <div class="stage-card">
         <div class="stage-top"><h3>Model katmanı — K1</h3><span class="chip t-model">model</span><span class="hrs">~8 saat · 10 adım</span></div>
         <p class="stage-what">Yapay zekâ ilk kez devreye giriyor — ve sıkı bir kafese konuyor.</p>
+        <div class="stage-progress">
+          <span class="track"><span class="fill" style="width:90%"></span></span>
+          <span class="n">9 / 10 · API anahtarı bekleniyor</span>
+        </div>
         <ol class="steps">
-          <li>Dil modeli nedir, <b>token</b> nedir, maliyet nasıl hesaplanır</li>
-          <li>Sağlayıcı soyutlaması — arayüzü tanımla, sağlayıcı değişimi bir günlük iş olsun</li>
-          <li>Hata taksonomisini kodda sabitle — beş aile, alt kategoriler</li>
-          <li><b>Yapılandırılmış çıktı</b> — modeli şemaya zorlama</li>
-          <li>İlk istemi (<b>prompt</b>) yaz ve <code>v1</code> diye numaralandır</li>
-          <li>Bulguyu metindeki tam konuma eşle</li>
-          <li>Hata ve yeniden deneme — model bazen bozuk cevap verir</li>
-          <li><code>analyses</code> ve <code>findings</code> tablolarını kur</li>
-          <li>Model kimliğini ve prompt sürümünü <b>her kayda</b> yaz</li>
+          <li class="done">Dil modeli nedir, <b>token</b> nedir, maliyet nasıl hesaplanır</li>
+          <li class="done">Sağlayıcı soyutlaması — arayüzü tanımla, sağlayıcı değişimi bir günlük iş olsun</li>
+          <li class="done">Hata taksonomisini kodda sabitle — beş aile, alt kategoriler</li>
+          <li class="done"><b>Yapılandırılmış çıktı</b> — modeli şemaya zorlama</li>
+          <li class="done">İlk istemi (<b>prompt</b>) yaz ve <code>v1</code> diye numaralandır</li>
+          <li class="done">Bulguyu metindeki tam konuma eşle</li>
+          <li class="done">Hata ve yeniden deneme — model bazen bozuk cevap verir</li>
+          <li class="done"><code>analyses</code> ve <code>findings</code> tablolarını kur</li>
+          <li class="done">Model kimliğini ve prompt sürümünü <b>her kayda</b> yaz</li>
           <li><b>Analiz ekranı</b> gerçek bulguları göstersin <span class="screen-tag">Analiz sekmesi</span></li>
         </ol>
         <div class="stage-done"><b>biter</b>Metinden şemaya uygun, konumlu bulgular geliyor ve sürümüyle birlikte saklanıyor.</div>

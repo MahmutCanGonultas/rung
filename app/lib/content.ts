@@ -6,31 +6,22 @@ import { db } from "./db";
 
 /* Bağlamlar ve görevler — okuma tarafı. */
 
-export const LEVELS = ["A1", "A2", "B1", "B2", "C1"] as const;
-export type Level = (typeof LEVELS)[number];
-
 /*
- * Seviye motoru Aşama 06'da geliyor; o zamana kadar herkes B1 sayılıyor.
- * Sabit burada tek yerde duruyor ki motor gelince değiştirilecek yer belli olsun.
+ * Tipler `content-types.ts`'te: bu dosya `server-only` ve veritabanına
+ * dokunuyor, ama tipler birim testlerinden de lazım.
+ *
+ * `DEFAULT_LEVEL` seviye motoru gelene kadar (Aşama 06) herkesin sayıldığı
+ * seviye — tek yerde duruyor ki motor gelince değiştirilecek yer belli olsun.
  */
-export const DEFAULT_LEVEL: Level = "B1";
+export {
+  LEVELS,
+  DEFAULT_LEVEL,
+  type Level,
+  type Context,
+  type Task,
+} from "./content-types.ts";
 
-export type Context = {
-  id: string;
-  slug: string;
-  name: string;
-  description: string;
-};
-
-export type Task = {
-  id: string;
-  contextId: string;
-  level: Level;
-  prompt: string;
-  hint: string;
-  minWords: number;
-  maxWords: number;
-};
+import type { Context, Level, Task } from "./content-types.ts";
 
 export const listContexts = cache(async (): Promise<Context[]> => {
   const rows = (await db()`

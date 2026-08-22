@@ -27,6 +27,7 @@
     "seed": "node --env-file=.env.local scripts/seed.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
     "@neondatabase/serverless": "^1.1.0",
     "bcryptjs": "^3.0.3",
     "dictionary-en": "^4.0.0",
@@ -34,7 +35,8 @@
     "nspell": "^2.1.5",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",

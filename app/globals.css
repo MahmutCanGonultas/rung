@@ -839,3 +839,59 @@ a.chip:hover {
   color: var(--ink-2);
   margin: 0;
 }
+
+/* ── K1 · model katmanı ───────────────────────────────────────────── */
+.k1 {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid var(--hairline);
+}
+.k1-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+.k1-tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--model);
+  border: 1px solid var(--model);
+  border-radius: 4px;
+  padding: 3px 8px;
+}
+.k1-meta {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.k1-empty,
+.k1-note {
+  font-size: 13.5px;
+  color: var(--ink-3);
+  margin: 0 0 16px;
+  max-width: 62ch;
+}
+/* Model kaynaklı bulgu mor kenarlı — deterministik olandan ayrılsın diye. */
+.finding.is-model {
+  border-color: var(--model);
+  background: color-mix(in srgb, var(--model) 6%, transparent);
+}
+.finding.is-model .finding-no {
+  border-color: var(--model);
+  color: var(--model);
+}
+.analyze {
+  margin-top: 16px;
+}
+.analyze .btn-primary {
+  width: auto;
+  padding: 10px 20px;
+}
+.analyze .form-error {
+  margin-top: 12px;
+}
