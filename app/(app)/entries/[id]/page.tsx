@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { K0Panel } from "../../../components/K0Panel";
+import { K1Panel } from "../../../components/K1Panel";
+import { findingsFor, latestAnalysis } from "../../../lib/analyses";
 import { findEntryForUser, previousAttempts } from "../../../lib/entries";
 import { requireUser } from "../../../lib/guard";
 
@@ -42,6 +44,11 @@ export default async function EntryPage({
 
   // Aynı göreve daha önce verilmiş cevaplar. `entry.taskId` — kaydın kimliği
   // değil görevin kimliği; ikisini karıştırmak sessizce boş liste döndürürdü.
+  // K1 sonucu varsa göster. Yoksa panel "modele sor" düğmesini gösteriyor.
+  const k1 = await latestAnalysis(entry.id, user.id, "K1");
+  const k1Findings =
+    k1 && k1.status === "ok" ? await findingsFor(k1.id, user.id) : [];
+
   const earlier = entry.taskId
     ? await previousAttempts(user.id, entry.taskId, entry.id)
     : [];
@@ -58,6 +65,8 @@ export default async function EntryPage({
       {entry.taskHint ? <p className="panel-lede">{entry.taskHint}</p> : null}
 
       <K0Panel text={entry.body} />
+
+      <K1Panel entryId={entry.id} analysis={k1} findings={k1Findings} />
 
       <dl className="facts">
         <div>
