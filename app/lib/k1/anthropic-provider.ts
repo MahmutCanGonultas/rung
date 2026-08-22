@@ -21,31 +21,71 @@ import {
  * eliyor: her bulgu metinde aranıyor, bulunamayan gösterilmiyor.
  */
 
-export const MODEL_ID = "claude-opus-5";
+/*
+ * Fiyatlar 1 milyon token başına, dolar (22 Ağustos 2026).
+ *
+ * Maliyet her koşumla birlikte veritabanına yazılıyor — doğruluk panosundaki
+ * "kayıt başı maliyet" buradan geliyor. Fiyat değişirse burası güncellenir;
+ * geçmiş kayıtlar o günkü fiyatla hesaplanmış hâlleriyle kalır, geriye dönük
+ * değişmez. Ölçümün anlamı buna bağlı.
+ */
+export const PRICING = {
+  "claude-opus-5": { input: 5.0, output: 25.0 },
+  "claude-sonnet-5": { input: 3.0, output: 15.0 },
+  "claude-haiku-4-5": { input: 1.0, output: 5.0 },
+} as const;
+
+export type ModelId = keyof typeof PRICING;
+
+export const DEFAULT_MODEL: ModelId = "claude-opus-5";
 
 /*
- * Fiyatlar 1 milyon token başına, dolar. Maliyet hesabı buradan yapılıyor ve
- * her analiz koşumuyla birlikte veritabanına yazılıyor — doğruluk panosundaki
- * "kayıt başı maliyet" bu sayıdan geliyor.
+ * Model ve çaba ORTAM DEĞİŞKENİNDEN okunuyor, koda gömülü değil.
  *
- * Fiyat değişirse burası güncellenir; geçmiş kayıtlar o günkü fiyatla
- * hesaplanmış hâlleriyle kalır, geriye dönük değişmez.
+ * Sebep bu projenin ana tezi: hangi modelin yeterli olduğu tahminle değil
+ * ölçümle bilinir. Aşama 05'in eval'i aynı altın kümeyi farklı modellerle
+ * koşturup sayılarla karşılaştıracak; bunun mümkün olması için modelin
+ * çalışma anında değişebilmesi gerekiyor.
  */
-const PRICE_PER_MTOK = { input: 5.0, output: 25.0 };
+export function configuredModel(): ModelId {
+  const raw = process.env.RUNG_K1_MODEL;
+  if (raw && raw in PRICING) return raw as ModelId;
+  if (raw) {
+    console.warn(`[rung] tanınmayan RUNG_K1_MODEL "${raw}" — ${DEFAULT_MODEL} kullanılıyor`);
+  }
+  return DEFAULT_MODEL;
+}
 
-function costOf(inputTokens: number, outputTokens: number): number {
+const EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
+type Effort = (typeof EFFORTS)[number];
+
+export function configuredEffort(): Effort {
+  const raw = process.env.RUNG_K1_EFFORT;
+  return EFFORTS.includes(raw as Effort) ? (raw as Effort) : "low";
+}
+
+export function costOf(
+  model: ModelId,
+  inputTokens: number,
+  outputTokens: number
+): number {
+  const price = PRICING[model];
   return (
-    (inputTokens / 1_000_000) * PRICE_PER_MTOK.input +
-    (outputTokens / 1_000_000) * PRICE_PER_MTOK.output
+    (inputTokens / 1_000_000) * price.input +
+    (outputTokens / 1_000_000) * price.output
   );
 }
 
 export class AnthropicProvider implements Provider {
-  readonly id = MODEL_ID;
+  readonly id: ModelId;
 
   private readonly client: Anthropic;
+  private readonly effort: Effort;
 
   constructor(apiKey?: string) {
+    this.id = configuredModel();
+    this.effort = configuredEffort();
+
     const key = apiKey ?? process.env.ANTHROPIC_API_KEY;
     if (!key) {
       throw new ProviderError(
@@ -62,19 +102,23 @@ export class AnthropicProvider implements Provider {
 
     try {
       const response = await this.client.messages.parse({
-        model: MODEL_ID,
+        model: this.id,
         max_tokens: 16000,
         system: request.system,
         messages: [{ role: "user", content: request.user }],
         /*
-         * Düşünme açık ama çaba düşük tutuluyor: bu iş uzun akıl yürütme
-         * değil, sabit bir şemaya dikkatli çıkarım. Yüksek çaba maliyeti
-         * ikiye katlarken bulgu kalitesini bu görevde belirgin artırmıyor —
-         * gerçek sayılarla ölçüldüğünde (Aşama 05 eval) tekrar bakılacak.
+         * Düşünme açık, çaba varsayılan olarak düşük. Bu iş uzun akıl yürütme
+         * değil, sabit bir şemaya dikkatli çıkarım — ve çıktı token'ı girdinin
+         * beş katı fiyatta, yani maliyeti asıl belirleyen şey düşünme uzunluğu.
+         *
+         * "Düşük çaba yeterli mi" sorusunun cevabı tahmin değil ölçüm:
+         * Aşama 05'in eval'i aynı altın kümede low/medium/high koşturup
+         * isabet ve yanlış alarmı karşılaştıracak. O zamana kadar ucuz olan
+         * varsayılan, ve `RUNG_K1_EFFORT` ile tek satırda değişiyor.
          */
         thinking: { type: "adaptive" },
         output_config: {
-          effort: "medium",
+          effort: this.effort,
           format: zodOutputFormat(RawResponseSchema),
         },
       });
@@ -102,9 +146,9 @@ export class AnthropicProvider implements Provider {
         usage: {
           inputTokens,
           outputTokens,
-          costUsd: costOf(inputTokens, outputTokens),
+          costUsd: costOf(this.id, inputTokens, outputTokens),
         },
-        modelId: MODEL_ID,
+        modelId: this.id,
         durationMs: Date.now() - startedAt,
       };
     } catch (error) {
