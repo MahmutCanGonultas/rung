@@ -406,6 +406,54 @@ async function main() {
       els.map((el) => el.textContent)
     );
     check("düzeltme önerisi veriliyor", suggestions.includes("I agree"), suggestions.join(", "));
+
+    // ══════════ ERİŞİLEBİLİRLİK ══════════
+    console.log("\n23 · erişilebilirlik");
+    await page.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
+
+    // Atlama bağlantısı: odaklanmadan gizli, odaklanınca görünür.
+    const skipHidden = await page.$eval(".skip", (el) => el.getBoundingClientRect().left < -1000);
+    check("atlama bağlantısı normalde gizli", skipHidden);
+    await page.keyboard.press("Tab");
+    const skipShown = await page.$eval(".skip", (el) => el.getBoundingClientRect().left >= 0);
+    check("ilk Tab'da atlama bağlantısı görünüyor", skipShown);
+
+    // Her form alanının erişilebilir bir adı olmalı.
+    const unnamed = await page.$$eval("input, select, textarea", (els) =>
+      els
+        .filter((el) => {
+          if (el.type === "hidden") return false;
+          const byLabel = el.closest("label") !== null;
+          const byAria = el.getAttribute("aria-label") !== null;
+          const byId = el.id && document.querySelector(`label[for="${el.id}"]`);
+          return !byLabel && !byAria && !byId;
+        })
+        .map((el) => el.getAttribute("name") ?? el.tagName)
+    );
+    check("her alanın erişilebilir adı var", unnamed.length === 0, unnamed.join(", "));
+
+    // Klavyeyle gönderme düğmesine ulaşılabilmeli.
+    const reachable = await page.evaluate(() => {
+      const focusable = document.querySelectorAll(
+        'a[href], button, input:not([type=hidden]), select, textarea'
+      );
+      return [...focusable].some((el) => el.matches('button[type="submit"]'));
+    });
+    check("gönder düğmesi klavye sırasında", reachable);
+
+    // Başlık düzeni: h1 var ve tek.
+    const headings = await page.$$eval("h1", (els) => els.length);
+    check("sayfada tam bir h1 var", headings === 1, `${headings} tane`);
+
+    // Sayfa dili ve İngilizce içeriğin işaretlenmesi.
+    await page.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
+    await page.waitForSelector(".editor", { timeout: 15000 });
+    const htmlLang = await page.$eval("html", (el) => el.lang);
+    check("sayfa dili tr", htmlLang === "tr", htmlLang);
+    const taskLang = await page.$eval(".task-title", (el) => el.lang);
+    check("İngilizce görev metni lang=en ile işaretli", taskLang === "en", taskLang);
+    const editorLang = await page.$eval(".editor", (el) => el.lang);
+    check("yazma alanı lang=en", editorLang === "en", editorLang);
   } finally {
     await browser.close();
     await cleanUp();

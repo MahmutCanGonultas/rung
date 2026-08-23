@@ -16,7 +16,7 @@ export default async function RegisterPage() {
   if (await getSessionUser()) redirect("/dashboard");
 
   return (
-    <main className="auth">
+    <main className="auth" id="main">
       <div className="auth-card">
         <h1 className="auth-title">Hesap oluştur</h1>
         <p className="auth-lede">

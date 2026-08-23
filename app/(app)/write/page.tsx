@@ -78,7 +78,7 @@ export default async function WritePage({
       <p className="context-note">{context.description}</p>
 
       <div className="task">
-        <h1 className="task-title">{chosen.prompt}</h1>
+        <h1 className="task-title" lang="en">{chosen.prompt}</h1>
         <p className="task-meta">
           {chosen.hint} · Hedef {chosen.minWords}–{chosen.maxWords} kelime ·
           Seviye {chosen.level}

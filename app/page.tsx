@@ -10,7 +10,7 @@ export default async function HomePage() {
   const user = await getSessionUser();
 
   return (
-    <main className="home">
+    <main className="home" id="main">
       <div className="home-inner">
         <h1>
           rung<i>.</i>

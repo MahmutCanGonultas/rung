@@ -21,7 +21,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="tr" className={inter.variable}>
-      <body>{children}</body>
+      <body>
+        {/*
+          Klavyeyle gezen ve ekran okuyucu kullananlar için: her sayfada
+          gezinme çubuğunu tek tek geçmek yerine doğrudan içeriğe atlama.
+          Odaklanana kadar görünmüyor.
+        */}
+        <a className="skip" href="#main">
+          İçeriğe atla
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

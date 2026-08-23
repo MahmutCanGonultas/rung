@@ -1344,3 +1344,43 @@ a.chip:hover {
   font-variant-numeric: tabular-nums;
   margin-bottom: 2px;
 }
+
+/* ── erişilebilirlik ──────────────────────────────────────────────── */
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 12px 18px;
+  background: var(--accent);
+  color: var(--plane);
+  font-weight: 600;
+  border-radius: 0 0 var(--r-sm) 0;
+  text-decoration: none;
+}
+.skip:focus {
+  left: 0;
+}
+
+/* Klavyeyle gezerken odak her zaman görünür olmalı. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Hareketi azalt tercihini olduğu gibi uygula. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

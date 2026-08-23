@@ -41,7 +41,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         </form>
       </header>
 
-      {children}
+      <main id="main">{children}</main>
     </div>
   );
 }

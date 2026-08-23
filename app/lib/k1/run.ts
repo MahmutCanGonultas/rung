@@ -1,4 +1,5 @@
 import "server-only";
+import { log } from "../log";
 
 import { saveAnalysis } from "../analyses";
 import { analyze as analyzeK0 } from "../k0";
@@ -130,7 +131,7 @@ export async function runK1(input: {
     const reason =
       error instanceof Error ? error.message : "Model çağrısı başarısız oldu.";
 
-    console.error("[rung] K1 koşumu başarısız:", error);
+    log.error("k1_failed", error, { entryId: input.entryId, kind });
 
     // Başarısız koşum da saklanıyor: neyin ne zaman patladığı ölçülebilir olmalı.
     await saveAnalysis({

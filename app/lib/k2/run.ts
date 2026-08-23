@@ -1,4 +1,5 @@
 import "server-only";
+import { log } from "../log";
 
 import { db } from "../db";
 import { AnthropicProvider, hasApiKey } from "../k1/anthropic-provider";
@@ -98,7 +99,7 @@ export async function runK2(input: {
       error instanceof ProviderError
         ? error.message
         : "İkinci geçiş başarısız oldu.";
-    console.error("[rung] K2 koşumu başarısız:", error);
+    log.error("k2_failed", error, { findings: input.findings.length });
     return { ok: false, reason };
   }
 }

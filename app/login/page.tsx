@@ -14,7 +14,7 @@ export default async function LoginPage() {
   if (await getSessionUser()) redirect("/dashboard");
 
   return (
-    <main className="auth">
+    <main className="auth" id="main">
       <div className="auth-card">
         <h1 className="auth-title">Giriş yap</h1>
         <p className="auth-lede">Kaldığın yerden devam et.</p>

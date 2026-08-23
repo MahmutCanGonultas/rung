@@ -59,6 +59,7 @@ export function Composer({ action, taskId, minWords, maxWords }: Props) {
         onChange={(event) => setText(event.target.value)}
         placeholder="Buraya İngilizce yaz. Sözlük kullanma — ölçtüğümüz şey şu anki hâlin."
         rows={14}
+        lang="en"
         spellCheck={false}
         aria-label="Metin"
       />

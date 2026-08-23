@@ -393,6 +393,10 @@ README ve demo
 | 2026-08-23 | **Toplulaştırma veritabanında, kodda değil.** `count`, `sum`, `date_trunc` ve `FILTER` sorgunun içinde. Alternatifi bütün kayıtları çekip JavaScript'te saymaktı — altı ay sonra 500 kayıt × ~10 bulgu = 5.000 satırı ağdan geçirmek, aynı sonuç için. Aynı ilke N+1'i de kapatıyor: her kaydın bulgularını ayrı sorguyla çekmek yerine tek JOIN. **Ölçüldü:** 7 aylık veriyle (24 kayıt, 150 bulgu) ilerleme sayfası **1,4 saniyede** açılıyor. |
 | 2026-08-23 | **İlerleme sayıları 100 kelimede oran olarak.** Ham sayı yanıltıyor: ilk ay 200 kelime yazıp bu ay 2.000 yazan biri "daha çok hata yapıyor" görünürdü. Grafikler sunucuda SVG olarak çiziliyor — veri zaten sunucuda ve iki basit grafik için tarayıcıya çizim kütüphanesi indirmek gereksiz; sayfa JavaScript olmadan da eksiksiz görünüyor. |
 
+| 2026-08-23 | **CI'da model çağrısı ve gerçek veritabanı YOK.** Her push'ta tip kontrolü, birim testleri ve üretim derlemesi koşuyor. Duman testi ve ölçüm koşumu elle çalıştırılıyor. **Gerekçe:** ikisi de gerçek anahtar istiyor — CI'ya anahtar koymak her push'ta ücret ödemek ve sızıntı yüzeyini büyütmek demek. Derleme veritabanı bile istemiyor, çünkü `db()` tembel: bağlantı ilk sorguda kuruluyor. |
+| 2026-08-23 | **Modelin çıktısı test edilmiyor, ÖLÇÜLÜYOR.** Birim testi deterministik şeyler için: ayrıştırma, ölçüm, taksonomi doğrulama, seviye eşikleri, çakışma eleme, isabet/yakalama hesabı. Modelin ne diyeceği olasılıksal — ona birim testi yazmak yeşil kalması için testi zayıflatmak demek olurdu. Onun yeri altın küme ve `eval_runs`. |
+| 2026-08-23 | **İngilizce içerik `lang="en"` ile işaretli.** Sayfa Türkçe (`lang="tr"`) ama görev metni, yazma alanı ve bulguların düzeltmeleri İngilizce. İşaretlenmezse ekran okuyucu İngilizce kelimeleri Türkçe telaffuzla okuyor — bu üründe, metnin yarısı İngilizce olduğu için ciddi bir kusur. |
+
 ### Hâlâ açık
 
 - **Yurtdışı hedefi** — Türkiye'den uzaktan yabancı şirkete mi, taşınmak mı, önce eğitim mi?

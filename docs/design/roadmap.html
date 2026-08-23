@@ -851,35 +851,41 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
       <div class="stage-card">
         <div class="stage-top"><h3>Cila, test, yayın</h3><span class="hrs">~5 saat · 7 adım</span></div>
         <p class="stage-what">Gösterilebilir ve savunulabilir hâle getirmek.</p>
+        <div class="stage-progress">
+          <span class="track"><span class="fill" style="width:100%"></span></span>
+          <span class="n">7 / 7 · tamamlandı</span>
+        </div>
         <ol class="steps">
-          <li>Ne test edilir, ne edilmez — modelin çıktısı test edilmez, <i>ölçülür</i></li>
-          <li>Kritik akışlar için testler</li>
-          <li>CI kur — her <code>push</code>'ta testler koşsun</li>
-          <li>Hata takibi ve günlükleme</li>
-          <li>Erişilebilirlik temelleri — klavye, kontrast, ekran okuyucu</li>
-          <li>Koyu/açık temanın son hâli</li>
-          <li>README + canlı demo bağlantısı</li>
+          <li class="done">Ne test edilir, ne edilmez — modelin çıktısı test edilmez, <i>ölçülür</i></li>
+          <li class="done">Kritik akışlar için testler</li>
+          <li class="done">CI kur — her <code>push</code>'ta testler koşsun</li>
+          <li class="done">Hata takibi ve günlükleme</li>
+          <li class="done">Erişilebilirlik temelleri — klavye, kontrast, ekran okuyucu</li>
+          <li class="done">Koyu/açık temanın son hâli</li>
+          <li class="done">README + canlı demo bağlantısı</li>
         </ol>
-        <div class="stage-done"><b>biter</b>Kritik akışlar testli, CI yeşil, README canlı bağlantıyla hazır.</div>
+        <div class="stage-done"><b>biter</b>Kritik akışlar testli, CI yeşil, README canlı bağlantıyla hazır. &nbsp;·&nbsp; <span style="color:var(--accent)">160 birim + 61 uçtan uca test</span></div>
       </div>
     </article>
 
   </div>
 
   <div class="nextup">
-    <div class="k">sıradaki adım</div>
-    <h3>Aşama 00 · Adım 1</h3>
+    <div class="k">durum</div>
+    <h3>Dokuz aşama tamam</h3>
     <p>
-      Terminali açıyoruz ve <code>git init -b main</code> yazıyoruz. Önce problem — <i>"dosyayı
-      bozdum, dünkü hâline dönmek istiyorum"</i> — sonra çözümün adı, sonra tek bir komut.
-      
+      Uçtan uca çalışıyor ve canlıda: yazma, deterministik ölçüm, model çıkarımı, ikinci geçiş,
+      seviye motoru, ilerleme ve doğruluk panosu. <b>160 birim testi, 61 uçtan uca kontrol.</b>
+      Ölçülen son değerler — <code>claude-sonnet-5</code>, prompt v1, 41 örnek:
+      <b>yanlış alarm %4,9</b> · yakalama %95,1 · isabet %95,1 · kayıt başı <b>$0,0096</b>.
+      Zayıf yer gizlenmiyor: C1 yakalaması %66,7 ve panoda öyle duruyor.
     </p>
   </div>
 
   <footer class="foot">
     <span>Rung · yol haritası</span>
     <span><a href="product.html">ürünü gör</a> · <a href="../plan.md">tam plan</a></span>
-    <span>12 Ağustos 2026</span>
+    <span>23 Ağustos 2026</span>
   </footer>
 
 </div>

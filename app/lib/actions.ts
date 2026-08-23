@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { log } from "./log";
 
 import { createUser, verifyCredentials } from "./auth";
 import type { FormState } from "./form-state";
@@ -97,7 +98,7 @@ export async function logoutAction(): Promise<void> {
   } catch (error) {
     // Çerez `destroySession` içinde en başta düşüyor; buraya gelmişsek
     // tarayıcı tarafı zaten temiz, sadece satır silinememiş olabilir.
-    console.error("[rung] çıkışta veritabanı hatası:", error);
+    log.error("logout_db_failed", error);
   }
 
   redirect("/");
@@ -110,6 +111,6 @@ export async function logoutAction(): Promise<void> {
  * göstermek tablo adlarını, sürücü sürümünü, bazen bağlantı bilgisini sızdırır.
  */
 function reportUnexpected(where: string, error: unknown): string {
-  console.error(`[rung] ${where} sırasında beklenmeyen hata:`, error);
+  log.error("action_failed", error, { where });
   return "Beklenmeyen bir hata oldu. Biraz sonra tekrar dener misin?";
 }

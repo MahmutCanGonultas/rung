@@ -61,7 +61,7 @@ export function FindingCard({
         </span>
       </div>
 
-      <div className="finding-fix">
+      <div className="finding-fix" lang="en">
         <span className="was">{finding.original}</span>
         {finding.suggestion ? (
           <>

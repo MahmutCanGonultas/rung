@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { log } from "./log";
 
 import { findTaskById } from "./content";
 import { createEntry } from "./entries";
@@ -99,10 +100,10 @@ export async function saveEntryAction(
         reliable: estimate.reliable,
       });
     } catch (error) {
-      console.error("[rung] seviye tahmini güncellenemedi:", error);
+      log.error("level_estimate_failed", error, { userId: user.id, entryId });
     }
   } catch (error) {
-    console.error("[rung] kayıt yazılırken hata:", error);
+    log.error("entry_save_failed", error, { userId: user.id });
     return { error: "Kaydedilemedi. Biraz sonra tekrar dener misin?", body };
   }
 

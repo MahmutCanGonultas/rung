@@ -1,0 +1,44 @@
+name: ci
+
+# Her push ve her pull request'te koşuyor.
+#
+# NE KOŞUYOR: tip kontrolü, birim testleri, üretim derlemesi.
+# NE KOŞMUYOR: uçtan uca duman testi ve ölçüm koşumu.
+#
+# Sebep: ikisi de gerçek bir veritabanı ve gerçek bir model çağrısı istiyor,
+# yani para ve gizli anahtar. CI'ya anahtar koymak, her push'ta ücret ödemek
+# ve sızıntı yüzeyini büyütmek demek. Onlar elle çalıştırılıyor:
+#   npm run smoke -- --base=https://rung-plum.vercel.app
+#   npm run eval
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      # `npm ci` — package-lock.json'a birebir uyar. `npm install` kilit
+      # dosyasını güncelleyebiliyor; CI'da kurulum tekrarlanabilir olmalı.
+      - run: npm ci
+
+      - name: Tip kontrolü
+        run: npm run typecheck
+
+      - name: Birim testleri
+        run: npm test
+
+      # Derleme tip hatasında duruyor; ayrıca yayın öncesi son kapı.
+      # Ortam değişkeni gerekmiyor: `db()` tembel — bağlantı ilk sorguda
+      # kuruluyor, derleme sırasında sorgu çalışmıyor.
+      - name: Üretim derlemesi
+        run: npm run build

@@ -74,7 +74,7 @@ export function K0Panel({ text }: { text: string }) {
         </p>
       ) : null}
 
-      <article className="entry-body">
+      <article className="entry-body" lang="en">
         {parts.map((part, i) =>
           part.kind === "plain" ? (
             <span key={i}>{part.text}</span>
@@ -135,7 +135,7 @@ export function K0Panel({ text }: { text: string }) {
                   güven {num(finding.confidence, 2)}
                 </span>
               </div>
-              <div className="finding-fix">
+              <div className="finding-fix" lang="en">
                 <span className="was">{visible(finding.original)}</span>
                 {finding.suggestion ? (
                   <>

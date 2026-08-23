@@ -63,7 +63,9 @@ export default async function EntryPage({
         <span className="entry-stamp">{STAMP.format(entry.createdAt)}</span>
       </div>
 
-      <h1 className="panel-title">{entry.taskPrompt ?? "Serbest yazı"}</h1>
+      <h1 className="panel-title" lang={entry.taskPrompt ? "en" : "tr"}>
+        {entry.taskPrompt ?? "Serbest yazı"}
+      </h1>
       {entry.taskHint ? <p className="panel-lede">{entry.taskHint}</p> : null}
 
       <K0Panel text={entry.body} />
