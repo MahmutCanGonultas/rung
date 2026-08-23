@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { responseSchema, validate } from "./contract.ts";
+import { RawResponseSchema, validate, type RawResponse } from "./contract.ts";
 import { FakeProvider } from "./fake-provider.ts";
 import { buildUserMessage, SYSTEM_PROMPT } from "./prompt.ts";
 
@@ -19,19 +19,20 @@ function request(text: string) {
       taskHint: "Serbest",
       alreadyFound: [],
     }),
-    schema: responseSchema(),
+    schema: RawResponseSchema,
   };
 }
 
 test("sahte sağlayıcı kalıpları buluyor", async () => {
   const result = await new FakeProvider().complete(request(TEXT));
-  const subs = result.parsed.findings.map((f) => f.subcategory);
+  const parsed = result.parsed as RawResponse;
+  const subs = parsed.findings.map((f) => f.subcategory);
   assert.deepEqual(subs.sort(), ["preposition", "register", "wrong_word"]);
 });
 
 test("sahte sağlayıcının bulguları doğrulamadan geçiyor", async () => {
   const result = await new FakeProvider().complete(request(TEXT));
-  const { findings, rejected } = validate(TEXT, result.parsed);
+  const { findings, rejected } = validate(TEXT, result.parsed as RawResponse);
   assert.equal(rejected.length, 0);
   assert.equal(findings.length, 3);
   for (const f of findings) {
@@ -42,9 +43,9 @@ test("sahte sağlayıcının bulguları doğrulamadan geçiyor", async () => {
 test("uydurma açıkken doğrulama onu eliyor", async () => {
   const provider = new FakeProvider({ hallucinate: true });
   const result = await provider.complete(request(TEXT));
-  assert.equal(result.parsed.findings.length, 4);
+  assert.equal((result.parsed as RawResponse).findings.length, 4);
 
-  const { findings, rejected } = validate(TEXT, result.parsed);
+  const { findings, rejected } = validate(TEXT, result.parsed as RawResponse);
   assert.equal(findings.length, 3, "uydurma geçmemeli");
   assert.equal(rejected.length, 1);
   assert.match(rejected[0].reason, /metinde geçmiyor/);
@@ -53,7 +54,7 @@ test("uydurma açıkken doğrulama onu eliyor", async () => {
 test("taksonomi dışı kod açıkken doğrulama onu eliyor", async () => {
   const provider = new FakeProvider({ invalidSubcategory: true });
   const result = await provider.complete(request(TEXT));
-  const { rejected } = validate(TEXT, result.parsed);
+  const { rejected } = validate(TEXT, result.parsed as RawResponse);
   assert.equal(rejected.length, 1);
   assert.match(rejected[0].reason, /taksonomide olmayan/);
 });
@@ -78,9 +79,29 @@ test("K0 bulguları isteme 'tekrar etme' diye giriyor", () => {
 });
 
 test("şema taksonomiyi enum olarak zorluyor", () => {
-  const schema = responseSchema();
-  const enumValues =
-    schema.properties.findings.items.properties.subcategory.enum;
-  assert.ok(enumValues.includes("tr_pattern"));
-  assert.ok(!enumValues.includes("made_up"));
+  const good = RawResponseSchema.safeParse({
+    findings: [
+      {
+        subcategory: "tr_pattern",
+        original: "x",
+        suggestion: null,
+        explanation: "y",
+        confidence: 0.5,
+      },
+    ],
+  });
+  assert.ok(good.success);
+
+  const bad = RawResponseSchema.safeParse({
+    findings: [
+      {
+        subcategory: "made_up",
+        original: "x",
+        suggestion: null,
+        explanation: "y",
+        confidence: 0.5,
+      },
+    ],
+  });
+  assert.ok(!bad.success, "taksonomi dışı kod şemadan geçmemeli");
 });

@@ -1,7 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 
-import { RawResponseSchema } from "./contract.ts";
 import {
   ProviderError,
   type ModelRequest,
@@ -37,7 +36,18 @@ export const PRICING = {
 
 export type ModelId = keyof typeof PRICING;
 
-export const DEFAULT_MODEL: ModelId = "claude-opus-5";
+/*
+ * Varsayılan model — 23 Ağustos 2026 kararı, gerekçe docs/plan.md §15.
+ *
+ * Kısaca: bu görev serbest metin üretmiyor, sabit taksonomiye ve zorunlu
+ * şemaya yazıyor; kafesi K0 ve doğrulama katmanı zaten kuruyor. Sonnet 5 bu
+ * kafeste yeterli, ve ayda 100 kayıtta ~$2. Opus 5'e çıkmak ayda ~$1,30 daha
+ * pahalı; haiku'ya inmek ~63 sent daha ucuz — ikisi de kararı belirleyecek
+ * kadar büyük farklar değil, o yüzden seçim maliyete göre değil ölçüme
+ * bırakılacak duruma göre yapıldı: TEK model, TEK değişken. Aşama 05'in
+ * eval'i katman katman değiştirip sayıyla karşılaştıracak.
+ */
+export const DEFAULT_MODEL: ModelId = "claude-sonnet-5";
 
 /*
  * Model ve çaba ORTAM DEĞİŞKENİNDEN okunuyor, koda gömülü değil.
@@ -119,7 +129,7 @@ export class AnthropicProvider implements Provider {
         thinking: { type: "adaptive" },
         output_config: {
           effort: this.effort,
-          format: zodOutputFormat(RawResponseSchema),
+          format: zodOutputFormat(request.schema),
         },
       });
 

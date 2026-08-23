@@ -1,7 +1,8 @@
 import { AnalyzeButton } from "./AnalyzeButton";
+import { FindingCard } from "./FindingCard";
 import { analyzeEntryAction } from "../lib/analysis-actions";
 import type { StoredAnalysis, StoredFinding } from "../lib/analyses";
-import { labelOf } from "../lib/taxonomy";
+import { partitionFindings } from "../lib/k2/display";
 
 /*
  * K1 — model katmanının çıktısı.
@@ -25,6 +26,9 @@ export function K1Panel({
   findings: StoredFinding[];
 }) {
   const label = analysis ? "Yeniden analiz et" : "Modele sor";
+
+  // Ayırma mantığı `k2/display.ts`'te ve testli — ürünün en kritik kuralı.
+  const { visible, counted, suspect, filtered } = partitionFindings(findings);
 
   return (
     <section className="k1">
@@ -50,32 +54,39 @@ export function K1Panel({
         <p className="form-error" role="alert">
           Son deneme başarısız oldu: {analysis.error}
         </p>
-      ) : findings.length === 0 ? (
+      ) : visible.length === 0 ? (
         <p className="k1-empty">
-          Model de bir şey bulamadı. Metin bu seviyede temiz görünüyor.
+          {filtered > 0
+            ? `Model ${filtered} aday bulgu üretti, ikinci geçiş hepsini eledi. Metin bu seviyede temiz.`
+            : "Model de bir şey bulamadı. Metin bu seviyede temiz görünüyor."}
         </p>
       ) : (
-        findings.map((finding, i) => (
-          <div key={finding.id} className="finding is-model">
-            <div className="finding-kind">
-              <span className="finding-no">{i + 1}</span>
-              {labelOf(finding.subcategory)}
-              <span className="finding-conf">
-                güven {finding.confidence.toFixed(2)}
-              </span>
-            </div>
-            <div className="finding-fix">
-              <span className="was">{finding.original}</span>
-              {finding.suggestion ? (
-                <>
-                  <span className="arrow">→</span>
-                  <span className="now">{finding.suggestion}</span>
-                </>
-              ) : null}
-            </div>
-            <p className="finding-why">{finding.explanation}</p>
-          </div>
-        ))
+        <>
+          <p className="k1-tally">
+            <b>{counted}</b> hata
+            {suspect > 0 ? (
+              <>
+                {" · "}
+                <b>{suspect}</b> şüpheli <span>(istatistiğe girmiyor)</span>
+              </>
+            ) : null}
+            {filtered > 0 ? (
+              <>
+                {" · "}
+                <b>{filtered}</b> aday <span>ikinci geçişte elendi</span>
+              </>
+            ) : null}
+          </p>
+
+          {visible.map((finding, i) => (
+            <FindingCard
+              key={finding.id}
+              finding={finding}
+              entryId={entryId}
+              index={i}
+            />
+          ))}
+        </>
       )}
 
       {analysis?.status === "ok" && analysis.error ? (

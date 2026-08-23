@@ -4,7 +4,12 @@ import { saveAnalysis } from "../analyses";
 import { analyze as analyzeK0 } from "../k0";
 import type { Level } from "../content-types";
 import { AnthropicProvider, hasApiKey } from "./anthropic-provider";
-import { PROMPT_VERSION, responseSchema, validate } from "./contract";
+import {
+  PROMPT_VERSION,
+  RawResponseSchema,
+  validate,
+  type RawResponse,
+} from "./contract";
 import { FakeProvider } from "./fake-provider";
 import { buildUserMessage, SYSTEM_PROMPT } from "./prompt";
 import { ProviderError, type Provider } from "./provider";
@@ -70,7 +75,7 @@ export async function runK1(input: {
       taskHint: input.taskHint,
       alreadyFound: k0.findings.map((f) => f.original),
     }),
-    schema: responseSchema(),
+    schema: RawResponseSchema,
   };
 
   let provider: Provider;
@@ -84,7 +89,10 @@ export async function runK1(input: {
 
   try {
     const result = await provider.complete(request);
-    const { findings, rejected } = validate(input.text, result.parsed);
+    const { findings, rejected } = validate(
+      input.text,
+      result.parsed as RawResponse
+    );
 
     /*
      * Elenen bulgular da kayda giriyor — sayı olarak, `error` alanında.

@@ -29,28 +29,25 @@ export type RawResponse = {
   findings: RawFinding[];
 };
 
-/*
- * Modele verilen JSON şeması. Sağlayıcının "yapılandırılmış çıktı" ya da
- * "araç kullanımı" mekanizmasına bu şema veriliyor; model bunun dışına
- * çıkamıyor.
- *
- * Konum (start/end) modelden İSTENMİYOR. Sebep: modeller karakter sayarken
- * güvenilmez, ve yanlış konum bulguyu metnin başka bir yerine çapalar.
- * Onun yerine model hatalı METNİ veriyor, konumu biz metinde arayarak
- * buluyoruz — deterministik ve doğrulanabilir.
- */
 const SUBCATEGORY_CODES = Object.keys(SUBCATEGORIES) as [Subcategory, ...Subcategory[]];
 
 /*
- * Zod şeması — sağlayıcıya verilen "yapılandırılmış çıktı" biçimi bundan
- * üretiliyor. Tek kaynak: taksonomiye yeni bir kod eklenince burası
- * kendiliğinden güncelleniyor, elle senkron tutulacak ikinci bir liste yok.
+ * Şemanın TEK kaynağı.
+ *
+ * Sağlayıcı bunu doğrudan modele "yapılandırılmış çıktı" olarak veriyor.
+ * Elle yazılmış ikinci bir JSON şeması yok — senkron tutulması gereken iki
+ * liste, er geç ayrışan iki liste demek. Taksonomiye yeni bir kod eklenince
+ * burası kendiliğinden güncelleniyor.
  */
 export const RawFindingSchema = z.object({
   subcategory: z.enum(SUBCATEGORY_CODES),
-  original: z.string(),
-  suggestion: z.string().nullable(),
-  explanation: z.string(),
+  original: z
+    .string()
+    .describe("Metinden BİREBİR kopyalanmış hatalı parça. Uydurma."),
+  suggestion: z.string().nullable().describe("Önerilen düzeltme; yoksa null."),
+  explanation: z
+    .string()
+    .describe("TÜRKÇE, tek cümle, neden hatalı olduğu."),
   confidence: z.number().min(0).max(1),
 });
 
@@ -58,51 +55,16 @@ export const RawResponseSchema = z.object({
   findings: z.array(RawFindingSchema).max(20),
 });
 
-export function responseSchema() {
-  return {
-    type: "object",
-    additionalProperties: false,
-    required: ["findings"],
-    properties: {
-      findings: {
-        type: "array",
-        maxItems: 20,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["subcategory", "original", "suggestion", "explanation", "confidence"],
-          properties: {
-            subcategory: {
-              type: "string",
-              enum: Object.keys(SUBCATEGORIES),
-              description: "Sabit taksonomiden bir alt kategori kodu.",
-            },
-            original: {
-              type: "string",
-              description:
-                "Metinden BİREBİR kopyalanmış hatalı parça. Metinde geçmeyen bir şey yazma.",
-            },
-            suggestion: {
-              type: ["string", "null"],
-              description: "Önerilen düzeltme. Öneri yoksa null.",
-            },
-            explanation: {
-              type: "string",
-              description:
-                "TÜRKÇE, tek cümle, neden hatalı olduğunu anlatan açıklama.",
-            },
-            confidence: {
-              type: "number",
-              minimum: 0,
-              maximum: 1,
-              description: "Bunun gerçekten hata olduğuna dair güven.",
-            },
-          },
-        },
-      },
-    },
-  } as const;
-}
+/*
+ * Konum (start/end) modelden İSTENMİYOR. Sebep: modeller karakter sayarken
+ * güvenilmez, ve yanlış konum bulguyu metnin başka bir yerine çapalar.
+ * Onun yerine model hatalı METNİ veriyor, konumu biz metinde arayarak
+ * buluyoruz — deterministik ve doğrulanabilir.
+ *
+ * Şemanın tek kaynağı yukarıdaki zod tipi; sağlayıcı onu doğrudan alıyor.
+ * Elle yazılmış ikinci bir JSON şeması yok — senkron tutulması gereken iki
+ * liste, ikisinin ayrışması demek.
+ */
 
 export type ValidationIssue = {
   index: number;

@@ -1,4 +1,4 @@
-import type { RawResponse } from "./contract.ts";
+import type { ZodType } from "zod";
 
 /*
  * Sağlayıcı soyutlaması.
@@ -14,7 +14,15 @@ import type { RawResponse } from "./contract.ts";
 export type ModelRequest = {
   system: string;
   user: string;
-  schema: object;
+  /*
+   * Beklenen çıktının şeması. Sağlayıcı bunu modele "yapılandırılmış çıktı"
+   * olarak veriyor; model bunun dışına çıkamıyor.
+   *
+   * Zod tipi olarak duruyor çünkü iki farklı katman iki farklı şema
+   * kullanıyor: K1 bulgu listesi, K2 karar listesi. Sağlayıcı hangisi
+   * olduğunu bilmiyor — sadece şemayı geçiriyor.
+   */
+  schema: ZodType;
 };
 
 export type ModelUsage = {
@@ -24,7 +32,8 @@ export type ModelUsage = {
 };
 
 export type ModelResult = {
-  parsed: RawResponse;
+  /* Şemaya uyduğu doğrulanmış ham cevap. Anlamını çağıran taraf biliyor. */
+  parsed: unknown;
   usage: ModelUsage;
   modelId: string;
   durationMs: number;

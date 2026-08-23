@@ -29,6 +29,8 @@ export type StoredFinding = Finding & {
   id: string;
   analysisId: string;
   verdict: "confirmed" | "rejected" | "uncertain" | null;
+  /** Kullanıcı bu bulguya ne dedi: true kabul, false itiraz, null cevapsız. */
+  agreed: boolean | null;
 };
 
 export async function saveAnalysis(input: {
@@ -136,9 +138,12 @@ export async function findingsFor(
   const rows = (await db()`
     SELECT f.id::text AS id, f.analysis_id::text AS analysis_id, f.subcategory,
            f.start_offset, f.end_offset, f.original, f.suggestion,
-           f.explanation, f.confidence, f.layer, f.verdict
+           f.explanation, f.confidence, f.layer, f.verdict,
+           fb.agreed
     FROM findings f
     JOIN entries e ON e.id = f.entry_id
+    LEFT JOIN finding_feedback fb
+      ON fb.finding_id = f.id AND fb.user_id = e.user_id
     WHERE f.analysis_id = ${analysisId}
       AND e.user_id = ${userId}
     ORDER BY f.start_offset
@@ -154,6 +159,7 @@ export async function findingsFor(
     confidence: number;
     layer: "K0" | "K1";
     verdict: "confirmed" | "rejected" | "uncertain" | null;
+    agreed: boolean | null;
   }>;
 
   return rows.map((row) => ({
@@ -168,5 +174,6 @@ export async function findingsFor(
     confidence: row.confidence,
     layer: row.layer,
     verdict: row.verdict,
+    agreed: row.agreed,
   }));
 }

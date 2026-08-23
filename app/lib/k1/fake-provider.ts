@@ -1,4 +1,5 @@
 import type { RawResponse } from "./contract.ts";
+import type { RawVerdictResponse } from "../k2/contract.ts";
 import type { ModelRequest, ModelResult, Provider } from "./provider.ts";
 
 /*
@@ -54,6 +55,14 @@ export type FakeOptions = {
   hallucinate?: boolean;
   /** Taksonomide olmayan bir kod üret — şema doğrulamasını sınamak için. */
   invalidSubcategory?: boolean;
+  /*
+   * İkinci geçişin kararları, sırayla. Liste biterse kalanlar "confirmed".
+   * Testte "şüpheli damgası gerçekten istatistiğe girmiyor mu" gibi soruları
+   * sınamak için.
+   */
+  verdicts?: Array<"confirmed" | "rejected" | "uncertain">;
+  /** İkinci geçiş bazı bulgular için hiç karar döndürmesin. */
+  skipVerdicts?: number[];
 };
 
 export class FakeProvider implements Provider {
@@ -71,10 +80,46 @@ export class FakeProvider implements Provider {
     this.options = options;
   }
 
+  /* İkinci geçiş taklidi. */
+  private async judge(request: ModelRequest): Promise<ModelResult> {
+    const lines = request.user
+      .split("\n")
+      .filter((line) => /^\d+\. span:/.test(line.trim()));
+
+    const skip = new Set(this.options.skipVerdicts ?? []);
+    const scripted = this.options.verdicts ?? [];
+
+    const verdicts = lines
+      .map((_, index) => ({
+        index,
+        verdict: scripted[index] ?? ("confirmed" as const),
+        reason: "Sahte ikinci geçiş kararı.",
+      }))
+      .filter((v) => !skip.has(v.index));
+
+    const parsed: RawVerdictResponse = { verdicts };
+
+    return {
+      parsed,
+      usage: { inputTokens: 0, outputTokens: 0, costUsd: 0 },
+      modelId: this.id,
+      durationMs: 0,
+    };
+  }
+
   async complete(request: ModelRequest): Promise<ModelResult> {
-    // İstemin sonundaki "TEXT:" bloğu analiz edilecek metin.
+    /*
+     * İki farklı iş var: bulgu üretmek (K1) ve bulguları yargılamak (K2).
+     * Hangisi olduğunu istemden anlıyoruz — gerçek sağlayıcıda şemayı
+     * modele veriyoruz, burada taklit ediyoruz.
+     */
+    if (request.user.includes("PROPOSED FINDINGS")) {
+      return this.judge(request);
+    }
+
+    // İstemin başındaki "TEXT:" bloğu analiz edilecek metin.
     const marker = "TEXT:\n";
-    const at = request.user.lastIndexOf(marker);
+    const at = request.user.indexOf(marker);
     const text = at === -1 ? "" : request.user.slice(at + marker.length);
 
     const findings: RawResponse["findings"] = [];
@@ -111,8 +156,10 @@ export class FakeProvider implements Provider {
       });
     }
 
+    const parsed: RawResponse = { findings };
+
     return {
-      parsed: { findings },
+      parsed,
       usage: { inputTokens: 0, outputTokens: 0, costUsd: 0 },
       modelId: this.id,
       durationMs: 0,
