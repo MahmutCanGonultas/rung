@@ -778,18 +778,22 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
       <div class="stage-card">
         <div class="stage-top"><h3>Doğrulama ve eval — K2</h3><span class="chip t-accent">projenin kalbi</span><span class="hrs">~10 saat · 11 adım</span></div>
         <p class="stage-what">En uzun aşama, ve projenin bütün değeri burada. "Ekledim" değil, "çalıştığını ölçtüm".</p>
+        <div class="stage-progress">
+          <span class="track"><span class="fill" style="width:91%"></span></span>
+          <span class="n">10 / 11 · gerçek model bekleniyor</span>
+        </div>
         <ol class="steps">
-          <li>İkinci geçiş: her bulguya bağımsız olarak "bu <i>gerçekten</i> hata mı"</li>
-          <li>Geçemeyene <b>şüpheli</b> damgası — gösterilir ama istatistiğe girmez</li>
-          <li>Altın küme nedir — A1, B1, C1 için 30–40'ar örneği <b>elle etiketle</b></li>
-          <li><code>gold_items</code> tablosu</li>
-          <li>İsabet ve yakalama nasıl hesaplanır — birim testle doğrula</li>
-          <li><code>eval_runs</code> — her ölçüm koşumunu kaydet</li>
-          <li>Prompt sürümleme: v1 ve v2 aynı küme üzerinde kıyaslanabilsin</li>
-          <li>"Katılmıyorum" düğmesi → <code>finding_feedback</code></li>
-          <li>İtirazları altın kümeye akıt — küme kendiliğinden büyüsün</li>
+          <li class="done">İkinci geçiş: her bulguya bağımsız olarak "bu <i>gerçekten</i> hata mı"</li>
+          <li class="done">Geçemeyene <b>şüpheli</b> damgası — gösterilir ama istatistiğe girmez</li>
+          <li class="done">Altın küme nedir — A1, B1, C1 için 30–40'ar örneği <b>elle etiketle</b></li>
+          <li class="done"><code>gold_items</code> tablosu</li>
+          <li class="done">İsabet ve yakalama nasıl hesaplanır — birim testle doğrula</li>
+          <li class="done"><code>eval_runs</code> — her ölçüm koşumunu kaydet</li>
+          <li class="done">Prompt sürümleme: v1 ve v2 aynı küme üzerinde kıyaslanabilsin</li>
+          <li class="done">"Katılmıyorum" düğmesi → <code>finding_feedback</code></li>
+          <li class="done">İtirazları altın kümeye akıt — küme kendiliğinden büyüsün</li>
           <li><b>Doğruluk panosu</b> — seviye kırılımlı <span class="screen-tag">Doğruluk sekmesi</span></li>
-          <li>İki prompt sürümünü kıyasla ve <b>takası bilerek yap</b></li>
+          <li class="done">İki prompt sürümünü kıyasla ve <b>takası bilerek yap</b></li>
         </ol>
         <div class="stage-done"><b>biter</b>Prompt değiştiğinde iki sürüm sayılarla kıyaslanabiliyor ve karar gerekçeli veriliyor.</div>
       </div>

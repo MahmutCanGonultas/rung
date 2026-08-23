@@ -28,6 +28,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <nav className="shell-nav" aria-label="Ekranlar">
           <NavLink href="/write">Yaz</NavLink>
           <NavLink href="/history">Geçmiş</NavLink>
+          <NavLink href="/accuracy">Doğruluk</NavLink>
         </nav>
 
         <span className="shell-user">{user.email}</span>
