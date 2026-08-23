@@ -25,6 +25,37 @@ kırılımıyla gösteriyor. Zayıf yer gizlenmiyor.
 > kaybedersin. Bu yüzden sistemin ana ölçütü yakalama oranı değil,
 > **yanlış alarm oranı**.
 
+### Ölçülen son değerler
+
+`claude-sonnet-5` · prompt v1 · çaba low · K1+K2 · 41 örnek (18'i bilerek hatasız)
+
+| | |
+|---|---|
+| **Yanlış alarm** | **%4,9** ← ana ölçüt |
+| Yakalama | %95,1 |
+| İsabet | %95,1 |
+| Kayıt başı maliyet | $0,0096 |
+
+Seviye kırılımı — çünkü tek ortalama sayı zayıf yeri gizler:
+
+| | A1 | A2 | B1 | B2 | C1 |
+|---|---|---|---|---|---|
+| isabet | %92,9 | %88,9 | %100 | %100 | %100 |
+| yakalama | %100 | %100 | %100 | %100 | **%66,7** |
+| yanlış alarm | %7,1 | %11,1 | %0 | %0 | %0 |
+
+**Zayıf yer gizlenmiyor:** C1 yakalaması %66,7. Nüans hataları (kayıt uyumu,
+doğal olmayan edat) modeller için gerçekten zor.
+
+Bu sayılar `npm run eval` ile üretiliyor ve her koşum modeli, prompt sürümü ve
+çabasıyla birlikte `eval_runs` tablosuna yazılıyor — iki sürümü karşılaştırmak
+ancak ikisi de kayıtlıysa mümkün.
+
+İlk koşum ölçüm aracının kendisinde bir hata gösterdi: harness yalnızca model
+katmanını puanlıyordu, ama deterministik katman hataların çoğunu zaten buluyor
+ve modele "bunları tekrar etme" deniyor — yani yakalama %50 görünürken gerçekte
+%100'dü. Gerekçeler ve düzeltmeler `docs/plan.md` §15'te.
+
 ---
 
 ## Analiz hattı
