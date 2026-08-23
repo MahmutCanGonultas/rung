@@ -7,6 +7,7 @@
  *   npm run eval -- --k1-only         ikinci geçiş olmadan
  *   npm run eval -- --limit=10        ilk N örnek
  *   npm run eval -- --note="v2 denemesi"
+ *   npm run eval -- --verbose          kaçırılanları ve yanlış alarmları dök
  *
  * Model ve çaba ortam değişkeninden: RUNG_K1_MODEL, RUNG_K1_EFFORT.
  * Her koşum `eval_runs` tablosuna yazılıyor — iki sürümü karşılaştırmanın
@@ -28,6 +29,7 @@ import { buildVerifyMessage, VERIFY_SYSTEM_PROMPT } from "../app/lib/k2/prompt.t
 import { PROMPT_VERSION } from "../app/lib/k1/contract.ts";
 import { score, total } from "../app/lib/eval/score.ts";
 import { analyze as analyzeK0 } from "../app/lib/k0/index.ts";
+import { dedupeOverlaps } from "../app/lib/k0/rules.ts";
 
 const args = process.argv.slice(2);
 const has = (flag) => args.includes(flag);
@@ -40,6 +42,7 @@ const USE_FAKE = has("--fake");
 const K1_ONLY = has("--k1-only");
 const LIMIT = value("limit") ? Number(value("limit")) : null;
 const NOTE = value("note");
+const VERBOSE = has("--verbose");
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1"];
 
@@ -82,6 +85,19 @@ async function loadGold(client) {
   return LIMIT ? all.slice(0, LIMIT) : all;
 }
 
+/*
+ * ÖLÇÜLEN ŞEY: kullanıcının gördüğü bulguların TAMAMI — K0 + doğrulanmış K1.
+ *
+ * İlk gerçek koşumda çıkan kusur buydu: harness yalnızca K1'i puanlıyordu.
+ * Ama K0 hataların çoğunu zaten buluyor ve K1'e "bunları tekrar etme" diye
+ * söyleniyor — yani K0'ın bulduğu her hata "kaçırıldı" sayılıyor, yakalama
+ * olduğundan düşük çıkıyordu. Ölçüm aracının kendisi yanlış ölçüyordu.
+ *
+ * K3 (seviyeye göre süzme) BİLEREK dışarıda: o katman deterministik ve ayrı
+ * bir soruyu cevaplıyor ("bu kullanıcıya ne gösterilmeli"), burada ölçülen
+ * ise "sistem hatayı buldu mu". Prompt ve model değişiklikleri ikincisini
+ * etkiliyor; ikisini karıştırmak neyin neyi değiştirdiğini görünmez yapar.
+ */
 async function analyseOne(model, item) {
   const k0 = analyzeK0(item.body);
 
@@ -120,7 +136,20 @@ async function analyseOne(model, item) {
     kept = findings.filter((_, i) => decisions[i].verdict === "confirmed");
   }
 
-  return { findings: kept, cost, rejected: rejected.length };
+  /*
+   * K0 önce: aynı yeri iki katman da işaretlediyse deterministik olan kalıyor.
+   * Uygulamanın kendi birleştirme mantığı kullanılıyor — ölçülen şey ile
+   * üretilen şey aynı kod olmak zorunda.
+   */
+  const all = dedupeOverlaps([...k0.findings, ...kept]);
+
+  return {
+    findings: all,
+    k0Count: k0.findings.length,
+    k1Count: kept.length,
+    cost,
+    rejected: rejected.length,
+  };
 }
 
 function pct(x) {
@@ -150,6 +179,10 @@ async function main() {
     const byLevel = new Map(LEVELS.map((l) => [l, []]));
     let totalCost = 0;
     let totalRejected = 0;
+    let totalK0 = 0;
+    let totalK1 = 0;
+    const misses = [];
+    const alarms = [];
 
     for (const [i, item] of gold.entries()) {
       const result = await analyseOne(model, item);
@@ -158,6 +191,17 @@ async function main() {
       byLevel.get(item.level).push(s);
       totalCost += result.cost;
       totalRejected += result.rejected;
+      totalK0 += result.k0Count;
+      totalK1 += result.k1Count;
+
+      for (const m of s.matches) {
+        if (m.expectation && !m.finding) {
+          misses.push({ level: item.level, ...m.expectation });
+        }
+        if (!m.expectation && m.finding) {
+          alarms.push({ level: item.level, ...m.finding });
+        }
+      }
 
       const flag =
         s.falsePositive > 0 ? "YANLIŞ ALARM" : s.falseNegative > 0 ? "kaçırdı" : "";
@@ -185,7 +229,25 @@ async function main() {
     if (totalRejected > 0) {
       console.log(`  ${totalRejected} ham bulgu doğrulama katmanında elendi (metinde yok / taksonomi dışı)`);
     }
-    console.log(`  maliyet $${totalCost.toFixed(4)} · süre ${(durationMs / 1000).toFixed(1)} sn`);
+    console.log(`  bulguların ${totalK0}'i K0'dan (modelsiz) · ${totalK1}'i modelden`);
+    console.log(`  maliyet $${totalCost.toFixed(4)} · kayıt başı $${(totalCost / gold.length).toFixed(4)} · süre ${(durationMs / 1000).toFixed(1)} sn`);
+
+    if (VERBOSE) {
+      if (alarms.length > 0) {
+        console.log("\n─────────── YANLIŞ ALARMLAR ───────────");
+        console.log("  Ana ölçüt bu: doğru cümleyi 'düzeltmek'.");
+        for (const a of alarms) {
+          console.log(`  ${a.level} · ${a.subcategory} · "${a.original}" → ${a.suggestion ?? "—"}`);
+          console.log(`       ${a.explanation.slice(0, 100)}`);
+        }
+      }
+      if (misses.length > 0) {
+        console.log("\n─────────── KAÇIRILANLAR ───────────");
+        for (const m of misses) {
+          console.log(`  ${m.level} · ${m.subcategory} · "${m.original}"`);
+        }
+      }
+    }
 
     console.log("\n─────────── SEVİYE KIRILIMI ───────────");
     console.log("      örnek  isabet  yakalama  yanlış alarm");

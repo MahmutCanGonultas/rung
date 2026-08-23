@@ -65,3 +65,28 @@ test("gerçekçi paragrafta yanlış alarm yok", () => {
     "which time works for you. Best regards, Mahmut";
   assert.deepEqual(flagged(paragraph), []);
 });
+
+test("İNGİLİZ yazımı yanlış alarm vermiyor", () => {
+  // İlk gerçek eval koşumundaki yedi yanlış alarmın beşi buydu.
+  assert.deepEqual(
+    flagged(
+      "My favourite neighbours discussed the behaviour of the organisation " +
+        "and used their own judgement while generalising from the colour of it."
+    ),
+    []
+  );
+});
+
+test("Amerikan yazımı da yanlış alarm vermiyor", () => {
+  assert.deepEqual(
+    flagged(
+      "My favorite neighbors discussed the behavior of the organization " +
+        "and used their own judgment while generalizing from the color of it."
+    ),
+    []
+  );
+});
+
+test("iki sözlük de gerçek hatayı yakalıyor", () => {
+  assert.deepEqual(flagged("I recieved the adress yesterday."), ["recieved", "adress"]);
+});

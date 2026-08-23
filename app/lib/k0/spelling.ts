@@ -1,5 +1,6 @@
 import nspell from "nspell";
 import dictionaryEn from "dictionary-en";
+import dictionaryEnGb from "dictionary-en-gb";
 
 import { sentences, words, type Word } from "./tokenize.ts";
 
@@ -15,6 +16,21 @@ import { sentences, words, type Word } from "./tokenize.ts";
  * Naif liste çekimli hâlleri ("receives", "occurring") ve modern kelimeleri
  * ("email", "website") bilmiyor; her birine "hata" diyor. Plan §07: ana ölçüt
  * yakalama değil yanlış alarm. Karar bu satıra dayanıyor.
+ *
+ * İKİ SÖZLÜK, TEK KARAR
+ *
+ * Amerikan ve İngiliz sözlüğü birlikte kullanılıyor: bir kelime İKİSİNDEN
+ * BİRİNDE varsa doğru sayılıyor.
+ *
+ * Sebebi ölçüldü. Tek sözlükle (Amerikan) yapılan ilk gerçek koşumda yedi
+ * yanlış alarmın beşi buydu: "neighbours", "favourite", "behaviour",
+ * "generalising", "judgement" — hepsi doğru yazılmış İngiliz varyantı. C1
+ * seviyesinde yanlış alarm %42,9'a çıkmıştı, çünkü ileri seviye metinler
+ * İngiliz yazımına daha çok kayıyor.
+ *
+ * Ürünün işi yazım VARYANTI seçmek değil, gerçek yazım hatasını bulmak.
+ * Kullanıcıya "behaviour yanlış yazılmış" demek, güveni kaybetmenin en hızlı
+ * yolu — ve plan §07'nin ana ölçütü tam olarak bu.
  */
 
 /*
@@ -26,10 +42,10 @@ import { sentences, words, type Word } from "./tokenize.ts";
  * riskine karşı ikinci bir kilit var: modül Node'un `Buffer`'ını kullanıyor,
  * istemci paketine girerse derleme zaten kırılır.
  */
-let speller: ReturnType<typeof nspell> | null = null;
+let spellers: Array<ReturnType<typeof nspell>> | null = null;
 
-function getSpeller() {
-  if (speller) return speller;
+function getSpellers() {
+  if (spellers) return spellers;
 
   /*
    * `dictionary-en` sözlüğü `Uint8Array` olarak veriyor, `nspell` tipleri
@@ -40,11 +56,18 @@ function getSpeller() {
   const view = (data: Uint8Array) =>
     Buffer.from(data.buffer, data.byteOffset, data.byteLength);
 
-  speller = nspell({
-    aff: view(dictionaryEn.aff),
-    dic: view(dictionaryEn.dic),
-  });
-  return speller;
+  const build = (dict: { aff: Uint8Array; dic: Uint8Array }) =>
+    nspell({ aff: view(dict.aff), dic: view(dict.dic) });
+
+  spellers = [build(dictionaryEn), build(dictionaryEnGb)];
+  return spellers;
+}
+
+/** Kelime sözlüklerden HERHANGİ BİRİNDE varsa doğru sayılıyor. */
+function known(word: string): boolean {
+  return getSpellers().some(
+    (spell) => spell.correct(word) || spell.correct(word.toLowerCase())
+  );
 }
 
 export type Misspelling = {
@@ -79,7 +102,6 @@ function isAcronym(text: string): boolean {
 }
 
 export function findMisspellings(text: string): Misspelling[] {
-  const spell = getSpeller();
   const sentenceStarts = new Set(sentences(text).map((s) => s.start));
   const found: Misspelling[] = [];
 
@@ -87,16 +109,14 @@ export function findMisspellings(text: string): Misspelling[] {
     if (isAcronym(word.text)) continue;
     if (isLikelyProperNoun(word, sentenceStarts)) continue;
 
-    // Sözlük büyük harfe duyarlı: "english" hatalı, "English" değil.
-    // Cümle başındaki büyük harf yapay olduğu için küçüğünü de deniyoruz.
-    if (spell.correct(word.text)) continue;
-    if (spell.correct(word.text.toLowerCase())) continue;
+    if (known(word.text)) continue;
 
+    // Öneri Amerikan sözlüğünden — ikisi de öneri veriyor, biri yeter.
     found.push({
       word: word.text,
       start: word.start,
       end: word.end,
-      suggestions: spell.suggest(word.text).slice(0, 3),
+      suggestions: getSpellers()[0].suggest(word.text).slice(0, 3),
     });
   }
 

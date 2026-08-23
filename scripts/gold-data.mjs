@@ -97,8 +97,10 @@ export const GOLD = [
 
   t("A2",
     "My friend gave me a very good advices about the job interview. I was nervous but his words helped me a lot. In the end they offered me the position.",
-    [["countability", "advices"], ["article", "a very good advices"]],
-    "İkinci beklenti tartışmalı: 'a' zaten 'advices' yüzünden yanlış."),
+    [["countability", "advices"], ["article", "a very good advices", true]],
+    "İkinci beklenti TARTIŞMALI (optional): 'a' zaten 'advices' yüzünden yanlış, " +
+    "ve iki beklenti aynı yeri gösteriyor. Bir bulgu iki beklentiyle eşleşemediği " +
+    "için zorunlu bırakılırsa haksız 'kaçırıldı' üretiyordu."),
 
   t("A2",
     "The train was late again this morning. I waited on the platform for almost an hour before it finally arrived. Everybody was tired and nobody said anything.",

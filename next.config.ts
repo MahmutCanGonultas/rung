@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
    * Çözüm paketlememek. Bu iki paket sunucuda normal Node `require`'ı ile
    * yükleniyor; Next.js dağıtıma dosyalarıyla birlikte kopyalıyor.
    */
-  serverExternalPackages: ["nspell", "dictionary-en"],
+  serverExternalPackages: ["nspell", "dictionary-en", "dictionary-en-gb"],
 };
 
 export default nextConfig;
