@@ -1148,3 +1148,89 @@ a.chip:hover {
   line-height: 1.45;
   margin-top: 5px;
 }
+
+.k3-note {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin: -6px 0 16px;
+  padding-left: 12px;
+  border-left: 2px solid var(--hairline);
+}
+.k3-note b {
+  color: var(--ink-2);
+}
+
+/* ── seviye kartı ─────────────────────────────────────────────────── */
+.level-card {
+  margin: 24px 0 4px;
+  padding: 20px 22px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+.level-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.level-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.level-value {
+  font-size: 32px;
+  font-weight: 660;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--accent);
+}
+.level-score {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.level-lede {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin: 10px 0 18px;
+}
+.level-signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.level-signal {
+  display: grid;
+  gap: 6px;
+}
+.level-signal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.level-signal-top b {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink);
+}
+.level-signal-detail {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+.level-warn {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin: 16px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--hairline);
+}

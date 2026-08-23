@@ -8,6 +8,9 @@ import type { SaveState } from "./save-state";
 import { getSessionUser } from "./session";
 import { readField } from "./validation";
 import { countWords } from "./words";
+import { analyze as analyzeK0 } from "./k0";
+import { estimateLevel } from "./k3/estimate";
+import { saveEstimate } from "./k3/store";
 
 /*
  * Kaydetme.
@@ -72,6 +75,32 @@ export async function saveEntryAction(
       body,
       wordCount,
     });
+
+    /*
+     * Seviye tahmini her yeni kayıttan sonra güncelleniyor (plan §06:
+     * "tahmin sürekli güncellenir"). K0'a dayanıyor, model kullanmıyor —
+     * yani kaydetme akışını yavaşlatmıyor ve para harcamıyor.
+     *
+     * Tahmin başarısız olursa kayıt yine de duruyor: metni saklamak asıl iş,
+     * tahmin türevi. Bir sonraki kayıtta yeniden hesaplanacak.
+     */
+    try {
+      const k0 = analyzeK0(body);
+      const estimate = estimateLevel(
+        body,
+        k0.findings.map((f) => f.subcategory)
+      );
+      await saveEstimate({
+        userId: user.id,
+        entryId,
+        level: estimate.level,
+        score: estimate.score,
+        signals: estimate.signals,
+        reliable: estimate.reliable,
+      });
+    } catch (error) {
+      console.error("[rung] seviye tahmini güncellenemedi:", error);
+    }
   } catch (error) {
     console.error("[rung] kayıt yazılırken hata:", error);
     return { error: "Kaydedilemedi. Biraz sonra tekrar dener misin?", body };

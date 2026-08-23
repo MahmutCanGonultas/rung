@@ -792,8 +792,8 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
           <li class="done">Prompt sürümleme: v1 ve v2 aynı küme üzerinde kıyaslanabilsin</li>
           <li class="done">"Katılmıyorum" düğmesi → <code>finding_feedback</code></li>
           <li class="done">İtirazları altın kümeye akıt — küme kendiliğinden büyüsün</li>
-          <li><b>Doğruluk panosu</b> — seviye kırılımlı <span class="screen-tag">Doğruluk sekmesi</span></li>
-          <li class="done">İki prompt sürümünü kıyasla ve <b>takası bilerek yap</b></li>
+          <li class="done"><b>Doğruluk panosu</b> — seviye kırılımlı <span class="screen-tag">Doğruluk sekmesi</span></li>
+          <li>İki prompt sürümünü kıyasla ve <b>takası bilerek yap</b></li>
         </ol>
         <div class="stage-done"><b>biter</b>Prompt değiştiğinde iki sürüm sayılarla kıyaslanabiliyor ve karar gerekçeli veriliyor.</div>
       </div>
@@ -805,16 +805,20 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
       <div class="stage-card">
         <div class="stage-top"><h3>Seviye motoru — K3</h3><span class="hrs">~8 saat · 7 adım</span></div>
         <p class="stage-what">Aynı hatanın önemi seviyeye göre değişiyor. Bu, seviyeyi sistemin merkezine koyuyor.</p>
+        <div class="stage-progress">
+          <span class="track"><span class="fill" style="width:100%"></span></span>
+          <span class="n">7 / 7 · tamamlandı</span>
+        </div>
         <ol class="steps">
-          <li>K0 metriklerinden seviye tahmini — eşikleri belirle</li>
-          <li><code>level_estimates</code> — tahmini zaman serisi olarak sakla</li>
-          <li>Bulgu önceliklendirme kuralları</li>
-          <li>Seviyeye göre gösterilecek bulgu <b>sayısı sınırı</b></li>
-          <li>Görev önerisini seviyeye bağla</li>
-          <li>Aynı metin A1 ve C1 kullanıcısına farklı görünüyor mu — test et</li>
-          <li>Tahmini her yeni kayıttan sonra güncelle</li>
+          <li class="done">K0 metriklerinden seviye tahmini — eşikleri belirle</li>
+          <li class="done"><code>level_estimates</code> — tahmini zaman serisi olarak sakla</li>
+          <li class="done">Bulgu önceliklendirme kuralları</li>
+          <li class="done">Seviyeye göre gösterilecek bulgu <b>sayısı sınırı</b></li>
+          <li class="done">Görev önerisini seviyeye bağla</li>
+          <li class="done">Aynı metin A1 ve C1 kullanıcısına farklı görünüyor mu — test et</li>
+          <li class="done">Tahmini her yeni kayıttan sonra güncelle</li>
         </ol>
-        <div class="stage-done"><b>biter</b>Aynı metin A1 ve C1 kullanıcısına farklı geri bildirim veriyor.</div>
+        <div class="stage-done"><b>biter</b>Aynı metin A1 ve C1 kullanıcısına farklı geri bildirim veriyor. &nbsp;·&nbsp; <span style="color:var(--accent)">20 birim testi</span></div>
       </div>
     </article>
 

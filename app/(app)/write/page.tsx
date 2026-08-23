@@ -4,12 +4,12 @@ import { redirect } from "next/navigation";
 
 import { Composer } from "../../components/Composer";
 import {
-  DEFAULT_LEVEL,
   findContextBySlug,
   findTaskById,
   listContexts,
   pickTask,
 } from "../../lib/content";
+import { currentLevel } from "../../lib/k3/store";
 import { saveEntryAction } from "../../lib/entry-actions";
 import { requireUser } from "../../lib/guard";
 
@@ -30,7 +30,7 @@ export default async function WritePage({
 }: {
   searchParams: Promise<Search>;
 }) {
-  await requireUser();
+  const user = await requireUser();
 
   const params = await searchParams;
   const contexts = await listContexts();
@@ -42,14 +42,20 @@ export default async function WritePage({
     (params.context ? await findContextBySlug(params.context) : null) ??
     contexts[0];
 
+  /*
+   * Görev artık sabit bir seviyeden değil, KULLANICININ ölçülmüş
+   * seviyesinden seçiliyor (plan §06 · Aşama 06). Hiç kaydı olmayan yeni
+   * kullanıcı varsayılan seviyeden başlıyor.
+   */
+  const level = await currentLevel(user.id);
   const chosen = params.task ? await findTaskById(params.task) : null;
 
   // Görev yoksa, ya da adresteki görev bu bağlama ait değilse: yeniden seç.
   if (!chosen || chosen.contextId !== context.id) {
-    const picked = await pickTask(context.id, DEFAULT_LEVEL, params.skip);
+    const picked = await pickTask(context.id, level, params.skip);
     if (!picked) {
       throw new Error(
-        `${context.name} bağlamında ${DEFAULT_LEVEL} seviyesinde görev yok.`
+        `${context.name} bağlamında ${level} seviyesinde görev yok.`
       );
     }
     redirect(`/write?context=${context.slug}&task=${picked.id}`);

@@ -3,6 +3,8 @@ import { FindingCard } from "./FindingCard";
 import { analyzeEntryAction } from "../lib/analysis-actions";
 import type { StoredAnalysis, StoredFinding } from "../lib/analyses";
 import { partitionFindings } from "../lib/k2/display";
+import { filterForLevel, limitFor } from "../lib/k3/filter";
+import type { Level } from "../lib/content-types";
 
 /*
  * K1 — model katmanının çıktısı.
@@ -20,15 +22,27 @@ export function K1Panel({
   entryId,
   analysis,
   findings,
+  level,
 }: {
   entryId: string;
   analysis: StoredAnalysis | null;
   findings: StoredFinding[];
+  level: Level;
 }) {
   const label = analysis ? "Yeniden analiz et" : "Modele sor";
 
   // Ayırma mantığı `k2/display.ts`'te ve testli — ürünün en kritik kuralı.
   const { visible, counted, suspect, filtered } = partitionFindings(findings);
+
+  /*
+   * K3 · seviyeye göre süzme. Plan §04: "A1'in cümlesinde on hata vardır;
+   * onuncusunu da yüzüne vurursan uygulamayı siler."
+   *
+   * İki ayrı eleme var ve ayrı gösteriliyor: seviyede önemsiz olanlar
+   * (gürültü) ile sıraya girmeyenler (önemli ama bugünlük yeter).
+   */
+  const byLevel = filterForLevel(visible, level);
+  const noise = byLevel.hidden.length - byLevel.overLimit;
 
   return (
     <section className="k1">
@@ -78,7 +92,16 @@ export function K1Panel({
             ) : null}
           </p>
 
-          {visible.map((finding, i) => (
+          <p className="k3-note">
+            <b>{level}</b> seviyesine göre süzüldü — en fazla {limitFor(level)}{" "}
+            bulgu gösteriliyor.
+            {noise > 0 ? ` ${noise} bulgu bu seviyede gürültü sayıldı.` : ""}
+            {byLevel.overLimit > 0
+              ? ` ${byLevel.overLimit} bulgu önemli ama sıraya girmedi.`
+              : ""}
+          </p>
+
+          {byLevel.shown.map((finding, i) => (
             <FindingCard
               key={finding.id}
               finding={finding}

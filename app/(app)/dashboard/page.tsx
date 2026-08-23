@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { countEntries, listEntries } from "../../lib/entries";
 import { requireUser } from "../../lib/guard";
+import { latestEstimate } from "../../lib/k3/store";
 
 export const metadata: Metadata = { title: "Pano · Rung" };
 
@@ -16,9 +17,10 @@ const DAY = new Intl.DateTimeFormat("tr-TR", {
 export default async function DashboardPage() {
   const user = await requireUser();
 
-  const [totals, recent] = await Promise.all([
+  const [totals, recent, estimate] = await Promise.all([
     countEntries(user.id),
     listEntries(user.id, { limit: 5 }),
+    latestEstimate(user.id),
   ]);
 
   return (
@@ -27,6 +29,47 @@ export default async function DashboardPage() {
       <p className="panel-lede">
         Ölçüm aleti. Yaz, sakla, aylar sonra ne değiştiğine bak.
       </p>
+
+      {estimate ? (
+        <div className="level-card">
+          <div className="level-head">
+            <span className="level-label">Tahmini seviye</span>
+            <span className="level-value">{estimate.level}</span>
+            <span className="level-score">
+              skor {estimate.score.toFixed(2)} / 4
+            </span>
+          </div>
+
+          <p className="level-lede">
+            Sana sorulmadı — <b>ölçüldü</b>. Dördü de deterministik katmandan,
+            model kullanılmadan.
+          </p>
+
+          <div className="level-signals">
+            {estimate.signals.map((signal) => (
+              <div key={signal.name} className="level-signal">
+                <div className="level-signal-top">
+                  <span>{signal.name}</span>
+                  <b>{signal.band}</b>
+                </div>
+                <span className="meter-track">
+                  <span
+                    className="meter-fill"
+                    style={{ width: `${Math.round((signal.value / 4) * 100)}%` }}
+                  />
+                </span>
+                <span className="level-signal-detail">{signal.detail}</span>
+              </div>
+            ))}
+          </div>
+
+          {!estimate.reliable ? (
+            <p className="level-warn">
+              Son metin kısaydı — tahmin oynak. Birkaç kayıt daha sonra oturuyor.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <dl className="facts">
         <div>
