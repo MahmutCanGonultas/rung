@@ -390,6 +390,9 @@ README ve demo
 | 2026-08-23 | **İki sözlük: Amerikan + İngiliz.** İlk koşumdaki yedi yanlış alarmın **beşi** İngiliz yazımıydı — `neighbours`, `favourite`, `behaviour`, `generalising`, `judgement`. Hepsi doğru yazılmış; sözlük Amerikan olduğu için hata sanılıyordu. C1'de yanlış alarm %42,9'a çıkmıştı, çünkü ileri seviye metinler İngiliz yazımına daha çok kayıyor. **Karar:** kelime iki sözlükten birinde varsa doğru sayılıyor. Ürünün işi yazım *varyantı* seçmek değil, gerçek hatayı bulmak. |
 | 2026-08-23 | **Düzeltmelerden sonra:** isabet %95,1 · yakalama %95,1 · **yanlış alarm %4,9** · kayıt başı **$0,0096**. C1'de yanlış alarm %42,9 → **%0**. Kalan iki yanlış alarm tartışmalı ("funny"→"fun", "fair for"→"fair to") — model haklı da olabilir. Kalan zayıf yer C1 yakalaması (%66,7) ve panoda gizlenmiyor. |
 
+| 2026-08-23 | **Toplulaştırma veritabanında, kodda değil.** `count`, `sum`, `date_trunc` ve `FILTER` sorgunun içinde. Alternatifi bütün kayıtları çekip JavaScript'te saymaktı — altı ay sonra 500 kayıt × ~10 bulgu = 5.000 satırı ağdan geçirmek, aynı sonuç için. Aynı ilke N+1'i de kapatıyor: her kaydın bulgularını ayrı sorguyla çekmek yerine tek JOIN. **Ölçüldü:** 7 aylık veriyle (24 kayıt, 150 bulgu) ilerleme sayfası **1,4 saniyede** açılıyor. |
+| 2026-08-23 | **İlerleme sayıları 100 kelimede oran olarak.** Ham sayı yanıltıyor: ilk ay 200 kelime yazıp bu ay 2.000 yazan biri "daha çok hata yapıyor" görünürdü. Grafikler sunucuda SVG olarak çiziliyor — veri zaten sunucuda ve iki basit grafik için tarayıcıya çizim kütüphanesi indirmek gereksiz; sayfa JavaScript olmadan da eksiksiz görünüyor. |
+
 ### Hâlâ açık
 
 - **Yurtdışı hedefi** — Türkiye'den uzaktan yabancı şirkete mi, taşınmak mı, önce eğitim mi?

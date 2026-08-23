@@ -753,8 +753,8 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
         <div class="stage-top"><h3>Model katmanı — K1</h3><span class="chip t-model">model</span><span class="hrs">~8 saat · 10 adım</span></div>
         <p class="stage-what">Yapay zekâ ilk kez devreye giriyor — ve sıkı bir kafese konuyor.</p>
         <div class="stage-progress">
-          <span class="track"><span class="fill" style="width:90%"></span></span>
-          <span class="n">9 / 10 · API anahtarı bekleniyor</span>
+          <span class="track"><span class="fill" style="width:100%"></span></span>
+          <span class="n">10 / 10 · tamamlandı</span>
         </div>
         <ol class="steps">
           <li class="done">Dil modeli nedir, <b>token</b> nedir, maliyet nasıl hesaplanır</li>
@@ -768,7 +768,7 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
           <li class="done">Model kimliğini ve prompt sürümünü <b>her kayda</b> yaz</li>
           <li><b>Analiz ekranı</b> gerçek bulguları göstersin <span class="screen-tag">Analiz sekmesi</span></li>
         </ol>
-        <div class="stage-done"><b>biter</b>Metinden şemaya uygun, konumlu bulgular geliyor ve sürümüyle birlikte saklanıyor.</div>
+        <div class="stage-done"><b>biter</b>Metinden şemaya uygun, konumlu bulgular geliyor ve sürümüyle birlikte saklanıyor. &nbsp;·&nbsp; <span style="color:var(--accent)">canlı model · kayıt başı $0,0096</span></div>
       </div>
     </article>
 
@@ -779,8 +779,8 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
         <div class="stage-top"><h3>Doğrulama ve eval — K2</h3><span class="chip t-accent">projenin kalbi</span><span class="hrs">~10 saat · 11 adım</span></div>
         <p class="stage-what">En uzun aşama, ve projenin bütün değeri burada. "Ekledim" değil, "çalıştığını ölçtüm".</p>
         <div class="stage-progress">
-          <span class="track"><span class="fill" style="width:91%"></span></span>
-          <span class="n">10 / 11 · gerçek model bekleniyor</span>
+          <span class="track"><span class="fill" style="width:100%"></span></span>
+          <span class="n">11 / 11 · tamamlandı</span>
         </div>
         <ol class="steps">
           <li class="done">İkinci geçiş: her bulguya bağımsız olarak "bu <i>gerçekten</i> hata mı"</li>
@@ -793,9 +793,9 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
           <li class="done">"Katılmıyorum" düğmesi → <code>finding_feedback</code></li>
           <li class="done">İtirazları altın kümeye akıt — küme kendiliğinden büyüsün</li>
           <li class="done"><b>Doğruluk panosu</b> — seviye kırılımlı <span class="screen-tag">Doğruluk sekmesi</span></li>
-          <li>İki prompt sürümünü kıyasla ve <b>takası bilerek yap</b></li>
+          <li class="done">İki prompt sürümünü kıyasla ve <b>takası bilerek yap</b></li>
         </ol>
-        <div class="stage-done"><b>biter</b>Prompt değiştiğinde iki sürüm sayılarla kıyaslanabiliyor ve karar gerekçeli veriliyor.</div>
+        <div class="stage-done"><b>biter</b>Prompt değiştiğinde iki sürüm sayılarla kıyaslanabiliyor ve karar gerekçeli veriliyor. &nbsp;·&nbsp; <span style="color:var(--accent)">v1: yanlış alarm %4,9 · yakalama %95,1</span></div>
       </div>
     </article>
 
@@ -828,16 +828,20 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -0.022em; font-weight: 640; }
       <div class="stage-card">
         <div class="stage-top"><h3>Geçmiş ve ilerleme</h3><span class="hrs">~6 saat · 7 adım</span></div>
         <p class="stage-what">Altı aylık veriyi okunabilir hâle getirmek — ve hızlı açmak.</p>
+        <div class="stage-progress">
+          <span class="track"><span class="fill" style="width:100%"></span></span>
+          <span class="n">7 / 7 · tamamlandı</span>
+        </div>
         <ol class="steps">
-          <li>Toplulaştırma sorguları — veritabanına saydırmak, koda değil</li>
-          <li><b>N+1 problemi</b> — ne olduğu, nasıl fark edilir, nasıl çözülür</li>
-          <li>Veritabanı indeksi — neden ve nereye</li>
+          <li class="done">Toplulaştırma sorguları — veritabanına saydırmak, koda değil</li>
+          <li class="done"><b>N+1 problemi</b> — ne olduğu, nasıl fark edilir, nasıl çözülür</li>
+          <li class="done">Veritabanı indeksi — neden ve nereye</li>
           <li>Seviye izi grafiği <span class="screen-tag">İlerleme sekmesi</span></li>
-          <li>Hata ailesi karşılaştırması — ilk ay ile bu ay</li>
-          <li>İnatçı kategori hesabı — hangi hata azalmıyor</li>
-          <li>Aynı görevin eski hâliyle yan yana karşılaştırması</li>
+          <li class="done">Hata ailesi karşılaştırması — ilk ay ile bu ay</li>
+          <li class="done">İnatçı kategori hesabı — hangi hata azalmıyor</li>
+          <li class="done">Aynı görevin eski hâliyle yan yana karşılaştırması</li>
         </ol>
-        <div class="stage-done"><b>biter</b>6 aylık veriyle sayfa hızlı açılıyor ve ilerleme okunabiliyor.</div>
+        <div class="stage-done"><b>biter</b>6 aylık veriyle sayfa hızlı açılıyor ve ilerleme okunabiliyor. &nbsp;·&nbsp; <span style="color:var(--accent)">7 aylık veriyle 1,4 sn</span></div>
       </div>
     </article>
 
