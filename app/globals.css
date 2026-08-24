@@ -1207,6 +1207,7 @@ a.chip:hover {
   display: block;
   position: relative;
   height: 100%;
+  transform-origin: left;
   border-radius: 4px;
   background: var(--accent);
 }
@@ -1667,13 +1668,6 @@ textarea:focus-visible,
   margin: 0;
   max-width: 62ch;
 }
-.sample-more {
-  background: var(--surface);
-  margin: 0;
-  padding: 12px 22px;
-  font-size: 12.5px;
-  color: var(--ink-3);
-}
 
 /* ── beş katmanlı hat ─────────────────────────────────────────────── */
 .pipe {
@@ -1901,137 +1895,417 @@ textarea:focus-visible,
   color: var(--accent);
   font-style: normal;
 }
-
-/* ── giriş / kayıt · iki sütun ────────────────────────────────────── */
+/* ── tek kart üstünde duran sayfalar ──────────────────────────────── */
 /*
- * 5:7. Eskiden 1 / 1.05 idi — yani fiilen yarı yarıya, ve göz hangi sütunun
- * ASIL olduğunu seçemiyordu. Hareket eklenmeden önce bile "tek düze" hissinin
- * bir parçası buydu. Form özne, kanıt zemin.
- *
- * Dar ekranda sağ sütunun gizlenmesi DEĞİŞMEDİ: AuthShell.tsx bunu gerekçesiyle
- * yazıyor — "giriş yapmak ikna olmaktan önce gelir". Onu değiştirmek bir ürün
- * kararı, medya sorgusuna sıkıştırılacak bir şey değil.
+ * `/error` ve `/not-found` bu iki sınıfı kullanıyor ve ikisinin de BUGÜNE
+ * KADAR hiç kuralı yoktu — iki sayfa da çıplak çıkıyordu. Giriş ve kayıt
+ * ekranları `.auth-stage` içinde aynı `.auth-card`ı kullanıyor, orada sadece
+ * ızgaradaki yeri değişiyor.
  */
-.auth-split {
+.auth {
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  place-items: center;
+  padding: clamp(20px, 5vw, 48px);
+  background: var(--plane);
 }
-/* İşaret üstte, alt yazı altta, kutu ikisinin ortasında. */
-.auth-pane {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(32px, 5vw, 64px) clamp(24px, 5vw, 72px);
-  gap: 0;
-}
-.auth-mark {
-  font-size: 20px;
-  text-decoration: none;
-}
-.auth-box {
+.auth-card {
   width: 100%;
-  max-width: 380px;
-  margin-block: auto;
+  max-width: 460px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  box-shadow: var(--e2), var(--edge);
+  padding: clamp(24px, 2.4vw, 34px);
 }
 .auth-title {
-  font-size: 28px;
-  letter-spacing: -0.03em;
+  margin: 0;
+  font-size: clamp(28px, 2.4vw, 36px);
+  line-height: 1.05;
+  letter-spacing: -0.032em;
+  font-weight: 640;
+}
+/*
+ * Kontrastı boyut değil AĞIRLIK taşıyor: aynı puntoda 640'a karşı 340, ve
+ * ikinci yarısı kendi satırında. 62px'lik bir başlık denendi ve reddedildi —
+ * bir ölçüm aletinde ekrandaki en yüksek sesli şey kapının adı olamaz.
+ */
+.auth-title-soft {
+  display: block;
+  font-weight: 340;
+  color: var(--ink-2);
 }
 .auth-lede {
   color: var(--ink-2);
-  font-size: 14.5px;
-  margin: 10px 0 26px;
+  font-size: 15px;
+  line-height: 1.55;
+  margin: 12px 0 26px;
 }
+/* `.auth-alt` DOKUNULMUYOR: `/error` ve kayıt detayı da kullanıyor. */
 .auth-alt {
   margin: 22px 0 0;
   font-size: 13.5px;
   color: var(--ink-3);
 }
-.auth-foot {
-  margin: 0;
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-3);
+
+/* ── giriş / kayıt · TEK LEVHA ────────────────────────────────────── */
+/*
+ * Dikey dikiş KALDIRILDI.
+ *
+ * Eskisi 5fr/7fr bir ızgaraydı ve tek işi iki belgenin arasına 100dvh boyunca
+ * bir çizgi çekmekti: solda 380px'lik bir kutu 600px'lik sütunun ortasında
+ * asılı duruyordu — ölçüldü, sütunun %76'sı boştu ve o boşluk tasarlanmış
+ * değildi, `margin-block: auto`nun artığıydı. Sağda anasayfanın sıkıştırılmış
+ * bir kopyası vardı. Hiçbir öğe dikişi geçmiyordu, o yüzden göz yan yana iki
+ * ayrı ürün görüyordu.
+ *
+ * Yeni yapı TEK LEVHA:
+ *   · analiz sayfanın ZEMİNİ, kenardan kenara
+ *   · form o zeminin üstünde duran ve üst kenarını KIRAN yükseltilmiş nesne
+ *   · beş gerçek bulgu kartın altından tam genişlikte geçiyor
+ *   · ölçülen doğruluk en altta, aletin durum çubuğu gibi
+ *
+ * Kompozisyon üstte ayrık, altta sürekli. Dikiş artık çizilemiyor.
+ *
+ * Sütunlar "pano" değil RAY: adlandırılmış ızgara çizgileri sayesinde aynı
+ * ızgara hem şerit genişliğinde bir kartı hem kenardan kenara bir levhayı
+ * tutabiliyor.
+ */
+.auth-stage {
+  --rail: clamp(20px, 5vw, 72px);
+  /* Giriş ekranı gösteri izlenecek yer değil: dizi yarı tempoda koşuyor. */
+  --t-lead: 480ms;
+  --t-step: 150ms;
+
+  min-height: 100dvh;
+  display: grid;
+  background: var(--plane);
+  grid-template-columns:
+    [bleed-start] var(--rail)
+    [rail-start] minmax(300px, 400px)
+    [lane-start] minmax(0, 1fr)
+    var(--rail) [bleed-end];
+  grid-template-rows:
+    auto /* 1 · başlık şeridi */
+    clamp(18px, 2.4vw, 34px) /* 2 · kartın levhadan taşan payı */
+    auto /* 3 · kart gövdesi ↔ okunan cümle */
+    auto /* 4 · bulgu rafı, tam genişlik */
+    1fr /* 5 · pay; dar ekranda kendiliğinden kapanıyor */
+    auto; /* 6 · ölçüm şeridi */
+}
+/* Levhanın üstündeki her şey kendi katmanında. */
+.auth-stage > *:not(.auth-plate) {
+  position: relative;
+  z-index: 1;
 }
 
-.auth-aside {
-  background: var(--surface-2);
-  border-left: 1px solid var(--hairline);
+.auth-head {
+  grid-column: rail-start / -2;
+  grid-row: 1;
   display: flex;
-  align-items: center;
-  padding: 44px 42px;
-  /*
-   * Kısa ekranda içerik taşabiliyor. Gizlemek yerine kaydırılabilir
-   * bırakıyoruz — kanıtın yarısını kesmektense, isteyen aşağı insin.
-   */
-  overflow-y: auto;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 28px;
+  flex-wrap: wrap;
+  padding-block: clamp(20px, 3vw, 34px);
 }
-.auth-aside-inner {
-  width: 100%;
-  max-width: 460px;
-  display: grid;
-  gap: 18px;
+.auth-head .mark-link {
+  font-size: 20px;
 }
 /*
- * Kenar sütunu dar: dört kutu 3+1 diye kırılıyordu ve son satırda boşluk
- * kalıyordu. Burada her zaman 2×2.
+ * Tek cümlelik çerçeve. `.hero-lede`'nin tekrarı DEĞİL: ürünü değil,
+ * aşağıdaki KANITI etiketliyor. Giriş ekranı ikinci bir anasayfa olmuyor.
  */
-.auth-aside .proof-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.auth-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 46ch;
+  text-align: right;
 }
-.auth-aside .proof-value {
-  font-size: 24px;
+
+/* Levha: kanıt bir pano değil, sayfanın üstüne kurulduğu DÜZLEM. */
+.auth-plate {
+  grid-column: 1 / -1;
+  grid-row: 3 / 5;
+  position: relative;
+  z-index: 0;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--hairline);
 }
-.auth-aside .sample-text {
-  font-size: 15px;
-  line-height: 1.85;
-  padding: 18px 18px 16px;
+/* Üst kenar ayrı bir çizgi: soldan sağa çekilebilsin diye (hareket katmanı). */
+.auth-plate::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--hairline);
+  transform-origin: left center;
 }
-.auth-aside .sample-finding {
-  padding: 13px 18px;
+
+/*
+ * Kart 2–3, levha 3–4 satırında: kart levhanın üst kenarından yukarı taşıyor.
+ * Hiçbir şey örtülmüyor, çünkü kartın altındaki levha boş.
+ */
+.auth-stage > .auth-card {
+  grid-column: rail-start / lane-start;
+  grid-row: 2 / 4;
+  z-index: 2;
+  align-self: start;
+  max-width: none;
 }
-.auth-aside .sample-why {
-  font-size: 12.5px;
+
+/*
+ * İki kapı. "Hesabın yok mu? Hesap oluştur" formun altına asılmış bir
+ * cümleydi; aslında üst düzey bir seçim. Kartın alt kuralının üstünde iki eşit
+ * bölme, etkin olanın üstünde vurgu çizgisi. JavaScript'siz çalışıyor.
+ *
+ * Formdan SONRA duruyor: bu ekrana gelen kişi kapıyı zaten seçmiş geliyor,
+ * burası yanlış seçtiğini fark ettiği yer. Sekme sırası e-posta → şifre →
+ * gönder → kapılar, yani form ilk.
+ */
+.auth-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 26px;
+  border-top: 1px solid var(--hairline);
 }
-.auth-aside-kicker {
+.auth-switch a {
+  margin-top: -1px;
+  padding: 13px 8px 2px;
+  text-align: center;
   font-family: var(--mono);
   font-size: 10px;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent);
-  margin: 0;
+  color: var(--ink-3);
+  text-decoration: none;
+  border-top: 2px solid transparent;
+  transition: color 160ms ease, border-color 160ms ease;
 }
-.auth-aside-lede {
-  font-size: 17px;
-  line-height: 1.6;
+.auth-switch a:hover {
   color: var(--ink);
-  margin: 0;
-  max-width: 42ch;
+}
+.auth-switch a[aria-current="page"] {
+  color: var(--ink);
+  border-top-color: var(--accent);
+}
+.auth-switch a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
-/* Dar ekranda kanıt sütunu gizleniyor: giriş yapmak ikna olmaktan önce gelir. */
-@media (max-width: 900px) {
-  .auth-split {
+/*
+ * Okuma şeridi: iki ucundan da bağlı. `align-self: start` olsaydı kartın
+ * fazla boyu yanında görünür bir boşluk bırakırdı — bugünkü sol sütunun
+ * hatasının aynadaki hâli.
+ */
+.auth-stage > .sample-read {
+  grid-column: lane-start / -2;
+  grid-row: 3;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  /*
+   * Şerit ve cümle TEK BİRİM, ve o birim alanın ortasında.
+   *
+   * İki deneme de yanlıştı ve ikisi de ölçülerek elendi. `space-between`
+   * aralarında 302px bırakıyordu — eski tasarımın "bir alan, içindekini
+   * yaslamak için var oluyor" hatasının yer değiştirmiş hâli. Cümleye
+   * `margin-block: auto` vermek boşluğu ikiye böldü ama şeridi tepede yalnız
+   * bıraktı: "K0 · deterministik" etiketi neyi etiketlediğinden 150px uzaktı.
+   */
+  justify-content: center;
+  gap: 20px;
+  padding: 20px 0 26px clamp(20px, 2.4vw, 40px);
+}
+.auth-stage .sample-head {
+  padding: 0;
+  border-bottom: 0;
+  background: none;
+  box-shadow: none;
+}
+/*
+ * Mikro kat `--ink-3` ile `--surface-2` üstünde 3,3:1'de kalıyordu. Bu tasarım
+ * o katı çok daha geniş gösteriyor; giriş yüzeyinde `--ink-2` (6,1:1).
+ */
+.auth-stage .sample-tag,
+.auth-stage .sample-count,
+.auth-stage .sample-kind,
+.auth-stage .proof-label {
+  color: var(--ink-2);
+}
+.auth-stage .sample-text {
+  padding: 0;
+  /*
+   * Tavan 26px. 30px denendi ve fazlaydı: sayfada oynayan tek şey, duran
+   * kapıdan yüksek sesle konuşmamalı — başlık 36px'te kalıyor. 21px ise
+   * şeridi doldurmaya yetmiyordu.
+   */
+  font-size: clamp(16.5px, 1.8vw, 26px);
+  line-height: 1.95;
+  color: var(--ink-2);
+  overflow-clip-margin: 12px;
+}
+/*
+ * TERS ÇEVİRME: cümle sessiz zemin, BULUNAN HATALAR yüksek sesli olan.
+ * Aletin gerçekte yaptığı şey bu.
+ */
+.auth-stage .sample-mark {
+  color: var(--ink);
+}
+
+/*
+ * Dikişi öldüren öğe. Sol kenarı KARTIN kenarı, sağ kenarı SAYFANIN kenarı:
+ * kompozisyon üstte ayrık, altta sürekli — göz tek yüzey okumak zorunda.
+ */
+.auth-stage > .sample-findings {
+  grid-column: rail-start / -2;
+  grid-row: 4;
+  /*
+   * Sütun sayısı BOŞLUĞA BIRAKILMIYOR. `auto-fit` 900–1250px arasında 3+2
+   * kırıyor ve son satırı tırtıklı bırakıyordu — 13" dizüstü tam orada.
+   * Beş bulgu = taksonominin beş bandı = `Mark.tsx`in beş basamağı.
+   */
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 1px solid var(--hairline);
+}
+/*
+ * Hücreler `--surface` değil `--surface-2`: raf, levhanın ÇİZGİLENMİŞ hâli;
+ * üstüne yapıştırılmış beş kutu değil.
+ */
+.auth-stage .sample-finding {
+  background: var(--surface-2);
+  padding: 15px 16px 17px;
+}
+.auth-stage .sample-fix {
+  font-size: 14px;
+}
+.auth-stage .sample-why {
+  font-size: 12px;
+}
+@media (max-width: 1080px) {
+  .auth-stage > .sample-findings {
     grid-template-columns: minmax(0, 1fr);
   }
-  .auth-aside {
-    display: none;
-  }
-  .auth-pane {
-    align-items: center;
-    padding: 36px 24px;
-  }
-  .auth-box,
-  .auth-mark,
-  .auth-foot {
-    max-width: 380px;
-    width: 100%;
-  }
 }
 
+/*
+ * Ölçüm şeridi: 5. satırdaki `1fr` onu ekranın alt kenarına itiyor, yani
+ * aletin durum çubuğu gibi okunuyor — dördüncü bir kart gibi değil.
+ *
+ * Levha bu METİNDE bulunanı gösteriyor; şerit ALETİN kendi doğruluğunu.
+ */
+.auth-stage > .proof {
+  grid-column: 1 / -1;
+  grid-row: 6;
+  background: var(--surface);
+  border-top: 1px solid var(--hairline);
+  padding-bottom: 22px;
+}
+.auth-stage .proof-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.auth-stage .proof-cell {
+  padding: 18px 18px 16px;
+}
+.auth-stage .proof-cell:first-child {
+  padding-left: var(--rail);
+}
+.auth-stage .proof-cell:last-child {
+  padding-right: var(--rail);
+}
+.auth-stage .proof-value {
+  font-size: clamp(26px, 2.2vw, 34px);
+}
+.auth-stage .proof-bands-DUPLICATE {
+  margin-inline: var(--rail);
+}
+.auth-stage .proof-bands .meters {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px 20px;
+}
+.auth-stage .proof-weak {
+  margin: 18px var(--rail) 0;
+}
+
+/* ── 390px: aynı ızgara tek sütuna iniyor, HİÇBİR ŞEY silinmiyor ──── */
+/*
+ * Eski `@media (max-width: 900px) { .auth-aside { display: none } }` kuralı
+ * KALDIRILDI. O kuralın gerekçesi ("giriş yapmak ikna olmaktan önce gelir")
+ * SIRA hakkındaydı ve doğruydu — ama kanıt sütunu o zaman GENİŞLİK için
+ * yarışıyordu ve gizlemek forma yer açmanın tek yoluydu.
+ *
+ * Tek sütunda kanıt hiçbir şeyle yarışmıyor: kart hâlâ tam genişlikte, hâlâ
+ * katlamanın üstünde, DOM'da hâlâ ilk, e-posta hâlâ `autoFocus`lu. Karşılığında
+ * üç şey kazanılıyor: ilk kez gelen kişi — sohbet botu olmadığını en çok
+ * görmesi gereken kişi — canlı analizi telefonda da görüyor; kendi ölçülmüş
+ * doğruluğunu yayımlayan bir ürün o sayıları en çok ziyaret alan cihazda
+ * silmiyor; ve `Proof` çıktısı bir medya sorgusuyla çöpe gidecek bir
+ * veritabanı turunu artık atmıyor.
+ */
+@media (max-width: 860px) {
+  .auth-stage {
+    grid-template-columns:
+      [bleed-start] var(--rail)
+      [rail-start lane-start] minmax(0, 1fr)
+      [lane-end] var(--rail) [bleed-end];
+    grid-template-rows: auto 0 auto auto auto auto;
+  }
+  .auth-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .auth-note {
+    text-align: left;
+    max-width: none;
+  }
+
+  .auth-stage > .auth-card {
+    grid-column: rail-start / lane-end;
+    grid-row: 2 / 4;
+    /* Telefonda levha ekranı dolduruyor; ağır bir yükseklik kipli pencere
+       gibi okunuyor. */
+    box-shadow: var(--e1), var(--edge);
+  }
+  .auth-stage > .sample-read {
+    grid-column: rail-start / lane-end;
+    grid-row: 4;
+    padding-block: 22px;
+  }
+  .auth-stage > .sample-findings {
+    grid-column: rail-start / lane-end;
+    grid-row: 5;
+  }
+  .auth-stage > .auth-plate {
+    grid-row: 4 / 6;
+  }
+  .auth-stage > .proof {
+    grid-row: 6;
+  }
+
+  .auth-stage .proof-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .auth-stage .proof-cell {
+    padding: 15px 16px;
+  }
+  .auth-stage .proof-cell:nth-child(odd) {
+    padding-left: var(--rail);
+  }
+  .auth-stage .proof-cell:nth-child(even) {
+    padding-right: var(--rail);
+  }
+  .auth-stage .proof-bands .meters {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+}
 
 /* ── kayıt satırı — geçmiş, pano ve kayıt detayı aynı satırı kullanıyor ────────────────────────────────────────────────── */
 .entry-row {
@@ -2178,15 +2452,6 @@ textarea:focus-visible,
    üretti" demek. Anlam taşıyan tek jetonu efekt malzemesine çevirmek, onu her
    yerde zayıflatır. */
 
-/*
- * Giriş ekranı, gelmek için bir sebebi olan bir ekran: kimse burada gösteri
- * izlemeye gelmedi. Sağ sütunun tamamı yarı sürede koşuyor.
- */
-.auth-aside {
-  --t-lead: 480ms;
-  --t-step: 150ms;
-}
-
 
 /* ═══════════════════════════════════════════════════════════════
    HAREKET
@@ -2196,11 +2461,6 @@ textarea:focus-visible,
    inmezse, gözlemci çalışmazsa, kullanıcı hareketi kapatmışsa — sayfa
    eksiksiz. Hiçbir bilgi yalnızca harekete emanet edilmiyor.
    ═══════════════════════════════════════════════════════════════ */
-
-.play-stack {
-  display: grid;
-  gap: 18px; /* .auth-aside-inner'ın kendi boşluğuyla aynı */
-}
 
 @keyframes fade-rise {
   from {
@@ -2235,7 +2495,8 @@ textarea:focus-visible,
   );
   background-repeat: no-repeat;
   background-size: 0% 100%;
-  animation: read-head var(--t-lead) cubic-bezier(0.45, 0, 0.3, 1) both;
+  animation: read-head var(--t-lead) cubic-bezier(0.45, 0, 0.3, 1) both
+    var(--t-enter, 0ms);
 }
 @keyframes read-head {
   0% {
@@ -2257,7 +2518,9 @@ textarea:focus-visible,
 /* ── hata aralıkları tek tek işaretleniyor ────────────────────────── */
 [data-play="1"] .sample-mark {
   animation: span-scan 520ms var(--ease-out) both;
-  animation-delay: calc(var(--t-lead) + var(--i) * var(--t-step));
+  animation-delay: calc(
+    var(--t-enter, 0ms) + var(--t-lead) + var(--i) * var(--t-step)
+  );
 }
 @keyframes span-scan {
   0% {
@@ -2279,7 +2542,9 @@ textarea:focus-visible,
 }
 [data-play="1"] .sample-mark sup {
   animation: sup-pop 200ms var(--ease-out) both;
-  animation-delay: calc(var(--t-lead) + var(--i) * var(--t-step) + 380ms);
+  animation-delay: calc(
+    var(--t-enter, 0ms) + var(--t-lead) + var(--i) * var(--t-step) + 380ms
+  );
 }
 @keyframes sup-pop {
   from {
@@ -2295,7 +2560,9 @@ textarea:focus-visible,
 /* Sayı, hak edildikten SONRA: bütün aralıklar işaretlenmeden "5 bulgu" yazmıyor. */
 [data-play="1"] .sample-count {
   animation: fade-rise 260ms var(--ease-out) both;
-  animation-delay: calc(var(--t-lead) + var(--n) * var(--t-step));
+  animation-delay: calc(
+    var(--t-enter, 0ms) + var(--t-lead) + var(--n) * var(--t-step)
+  );
 }
 /*
  * Kartlar bütün aralıkların işaretlenmesini BEKLEMİYOR; okuma kafası biter
@@ -2308,7 +2575,9 @@ textarea:focus-visible,
  */
 [data-play="1"] .sample-finding {
   animation: fade-rise 380ms var(--ease-out) both;
-  animation-delay: calc(var(--t-lead) + 320ms + var(--i) * 160ms);
+  animation-delay: calc(
+    var(--t-enter, 0ms) + var(--t-lead) + 320ms + var(--i) * 160ms
+  );
 }
 
 /* Zorlanmış renklerde arka plan yıkaması tamamen düşüyor — bulgu yalnızca
@@ -2339,7 +2608,7 @@ textarea:focus-visible,
 }
 [data-play="1"] .proof-fill {
   animation: fill-to 760ms var(--ease-out) both;
-  animation-delay: calc(var(--i) * 140ms);
+  animation-delay: calc(var(--t-enter, 0ms) + var(--i) * 140ms);
 }
 @keyframes fill-to {
   from {
@@ -2351,11 +2620,11 @@ textarea:focus-visible,
 }
 [data-play="1"] .proof-value {
   animation: fade-rise 420ms var(--ease-out) both;
-  animation-delay: calc(var(--i) * 140ms + 300ms);
+  animation-delay: calc(var(--t-enter, 0ms) + var(--i) * 140ms + 300ms);
 }
 /* Zayıf yer cümlesi en sona, tek başına: iyi sayıların arasında kaybolmasın. */
 [data-play="1"] .proof-weak {
-  animation: weak-in 520ms var(--ease-out) both 1200ms;
+  animation: weak-in 520ms var(--ease-out) both calc(var(--t-enter, 0ms) + 1200ms);
 }
 @keyframes weak-in {
   from {
@@ -2368,7 +2637,19 @@ textarea:focus-visible,
   }
 }
 [data-play="1"] .proof-source {
-  animation: fade-rise 320ms var(--ease-out) both 1600ms;
+  animation: fade-rise 320ms var(--ease-out) both calc(var(--t-enter, 0ms) + 1600ms);
+}
+
+.proof-bands {
+  margin-top: 20px;
+}
+.proof-bands-cap {
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
 }
 
 /* ── beş katman sırayla yanıyor ───────────────────────────────────── */
@@ -2685,4 +2966,41 @@ textarea:focus-visible,
     letter-spacing: 0.06em;
     gap: 8px;
   }
+}
+
+
+/* ── giriş levhası ────────────────────────────────────────────────── */
+/*
+ * Giriş dizisi YAPIYI çiziyor, METNİ değil. Bu sayfada tek bir harf bile
+ * gizlenmiyor. Karta hiçbir oynatma kuralı YAZILMIYOR: insanın buraya geldiği
+ * tek şey asla belirmez, ilk kareden itibaren oradadır.
+ */
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: none;
+  }
+}
+[data-play="1"] .auth-plate::before {
+  animation: rule-draw 680ms var(--ease-out) both;
+}
+
+/*
+ * Sıra ANLAM taşıyor: önce cümle okunuyor, sonra doğruluk bildiriliyor.
+ * Eskiden ikisi aynı anda başlıyordu — aynı anda oynayan iki şey iki ayrı şey
+ * gibi okunuyor, sırayla oynayınca iki aşamalı tek süreç oluyor.
+ *
+ * 861px altında kapalı: orada şerit katlamanın altında ve kaydırarak gelinen
+ * bir şeye yapay bekleme eklemek bozuk hissettiriyor.
+ */
+@media (min-width: 861px) {
+  .auth-stage > .proof {
+    --t-enter: calc(var(--t-lead) + 240ms);
+  }
+}
+[data-play="1"] .proof-bands .meter-fill {
+  animation: fill-to 620ms var(--ease-out) both;
+  animation-delay: calc(var(--t-enter, 0ms) + 560ms + var(--i) * 90ms);
 }

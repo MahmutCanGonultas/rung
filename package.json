@@ -27,7 +27,9 @@
     "seed": "node --env-file=.env.local scripts/seed.mjs",
     "seed:gold": "node --env-file=.env.local scripts/seed-gold.mjs",
     "eval": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file=.env.local scripts/eval.mjs",
-    "gold:from-feedback": "node --env-file=.env.local scripts/feedback-to-gold.mjs"
+    "gold:from-feedback": "node --env-file=.env.local scripts/feedback-to-gold.mjs",
+    "shots": "node --env-file=.env.local scripts/shots.mjs",
+    "shots:auth": "node scripts/auth-shots.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",

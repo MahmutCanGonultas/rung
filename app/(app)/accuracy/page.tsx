@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { pct } from "../../lib/eval/format";
 import { requireUser } from "../../lib/guard";
 import {
   objectionCount,
@@ -17,7 +18,6 @@ export const metadata: Metadata = { title: "Doğruluk · Rung" };
  * yanlış alarm ilk kutuda ve vurgulu.
  */
 
-const pct = (x: number) => `%${(x * 100).toFixed(1)}`;
 
 const STAMP = new Intl.DateTimeFormat("tr-TR", {
   day: "numeric",

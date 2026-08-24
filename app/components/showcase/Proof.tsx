@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 
+import { pct } from "../../lib/eval/format";
 import { recentRuns } from "../../lib/eval/runs";
 
 /*
@@ -13,9 +14,10 @@ import { recentRuns } from "../../lib/eval/runs";
  * göstermemek doğru.
  */
 
-const pct = (x: number) => `%${(x * 100).toFixed(1).replace(".", ",")}`;
-
-export async function Proof({ compact = false }: { compact?: boolean } = {}) {
+export async function Proof({
+  compact = false,
+  bands = false,
+}: { compact?: boolean; bands?: boolean } = {}) {
   let run;
   try {
     [run] = await recentRuns(1);
@@ -87,6 +89,48 @@ export async function Proof({ compact = false }: { compact?: boolean } = {}) {
           <span className="proof-note">altın kümeden</span>
         </div>
       </div>
+
+      {bands && run.levels.length > 0 ? (
+        /*
+         * Bant başına yakalama — logonun kendisi, ölçülmüş sayılarla.
+         *
+         * `Mark.tsx` beş yükselen basamak çiziyor: A1, A2, B1, B2, C1. Burada
+         * o beş basamağın boyu SABİT DEĞİL, her biri o seviyede ÖLÇÜLEN
+         * yakalama. C1 kısa çıkıyorsa sebebi tasarım değil, son koşum — ve
+         * zayıf yer bir cümlenin içine değil, sıradaki tek kısa çubuğa
+         * yazılıyor.
+         *
+         * Çizim takımı ödünç DEĞİL: `.meter-*` zaten Doğruluk ekranında tam
+         * olarak bu niceliği çiziyor. Aynı şey için ikinci bir çubuk dili
+         * yazılmıyor — stil sayfasında hâlihazırda dört tane var.
+         */
+        <div className="proof-bands">
+          <p className="proof-bands-cap">Bant başına yakalama</p>
+          <div className="meters">
+            {run.levels.map((level, i) => {
+              const missing = level.recall < 0.9;
+              return (
+                <div
+                  key={level.level}
+                  className="meter-row"
+                  style={{ "--i": String(i) } as CSSProperties}
+                >
+                  <div className="meter-top">
+                    <span className="meter-name">{level.level}</span>
+                    <span className="meter-val">{pct(level.recall)}</span>
+                  </div>
+                  <span className="meter-track">
+                    <span
+                      className={missing ? "meter-fill warn" : "meter-fill"}
+                      style={{ width: `${Math.round(level.recall * 100)}%` }}
+                    />
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
 
       {/*
         Zayıf yeri ön sayfada söylemek bilinçli. Plan §08: "Zayıf yer

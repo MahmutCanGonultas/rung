@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AuthForm } from "../components/AuthForm";
@@ -16,9 +15,10 @@ export default async function LoginPage() {
 
   return (
     <AuthShell
-      title="Giriş yap"
+      mode="login"
+      title="Giriş"
+      titleSoft="yap."
       lede="Kaldığın yerden devam et."
-      alt={<>Hesabın yok mu? <Link href="/register">Hesap oluştur</Link></>}
     >
       <AuthForm
         action={loginAction}
