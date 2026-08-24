@@ -204,10 +204,23 @@ export default async function ProgressPage() {
       {families.length > 0 && !singleMonth ? (
         <>
           <h2 className="section-title">Hata ailesi · ilk ay → bu ay</h2>
+          <p className="section-note">
+            Soluk çubuk nerede başladığın, dolu çubuk bugün. Ölçek dört ailede
+            ortak — çubuklar birbiriyle karşılaştırılabilir.
+          </p>
           <div className="meters">
-            {families.map((f) => {
-              const max = Math.max(f.firstMonth, f.lastMonth, 0.1);
-              return (
+            {(() => {
+              /*
+               * Ölçek BÜTÜN satırlar için ortak. Her satırı kendi maksimumuna
+               * göre çizmek görsel bir yalan üretiyordu: aynı değerde biten iki
+               * aile farklı uzunlukta çubuk alıyor, okuyan birini daha kötü
+               * sanıyordu.
+               */
+              const scale = Math.max(
+                ...families.flatMap((f) => [f.firstMonth, f.lastMonth]),
+                0.1
+              );
+              return families.map((f) => (
                 <div key={f.family} className="meter-row">
                   <div className="meter-top">
                     <span className="meter-name">
@@ -219,14 +232,19 @@ export default async function ProgressPage() {
                     </span>
                   </div>
                   <span className="meter-track">
+                    {/* soluk çubuk = başlangıç, dolu çubuk = bugün */}
+                    <span
+                      className="meter-was"
+                      style={{ width: `${(f.firstMonth / scale) * 100}%` }}
+                    />
                     <span
                       className={f.stuck ? "meter-fill warn" : "meter-fill"}
-                      style={{ width: `${(f.lastMonth / max) * 100}%` }}
+                      style={{ width: `${(f.lastMonth / scale) * 100}%` }}
                     />
                   </span>
                 </div>
-              );
-            })}
+              ));
+            })()}
           </div>
         </>
       ) : null}
@@ -235,15 +253,20 @@ export default async function ProgressPage() {
         <>
           <h2 className="section-title">İnatçı kategoriler</h2>
           <p className="section-note">
-            En çok tekrar eden hatalar. Bir sonraki tekrar seti buradan
-            üretilecek.
+            {stubborn.some((s) => s.recent > 0)
+              ? "Hâlâ tekrar eden hatalar, son 30 güne göre sıralı. Bir sonraki tekrar seti buradan üretilecek."
+              : "Son 30 günde hiçbiri tekrarlamadı. Aşağıdakiler geçmişteki toplam — çalışılacak taze bir şey yok."}
           </p>
           <div className="stubborn">
             {stubborn.map((s) => (
               <div key={s.subcategory} className="stubborn-row">
                 <span className="cat">
                   {s.label}
-                  <span>son 30 günde {s.recent} kez</span>
+                  <span>
+                    {s.recent > 0
+                      ? `son 30 günde ${s.recent} kez`
+                      : "son 30 günde tekrarlamadı"}
+                  </span>
                 </span>
                 <span className="n">
                   <b>{s.total}</b>toplam

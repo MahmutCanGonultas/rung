@@ -21,6 +21,10 @@ export type EntrySummary = {
   contextName: string;
   contextSlug: string;
   taskPrompt: string | null;
+  /** Doğrulanmış bulgu sayısı. Analiz yapılmamışsa null. */
+  findings: number | null;
+  /** 100 kelimede bulgu — listede tek karşılaştırılabilir sayı. */
+  per100: number | null;
 };
 
 export type EntryDetail = EntrySummary & {
@@ -37,9 +41,17 @@ type SummaryRow = {
   context_name: string;
   context_slug: string;
   task_prompt: string | null;
+  analyses: number;
+  findings: number;
 };
 
 function toSummary(row: SummaryRow): EntrySummary {
+  /*
+   * Hiç analiz koşumu yoksa bulgu sayısı 0 değil BİLİNMİYOR. İkisini
+   * karıştırmak, analiz edilmemiş bir kaydı "hatasız" göstermek olurdu.
+   */
+  const analysed = row.analyses > 0;
+
   return {
     id: row.id,
     createdAt: row.created_at,
@@ -47,6 +59,11 @@ function toSummary(row: SummaryRow): EntrySummary {
     contextName: row.context_name,
     contextSlug: row.context_slug,
     taskPrompt: row.task_prompt,
+    findings: analysed ? row.findings : null,
+    per100:
+      analysed && row.word_count > 0
+        ? (row.findings / row.word_count) * 100
+        : null,
   };
 }
 
@@ -100,7 +117,12 @@ export async function listEntries(
            e.word_count,
            c.name         AS context_name,
            c.slug         AS context_slug,
-           t.prompt       AS task_prompt
+           t.prompt       AS task_prompt,
+           (SELECT count(*)::int FROM analyses a
+             WHERE a.entry_id = e.id AND a.status = 'ok') AS analyses,
+           (SELECT count(*)::int FROM findings f
+             WHERE f.entry_id = e.id
+               AND (f.verdict IS NULL OR f.verdict = 'confirmed')) AS findings
     FROM entries e
     JOIN contexts c ON c.id = e.context_id
     LEFT JOIN tasks t ON t.id = e.task_id
@@ -153,7 +175,12 @@ export async function findEntryForUser(
            c.slug      AS context_slug,
            t.prompt    AS task_prompt,
            t.hint      AS task_hint,
-           t.level     AS task_level
+           t.level     AS task_level,
+           (SELECT count(*)::int FROM analyses a
+             WHERE a.entry_id = e.id AND a.status = 'ok') AS analyses,
+           (SELECT count(*)::int FROM findings f
+             WHERE f.entry_id = e.id
+               AND (f.verdict IS NULL OR f.verdict = 'confirmed')) AS findings
     FROM entries e
     JOIN contexts c ON c.id = e.context_id
     LEFT JOIN tasks t ON t.id = e.task_id
@@ -193,7 +220,12 @@ export async function previousAttempts(
            e.word_count,
            c.name     AS context_name,
            c.slug     AS context_slug,
-           t.prompt   AS task_prompt
+           t.prompt   AS task_prompt,
+           (SELECT count(*)::int FROM analyses a
+             WHERE a.entry_id = e.id AND a.status = 'ok') AS analyses,
+           (SELECT count(*)::int FROM findings f
+             WHERE f.entry_id = e.id
+               AND (f.verdict IS NULL OR f.verdict = 'confirmed')) AS findings
     FROM entries e
     JOIN contexts c ON c.id = e.context_id
     JOIN tasks t ON t.id = e.task_id

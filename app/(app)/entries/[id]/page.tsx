@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { EntryRow } from "../../../components/EntryRow";
+
 import { K0Panel } from "../../../components/K0Panel";
 import { K1Panel } from "../../../components/K1Panel";
 import { findingsFor, latestAnalysis } from "../../../lib/analyses";
@@ -56,7 +58,7 @@ export default async function EntryPage({
     : [];
 
   return (
-    <section className="panel">
+    <section className="panel panel-reading">
       <div className="entry-head">
         <span className="chip">{entry.contextName}</span>
         {entry.taskLevel ? <span className="chip">{entry.taskLevel}</span> : null}
@@ -96,19 +98,17 @@ export default async function EntryPage({
         <div className="earlier">
           <h2 className="earlier-title">Aynı görevi daha önce de yazmışsın</h2>
           {earlier.map((e) => (
-            <Link key={e.id} className="entry-row" href={`/entries/${e.id}`}>
-              <span className="day">{DAY.format(e.createdAt)}</span>
-              <span className="name">{e.taskPrompt}</span>
-              <span className="num">{e.wordCount} kelime</span>
-            </Link>
+            <EntryRow key={e.id} entry={e} />
           ))}
         </div>
       ) : null}
 
       <p className="panel-next">
-        Bu metin bir daha değiştirilemez. Yukarıdaki ölçüm <b>modelsiz</b>
-        yapıldı — aynı metin her zaman aynı sonucu verir. Yorum gerektiren
-        hatalar (zaman, ton, eşdizim) model katmanında gelecek.
+        Bu metin bir daha değiştirilemez. Yazım, kural ve seviye ölçümü
+        <b>modelsiz</b> yapılıyor — aynı metin her zaman aynı sonucu verir.
+        Yorum gerektiren hatalar (zaman, ton, eşdizim) model katmanından
+        geçiyor ve <b>ikinci bir kez doğrulanıyor</b>; doğrulamayı geçemeyen
+        bulgu sana hiç gösterilmiyor.
       </p>
 
       <p className="auth-alt">

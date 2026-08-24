@@ -109,33 +109,68 @@ function RunPanel({ run, previous }: { run: EvalRun; previous: EvalRun | null })
         />
       </div>
 
-      <h2 className="section-title">Seviye kırılımlı isabet</h2>
+      <h2 className="section-title">Seviye kırılımı</h2>
       <p className="section-note">
-        Tek ortalama sayı gerçeği gizler — plan §06. Doğruluk seviyeye göre
-        değişiyor, o yüzden kırılımlı.
+        Tek ortalama sayı gerçeği gizler — plan §06. Her seviye iki ayrı
+        şekilde bozulabiliyor: olmayan hatayı göstermek (isabet düşer) ve
+        gerçek hatayı kaçırmak (yakalama düşer). İkisi de ayrı çiziliyor.
       </p>
 
       <div className="meters">
         {run.levels.map((level) => {
-          const weak = level.falseAlarmRate > 0.1;
+          /*
+           * Bir seviye iki ayrı şekilde zayıf olabiliyor ve ikisi aynı şey
+           * değil: çok yanlış alarm (olmayan hatayı gösteriyor) ya da düşük
+           * yakalama (gerçek hatayı kaçırıyor).
+           *
+           * Önceden bayrak sadece yanlış alarma bakıyor, çubuk sadece isabeti
+           * çiziyordu. Sonuç: yakalaması %66.7 olan bir seviye tam yeşil ve
+           * bayraksız görünüyordu — yani bu sayfa tam da gizlememeye söz
+           * verdiği şeyi gizliyordu. İki çubuk da çiziliyor artık.
+           */
+          const noisy = level.falseAlarmRate > 0.1;
+          const missing = level.recall < 0.85;
+          const weak = noisy || missing;
+          const why = noisy && missing
+            ? "yanlış alarm + kaçırma"
+            : noisy
+              ? "yanlış alarm"
+              : "kaçırma";
+
           return (
             <div key={level.level} className="meter-row">
               <div className="meter-top">
                 <span className="meter-name">
                   {level.level}
-                  {weak ? <span className="meter-flag">▲ zayıf</span> : null}
+                  {weak ? <span className="meter-flag">▲ {why}</span> : null}
                 </span>
-                <span className="meter-val">{pct(level.precision)}</span>
+                <span className="meter-sub">{level.items} örnek</span>
               </div>
-              <span className="meter-track">
-                <span
-                  className={weak ? "meter-fill warn" : "meter-fill"}
-                  style={{ width: `${Math.round(level.precision * 100)}%` }}
-                />
-              </span>
+
+              <div className="pair">
+                <span className="pair-key">isabet</span>
+                <span className="meter-track">
+                  <span
+                    className={noisy ? "meter-fill warn" : "meter-fill"}
+                    style={{ width: `${Math.round(level.precision * 100)}%` }}
+                  />
+                </span>
+                <span className="pair-val">{pct(level.precision)}</span>
+              </div>
+
+              <div className="pair">
+                <span className="pair-key">yakalama</span>
+                <span className="meter-track">
+                  <span
+                    className={missing ? "meter-fill warn" : "meter-fill"}
+                    style={{ width: `${Math.round(level.recall * 100)}%` }}
+                  />
+                </span>
+                <span className="pair-val">{pct(level.recall)}</span>
+              </div>
+
               <div className="meter-sub">
-                {level.items} örnek · yakalama {pct(level.recall)} · yanlış alarm{" "}
-                {pct(level.falseAlarmRate)}
+                yanlış alarm {pct(level.falseAlarmRate)}
               </div>
             </div>
           );
@@ -196,8 +231,11 @@ export default async function AccuracyPage() {
             İki sürümü karşılaştırmak, ikisinin de kayıtlı olmasını gerektiriyor.
             Model, prompt sürümü ve çaba her satırda yazıyor — biri eksikse
             &quot;daha iyi&quot; cümlesi neyin daha iyi olduğunu söylemiyor.
+            Taklit modelle yapılan duman testleri bu listede yok: onlar ölçüm
+            değil, ölçüm aracının kendi kontrolü.
           </p>
-          <table className="runs">
+          <div className="table-scroll">
+            <table className="runs">
             <thead>
               <tr>
                 <th>tarih</th>
@@ -222,7 +260,8 @@ export default async function AccuracyPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         </>
       ) : null}
 

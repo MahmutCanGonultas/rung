@@ -61,12 +61,24 @@ function rates(row: {
   };
 }
 
+/*
+ * Son koşumlar — sahte model koşumları HARİÇ.
+ *
+ * `--fake` koşumu ölçüm değil, ölçüm aracının kendi duman testi: sabit bir
+ * yanıt döndüren bir taklit model kullanıyor. Sayfa en son koşumu manşete
+ * koyduğu için filtre şart — biri bir kez `--fake` koşsa, ürünün ilan edilen
+ * doğruluğu taklit modelin sayılarına dönüşürdü.
+ *
+ * Ekran bu ayıklamayı yazıyla söylüyor; sessizce satır gizlemek bu sayfanın
+ * bütün iddiasını çürütürdü.
+ */
 export async function recentRuns(limit = 5): Promise<EvalRun[]> {
   const runs = (await db()`
     SELECT id::text AS id, model_id, prompt_version, effort, layers,
            items, expected, found, true_positive, false_positive,
            false_negative, cost_usd, duration_ms, note, created_at
     FROM eval_runs
+    WHERE model_id NOT LIKE 'fake-%'
     ORDER BY created_at DESC
     LIMIT ${limit}
   `) as Array<{

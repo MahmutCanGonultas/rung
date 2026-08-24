@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { EntryRow } from "../../components/EntryRow";
 import { listContexts } from "../../lib/content";
 import { countEntries, listEntries, type EntrySummary } from "../../lib/entries";
 import { requireUser } from "../../lib/guard";
@@ -10,12 +11,6 @@ export const metadata: Metadata = { title: "Geçmiş · Rung" };
 const MONTH = new Intl.DateTimeFormat("tr-TR", {
   month: "long",
   year: "numeric",
-  timeZone: "Europe/Istanbul",
-});
-
-const DAY = new Intl.DateTimeFormat("tr-TR", {
-  day: "2-digit",
-  month: "short",
   timeZone: "Europe/Istanbul",
 });
 
@@ -123,21 +118,14 @@ export default async function HistoryPage({
         groups.map((group) => (
           <div key={group.label}>
             <div className="month">
-              <span>{group.label}</span>
-              <span>{group.entries.length} kayıt</span>
+              <span>
+                {group.label} · {group.entries.length} kayıt
+              </span>
+              <span>100 kelimede bulgu</span>
             </div>
 
             {group.entries.map((entry) => (
-              <Link
-                key={entry.id}
-                className="entry-row"
-                href={`/entries/${entry.id}`}
-              >
-                <span className="day">{DAY.format(entry.createdAt)}</span>
-                <span className="name">{entry.taskPrompt ?? "Serbest yazı"}</span>
-                <span className="chip">{entry.contextName}</span>
-                <span className="num">{entry.wordCount} kelime</span>
-              </Link>
+              <EntryRow key={entry.id} entry={entry} />
             ))}
           </div>
         ))

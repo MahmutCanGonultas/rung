@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { EntryRow } from "../../components/EntryRow";
 import { countEntries, listEntries } from "../../lib/entries";
 import { requireUser } from "../../lib/guard";
 import { latestEstimate } from "../../lib/k3/store";
@@ -100,23 +101,18 @@ export default async function DashboardPage() {
       {recent.length > 0 ? (
         <>
           <div className="month">
-            <span>Son kayıtlar</span>
-            <span>{recent.length} tane</span>
+            <span>Son kayıtlar · {recent.length} tane</span>
+            <span>100 kelimede bulgu</span>
           </div>
           {recent.map((entry) => (
-            <Link key={entry.id} className="entry-row" href={`/entries/${entry.id}`}>
-              <span className="day">{DAY.format(entry.createdAt)}</span>
-              <span className="name">{entry.taskPrompt ?? "Serbest yazı"}</span>
-              <span className="chip">{entry.contextName}</span>
-              <span className="num">{entry.wordCount} kelime</span>
-            </Link>
+            <EntryRow key={entry.id} entry={entry} />
           ))}
         </>
       ) : null}
 
       <p className="panel-next">
-        Sıradaki aşama: yazdığın metni model kullanmadan ölçen deterministik
-        katman — yazım, kurallar, kelime seviyesi, cümle karmaşıklığı.
+        Listedeki sayı <b>100 kelimede bulgu</b> — uzun ve kısa metinleri
+        karşılaştırılabilir yapan tek ölçü. Küçülmesi iyiye gidiş demek.
       </p>
     </section>
   );

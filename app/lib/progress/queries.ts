@@ -143,7 +143,17 @@ export type StubbornCategory = {
   recent: number;
 };
 
-/** Hangi alt kategori azalmıyor — bir sonraki tekrar setinin kaynağı. */
+/*
+ * Hangi alt kategori HÂLÂ tekrar ediyor — bir sonraki tekrar setinin kaynağı.
+ *
+ * Sıralama önce son 30 güne bakıyor, sonra toplama. Sadece toplama bakmak
+ * yanlış cevap veriyordu: aylar önce çözülmüş bir kategori, bir daha hiç
+ * tekrarlamasa bile listenin başında kalıyordu — yani ekran "bunu çalış"
+ * derken kullanıcının çoktan bitirdiği şeyi gösteriyordu.
+ *
+ * `recent = 0` olan satırlar dışarıda bırakılmıyor: çağıran taraf ikisini de
+ * görüp neyi göstereceğine karar veriyor.
+ */
 export async function stubbornCategories(
   userId: string,
   limit = 6
@@ -159,7 +169,10 @@ export async function stubbornCategories(
     WHERE e.user_id = ${userId}
       AND (f.verdict IS NULL OR f.verdict = 'confirmed')
     GROUP BY f.subcategory
-    ORDER BY count(*) DESC
+    ORDER BY count(*) FILTER (
+             WHERE e.created_at > now() - interval '30 days'
+           ) DESC,
+           count(*) DESC
     LIMIT ${limit}
   `) as Array<{ subcategory: Subcategory; total: number; recent: number }>;
 

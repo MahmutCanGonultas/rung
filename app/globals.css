@@ -23,6 +23,7 @@
   --accent: #0e9b6c;
   --model: #5b4bd6;
   --error: #8f2418;
+  --suspect: #6b7680;
 
   --accent-wash: rgba(14, 155, 108, 0.1);
   --error-wash: rgba(143, 36, 24, 0.06);
@@ -60,6 +61,7 @@
   --accent: #35d39b;
   --model: #9a8cf5;
   --error: #f2764a;
+  --suspect: #5f6b74;
 
   --accent-wash: rgba(53, 211, 155, 0.11);
   --error-wash: rgba(242, 118, 74, 0.1);
@@ -87,6 +89,7 @@
     --accent: #35d39b;
     --model: #9a8cf5;
     --error: #f2764a;
+  --suspect: #5f6b74;
 
     --accent-wash: rgba(53, 211, 155, 0.11);
     --error-wash: rgba(242, 118, 74, 0.1);
@@ -180,37 +183,6 @@ h3 {
   filter: saturate(0.5);
 }
 
-/* ── giriş / kayıt ────────────────────────────────────────────── */
-.auth {
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 32px 22px;
-}
-.auth-card {
-  width: 100%;
-  max-width: 400px;
-  background: var(--surface);
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-md);
-  box-shadow: var(--shadow);
-  padding: 32px 30px 28px;
-}
-.auth-title {
-  font-size: 26px;
-}
-.auth-lede {
-  color: var(--ink-2);
-  font-size: 14px;
-  margin: 10px 0 24px;
-}
-.auth-alt {
-  margin: 20px 0 0;
-  font-size: 13.5px;
-  color: var(--ink-3);
-  text-align: center;
-}
-
 .form {
   display: grid;
   gap: 16px;
@@ -256,8 +228,13 @@ h3 {
 }
 
 /* ── uygulama kabuğu ──────────────────────────────────────────── */
+/*
+ * Kabuk genişledi (880 → 1060). Metin okunabilirliği kaybolmasın diye ölçü
+ * bloklarda tutuluyor: `max-width: 62–66ch` olan paragraflar zaten dar
+ * kalıyor, ama tablolar, ızgaralar ve grafikler artık boşa gitmiyor.
+ */
 .shell {
-  max-width: 880px;
+  max-width: 1060px;
   margin: 0 auto;
   padding: 28px 22px 80px;
 }
@@ -273,8 +250,48 @@ h3 {
   font-family: var(--mono);
   font-size: 11.5px;
   color: var(--ink-3);
+  /* Uzun e-posta çubuğu taşırmasın. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/*
+ * Dar ekranda üst çubuk iki satıra iniyor: üstte marka ve çıkış, altta
+ * sekmeler. E-posta gizleniyor — kim olduğunu zaten biliyor, ve tek satıra
+ * sığdırmaya çalışmak sekmeleri eziyordu.
+ */
+@media (max-width: 640px) {
+  .shell-bar {
+    flex-wrap: wrap;
+    gap: 10px 12px;
+  }
+  .shell-user {
+    display: none;
+  }
+  .shell-bar form {
+    margin-left: auto;
+  }
+  .shell-nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    /* Kaydırma çubuğu görünmesin ama parmakla kaydırılabilsin. */
+    scrollbar-width: none;
+  }
+  .shell-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .nav-link {
+    white-space: nowrap;
+  }
+}
+
+/* Yazma ve okuma ekranlarında satır uzunluğu rahat kalsın. */
+.panel-reading {
+  max-width: 780px;
+}
 .panel {
   margin-top: 30px;
   background: var(--surface);
@@ -316,46 +333,6 @@ h3 {
   margin: 5px 0 0;
   font-size: 15.5px;
   color: var(--ink);
-}
-
-/* ── anasayfa ─────────────────────────────────────────────────── */
-.home {
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 40px 22px;
-}
-.home-inner {
-  width: 100%;
-  max-width: 520px;
-}
-.home h1 {
-  font-size: 44px;
-  letter-spacing: -0.04em;
-}
-.home h1 i {
-  color: var(--accent);
-  font-style: normal;
-}
-.home-lede {
-  color: var(--ink-2);
-  font-size: 16.5px;
-  margin: 18px 0 30px;
-  max-width: 46ch;
-}
-.home-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.home-actions .btn-primary {
-  width: auto;
-  padding: 11px 22px;
-}
-.home-note {
-  margin: 34px 0 0;
-  font-size: 13px;
-  color: var(--ink-3);
 }
 
 /* ── uygulama gezinme ─────────────────────────────────────────────── */
@@ -563,53 +540,6 @@ a.chip:hover {
   text-transform: uppercase;
   color: var(--ink-3);
 }
-.entry-row {
-  display: grid;
-  grid-template-columns: 62px minmax(0, 1fr) auto auto;
-  gap: 14px;
-  align-items: center;
-  padding: 13px 10px;
-  margin: 0 -10px;
-  border-radius: var(--r-sm);
-  text-decoration: none;
-  color: inherit;
-}
-.entry-row:hover {
-  background: var(--surface-2);
-}
-.entry-row + .entry-row {
-  border-top: 1px solid var(--hairline);
-}
-.entry-row .day {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink-3);
-}
-.entry-row .name {
-  font-size: 14.5px;
-  color: var(--ink);
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.entry-row .num {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink-3);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-@media (max-width: 720px) {
-  .entry-row {
-    grid-template-columns: 56px minmax(0, 1fr);
-  }
-  .entry-row .chip,
-  .entry-row .num {
-    display: none;
-  }
-}
-
 /* ── tek kayıt ────────────────────────────────────────────────────── */
 .entry-head {
   display: flex;
@@ -820,6 +750,11 @@ a.chip:hover {
   font-size: 15.5px;
   line-height: 1.5;
   margin-bottom: 7px;
+  /*
+   * Uzun İngilizce ifadeler dar ekranda kutuyu taşırıyordu. Kelime
+   * ortasından kırmak son çare — ama taşan bir kutudan iyi.
+   */
+  overflow-wrap: anywhere;
 }
 .finding-fix .was {
   color: var(--error);
@@ -1082,13 +1017,23 @@ a.chip:hover {
 }
 .meter-track {
   display: block;
+  position: relative;
   height: 8px;
   border-radius: 4px;
   background: var(--surface-3);
   overflow: hidden;
 }
+/* Nerede başladığı — soluk iz. Üstüne bugünkü değer biniyor. */
+.meter-was {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 4px;
+  background: var(--ink-3);
+  opacity: 0.45;
+}
 .meter-fill {
   display: block;
+  position: relative;
   height: 100%;
   border-radius: 4px;
   background: var(--accent);
@@ -1101,8 +1046,17 @@ a.chip:hover {
   color: var(--ink-3);
 }
 
+/*
+ * Geniş tablo sayfayı yatayda kaydırmasın: kendi kutusunun içinde kaysın.
+ * Sayfanın gövdesi asla yatay kaymamalı.
+ */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .runs {
   width: 100%;
+  min-width: 520px;
   border-collapse: collapse;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
@@ -1382,5 +1336,595 @@ textarea:focus-visible,
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   VİTRİN — anasayfa, giriş, kayıt
+   Renkler yalnızca yukarıdaki doğrulanmış jetonlardan; yeni renk yok.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── ortak parçalar ───────────────────────────────────────────────── */
+.btn-lg {
+  font-size: 15px;
+  padding: 13px 24px;
+}
+.btn-primary.btn-lg {
+  width: auto;
+}
+
+/* ── canlı örnek analiz ───────────────────────────────────────────── */
+.sample {
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+.sample-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--surface-2);
+}
+.sample-tag,
+.sample-count {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.sample-text {
+  margin: 0;
+  padding: 24px 22px 22px;
+  font-size: 17px;
+  line-height: 2;
+  color: var(--ink);
+}
+.sample-mark {
+  background: var(--error-wash);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 2px;
+  text-decoration: underline wavy var(--error);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+}
+.sample-mark sup {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--error);
+  margin-left: 2px;
+  text-decoration: none;
+}
+.sample-findings {
+  display: grid;
+  gap: 1px;
+  background: var(--hairline);
+  border-top: 1px solid var(--hairline);
+}
+.sample-finding {
+  background: var(--surface);
+  padding: 15px 22px;
+}
+.sample-kind {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+.sample-no {
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 4px;
+  border: 1px solid var(--error-line);
+  color: var(--error);
+  font-size: 10px;
+  flex: none;
+}
+.sample-fix {
+  font-size: 15.5px;
+  line-height: 1.5;
+  margin-bottom: 6px;
+  overflow-wrap: anywhere;
+}
+.sample-fix .was {
+  color: var(--error);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.sample-fix .arrow {
+  color: var(--ink-3);
+  margin: 0 8px;
+}
+.sample-fix .now {
+  color: var(--accent);
+  font-weight: 620;
+}
+.sample-why {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin: 0;
+  max-width: 62ch;
+}
+.sample-more {
+  background: var(--surface);
+  margin: 0;
+  padding: 12px 22px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+/* ── beş katmanlı hat ─────────────────────────────────────────────── */
+.pipe {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.pipe-cell {
+  background: var(--surface);
+  padding: 16px 16px 14px;
+  display: grid;
+  gap: 5px;
+  align-content: start;
+}
+.pipe-cell.is-ai {
+  background: color-mix(in srgb, var(--model) 7%, var(--surface));
+}
+.pipe-code {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+}
+.pipe-name {
+  font-size: 13.5px;
+  font-weight: 620;
+  color: var(--ink);
+  line-height: 1.25;
+}
+.pipe-what {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  line-height: 1.45;
+}
+.pipe-tag {
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.pipe-cell.is-ai .pipe-tag {
+  color: var(--model);
+}
+@media (max-width: 820px) {
+  .pipe {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .pipe {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── ölçülen doğruluk ─────────────────────────────────────────────── */
+.proof-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.proof-cell {
+  background: var(--surface);
+  padding: 17px 18px 15px;
+  display: grid;
+  gap: 7px;
+  align-content: start;
+}
+.proof-cell.is-lead {
+  background: var(--accent-wash);
+}
+.proof-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.proof-value {
+  font-size: 29px;
+  font-weight: 660;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.proof-cell.is-lead .proof-value {
+  color: var(--accent);
+}
+.proof-note {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+.proof-weak {
+  margin: 14px 0 0;
+  padding-left: 13px;
+  border-left: 2px solid var(--error);
+  font-size: 13px;
+  color: var(--ink-2);
+  max-width: 66ch;
+}
+.proof-weak b {
+  color: var(--ink);
+}
+.proof-source {
+  margin: 12px 0 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+/* ── anasayfa ─────────────────────────────────────────────────────── */
+.land {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 24px 90px;
+}
+.land-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0;
+}
+.land-nav {
+  display: flex;
+  gap: 8px;
+}
+.land-nav .btn {
+  white-space: nowrap;
+}
+.hero {
+  padding: 70px 0 64px;
+}
+.hero-kicker {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 20px;
+}
+.hero-title {
+  font-size: clamp(40px, 7vw, 68px);
+  line-height: 1.03;
+  letter-spacing: -0.045em;
+  font-weight: 680;
+  margin: 0;
+}
+.hero-em {
+  color: var(--accent);
+}
+.hero-lede {
+  font-size: 17.5px;
+  line-height: 1.65;
+  color: var(--ink-2);
+  max-width: 54ch;
+  margin: 26px 0 32px;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.hero-note {
+  margin: 18px 0 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.land-section {
+  padding: 44px 0 0;
+}
+.land-h {
+  font-size: 25px;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+.land-sub {
+  font-size: 14.5px;
+  color: var(--ink-3);
+  margin: 10px 0 22px;
+  max-width: 64ch;
+  line-height: 1.6;
+}
+.land-cta {
+  margin-top: 64px;
+  padding: 40px 34px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.land-cta .land-sub {
+  margin-bottom: 26px;
+}
+.land-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 56px;
+  padding-top: 22px;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.land-foot i {
+  color: var(--accent);
+  font-style: normal;
+}
+
+/* ── giriş / kayıt · iki sütun ────────────────────────────────────── */
+.auth-split {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+}
+.auth-pane {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 42px;
+  gap: 28px;
+}
+.auth-mark {
+  font-size: 20px;
+  text-decoration: none;
+}
+.auth-box {
+  width: 100%;
+  max-width: 380px;
+}
+.auth-title {
+  font-size: 28px;
+  letter-spacing: -0.03em;
+}
+.auth-lede {
+  color: var(--ink-2);
+  font-size: 14.5px;
+  margin: 10px 0 26px;
+}
+.auth-alt {
+  margin: 22px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+.auth-foot {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.auth-aside {
+  background: var(--surface-2);
+  border-left: 1px solid var(--hairline);
+  display: flex;
+  align-items: center;
+  padding: 44px 42px;
+  /*
+   * Kısa ekranda içerik taşabiliyor. Gizlemek yerine kaydırılabilir
+   * bırakıyoruz — kanıtın yarısını kesmektense, isteyen aşağı insin.
+   */
+  overflow-y: auto;
+}
+.auth-aside-inner {
+  width: 100%;
+  max-width: 460px;
+  display: grid;
+  gap: 18px;
+}
+/*
+ * Kenar sütunu dar: dört kutu 3+1 diye kırılıyordu ve son satırda boşluk
+ * kalıyordu. Burada her zaman 2×2.
+ */
+.auth-aside .proof-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.auth-aside .proof-value {
+  font-size: 24px;
+}
+.auth-aside .sample-text {
+  font-size: 15px;
+  line-height: 1.85;
+  padding: 18px 18px 16px;
+}
+.auth-aside .sample-finding {
+  padding: 13px 18px;
+}
+.auth-aside .sample-why {
+  font-size: 12.5px;
+}
+.auth-aside-kicker {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0;
+}
+.auth-aside-lede {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 0;
+  max-width: 42ch;
+}
+
+/* Dar ekranda kanıt sütunu gizleniyor: giriş yapmak ikna olmaktan önce gelir. */
+@media (max-width: 900px) {
+  .auth-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .auth-aside {
+    display: none;
+  }
+  .auth-pane {
+    align-items: center;
+    padding: 36px 24px;
+  }
+  .auth-box,
+  .auth-mark,
+  .auth-foot {
+    max-width: 380px;
+    width: 100%;
+  }
+}
+
+
+/* ── kayıt satırı — geçmiş, pano ve kayıt detayı aynı satırı kullanıyor ────────────────────────────────────────────────── */
+.entry-row {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 13px 12px;
+  margin: 0 -12px;
+  border-radius: var(--r-sm);
+  text-decoration: none;
+  color: inherit;
+}
+.entry-row:hover {
+  background: var(--surface-2);
+}
+.row + .entry-row {
+  border-top: 1px solid var(--hairline);
+}
+.entry-day {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.entry-main {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.entry-name {
+  font-size: 14.5px;
+  font-weight: 550;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.entry-meta {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+.entry-dens {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+.entry-bar {
+  display: block;
+  width: 84px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--surface-3);
+  overflow: hidden;
+  flex: none;
+}
+.entry-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--suspect, var(--ink-3));
+  min-width: 2px;
+}
+.entry-num {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  min-width: 30px;
+  text-align: right;
+}
+.entry-pending {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+@media (max-width: 600px) {
+  .entry-row {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+  .entry-bar {
+    width: 48px;
+  }
+}
+
+
+/* ── isabet / yakalama ikili çubuğu ──────────────────────────────── */
+.pair {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 46px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+.pair-key {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.pair-val {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.pair .meter-track {
+  height: 6px;
+}
+@media (max-width: 600px) {
+  .pair {
+    grid-template-columns: 56px minmax(0, 1fr) 42px;
+    gap: 8px;
   }
 }
