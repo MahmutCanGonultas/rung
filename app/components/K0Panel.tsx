@@ -9,8 +9,9 @@ import { labelOf } from "../lib/taxonomy";
  * gösteren HTML iniyor. Sözlük (~1 MB) hiçbir zaman inmiyor.
  *
  * Bu katmanda model yok: aynı metin her açılışta aynı sonucu veriyor, o yüzden
- * sonucu veritabanında saklamaya da gerek yok. Model katmanı geldiğinde
- * (Aşama 04) durum değişecek — orada sonuç sürümüyle birlikte kaydedilecek.
+ * sonucu veritabanında saklamaya da gerek yok. Model katmanı (K1/K2) tersi —
+ * o koşumun sonucu, kullanılan prompt sürümüyle birlikte `analyses` tablosunda
+ * saklanıyor, çünkü aynı metin ikinci koşumda başka cevap verebilir.
  */
 
 function pct(x: number): string {

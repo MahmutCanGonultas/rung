@@ -44,7 +44,7 @@ export default async function WritePage({
 
   /*
    * Görev artık sabit bir seviyeden değil, KULLANICININ ölçülmüş
-   * seviyesinden seçiliyor (plan §06 · Aşama 06). Hiç kaydı olmayan yeni
+   * seviyesinden seçiliyor (plan §06). Hiç kaydı olmayan yeni
    * kullanıcı varsayılan seviyeden başlıyor.
    */
   const level = await currentLevel(user.id);
@@ -62,7 +62,7 @@ export default async function WritePage({
   }
 
   return (
-    <section className="panel">
+    <section className="panel panel-reading">
       <nav className="chips" aria-label="Bağlam">
         {contexts.map((c) => (
           <Link
@@ -99,8 +99,8 @@ export default async function WritePage({
       />
 
       <p className="panel-next">
-        Analiz henüz yok — Aşama 03 ve 04'te geliyor. Şimdilik yazdığın metin
-        olduğu gibi, değiştirilemez şekilde saklanıyor.
+        Kaydettiğin metin <b>değiştirilemez</b> — yazdığın hâliyle duruyor.
+        Analiz hemen ardından çalışıyor; sonucu kaydın sayfasında görürsün.
       </p>
     </section>
   );
