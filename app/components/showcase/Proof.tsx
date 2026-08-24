@@ -70,15 +70,21 @@ export async function Proof({ compact = false }: { compact?: boolean } = {}) {
         </div>
         {/*
           Burada eskiden kayıt başı dolar maliyeti vardı. Ziyaretçinin ilgisini
-          çeken şey o değil; sayının neye dayandığı. Altın kümenin boyutu
-          diğer üç sayının anlamını veriyor: %95 neyin üstünde ölçülmüş?
+          çeken şey o değil; sayının neye dayandığı: %95 neyin üstünde ölçülmüş?
+
+          Etiket "altın küme" DEĞİL, "ölçülen örnek". `eval_runs.items` bu
+          koşumun kaç örnek puanladığı; altın kümenin bugünkü boyutu değil.
+          `--limit` ile koşulmuş ya da sonradan büyümüş bir kümede ikisi
+          ayrışıyor, ve aynı Türkçe başlığı iki farklı sayı için kullanmak tam
+          olarak bu sayfanın karşı durduğu şey olurdu. Kümenin canlı boyutu
+          Doğruluk ekranında, kendi başlığı altında.
+
+          Oran değil SAYI — paydası olmayan şeye orantılı çubuk çizilmiyor.
         */}
-        {/* Altın küme bir SAYI, oran değil — paydası olmayan şeye orantılı
-            çubuk çizilmiyor. */}
         <div className="proof-cell" style={{ "--i": "3" } as CSSProperties}>
-          <span className="proof-label">Altın küme</span>
+          <span className="proof-label">Ölçülen örnek</span>
           <span className="proof-value">{run.items}</span>
-          <span className="proof-note">örnek metin</span>
+          <span className="proof-note">altın kümeden</span>
         </div>
       </div>
 
