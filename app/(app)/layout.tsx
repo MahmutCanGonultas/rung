@@ -1,3 +1,4 @@
+import { Mark } from "../components/Mark";
 import type { ReactNode } from "react";
 import Link from "next/link";
 
@@ -21,8 +22,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="shell">
       <header className="shell-bar">
-        <Link className="mark" href="/dashboard">
-          rung<i>.</i>
+        <Link className="mark-link" href="/dashboard" aria-label="Rung · panoya dön">
+          <Mark />
         </Link>
 
         <nav className="shell-nav" aria-label="Ekranlar">

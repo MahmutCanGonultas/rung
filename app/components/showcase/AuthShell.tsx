@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
+import { Mark } from "../Mark";
+import { InView } from "./InView";
 import { Proof } from "./Proof";
 import { SampleAnalysis } from "./SampleAnalysis";
 
@@ -29,8 +31,8 @@ export function AuthShell({
   return (
     <main className="auth-split" id="main">
       <div className="auth-pane">
-        <Link className="mark auth-mark" href="/">
-          rung<i>.</i>
+        <Link className="mark-link auth-mark" href="/" aria-label="Rung ana sayfası">
+          <Mark />
         </Link>
 
         <div className="auth-box">
@@ -51,8 +53,11 @@ export function AuthShell({
             aylar boyunca izliyor ve <b>kendi doğruluğunu ölçüyor</b>.
           </p>
 
-          <SampleAnalysis compact />
-          <Proof compact />
+          {/* Tek sarmalayıcı = sağ sütunun tamamı tek saatle koşuyor. */}
+          <InView className="play-stack">
+            <SampleAnalysis compact />
+            <Proof compact />
+          </InView>
         </div>
       </aside>
     </main>
