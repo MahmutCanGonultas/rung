@@ -37,6 +37,24 @@ export function EntryRow({ entry }: { entry: EntrySummary }) {
           {entry.taskPrompt ?? "Serbest yazı"}
         </span>
         <span className="entry-meta">
+          {/*
+            Metnin ÖLÇÜLEN seviyesi. Ölçülmemişse rozet hiç çizilmiyor —
+            varsayılan bir bant koymak, olmayan bir ölçümü varmış gibi
+            göstermek olurdu. Kısa metinde tahmin oynak olduğu için o durumda
+            çerçeve kesikli.
+          */}
+          {entry.level ? (
+            <span
+              className={entry.levelReliable ? "row-level" : "row-level is-soft"}
+              title={
+                entry.levelReliable
+                  ? `Bu metnin ölçülen seviyesi: ${entry.level}`
+                  : `Bu metnin ölçülen seviyesi: ${entry.level} — metin kısa olduğu için oynak`
+              }
+            >
+              {entry.level}
+            </span>
+          ) : null}
           {entry.contextName} · {entry.wordCount} kelime
         </span>
       </span>

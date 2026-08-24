@@ -2354,7 +2354,30 @@ textarea:focus-visible,
 .entry-meta {
   font-size: 11.5px;
   color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  gap: 7px;
 }
+/*
+ * Metnin ölçülen seviyesi. Sayı değil bant olduğu için mono ve kutulu:
+ * yanındaki "70 kelime"den farklı bir şey söylediği belli olsun.
+ */
+.row-level {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  padding: 2px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--hairline);
+  color: var(--ink-2);
+  flex: none;
+}
+/* Kısa metinde tahmin oynak — kesikli çerçeve bunu söylüyor. */
+.row-level.is-soft {
+  border-style: dashed;
+  color: var(--ink-3);
+}
+
 .entry-dens {
   display: flex;
   align-items: center;
@@ -3010,4 +3033,16 @@ textarea:focus-visible,
 [data-play="1"] .proof-bands .meter-fill {
   animation: fill-to 620ms var(--ease-out) both;
   animation-delay: calc(var(--t-enter, 0ms) + 560ms + var(--i) * 90ms);
+}
+
+
+/* Seviyesi hiç ölçülmemiş kayıt. */
+.level-none {
+  margin: 26px 0 0;
+  padding: 13px 15px;
+  border: 1px dashed var(--hairline);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-3);
 }

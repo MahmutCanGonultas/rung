@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EntryRow } from "../../components/EntryRow";
+import { LevelCard } from "../../components/LevelCard";
 import { Notebook } from "../../components/Notebook";
 import { countEntries, listEntries } from "../../lib/entries";
 import { listNotes, noteCounts } from "../../lib/vocab/notes";
@@ -36,44 +37,12 @@ export default async function DashboardPage() {
       </p>
 
       {estimate ? (
-        <div className="level-card">
-          <div className="level-head">
-            <span className="level-label">Tahmini seviye</span>
-            <span className="level-value">{estimate.level}</span>
-            <span className="level-score">
-              skor {estimate.score.toFixed(2)} / 4
-            </span>
-          </div>
-
-          <p className="level-lede">
-            Sana sorulmadı — <b>ölçüldü</b>. Dördü de deterministik katmandan,
-            model kullanılmadan.
-          </p>
-
-          <div className="level-signals">
-            {estimate.signals.map((signal) => (
-              <div key={signal.name} className="level-signal">
-                <div className="level-signal-top">
-                  <span>{signal.name}</span>
-                  <b>{signal.band}</b>
-                </div>
-                <span className="meter-track">
-                  <span
-                    className="meter-fill"
-                    style={{ width: `${Math.round((signal.value / 4) * 100)}%` }}
-                  />
-                </span>
-                <span className="level-signal-detail">{signal.detail}</span>
-              </div>
-            ))}
-          </div>
-
-          {!estimate.reliable ? (
-            <p className="level-warn">
-              Son metin kısaydı — tahmin oynak. Birkaç kayıt daha sonra oturuyor.
-            </p>
-          ) : null}
-        </div>
+        <LevelCard
+          estimate={estimate}
+          label="Tahmini seviye"
+          lede="Sana sorulmadı — ölçüldü. Dördü de deterministik katmandan, model kullanılmadan."
+          warn="Son metin kısaydı — tahmin oynak. Birkaç kayıt daha sonra oturuyor."
+        />
       ) : null}
 
       <dl className="facts">

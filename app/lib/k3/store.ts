@@ -76,6 +76,49 @@ export async function latestEstimate(
  * Hiç tahmin yoksa varsayılan dönüyor — yeni kullanıcı için bir başlangıç
  * gerekiyor ve sormak plan §06'ya göre güvenilmez.
  */
+/*
+ * BİR KAYDIN kendi seviye tahmini.
+ *
+ * `latestEstimate` kullanıcının GÜNCEL seviyesini veriyor; bu ise "şu metin
+ * hangi seviyedeydi" sorusunun cevabı. Tahmin kayıt anında o metnin kendi K0
+ * sinyallerinden hesaplanıp `entry_id` ile saklanıyordu ama hiçbir ekranda
+ * okunmuyordu — veri aylardır oradaydı, gösterimi yoktu.
+ *
+ * Sahiplik sorgunun içinde: `level_estimates.user_id` ile eşleşmeyen bir
+ * kaydın tahmini dönmüyor.
+ */
+export async function estimateForEntry(
+  entryId: string,
+  userId: string
+): Promise<StoredEstimate | null> {
+  const rows = (await db()`
+    SELECT id::text AS id, level, score, signals, reliable, created_at
+    FROM level_estimates
+    WHERE entry_id = ${entryId} AND user_id = ${userId}
+    ORDER BY created_at DESC
+    LIMIT 1
+  `) as Array<{
+    id: string;
+    level: Level;
+    score: string;
+    signals: LevelSignal[];
+    reliable: boolean;
+    created_at: Date;
+  }>;
+
+  const row = rows[0];
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    level: row.level,
+    score: Number(row.score),
+    signals: row.signals,
+    reliable: row.reliable,
+    createdAt: row.created_at,
+  };
+}
+
 export async function currentLevel(userId: string): Promise<Level> {
   const estimate = await latestEstimate(userId);
   return estimate?.level ?? DEFAULT_LEVEL;

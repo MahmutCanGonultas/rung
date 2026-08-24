@@ -25,6 +25,21 @@ export type EntrySummary = {
   findings: number | null;
   /** 100 kelimede bulgu — listede tek karşılaştırılabilir sayı. */
   per100: number | null;
+  /*
+   * BU METNİN ölçülen seviyesi — görevin zorluğu değil.
+   *
+   * Tahmin kayıt anında, o metnin kendi K0 sinyallerinden hesaplanıp
+   * `level_estimates` tablosuna `entry_id` ile yazılıyor. Bugüne kadar
+   * yalnızca "kullanıcının güncel seviyesi" olarak okunuyordu; hangi metnin
+   * hangi seviyede olduğu hiçbir yerde görünmüyordu.
+   *
+   * `null` = ölçülmedi (tahmin motorundan önceki eski kayıtlar, ya da o
+   * koşumun patladığı kayıtlar). Bilinmeyen seviyeyi varsayılanla doldurmak
+   * ölçüm gibi görünen bir uydurma olurdu.
+   */
+  level: string | null;
+  /** Kısa metinde tahmin oynak. */
+  levelReliable: boolean;
 };
 
 export type EntryDetail = EntrySummary & {
@@ -43,6 +58,8 @@ type SummaryRow = {
   task_prompt: string | null;
   analyses: number;
   findings: number;
+  level: string | null;
+  level_reliable: boolean | null;
 };
 
 function toSummary(row: SummaryRow): EntrySummary {
@@ -58,6 +75,8 @@ function toSummary(row: SummaryRow): EntrySummary {
     wordCount: row.word_count,
     contextName: row.context_name,
     contextSlug: row.context_slug,
+    level: row.level,
+    levelReliable: row.level_reliable === true,
     taskPrompt: row.task_prompt,
     findings: analysed ? row.findings : null,
     per100:
@@ -122,7 +141,16 @@ export async function listEntries(
              WHERE a.entry_id = e.id AND a.status = 'ok') AS analyses,
            (SELECT count(*)::int FROM findings f
              WHERE f.entry_id = e.id
-               AND (f.verdict IS NULL OR f.verdict = 'confirmed')) AS findings
+               AND (f.verdict IS NULL OR f.verdict = 'confirmed')) AS findings,
+           -- Bu kaydın kendi seviye tahmini: entry_id ile bağlı, yani
+           -- "kullanıcının o günkü seviyesi" değil, TAM OLARAK bu metnin
+           -- ölçümü. Yoksa null — ölçülmemiş demek, varsayılan demek değil.
+           (SELECT le.level FROM level_estimates le
+             WHERE le.entry_id = e.id
+             ORDER BY le.created_at DESC LIMIT 1) AS level,
+           (SELECT le.reliable FROM level_estimates le
+             WHERE le.entry_id = e.id
+             ORDER BY le.created_at DESC LIMIT 1) AS level_reliable
     FROM entries e
     JOIN contexts c ON c.id = e.context_id
     LEFT JOIN tasks t ON t.id = e.task_id
@@ -180,7 +208,16 @@ export async function findEntryForUser(
              WHERE a.entry_id = e.id AND a.status = 'ok') AS analyses,
            (SELECT count(*)::int FROM findings f
              WHERE f.entry_id = e.id
-               AND (f.verdict IS NULL OR f.verdict = 'confirmed')) AS findings
+               AND (f.verdict IS NULL OR f.verdict = 'confirmed')) AS findings,
+           -- Bu kaydın kendi seviye tahmini: entry_id ile bağlı, yani
+           -- "kullanıcının o günkü seviyesi" değil, TAM OLARAK bu metnin
+           -- ölçümü. Yoksa null — ölçülmemiş demek, varsayılan demek değil.
+           (SELECT le.level FROM level_estimates le
+             WHERE le.entry_id = e.id
+             ORDER BY le.created_at DESC LIMIT 1) AS level,
+           (SELECT le.reliable FROM level_estimates le
+             WHERE le.entry_id = e.id
+             ORDER BY le.created_at DESC LIMIT 1) AS level_reliable
     FROM entries e
     JOIN contexts c ON c.id = e.context_id
     LEFT JOIN tasks t ON t.id = e.task_id
@@ -225,7 +262,16 @@ export async function previousAttempts(
              WHERE a.entry_id = e.id AND a.status = 'ok') AS analyses,
            (SELECT count(*)::int FROM findings f
              WHERE f.entry_id = e.id
-               AND (f.verdict IS NULL OR f.verdict = 'confirmed')) AS findings
+               AND (f.verdict IS NULL OR f.verdict = 'confirmed')) AS findings,
+           -- Bu kaydın kendi seviye tahmini: entry_id ile bağlı, yani
+           -- "kullanıcının o günkü seviyesi" değil, TAM OLARAK bu metnin
+           -- ölçümü. Yoksa null — ölçülmemiş demek, varsayılan demek değil.
+           (SELECT le.level FROM level_estimates le
+             WHERE le.entry_id = e.id
+             ORDER BY le.created_at DESC LIMIT 1) AS level,
+           (SELECT le.reliable FROM level_estimates le
+             WHERE le.entry_id = e.id
+             ORDER BY le.created_at DESC LIMIT 1) AS level_reliable
     FROM entries e
     JOIN contexts c ON c.id = e.context_id
     JOIN tasks t ON t.id = e.task_id

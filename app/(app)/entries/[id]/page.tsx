@@ -7,7 +7,8 @@ import { EntryRow } from "../../../components/EntryRow";
 import { K0Panel } from "../../../components/K0Panel";
 import { K1Panel } from "../../../components/K1Panel";
 import { findingsFor, latestAnalysis } from "../../../lib/analyses";
-import { currentLevel } from "../../../lib/k3/store";
+import { LevelCard } from "../../../components/LevelCard";
+import { currentLevel, estimateForEntry } from "../../../lib/k3/store";
 import { findEntryForUser, previousAttempts } from "../../../lib/entries";
 import { requireUser } from "../../../lib/guard";
 import { notedWords } from "../../../lib/vocab/notes";
@@ -56,13 +57,15 @@ export default async function EntryPage({
    * `entry.taskId` — kaydın kimliği değil GÖREVİN kimliği; ikisini
    * karıştırmak sessizce boş liste döndürürdü.
    */
-  const [level, noted, k1, earlier] = await Promise.all([
+  const [level, noted, k1, earlier, written] = await Promise.all([
     currentLevel(user.id),
     notedWords(user.id),
     latestAnalysis(entry.id, user.id, "K1"),
     entry.taskId
       ? previousAttempts(user.id, entry.taskId, entry.id)
       : Promise.resolve([]),
+    // BU METNİN kendi seviyesi — kullanıcının güncel seviyesi değil.
+    estimateForEntry(entry.id, user.id),
   ]);
 
   // Bu sorgu k1'e bağlı, o yüzden dışarıda.
@@ -73,7 +76,14 @@ export default async function EntryPage({
     <section className="panel panel-reading">
       <div className="entry-head">
         <span className="chip">{entry.contextName}</span>
-        {entry.taskLevel ? <span className="chip">{entry.taskLevel}</span> : null}
+        {/*
+          Etiketsiz bir "B1" rozeti iki farklı şeyi anlatabiliyordu ve metnin
+          kendi seviyesi de gösterilmeye başlayınca bu belirsizlik hataya
+          döner: bu rozet GÖREVİN zorluğu, metnin ölçümü değil.
+        */}
+        {entry.taskLevel ? (
+          <span className="chip">Görev {entry.taskLevel}</span>
+        ) : null}
         <span className="entry-stamp">{STAMP.format(entry.createdAt)}</span>
       </div>
 
@@ -81,6 +91,26 @@ export default async function EntryPage({
         {entry.taskPrompt ?? "Serbest yazı"}
       </h1>
       {entry.taskHint ? <p className="panel-lede">{entry.taskHint}</p> : null}
+
+      {/*
+        Bu metnin ölçülen seviyesi. Kayıt anında, o metnin KENDİ K0
+        sinyallerinden hesaplanıp saklanmıştı; bugüne kadar hiçbir ekranda
+        okunmuyordu.
+      */}
+      {written ? (
+        <LevelCard
+          estimate={written}
+          label="Bu metnin seviyesi"
+          lede="Kaydedildiği anda ölçüldü — dördü de deterministik katmandan, model kullanılmadan. Sonradan değişmiyor."
+          warn="Metin kısaydı — bu tahmin oynak. Uzun metinde dört sinyal de oturuyor."
+        />
+      ) : (
+        <p className="level-none">
+          Bu kaydın seviyesi ölçülmedi — seviye motorundan önce yazılmış ya da
+          o koşum başarısız olmuş. Uydurulmuş bir bant göstermek yerine
+          söylüyoruz.
+        </p>
+      )}
 
       <K0Panel
         text={entry.body}
