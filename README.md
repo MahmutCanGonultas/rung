@@ -8,16 +8,32 @@ izler — ve **kendi doğruluğunu ölçer.**
 
 **Canlı → https://rung-plum.vercel.app**
 
-Next.js 16 · TypeScript (katı) · PostgreSQL · Anthropic API · 160 birim testi ·
+Next.js 16 · TypeScript (katı) · PostgreSQL · Anthropic API · 163 birim testi ·
 61 uçtan uca kontrol
 
-![Giriş ekranı](docs/shots/login.png)
+![Anasayfa](docs/shots/landing.png)
 
-<sub>Giriş ekranındaki analiz maket değil: sayfa açılırken gerçek K0 motorundan
-geçiyor. Sağdaki doğruluk sayıları da sabit değil — son ölçüm koşumundan
-okunuyor.</sub>
+<sub>Sayfadaki hiçbir şey maket değil. İki cümle de sayfa açılırken gerçek K0
+motorundan geçiyor, doğruluk sayıları son ölçüm koşumundan okunuyor.</sub>
 
 ---
+
+## Sayfanın kendisi bir kanıt
+
+Anasayfada iki cümle var ve ikisi de **aynı motordan** geçiyor:
+
+| | bulgu |
+|---|---|
+| `I am agree with your suggestion about the meeting of tomorrow…` | **5** |
+| `I agree with your suggestion about tomorrow's meeting…` | **0** |
+
+İkincisi doğru İngilizce ve motor onda **hiçbir şey bulmuyor**. Ürünün
+kanıtlanamaz iddiası — *bir hatayı kaçırmak telafi edilir, doğru bir cümleyi
+"düzeltmek" edilmez* — böylece bir cümle olmaktan çıkıp sayfanın render anında
+hesapladığı bir olaya dönüşüyor.
+
+`app/lib/k0/showcase.test.ts` iki sayıyı da kilitliyor: bir kural değişip motor
+doğru cümleye takılırsa vitrin sessizce yalan söylemiyor, `npm test` düşüyor.
 
 ## Çözmeye çalıştığı problem
 
@@ -55,6 +71,11 @@ Seviye kırılımıyla — çünkü tek ortalama sayı zayıf yeri gizler:
 **Zayıf yer gizlenmiyor:** C1'de her üç hatadan biri kaçıyor. Nüans hataları
 (kayıt uyumu, doğal olmayan edat) modeller için gerçekten zor. Uygulama bunu
 kendi doğruluk ekranında da yazıyor.
+
+![Giriş ekranı](docs/shots/login.png)
+
+<sub>Giriş ekranı: analiz sayfanın zemini, form o zeminin üst kenarını kıran
+yükseltilmiş bir nesne, ölçülen doğruluk en altta aletin durum çubuğu gibi.</sub>
 
 ![Doğruluk ekranı](docs/shots/accuracy.png)
 
@@ -172,6 +193,7 @@ kaydedilmiyor.
 | `npm run eval` | Ölçüm koşumu · `-- --fake` anahtarsız |
 | `npm run typecheck` · `build` | Tip kontrolü · üretim derlemesi |
 | `npm run migrate` · `seed` · `seed:gold` | Şema ve tohum veri |
+| `npm run shots` · `shots:public` | Ekran görüntüsü turu · tümü / herkese açık |
 | `npm run gold:from-feedback` | İtirazları ölçüm kümesine akıtır · `-- --dry` |
 
 CI'da model çağrısı ve gerçek veritabanı **yok**: her push'ta tip kontrolü,
