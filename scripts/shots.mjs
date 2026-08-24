@@ -19,12 +19,73 @@ if (!OUT) throw new Error("çıktı klasörü gerekiyor");
 
 const BASE = process.env.SHOTS_BASE ?? "http://localhost:3000";
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-const EMAIL = `shots-${Date.now()}@rung.test`;
+/*
+ * Sabit ve sunuma uygun bir adres: görüntülerdeki kabuk çubuğunda kullanıcının
+ * e-postası görünüyor ve `shots-1787564837194@rung.test` gibi bir şey README'de
+ * çirkin duruyor. Koşum başında ve sonunda siliniyor.
+ */
+const EMAIL = "demo@rung.app";
 const PASS = "duman-testi-9182";
 
 const SUBS = ["tense", "article", "register", "tr_pattern", "spelling", "collocation"];
 
+/*
+ * Görüntüyü almadan önce sayfayı BİTMİŞ karesine getir.
+ *
+ * Önce sayfa boyunca kaydırılıyor ki ekran dışındaki bölümlerin görünüm
+ * gözcüsü tetiklensin, sonra her animasyon son karesine atlatılıyor. Sonsuz
+ * olanlar (bekleyen düğmenin ışığı) `finish()` kabul etmiyor, atlanıyor.
+ *
+ * `requestAnimationFrame` KULLANILMIYOR: arka plandaki sekmede hiç ateşlenmiyor
+ * ve burası sonsuza kadar bekliyordu. Aynı sebep animasyonları da donduruyordu
+ * — bu yüzden artık tek sekme var (aşağı bak).
+ */
+async function settle(tab) {
+  /*
+   * 1) Hidrasyonu bekle. Bu adım atlanınca araç sessizce yanlış sonuç veriyordu:
+   *    `getAnimations()` boş dönüyor, `finish()` hiçbir şey yapmıyor, sonra
+   *    React yükleniyor, animasyonlar BAŞLIYOR ve görüntü tam ilk karede
+   *    alınıyordu — işaretsiz hata aralıkları, boş sayılar.
+   */
+  await tab.waitForFunction(
+    () => document.querySelector('[data-play="1"]') !== null || !document.querySelector("[data-play]"),
+    { timeout: 5000 }
+  ).catch(() => {});
+
+  // 2) Sayfa boyunca kaydır ki ekran dışı bölümlerin görünüm gözcüsü tetiklensin.
+  await tab.evaluate(() => {
+    const h = document.documentElement.scrollHeight;
+    for (let y = 0; y < h; y += 400) window.scrollTo(0, y);
+    window.scrollTo(0, 0);
+  });
+  await new Promise((r) => setTimeout(r, 250));
+
+  /*
+   * 3) Her animasyonu son karesine atlat. İki tur: ilk tur sırasında yeni
+   *    animasyon doğmuş olabiliyor. Sonsuz olanlar (bekleyen düğmenin ışığı)
+   *    `finish()` kabul etmiyor, atlanıyor.
+   *
+   *    `requestAnimationFrame` kullanılmıyor — arka plandaki sekmede hiç
+   *    ateşlenmiyor ve burası sonsuza kadar bekliyordu.
+   */
+  for (let pass = 0; pass < 2; pass += 1) {
+    await tab.evaluate(() => {
+      for (const a of document.getAnimations()) {
+        try {
+          a.finish();
+        } catch {
+          /* sonsuz animasyon — bitmesi diye bir şey yok */
+        }
+      }
+    });
+    await new Promise((r) => setTimeout(r, 120));
+  }
+}
+
 async function seed(client) {
+  // Önceki koşumdan kalmış olabilir.
+  await client.query("DELETE FROM users WHERE email = $1", [EMAIL]);
+
   const id = (await client.query(
     "INSERT INTO users (email,password_hash) VALUES ($1,$2) RETURNING id::text AS id",
     [EMAIL, await bcrypt.hash(PASS, 12)]
@@ -90,12 +151,6 @@ async function seed(client) {
   return { id, entry: firstEntry };
 }
 
-/*
- * `authed` alanı boşuna değil: giriş yapmış bir tarayıcı `/login` adresine
- * gittiğinde panoya yönlendiriliyor. Tek oturumla çekilen görüntülerde giriş
- * ve kayıt ekranları hiç görünmüyordu — üç görüntü panonun kopyasıydı.
- * Herkese açık sayfalar ayrı, çerezsiz bir bağlamdan çekiliyor.
- */
 const PAGES = [
   ["anasayfa", "/", false],
   ["giris", "/login", false],
@@ -117,11 +172,81 @@ async function main() {
     args: ["--no-sandbox", "--disable-gpu", "--hide-scrollbars"],
   });
 
-  // çerezsiz bağlam — giriş yapmamış ziyaretçinin gördüğü
-  const guestCtx = await browser.createBrowserContext();
-  const guest = await guestCtx.newPage();
-
+  /*
+   * TEK SEKME, bilerek.
+   *
+   * Önce ikinci bir sekme (giriş yapmamış ziyaretçi için) kullanılıyordu ve
+   * sonuçlar sessizce yanlıştı: Chrome arka plandaki sekmede CSS
+   * animasyonlarını ve `requestAnimationFrame`i askıya alıyor. O sekmenin
+   * görüntüleri hareketin İLK karesinde donuyordu — işaretsiz hata aralıkları,
+   * boş sayılar. Ürün doğruydu, ölçen araç yanlış bakıyordu. `bringToFront()`
+   * çözmedi.
+   *
+   * Çözüm sekme sayısını bire indirmek: önce herkese açık sayfalar çerezsiz
+   * çekiliyor, SONRA giriş yapılıp geri kalanlar. Tek sekme daima önde.
+   */
   const page = await browser.newPage();
+
+  const all = [...PAGES, ["kayit-detay", `/entries/${entry}`, true]];
+  const problems = [];
+
+  async function capture(list) {
+    for (const dark of [false, true]) {
+      /*
+       * `prefers-reduced-motion: reduce` DAİMA açık.
+       *
+       * İki sebep, ikisi de önemli:
+       *
+       * 1. Bu tercih bitmiş kareyi garanti ediyor. Zamanlamayla bitmiş kareyi
+       *    yakalamaya çalışmak defalarca yanlış sonuç verdi — animasyonlar
+       *    hidrasyondan sonra doğuyor, arka plan sekmesinde donuyor, `finish()`
+       *    henüz var olmayan animasyona işlemiyor. Tercihi açmak bu sınıfın
+       *    tamamını ortadan kaldırıyor.
+       *
+       * 2. Asıl doğrulanması gereken durum zaten bu. Kural şu: TEMEL CSS DAİMA
+       *    BİTMİŞ KARE. Bu görüntüler o kuralın tutup tutmadığının kanıtı —
+       *    bir bilgi yalnızca harekete emanet edilmişse burada eksik görünür.
+       *
+       * Hareketin kendisi tarayıcıda gözle bakılarak kontrol ediliyor.
+       */
+      await page.emulateMediaFeatures([
+        { name: "prefers-color-scheme", value: dark ? "dark" : "light" },
+        { name: "prefers-reduced-motion", value: "reduce" },
+      ]);
+
+      for (const [name, path] of list) {
+        for (const [w, h, tag] of [[1440, 900, "gs"], [390, 844, "mb"]]) {
+          await page.setViewport({ width: w, height: h });
+          await page.goto(BASE + path, { waitUntil: "networkidle0" });
+          await settle(page);
+
+          const check = await page.evaluate(() => {
+            const docW = document.documentElement.clientWidth;
+            const over = [...document.querySelectorAll("body *")]
+              .filter((el) => el.getBoundingClientRect().right > docW + 1)
+              .map((el) => `${el.tagName.toLowerCase()}.${(el.className || "").toString().split(" ")[0]}`);
+            return {
+              overflow: document.documentElement.scrollWidth > docW + 1,
+              culprits: [...new Set(over)].slice(0, 3),
+            };
+          });
+          if (check.overflow) {
+            problems.push(`${name} ${tag} ${dark ? "koyu" : "acik"}: ${check.culprits.join(", ")}`);
+          }
+
+          await page.screenshot({
+            path: `${OUT}/${name}-${tag}-${dark ? "koyu" : "acik"}.png`,
+            fullPage: tag === "gs",
+          });
+        }
+      }
+    }
+  }
+
+  // 1) çerez yokken: anasayfa, giriş, kayıt
+  await capture(all.filter(([, , authed]) => !authed));
+
+  // 2) giriş yap, sonra kalanlar
   await page.setViewport({ width: 1440, height: 900 });
   await page.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
   await page.type('input[name="email"]', EMAIL);
@@ -129,44 +254,7 @@ async function main() {
   await page.click('button[type="submit"]');
   await new Promise((r) => setTimeout(r, 2500));
 
-  const all = [...PAGES, ["kayit-detay", `/entries/${entry}`, true]];
-  const problems = [];
-
-  for (const dark of [false, true]) {
-    const feature = [
-      { name: "prefers-color-scheme", value: dark ? "dark" : "light" },
-    ];
-    await page.emulateMediaFeatures(feature);
-    await guest.emulateMediaFeatures(feature);
-
-    for (const [name, path, authed] of all) {
-      const tab = authed ? page : guest;
-      for (const [w, h, tag] of [[1440, 900, "gs"], [390, 844, "mb"]]) {
-        await tab.setViewport({ width: w, height: h });
-        await tab.goto(BASE + path, { waitUntil: "networkidle0" });
-        await new Promise((r) => setTimeout(r, 400));
-
-        const check = await tab.evaluate(() => {
-          const docW = document.documentElement.clientWidth;
-          const over = [...document.querySelectorAll("body *")]
-            .filter((el) => el.getBoundingClientRect().right > docW + 1)
-            .map((el) => `${el.tagName.toLowerCase()}.${(el.className || "").toString().split(" ")[0]}`);
-          return {
-            overflow: document.documentElement.scrollWidth > docW + 1,
-            culprits: [...new Set(over)].slice(0, 3),
-          };
-        });
-        if (check.overflow) {
-          problems.push(`${name} ${tag} ${dark ? "koyu" : "acik"}: ${check.culprits.join(", ")}`);
-        }
-
-        await tab.screenshot({
-          path: `${OUT}/${name}-${tag}-${dark ? "koyu" : "acik"}.png`,
-          fullPage: tag === "gs",
-        });
-      }
-    }
-  }
+  await capture(all.filter(([, , authed]) => authed));
 
   await browser.close();
   await client.query("DELETE FROM users WHERE email=$1", [EMAIL]);
