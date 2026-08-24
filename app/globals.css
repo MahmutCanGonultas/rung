@@ -18,7 +18,16 @@
 
   --ink: #14171a;
   --ink-2: #4f5a60;
-  --ink-3: #78838a;
+  /*
+   * ÖLÇÜLDÜ. Eski değer (#78838a) mikro etiketleri en açık zeminde 3,05:1'de
+   * bırakıyordu — okunabilirlik alt sınırı 4,5:1. Bu jeton ürünün her yerinde
+   * 9–13,5px metin taşıyor: alan etiketleri, koşum künyeleri, bant rozetleri.
+   * Yeni değer dört zeminin dördünde de sınırı geçiyor (4,03 – 4,86).
+   *
+   * İki ekranda yerel olarak `--ink-2`ye yükseltilmişti; o yamalar artık
+   * gerekmiyor ama zarar da vermiyor, duruyorlar.
+   */
+  --ink-3: #5f686e;
 
   --accent: #0e9b6c;
   --model: #5b4bd6;
@@ -85,7 +94,7 @@
 
   --ink: #e8edf1;
   --ink-2: #9aa7b1;
-  --ink-3: #6c7984;
+  --ink-3: #7f8b95;
 
   --accent: #35d39b;
   --model: #9a8cf5;
@@ -122,7 +131,7 @@
 
     --ink: #e8edf1;
     --ink-2: #9aa7b1;
-    --ink-3: #6c7984;
+    --ink-3: #7f8b95;
 
     --accent: #35d39b;
     --model: #9a8cf5;
@@ -1895,13 +1904,25 @@ textarea:focus-visible,
   color: var(--accent);
 }
 .hero-title {
-  grid-row: 2;
   font-size: var(--fs-display);
-  /* 1.09 ÖLÇÜLDÜ, DEĞİŞTİRİLMİYOR: 1.03'te 390px'de ikinci satırın dalgalı
-     çizgisi "Ölç."in kutusuna giriyordu (çizgi y≈283, "Ölç." y=276). */
-  line-height: 1.09;
+  /*
+   * 1.24, ve bu sefer GERÇEKTEN ölçüldü.
+   *
+   * Önce 1.09 yazıp yanına "ölçüldü" diye not düşülmüştü; ölçülmemişti.
+   * `.hero-was` altındaki dalgalı çizgi (0.13em ötelemeli, ~5,5px genlikli)
+   * bir sonraki satırın kutusuna giriyordu ve 4× büyütmede görülen şuydu:
+   * dalga tam olarak "Ölç."ün Ö harfinin iki noktasının ARASINDAN geçiyordu —
+   * yani düzeltmenin kabul edildiğini gösteren kelimenin üstü, hata rengiyle
+   * çiziliyormuş gibi duruyordu. Anlamın tersi.
+   *
+   * Ölçüm ölçek bağımsız (satır kutusu em, öteleme em), o yüzden 360'tan
+   * 1440'a kadar HER genişlikte oluyordu — telefona özgü değildi.
+   * 1.24'te 390px'de dalga y≈272, noktalar y≈281: temiz.
+   */
+  line-height: 1.24;
   letter-spacing: -0.045em;
   font-weight: 680;
+  margin: 0;
 }
 .claim-intro {
   grid-row: 3;
@@ -1911,7 +1932,21 @@ textarea:focus-visible,
   color: var(--ink-2);
   max-width: 44ch;
 }
-.claim-actions { grid-row: 4; display: flex; flex-wrap: wrap; gap: 10px; padding-top: 8px; }
+/*
+ * `grid-row` KAPSAMLI olmak zorunda. Çıplak `.claim-actions` yazıldığında
+ * kapanış bandındaki düğme de 4. satıra çakılıyordu: DOM'da başlıktan sonra
+ * ve nottan önce duruyor ama EKRANDA notun altına düşüyordu. Görsel sıra ile
+ * okuma sırası ayrışınca klavyeyle gezen kişi başka bir sayfa geziyor demek.
+ */
+.claim-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 8px;
+}
+.claim > .claim-actions {
+  grid-row: 4;
+}
 .claim-note { grid-row: 5; font-size: var(--fs-small); color: var(--ink-3); }
 
 /*
@@ -1928,7 +1963,9 @@ textarea:focus-visible,
   padding-left: clamp(24px, 3vw, 52px);
   border-left: 1px solid var(--hairline);
 }
-.claim-thesis p { margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink-2); }
+/* `.claim-thesis p` (0,1,1), `.claim-metric`i (0,1,0) yeniyordu: ikincinin
+   üst boşluğu hiç uygulanmıyor, iki paragraf birbirine yapışıyordu. */
+.claim-thesis > p:first-child { margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink-2); }
 .claim-thesis strong { color: var(--ink); font-weight: 620; }
 .claim-metric {
   margin-top: 14px;
@@ -2038,6 +2075,13 @@ textarea:focus-visible,
   border: 0;
   border-radius: 0;
   box-shadow: none;
+  /*
+   * 481–820px arasında ızgara iki sütuna düşüyor ve orada iki METİN sütunu
+   * hiç boşluk bırakmadan yan yana geliyordu. Satır boşluğu sıfır kalıyor
+   * (şeritler dikişsiz buluşsun diye), sütun boşluğu değil.
+   */
+  column-gap: clamp(14px, 2vw, 24px);
+  row-gap: 0;
   background: none;
   gap: 0;
   overflow: visible;
@@ -2055,8 +2099,17 @@ textarea:focus-visible,
 .mech .pipe-name { font-size: 15px; }
 .mech .pipe-what { font-size: 12.5px; }
 @media (max-width: 820px) {
-  /* İki sütuna düşünce dikey ayraç anlamını yitiriyor. */
-  .mech .pipe-cell { border-left: 0; padding-inline: 0; }
+  /*
+   * İki sütuna düşünce dikey ayraç anlamını yitiriyor — ama sol boşluk
+   * KALIYOR. Sıfırlandığında, aynı kırılmada sola geçen 2px'lik iz metinle
+   * aynı x'te başlıyordu ve ölçüldüğünde "K0"ın dikey gövdesini tamamen
+   * kapattığı görüldü.
+   */
+  .mech .pipe-cell,
+  .mech .pipe-cell:first-child {
+    border-left: 0;
+    padding-inline: 16px 0;
+  }
 }
 
 /* ── şerit 4 · ÖLÇÜM ──────────────────────────────────────────────── */
@@ -2216,7 +2269,7 @@ textarea:focus-visible,
    hiçbir seçiciye bağlı değil): `.land`in eski gövdesi, `.land-section`,
    `.land-h`, `.land-sub`, `.land-cta`, `.hero`, `.hero-kicker`, `.hero-lede`,
    `.hero-actions`, `.hero-note`, ve "yükseklik uygulaması" bloğundaki
-   `.land-cta { box-shadow: … }` satırı.
+   `` satırı.
    KALIYOR, aynen: `.hero-title` (yalnız boyu değişti), `.hero-was`, `.hero-em`. */
 
 
@@ -2893,9 +2946,6 @@ textarea:focus-visible,
 .proof-grid {
   box-shadow: var(--e1);
 }
-.land-cta {
-  box-shadow: var(--e2), var(--edge);
-}
 .sample-head,
 .pipe-cell,
 .proof-cell,
@@ -2991,7 +3041,13 @@ textarea:focus-visible,
   }
 }
 
-.sample-mark sup {
+/*
+ * `inline-block` YALNIZCA oynatılırken: `sup-pop` bir `transform` uyguluyor ve
+ * satır içi kutuya `transform` işlemiyor. Temel durumda satır içi kalıyor —
+ * orada dönüşecek bir şey yok ve `inline-block` satır kutusunu gereksiz
+ * büyütüyor.
+ */
+[data-play="1"] .sample-mark sup {
   display: inline-block;
 }
 [data-play="1"] .sample-mark sup {
@@ -3266,7 +3322,13 @@ textarea:focus-visible,
 
 /* Zorlanmış renklerde ölçülen çubuklar kaybolmamalı — arka plan rengi düşüyor. */
 @media (forced-colors: active) {
+  /*
+   * `.proof-cell.is-lead .proof-fill` (0,2,0) buradaki çıplak seçiciyi (0,1,0)
+   * yeniyordu — yani zorlanmış renklerde tam da en önemli çubuk, ana ölçütün
+   * çubuğu kayboluyordu. Medya sorgusu özgüllük eklemiyor.
+   */
   .proof-fill,
+  .proof-cell.is-lead .proof-fill,
   .pipe-cell::before {
     background: CanvasText;
   }
