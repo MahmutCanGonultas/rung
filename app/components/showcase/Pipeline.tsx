@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 /*
  * Beş katmanlı analiz hattı.
  *
@@ -41,8 +43,12 @@ const LAYERS = [
 export function Pipeline() {
   return (
     <div className="pipe" aria-label="Analiz hattı: beş katman">
-      {LAYERS.map((layer) => (
-        <div key={layer.code} className={layer.model ? "pipe-cell is-ai" : "pipe-cell"}>
+      {LAYERS.map((layer, i) => (
+        <div
+          key={layer.code}
+          className={layer.model ? "pipe-cell is-ai" : "pipe-cell"}
+          style={{ "--i": String(i) } as CSSProperties}
+        >
           <span className="pipe-code">{layer.code}</span>
           <span className="pipe-name">{layer.name}</span>
           <span className="pipe-what">{layer.what}</span>
