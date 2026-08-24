@@ -2028,7 +2028,14 @@ textarea:focus-visible,
 /* Levha: kanıt bir pano değil, sayfanın üstüne kurulduğu DÜZLEM. */
 .auth-plate {
   grid-column: 1 / -1;
-  grid-row: 3 / 5;
+  /*
+   * 3–6 arası, yani 5. satırdaki payı DA kaplıyor.
+   *
+   * Önce 3–5 yazılmıştı ve uzun ekranda hata veriyordu: 1600×1400'te rafla
+   * ölçüm şeridi arasında 375px çıplak `--plane` kalıyordu. Levha sayfanın
+   * ZEMİNİ; zemin, üstündeki içerik bitti diye kesilmiyor.
+   */
+  grid-row: 3 / 6;
   position: relative;
   z-index: 0;
   background: var(--surface-2);
@@ -2222,7 +2229,7 @@ textarea:focus-visible,
 .auth-stage .proof-value {
   font-size: clamp(26px, 2.2vw, 34px);
 }
-.auth-stage .proof-bands-DUPLICATE {
+.auth-stage .proof-bands {
   margin-inline: var(--rail);
 }
 .auth-stage .proof-bands .meters {
