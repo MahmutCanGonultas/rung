@@ -202,6 +202,16 @@ h3 {
   height: 18px;
   flex: none;
   fill: currentColor;
+}
+/*
+ * Saydamlık KÖKTE DEĞİL, basamaklarda.
+ *
+ * Önce `.mark-glyph { opacity: .32 }` yazılmıştı ve bu bir hataydı: grup
+ * saydamlığı çocuklara ÇARPILIYOR, yani üst basamağa yazılan `opacity: 1`
+ * hiçbir şey yapmıyordu. Vurgu rengi %32'ye iniyor, koyu temada dört
+ * komşusundan DAHA SÖNÜK çıkıyordu — logonun tek fikri tersine dönüyordu.
+ */
+.mark-glyph rect {
   opacity: 0.32;
   transition: opacity 200ms ease;
 }
@@ -219,8 +229,11 @@ h3 {
   text-decoration: none;
   border-radius: var(--r-sm);
 }
-.mark-link:hover .mark-glyph {
+.mark-link:hover .mark-glyph rect {
   opacity: 0.6;
+}
+.mark-link:hover .mark-glyph .mark-top {
+  opacity: 1;
 }
 
 /* ── düğmeler ─────────────────────────────────────────────────── */
@@ -1513,7 +1526,6 @@ textarea:focus-visible,
   .sample-text::before,
   .pipe::after,
   .hero-was,
-  .hero-was::after,
   .hero-em,
   .btn-primary:disabled::after {
     animation: none !important;
@@ -1805,7 +1817,12 @@ textarea:focus-visible,
 }
 .hero-title {
   font-size: clamp(40px, 7vw, 68px);
-  line-height: 1.03;
+  /*
+   * 1.03 fazla sıkıydı: başlık altı dalgalı çizgi taşıyor ve telefonda ikinci
+   * satırın çizgisi üçüncü satırın ("Ölç.") kutusuna giriyordu. Ölçüldü —
+   * 390px'de çizgi y≈283, "Ölç." y=276'da başlıyordu.
+   */
+  line-height: 1.09;
   letter-spacing: -0.045em;
   font-weight: 680;
   margin: 0;
@@ -2405,13 +2422,6 @@ textarea:focus-visible,
 }
 
 /* ── başlık kendini düzeltiyor ────────────────────────────────────── */
-.hero-was {
-  position: relative;
-  text-decoration: underline wavy var(--error-line);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 10px;
-  animation: hero-flag 500ms var(--ease-out) both 420ms;
-}
 @keyframes hero-flag {
   from {
     text-decoration-color: transparent;
@@ -2420,23 +2430,40 @@ textarea:focus-visible,
     text-decoration-color: var(--error-line);
   }
 }
-.hero-was::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 55%;
-  height: 2px;
-  background: var(--error);
-  transform-origin: left;
-  animation: hero-strike 380ms var(--ease-out) both 900ms;
+/*
+ * Üstü çizme, mutlak konumlu bir çubukla DEĞİL arka plan çizgisiyle.
+ *
+ * Önce `::after` ile 2px'lik mutlak konumlu bir çubuk vardı ve 470px altında
+ * bozuluyordu: başlık iki satıra kayınca satır içi kutu iki parçaya bölünüyor,
+ * `top: 55%` iki satırın ortasına — yani boşluğa — düşüyordu. Ekranda hiçbir
+ * şeyin üstünü çizmeyen kırmızı bir çubuk kalıyordu, ve bu hareketin geçici
+ * bir karesi değil kalıcı hâliydi. Her telefon genişliğinde.
+ *
+ * `box-decoration-break: clone` ile arka plan her satır parçasına AYRI
+ * uygulanıyor, yani çizgi her satırın kendi ortasından geçiyor.
+ */
+.hero-was {
+  text-decoration: underline wavy var(--error-line);
+  text-decoration-thickness: 2px;
+  /* `em` — başlık clamp ile 40'tan 68px'e çıkıyor, sabit piksel küçük
+     boyutta orantısız uzak kalıyordu. */
+  text-underline-offset: 0.13em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  background-image: linear-gradient(var(--error), var(--error));
+  background-repeat: no-repeat;
+  background-position: 0 58%;
+  background-size: 100% 2px;
+  animation:
+    hero-flag 500ms var(--ease-out) both 420ms,
+    hero-strike 380ms var(--ease-out) both 900ms;
 }
 @keyframes hero-strike {
   from {
-    transform: scaleX(0);
+    background-size: 0 2px;
   }
   to {
-    transform: scaleX(1);
+    background-size: 100% 2px;
   }
 }
 /*

@@ -25,9 +25,27 @@ const WORD_SHAPE = /^[A-Za-z][A-Za-z'’-]{0,63}$/;
 
 const SNIPPET_MAX = 400;
 
-function cleanSnippet(raw: string): string | null {
+/*
+ * Bağlam cümlesi, KELİMEYİ İÇERMİYORSA saklanmıyor.
+ *
+ * Şema bu sütunu "kelimenin görüldüğü cümle" diye tanımlıyor ve ekran onu öyle
+ * gösteriyor. İki yol bu sözü tutmuyordu:
+ *
+ *   - Elle eklenen kelimede görev metni bağlam olarak gönderiliyordu, ama
+ *     kullanıcının yazdığı kelime o metinde geçmek zorunda değil. Sonuç:
+ *     defterde, kelimeyi içermeyen bir İngilizce cümle "bu cümlede gördün"
+ *     diye duruyordu.
+ *   - Öneriden gelen notta bulgunun açıklaması gönderiliyordu; o açıklama
+ *     TÜRKÇE, oysa ekran bağlamı `lang="en"` ile işaretliyor. Ekran okuyucu
+ *     Türkçe cümleyi İngilizce telaffuzla okuyordu.
+ *
+ * Tek kural ikisini de kapatıyor: cümle kelimeyi içermiyorsa bağlam yok.
+ * Bağlamsız not eksik değil — yanlış bağlamlı not yanlış.
+ */
+function cleanSnippet(raw: string, word: string): string | null {
   const s = raw.trim().replace(/\s+/g, " ");
   if (s.length === 0) return null;
+  if (!s.toLowerCase().includes(word)) return null;
   return s.length > SNIPPET_MAX ? `${s.slice(0, SNIPPET_MAX - 1)}…` : s;
 }
 
@@ -46,7 +64,7 @@ export async function noteWordAction(formData: FormData): Promise<void> {
 
   const word = surface.toLowerCase();
   const band = bandOf(word);
-  const snippet = cleanSnippet(readField(formData, "snippet"));
+  const snippet = cleanSnippet(readField(formData, "snippet"), word);
   const back = readField(formData, "back");
 
   /*

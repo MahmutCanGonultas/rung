@@ -96,7 +96,7 @@ export async function Proof({ compact = false }: { compact?: boolean } = {}) {
 
       {compact ? null : (
         <p className="proof-source">
-          {run.items} örneklik altın kümede ölçüldü · prompt {run.promptVersion} ·
+          bu koşumda {run.items} örnek ölçüldü · prompt {run.promptVersion} ·
           çaba {run.effort} · {run.layers}
         </p>
       )}

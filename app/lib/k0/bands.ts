@@ -1,3 +1,4 @@
+import type { Level } from "../content-types.ts";
 import { A1, A2, B1, B2, parse } from "./word-bands.ts";
 import { words } from "./tokenize.ts";
 
@@ -10,6 +11,21 @@ import { words } from "./tokenize.ts";
 
 export const BAND_ORDER = ["A1", "A2", "B1", "B2", "C1"] as const;
 export type Band = (typeof BAND_ORDER)[number];
+
+/*
+ * `Band` (bir KELİMENİN seviyesi) ile `Level` (bir KULLANICININ ölçülmüş
+ * seviyesi) ayrı kavramlar ama aynı ölçeği paylaşıyorlar — ürün bu ikisini
+ * karşılaştırabildiği için "senin bandının üstünde şu kelimeler var"
+ * diyebiliyor.
+ *
+ * İki demet birbirinden habersiz tanımlıydı ve karşılaştırmalar yalnızca
+ * yapısal benzerlik sayesinde derleniyordu: birine C2 eklense diğeri sessizce
+ * ayrışır, kod derlenmeye devam eder ve karşılaştırma yanlış cevap verirdi.
+ * Aşağıdaki iki satır bunu derleme hatasına çeviriyor; çalışma zamanında
+ * hiçbir şey yapmıyorlar.
+ */
+type Extends<A, B> = [A] extends [B] ? true : never;
+export type BandMatchesLevel = [Extends<Band, Level>, Extends<Level, Band>];
 
 /*
  * Bantlar sırayla taranıyor ve **ilk eşleşme kazanıyor**. Bir kelime hem A1

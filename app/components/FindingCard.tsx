@@ -118,7 +118,6 @@ export function FindingCard({
             surface={word}
             source="suggestion"
             anchorId={finding.id}
-            snippet={finding.explanation}
             back={`/entries/${entryId}`}
             noted={noted.has(word.toLowerCase())}
           />

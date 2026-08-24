@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { bandOf, profile } from "./bands.ts";
+import { LEVELS } from "../content-types.ts";
+import { BAND_ORDER, bandOf, profile } from "./bands.ts";
 
 test("temel kelimeler A1", () => {
   for (const w of ["the", "and", "house", "water", "good"]) {
@@ -84,4 +85,17 @@ test("yoksayılan kelimeler banda girmiyor", () => {
   assert.equal(withAll.distinctWords, 5);
   assert.equal(withoutTypo.distinctWords, 4);
   assert.ok(withoutTypo.aboveBasic < withAll.aboveBasic);
+});
+
+/*
+ * `BandMatchesLevel` derleme zamanı bir iddia; çalışma zamanında karşılığı
+ * yok. Burası onun ÖLÇÜLEBİLİR yarısı: iki demet gerçekten aynı mı.
+ *
+ * Neden gerek var: `bandOf()` bir kelimenin bandını, `currentLevel()` bir
+ * kullanıcının seviyesini döndürüyor ve ürün ikisini karşılaştırıyor. Demetler
+ * ayrışırsa ("hangi kelimeler senin üstünde" sorusu) sessizce yanlış cevap
+ * verir.
+ */
+test("kelime bandı ölçeği ile kullanıcı seviyesi ölçeği aynı", () => {
+  assert.deepEqual([...BAND_ORDER], [...LEVELS]);
 });

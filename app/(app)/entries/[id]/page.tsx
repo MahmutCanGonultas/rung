@@ -46,18 +46,28 @@ export default async function EntryPage({
   const entry = await findEntryForUser(id, user.id);
   if (!entry) notFound();
 
-  // Aynı göreve daha önce verilmiş cevaplar. `entry.taskId` — kaydın kimliği
-  // değil görevin kimliği; ikisini karıştırmak sessizce boş liste döndürürdü.
-  // K1 sonucu varsa göster. Yoksa panel "modele sor" düğmesini gösteriyor.
-  const level = await currentLevel(user.id);
-  const noted = await notedWords(user.id);
-  const k1 = await latestAnalysis(entry.id, user.id, "K1");
+  /*
+   * Dördü birbirinden bağımsız, tek turda.
+   *
+   * Sırayla beklemek dört ayrı HTTPS gidiş-dönüşü demekti: `db()` HTTP
+   * sürücüsü kullanıyor, her sorgu ayrı bir istek. Sayfanın geri kalanı
+   * (pano, geçmiş, ilerleme, doğruluk) zaten `Promise.all` kullanıyordu.
+   *
+   * `entry.taskId` — kaydın kimliği değil GÖREVİN kimliği; ikisini
+   * karıştırmak sessizce boş liste döndürürdü.
+   */
+  const [level, noted, k1, earlier] = await Promise.all([
+    currentLevel(user.id),
+    notedWords(user.id),
+    latestAnalysis(entry.id, user.id, "K1"),
+    entry.taskId
+      ? previousAttempts(user.id, entry.taskId, entry.id)
+      : Promise.resolve([]),
+  ]);
+
+  // Bu sorgu k1'e bağlı, o yüzden dışarıda.
   const k1Findings =
     k1 && k1.status === "ok" ? await findingsFor(k1.id, user.id) : [];
-
-  const earlier = entry.taskId
-    ? await previousAttempts(user.id, entry.taskId, entry.id)
-    : [];
 
   return (
     <section className="panel panel-reading">

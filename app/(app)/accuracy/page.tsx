@@ -277,7 +277,7 @@ export default async function AccuracyPage() {
       <h2 className="section-title">Beş savunma</h2>
       <div className="defences">
         {[
-          ["01 · ölç", "Altın küme", "Hataları önceden bilinen paragraflar. Üçte biri hatasız — yanlış alarm ancak öyle ölçülür."],
+          ["01 · ölç", "Altın küme", "Hataları önceden bilinen paragraflar. Bir kısmı bilerek hatasız — yanlış alarm ancak öyle ölçülür. Kesin sayılar yukarıdaki karolarda."],
           ["02 · daralt", "Şema zorlaması", "Modele açık uçlu soru sorulmuyor. Sabit kategori, zorunlu şema."],
           ["03 · ayır", "Deterministik önce", "Yazım ve temel kurallar modelsiz. Modele sadece yorum gerektiren kısım gidiyor."],
           ["04 · doğrula", "İkinci geçiş", "Her bulguya bağımsız olarak 'bu gerçekten hata mı' soruluyor — gerekçesi gösterilmeden."],

@@ -1,4 +1,5 @@
-import { BAND_ORDER, bandOf, type Band } from "../lib/k0/bands";
+import type { Level } from "../lib/content-types";
+import { BAND_ORDER, bandOf } from "../lib/k0/bands";
 import { words } from "../lib/k0/tokenize";
 import { noteWordAction } from "../lib/vocab/note-actions";
 import { NoteWordButton } from "./NoteWordButton";
@@ -31,7 +32,8 @@ export function OffBandStrip({
   noted,
 }: {
   prompt: string;
-  level: Band;
+  /* Kullanıcının ölçülmüş seviyesi — kelimenin bandı değil. */
+  level: Level;
   taskId: string;
   back: string;
   noted: Set<string>;
@@ -43,7 +45,7 @@ export function OffBandStrip({
    * benzersizlik için; ekranda görünen, metindeki hâli.
    */
   const seen = new Set<string>();
-  const above: Array<{ surface: string; band: Band }> = [];
+  const above: Array<{ surface: string; band: Level }> = [];
 
   for (const w of words(prompt)) {
     const key = w.text.toLowerCase();

@@ -49,11 +49,19 @@ export default async function WritePage({
    * seviyesinden seçiliyor (plan §06). Hiç kaydı olmayan yeni
    * kullanıcı varsayılan seviyeden başlıyor.
    */
-  const level = await currentLevel(user.id);
-  const chosen = params.task ? await findTaskById(params.task) : null;
-  const noted = await notedWords(user.id);
+  const [level, chosen] = await Promise.all([
+    currentLevel(user.id),
+    params.task ? findTaskById(params.task) : Promise.resolve(null),
+  ]);
 
-  // Görev yoksa, ya da adresteki görev bu bağlama ait değilse: yeniden seç.
+  /*
+   * Görev yoksa, ya da adresteki görev bu bağlama ait değilse: yeniden seç.
+   *
+   * Bu dal neredeyse HER ilk istekte çalışıyor — uygulamadaki bütün bağlantılar
+   * `?task=` olmadan `/write` diyor. Deftere alınmış kelimeler bu yüzden
+   * yönlendirmeden SONRA çekiliyor: önce çekilirse her ziyarette bir sorgu
+   * boşa gidiyordu.
+   */
   if (!chosen || chosen.contextId !== context.id) {
     const picked = await pickTask(context.id, level, params.skip);
     if (!picked) {
@@ -63,6 +71,8 @@ export default async function WritePage({
     }
     redirect(`/write?context=${context.slug}&task=${picked.id}`);
   }
+
+  const noted = await notedWords(user.id);
 
   return (
     <section className="panel panel-reading">
