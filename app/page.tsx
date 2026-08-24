@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { Mark } from "./components/Mark";
+import { InView } from "./components/showcase/InView";
 import { Pipeline } from "./components/showcase/Pipeline";
 import { Proof } from "./components/showcase/Proof";
 import { SampleAnalysis } from "./components/showcase/SampleAnalysis";
@@ -21,9 +23,7 @@ export default async function HomePage() {
   return (
     <main className="land" id="main">
       <header className="land-bar">
-        <span className="mark">
-          rung<i>.</i>
-        </span>
+        <Mark />
         <nav className="land-nav">
           {user ? (
             <Link className="btn btn-primary" href="/dashboard">
@@ -44,8 +44,17 @@ export default async function HomePage() {
 
       <section className="hero">
         <p className="hero-kicker">Türkçe konuşanlar için</p>
+        {/*
+          Başlık ürünün kendi dilbilgisini kendine uyguluyor: önce "tahmin
+          etme" cümlesi hata rengiyle dalgalı çiziliyor, sonra üstü çiziliyor,
+          sonra "Ölç." vurgu rengine dönüyor — düzeltme kabul edildi. Her bulgu
+          kartında olan şeyin aynısı, sayfanın ilk saniyesinde.
+
+          Hiçbir şey gizlenmiyor: başlık ilk kareden itibaren tam okunur,
+          yalnızca rengi ve çizgisi değişiyor. LCP cezası ve düzen kayması yok.
+        */}
         <h1 className="hero-title">
-          İngilizceni tahmin etme.
+          <span className="hero-was">İngilizceni tahmin etme.</span>
           <br />
           <span className="hero-em">Ölç.</span>
         </h1>
@@ -83,9 +92,12 @@ export default async function HomePage() {
         <h2 className="land-h">Bir metin böyle okunuyor</h2>
         <p className="land-sub">
           Aşağıdaki bulgular maket değil — bu metin sayfa açılırken gerçek
-          deterministik katmandan geçti. Model çağrısı yok, maliyeti sıfır.
+          deterministik katmandan geçti. Model çağrısı yok: aynı metin her
+          zaman aynı sonucu veriyor.
         </p>
-        <SampleAnalysis />
+        <InView>
+          <SampleAnalysis />
+        </InView>
       </section>
 
       <section className="land-section">
@@ -94,7 +106,9 @@ export default async function HomePage() {
           Modele ne kadar az iş verirsen o kadar az saçmalıyor. Neyin modele
           verilmeyeceğini bilmek, model çağırabilmekten daha zor.
         </p>
-        <Pipeline />
+        <InView>
+          <Pipeline />
+        </InView>
       </section>
 
       <section className="land-section">
@@ -103,7 +117,9 @@ export default async function HomePage() {
           %100 doğruluk mümkün değil — dil modelleri olasılıksal çalışır. Bunu
           garanti eden herkes yanılıyor. Yapılabilecek şey ölçmek.
         </p>
-        <Proof />
+        <InView>
+          <Proof />
+        </InView>
       </section>
 
       <section className="land-cta">

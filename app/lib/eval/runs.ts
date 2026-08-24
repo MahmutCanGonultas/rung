@@ -183,8 +183,16 @@ export async function goldSetSize(): Promise<{
   };
 }
 
-/** Kullanıcı itirazları — altın kümeyi büyütecek ham veri. */
-export async function disagreementCount(): Promise<number> {
+/*
+ * Kayda geçmiş itirazların TOPLAMI.
+ *
+ * Adı önce `disagreementCount` idi ve ekran bunu "bekleyen itiraz" diye
+ * etiketliyordu — iki kere yanlış: sayı hiç azalmıyor (filtre yok, sadece
+ * `agreed = false`), ve altın kümeye çoktan alınmış itirazları da sayıyor.
+ * Yani asla düşmeyen bir "bekleyen" sayacı. Doğruluk panosunun yanlış sayı
+ * göstermesi, bu üründe kabul edilebilir en son şey.
+ */
+export async function objectionCount(): Promise<number> {
   const rows = (await db()`
     SELECT count(*)::int AS n FROM finding_feedback WHERE agreed = false
   `) as Array<{ n: number }>;

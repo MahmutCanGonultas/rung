@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { analyze } from "../../lib/k0";
 import { segment } from "../../lib/k0/segments";
 import { labelOf } from "../../lib/taxonomy";
@@ -9,8 +11,8 @@ import { labelOf } from "../../lib/taxonomy";
  * geçiyor ve çıkan ne ise o gösteriliyor. Kurallar değişirse bu sayfa da
  * değişir — yani vitrin, ürünün gerçekten yaptığı şeyi göstermek zorunda.
  *
- * Deterministik katman olduğu için maliyeti sıfır ve her açılışta aynı sonuç
- * çıkıyor; model çağrısı yok.
+ * Model çağrısı yok: her açılışta aynı sonuç çıkıyor ve sayfanın açılması
+ * hiçbir dış servise bağlı değil.
  */
 
 const SAMPLE =
@@ -22,8 +24,13 @@ export function SampleAnalysis({ compact = false }: { compact?: boolean }) {
   const parts = segment(SAMPLE, findings);
   const shown = compact ? findings.slice(0, 2) : findings;
 
+  /*
+   * Hareketin ritmi GERÇEK VERİDEN geliyor: `--n` bulgu sayısı, `--i` her
+   * bulgunun metindeki sırası. Bir K0 kuralı değişip sayı beşten dörde inerse
+   * dizinin temposu da onunla değişiyor — sahne değil, ölçümün kendisi.
+   */
   return (
-    <div className="sample">
+    <div className="sample" style={{ "--n": String(findings.length) } as CSSProperties}>
       <div className="sample-head">
         <span className="sample-tag">K0 · deterministik · model yok</span>
         <span className="sample-count">{findings.length} bulgu</span>
@@ -34,7 +41,11 @@ export function SampleAnalysis({ compact = false }: { compact?: boolean }) {
           part.kind === "plain" ? (
             <span key={i}>{part.text}</span>
           ) : (
-            <mark key={i} className="sample-mark">
+            <mark
+              key={i}
+              className="sample-mark"
+              style={{ "--i": String(part.index) } as CSSProperties}
+            >
               {part.text}
               <sup>{part.index + 1}</sup>
             </mark>
@@ -44,7 +55,11 @@ export function SampleAnalysis({ compact = false }: { compact?: boolean }) {
 
       <div className="sample-findings">
         {shown.map((finding, i) => (
-          <div key={`${finding.start}-${i}`} className="sample-finding">
+          <div
+            key={`${finding.start}-${i}`}
+            className="sample-finding"
+            style={{ "--i": String(i) } as CSSProperties}
+          >
             <div className="sample-kind">
               <span className="sample-no">{i + 1}</span>
               {labelOf(finding.subcategory)}

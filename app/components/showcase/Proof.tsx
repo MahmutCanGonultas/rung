@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { recentRuns } from "../../lib/eval/runs";
 
 /*
@@ -25,34 +27,58 @@ export async function Proof({ compact = false }: { compact?: boolean } = {}) {
   const precision = run.found === 0 ? 1 : run.truePositive / run.found;
   const recall = run.expected === 0 ? 1 : (run.expected - run.falseNegative) / run.expected;
   const falseAlarm = run.found === 0 ? 0 : run.falsePositive / run.found;
-  const perItem = run.costUsd === null ? null : run.costUsd / Math.max(run.items, 1);
-
   const worst = [...run.levels].sort((a, b) => a.recall - b.recall)[0];
 
   return (
     <div className="proof">
       <div className="proof-grid">
-        <div className="proof-cell is-lead">
+        {/*
+          Hücrenin altındaki çubuk oranın KENDİSİ: %4,9 yanlış alarm gerçekten
+          hücrenin %4,9'unu kaplıyor. Sayıyı sıfırdan yukarı saydıran bir sayaç
+          YOK — o, yarım saniye boyunca ekranda ölçülmemiş sayı göstermek olurdu
+          ve bu ürünün tek cümlelik kimliği tam olarak onu yapmamak.
+        */}
+        <div className="proof-cell is-lead" style={{ "--i": "0" } as CSSProperties}>
           <span className="proof-label">Yanlış alarm</span>
           <span className="proof-value">{pct(falseAlarm)}</span>
           <span className="proof-note">ana ölçüt</span>
+          <i
+            className="proof-fill"
+            aria-hidden="true"
+            style={{ "--v": String(falseAlarm) } as CSSProperties}
+          />
         </div>
-        <div className="proof-cell">
+        <div className="proof-cell" style={{ "--i": "1" } as CSSProperties}>
           <span className="proof-label">Yakalama</span>
           <span className="proof-value">{pct(recall)}</span>
           <span className="proof-note">{run.expected} beklenen hata</span>
+          <i
+            className="proof-fill"
+            aria-hidden="true"
+            style={{ "--v": String(recall) } as CSSProperties}
+          />
         </div>
-        <div className="proof-cell">
+        <div className="proof-cell" style={{ "--i": "2" } as CSSProperties}>
           <span className="proof-label">İsabet</span>
           <span className="proof-value">{pct(precision)}</span>
           <span className="proof-note">{run.found} bulgu</span>
+          <i
+            className="proof-fill"
+            aria-hidden="true"
+            style={{ "--v": String(precision) } as CSSProperties}
+          />
         </div>
-        <div className="proof-cell">
-          <span className="proof-label">Kayıt başı</span>
-          <span className="proof-value">
-            {perItem === null ? "—" : `$${perItem.toFixed(4)}`}
-          </span>
-          <span className="proof-note">{run.modelId}</span>
+        {/*
+          Burada eskiden kayıt başı dolar maliyeti vardı. Ziyaretçinin ilgisini
+          çeken şey o değil; sayının neye dayandığı. Altın kümenin boyutu
+          diğer üç sayının anlamını veriyor: %95 neyin üstünde ölçülmüş?
+        */}
+        {/* Altın küme bir SAYI, oran değil — paydası olmayan şeye orantılı
+            çubuk çizilmiyor. */}
+        <div className="proof-cell" style={{ "--i": "3" } as CSSProperties}>
+          <span className="proof-label">Altın küme</span>
+          <span className="proof-value">{run.items}</span>
+          <span className="proof-note">örnek metin</span>
         </div>
       </div>
 

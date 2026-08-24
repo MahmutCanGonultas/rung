@@ -14,20 +14,19 @@ import type { Level } from "../lib/content-types";
  * temel iddiası bu ayrımın görünür olması.
  */
 
-function money(x: number): string {
-  return `$${x.toFixed(4)}`;
-}
-
 export function K1Panel({
   entryId,
   analysis,
   findings,
   level,
+  noted,
 }: {
   entryId: string;
   analysis: StoredAnalysis | null;
   findings: StoredFinding[];
   level: Level;
+  /** Deftere alınmış kelimeler — düğme durumunu bilsin diye. */
+  noted: Set<string>;
 }) {
   const label = analysis ? "Yeniden analiz et" : "Modele sor";
 
@@ -51,8 +50,12 @@ export function K1Panel({
 
         {analysis?.status === "ok" ? (
           <span className="k1-meta">
+            {/*
+              Maliyet burada gösterilmiyor: kullanıcının bir kaydı analiz
+              etmenin kaç dolar tuttuğunu bilmesi gerekmiyor. Model kimliği ve
+              süre kalıyor — ikisi de "bu bulguyu ne üretti" sorusunun cevabı.
+            */}
             {analysis.modelId} · prompt {analysis.promptVersion}
-            {analysis.costUsd !== null ? ` · ${money(analysis.costUsd)}` : ""}
             {analysis.durationMs !== null ? ` · ${analysis.durationMs} ms` : ""}
           </span>
         ) : null}
@@ -107,6 +110,7 @@ export function K1Panel({
               finding={finding}
               entryId={entryId}
               index={i}
+              noted={noted}
             />
           ))}
         </>

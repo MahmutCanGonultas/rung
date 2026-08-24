@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { requireUser } from "../../lib/guard";
 import {
-  disagreementCount,
+  objectionCount,
   goldSetSize,
   recentRuns,
   type EvalRun,
@@ -18,7 +18,6 @@ export const metadata: Metadata = { title: "Doğruluk · Rung" };
  */
 
 const pct = (x: number) => `%${(x * 100).toFixed(1)}`;
-const money = (x: number) => `$${x.toFixed(4)}`;
 
 const STAMP = new Intl.DateTimeFormat("tr-TR", {
   day: "numeric",
@@ -70,7 +69,17 @@ function Tile({
 }
 
 function RunPanel({ run, previous }: { run: EvalRun; previous: EvalRun | null }) {
-  const costPerItem = run.costUsd === null ? null : run.costUsd / Math.max(run.items, 1);
+  /*
+   * Maliyet bu ekranda YOK. Ölçüm koşumunun kaç dolara mal olduğu ürünü
+   * işleten kişinin sorunu; ürünü kullanan kişinin ekranında yeri yok. Sayı
+   * `analyses.cost_usd` ve `eval_runs.cost_usd` sütunlarında duruyor ve
+   * `npm run eval` çıktısında yazıyor — kaybolmadı, sadece kullanıcıya
+   * gösterilmiyor.
+   *
+   * Boşalan yere en zayıf seviye geldi: sayfanın asıl iddiası "zayıf yer
+   * gizlenmez" ve bunu bir dolar rakamından çok daha iyi taşıyor.
+   */
+  const weakest = [...run.levels].sort((a, b) => a.recall - b.recall)[0];
 
   return (
     <>
@@ -103,9 +112,9 @@ function RunPanel({ run, previous }: { run: EvalRun; previous: EvalRun | null })
           note={`${run.truePositive} / ${run.found}`}
         />
         <Tile
-          label="Kayıt başı maliyet"
-          value={costPerItem === null ? "—" : money(costPerItem)}
-          note={run.costUsd === null ? undefined : `koşum ${money(run.costUsd)}`}
+          label="En zayıf seviye"
+          value={weakest ? weakest.level : "—"}
+          note={weakest ? `yakalama ${pct(weakest.recall)}` : undefined}
         />
       </div>
 
@@ -183,10 +192,10 @@ function RunPanel({ run, previous }: { run: EvalRun; previous: EvalRun | null })
 export default async function AccuracyPage() {
   await requireUser();
 
-  const [runs, gold, disagreements] = await Promise.all([
+  const [runs, gold, objections] = await Promise.all([
     recentRuns(6),
     goldSetSize(),
-    disagreementCount(),
+    objectionCount(),
   ]);
 
   const latest = runs[0] ?? null;
@@ -220,7 +229,7 @@ export default async function AccuracyPage() {
         <Tile
           label="İtirazdan gelen"
           value={String(gold.fromFeedback)}
-          note={`${disagreements} bekleyen itiraz`}
+          note={`${objections} itiraz kaydedildi`}
         />
       </div>
 
@@ -272,7 +281,7 @@ export default async function AccuracyPage() {
           ["02 · daralt", "Şema zorlaması", "Modele açık uçlu soru sorulmuyor. Sabit kategori, zorunlu şema."],
           ["03 · ayır", "Deterministik önce", "Yazım ve temel kurallar modelsiz. Modele sadece yorum gerektiren kısım gidiyor."],
           ["04 · doğrula", "İkinci geçiş", "Her bulguya bağımsız olarak 'bu gerçekten hata mı' soruluyor — gerekçesi gösterilmeden."],
-          ["05 · dinle", "İtiraz döngüsü", "Katılmadığın her düzeltme altın kümeye bir yanlış alarm örneği olarak giriyor."],
+          ["05 · dinle", "İtiraz döngüsü", "Katılmadığın her düzeltme kaydediliyor; elle gözden geçirilip altın kümeye yanlış alarm örneği olarak ekleniyor."],
         ].map(([n, title, text]) => (
           <div key={n} className="defence">
             <div className="defence-n">{n}</div>
