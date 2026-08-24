@@ -148,6 +148,27 @@ async function seed(client) {
     }
   }
 
+  /*
+   * Kelime defterine birkaç not: bölüm hiç not yokken çizilmiyor, o yüzden
+   * tohumsuz görüntülerde tasarımı görmek mümkün değildi.
+   */
+  const NOTES = [
+    ["reluctant", "reluctant", "C1", "She was reluctant to accept the offer.", 3],
+    ["deposit", "deposit", "B2", "Ask your landlord about the deposit you have not received.", 6],
+    ["landlord", "landlord", "C1", "Ask your landlord about the deposit you have not received.", 9],
+    ["received", "received", "A2", '"recieved" sözlükte yok. Önerilenler: received, relieved.', 14],
+  ];
+  for (const [word, surface, band, snippet, days] of NOTES) {
+    await client.query(
+      `INSERT INTO word_notes
+         (user_id, word, surface, band, source, source_entry_id, context_snippet,
+          noted_at, resolved_at)
+       VALUES ($1,$2,$3,$4,'entry',$5,$6, now() - ($7 || ' days')::interval, $8)`,
+      [id, word, surface, band, firstEntry, snippet, days,
+       word === "received" ? new Date() : null]
+    );
+  }
+
   return { id, entry: firstEntry };
 }
 

@@ -114,12 +114,15 @@ export default async function DashboardPage() {
         </>
       ) : null}
 
-      <Notebook notes={notes} open={counts.open} resolved={counts.resolved} />
-
+      {/* Açıklama listenin hemen altında: defterin arkasına düşerse neyi
+          anlattığı belirsizleşiyor. */}
       <p className="panel-next">
         Listedeki sayı <b>100 kelimede bulgu</b> — uzun ve kısa metinleri
         karşılaştırılabilir yapan tek ölçü. Küçülmesi iyiye gidiş demek.
       </p>
+
+      <Notebook notes={notes} open={counts.open} resolved={counts.resolved} />
+
     </section>
   );
 }

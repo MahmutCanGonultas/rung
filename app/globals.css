@@ -2524,6 +2524,31 @@ textarea:focus-visible,
   font-size: 11.5px;
   color: var(--ink-3);
 }
+.offband-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 3px;
+}
+.offband-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.offband-input {
+  width: auto;
+  flex: 1 1 180px;
+  min-width: 0;
+  font-size: 14px;
+  padding: 7px 10px;
+}
+.offband-add .btn {
+  padding: 7px 13px;
+  font-size: 13px;
+}
 
 /* ── kendi yazdığın üst bant kelimeleri ───────────────────────────── */
 .ownwords {
