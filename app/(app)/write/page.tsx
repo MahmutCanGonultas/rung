@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { Composer } from "../../components/Composer";
+import { OffBandStrip } from "../../components/OffBandStrip";
 import {
   findContextBySlug,
   findTaskById,
@@ -12,6 +13,7 @@ import {
 import { currentLevel } from "../../lib/k3/store";
 import { saveEntryAction } from "../../lib/entry-actions";
 import { requireUser } from "../../lib/guard";
+import { notedWords } from "../../lib/vocab/notes";
 
 export const metadata: Metadata = { title: "Yaz · Rung" };
 
@@ -49,6 +51,7 @@ export default async function WritePage({
    */
   const level = await currentLevel(user.id);
   const chosen = params.task ? await findTaskById(params.task) : null;
+  const noted = await notedWords(user.id);
 
   // Görev yoksa, ya da adresteki görev bu bağlama ait değilse: yeniden seç.
   if (!chosen || chosen.contextId !== context.id) {
@@ -90,6 +93,14 @@ export default async function WritePage({
           Başka görev ver
         </Link>
       </div>
+
+      <OffBandStrip
+        prompt={chosen.prompt}
+        level={level}
+        taskId={chosen.id}
+        back={`/write?context=${context.slug}&task=${chosen.id}`}
+        noted={noted}
+      />
 
       <Composer
         action={saveEntryAction}

@@ -1,4 +1,7 @@
+import { BAND_ORDER, bandOf, type Band } from "../lib/k0/bands";
 import { analyze } from "../lib/k0";
+import { words } from "../lib/k0/tokenize";
+import { NoteWordButton } from "./NoteWordButton";
 import { segment } from "../lib/k0/segments";
 import { labelOf } from "../lib/taxonomy";
 
@@ -34,7 +37,18 @@ function num(x: number, digits = 1): string {
   });
 }
 
-export function K0Panel({ text }: { text: string }) {
+export function K0Panel({
+  text,
+  entryId,
+  level,
+  noted,
+}: {
+  text: string;
+  entryId: string;
+  level: Band;
+  /** Deftere alınmış kelimeler. */
+  noted: Set<string>;
+}) {
   const result = analyze(text);
   const { metrics, bands, findings } = result;
   const parts = segment(text, findings);
@@ -113,6 +127,18 @@ export function K0Panel({ text }: { text: string }) {
             temel bandın üstü <b>{pct(bands.aboveBasic)}</b>
           </span>
         </div>
+
+        <OwnWords
+          text={text}
+          level={level}
+          entryId={entryId}
+          noted={noted}
+          spelling={new Set(
+            findings
+              .filter((f) => f.subcategory === "spelling")
+              .map((f) => f.original.toLowerCase())
+          )}
+        />
       </div>
 
       <div className="findings">
@@ -151,5 +177,74 @@ export function K0Panel({ text }: { text: string }) {
         )}
       </div>
     </>
+  );
+}
+
+/*
+ * Kendi yazdığın, bandının üstündeki kelimeler.
+ *
+ * Neden burada: bir kelimeyi KULLANMAK, onu bildiğin anlamına gelmiyor —
+ * insan yarım bildiği kelimeyi de yazıyor. "Bunu doğru mu kullandım?" sorusu
+ * en çok burada çıkıyor.
+ *
+ * Yazım hatası olarak işaretlenen kelimeler dışarıda: "recieved" bir kelime
+ * bilgisi değil, `bands.ts` de aynı sebeple onları ölçüm dışında tutuyor.
+ *
+ * `<details>` içinde kapalı duruyor — kayıt sayfasının asıl işi bulgular.
+ */
+function OwnWords({
+  text,
+  level,
+  entryId,
+  noted,
+  spelling,
+}: {
+  text: string;
+  level: Band;
+  entryId: string;
+  noted: Set<string>;
+  spelling: Set<string>;
+}) {
+  const floor = BAND_ORDER.indexOf(level);
+  const seen = new Set<string>();
+  const above: Array<{ surface: string; sentence: string }> = [];
+
+  for (const w of words(text)) {
+    const key = w.text.toLowerCase();
+    if (seen.has(key) || spelling.has(key)) continue;
+    seen.add(key);
+    if (BAND_ORDER.indexOf(bandOf(key)) <= floor) continue;
+
+    const around = text.slice(Math.max(0, w.start - 60), w.start + 60).trim();
+    above.push({ surface: w.text, sentence: around });
+  }
+
+  if (above.length === 0) return null;
+
+  return (
+    <details className="ownwords">
+      <summary>
+        Bu metinde <b>{level}</b> bandının üstünde {above.length} kelime
+        kullanmışsın
+      </summary>
+      <p className="ownwords-note">
+        Kullanmak bilmek değil. Emin olmadığın varsa deftere al — bant listesi
+        elle derlendi ve <b>C1</b> burada &quot;listede yok&quot; demek.
+      </p>
+      <div className="offband-words">
+        {above.slice(0, 12).map((w) => (
+          <NoteWordButton
+            key={w.surface}
+            surface={w.surface}
+            source="entry"
+            anchorId={entryId}
+            snippet={w.sentence}
+            back={`/entries/${entryId}`}
+            noted={noted.has(w.surface.toLowerCase())}
+            compact
+          />
+        ))}
+      </div>
+    </details>
   );
 }

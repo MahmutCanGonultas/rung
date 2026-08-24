@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EntryRow } from "../../components/EntryRow";
+import { Notebook } from "../../components/Notebook";
 import { countEntries, listEntries } from "../../lib/entries";
+import { listNotes, noteCounts } from "../../lib/vocab/notes";
 import { requireUser } from "../../lib/guard";
 import { latestEstimate } from "../../lib/k3/store";
 
@@ -18,10 +20,12 @@ const DAY = new Intl.DateTimeFormat("tr-TR", {
 export default async function DashboardPage() {
   const user = await requireUser();
 
-  const [totals, recent, estimate] = await Promise.all([
+  const [totals, recent, estimate, notes, counts] = await Promise.all([
     countEntries(user.id),
     listEntries(user.id, { limit: 5 }),
     latestEstimate(user.id),
+    listNotes(user.id, 8),
+    noteCounts(user.id),
   ]);
 
   return (
@@ -109,6 +113,8 @@ export default async function DashboardPage() {
           ))}
         </>
       ) : null}
+
+      <Notebook notes={notes} open={counts.open} resolved={counts.resolved} />
 
       <p className="panel-next">
         Listedeki sayı <b>100 kelimede bulgu</b> — uzun ve kısa metinleri

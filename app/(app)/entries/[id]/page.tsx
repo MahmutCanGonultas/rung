@@ -10,6 +10,7 @@ import { findingsFor, latestAnalysis } from "../../../lib/analyses";
 import { currentLevel } from "../../../lib/k3/store";
 import { findEntryForUser, previousAttempts } from "../../../lib/entries";
 import { requireUser } from "../../../lib/guard";
+import { notedWords } from "../../../lib/vocab/notes";
 
 export const metadata: Metadata = { title: "Kayıt · Rung" };
 
@@ -49,6 +50,7 @@ export default async function EntryPage({
   // değil görevin kimliği; ikisini karıştırmak sessizce boş liste döndürürdü.
   // K1 sonucu varsa göster. Yoksa panel "modele sor" düğmesini gösteriyor.
   const level = await currentLevel(user.id);
+  const noted = await notedWords(user.id);
   const k1 = await latestAnalysis(entry.id, user.id, "K1");
   const k1Findings =
     k1 && k1.status === "ok" ? await findingsFor(k1.id, user.id) : [];
@@ -70,13 +72,19 @@ export default async function EntryPage({
       </h1>
       {entry.taskHint ? <p className="panel-lede">{entry.taskHint}</p> : null}
 
-      <K0Panel text={entry.body} />
+      <K0Panel
+        text={entry.body}
+        entryId={entry.id}
+        level={level}
+        noted={noted}
+      />
 
       <K1Panel
         entryId={entry.id}
         analysis={k1}
         findings={k1Findings}
         level={level}
+        noted={noted}
       />
 
       <dl className="facts">
