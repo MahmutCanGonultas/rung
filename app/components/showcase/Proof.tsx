@@ -17,7 +17,17 @@ import { recentRuns } from "../../lib/eval/runs";
 export async function Proof({
   compact = false,
   bands = false,
-}: { compact?: boolean; bands?: boolean } = {}) {
+  layout = "card",
+}: {
+  compact?: boolean;
+  bands?: boolean;
+  /*
+   * `flat`: dört parça ızgaranın DOĞRUDAN çocuğu oluyor. Anasayfada itiraf
+   * şeridi kendi zeminine ve kendi genişliğine geçmek zorunda; kap içinde
+   * kalırsa geçemiyor. `SampleAnalysis` ile aynı kalıp, aynı gerekçe.
+   */
+  layout?: "card" | "flat";
+} = {}) {
   let run;
   try {
     [run] = await recentRuns(1);
@@ -31,8 +41,8 @@ export async function Proof({
   const falseAlarm = run.found === 0 ? 0 : run.falsePositive / run.found;
   const worst = [...run.levels].sort((a, b) => a.recall - b.recall)[0];
 
-  return (
-    <div className="proof">
+  const inner = (
+    <>
       <div className="proof-grid">
         {/*
           Hücrenin altındaki çubuk oranın KENDİSİ: %4,9 yanlış alarm gerçekten
@@ -150,6 +160,9 @@ export async function Proof({
           çaba {run.effort} · {run.layers}
         </p>
       )}
-    </div>
+    </>
   );
+
+  if (layout === "flat") return inner;
+  return <div className="proof">{inner}</div>;
 }

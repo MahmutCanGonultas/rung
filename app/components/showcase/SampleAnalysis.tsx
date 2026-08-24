@@ -2,6 +2,10 @@ import type { CSSProperties } from "react";
 
 import { analyze } from "../../lib/k0";
 import { segment } from "../../lib/k0/segments";
+import {
+  SHOWCASE_SAMPLES,
+  type ShowcaseVariant,
+} from "../../lib/k0/showcase-samples";
 import { labelOf } from "../../lib/taxonomy";
 
 /*
@@ -14,28 +18,26 @@ import { labelOf } from "../../lib/taxonomy";
  * Model çağrısı yok: her açılışta aynı sonuç çıkıyor ve sayfanın açılması
  * hiçbir dış servise bağlı değil.
  *
- * İKİ YERLEŞİM:
- *   card  anasayfa — okuma ve raf tek bir kutunun içinde
- *   flat  giriş ekranı — ikisi ızgaranın DOĞRUDAN çocuğu oluyor
- *
- * `flat` şart, çünkü giriş ekranında raf kartın altından TAM GENİŞLİKTE
- * geçmek zorunda. `.sample` içinde kalırsa geçemiyor: `.sample`ın
- * `overflow: hidden`ı yeni bir blok biçimlendirme bağlamı açıyor ve ızgara
- * öğesi olarak tek şeritten geniş olamıyor. `display: contents` de çözüm
- * değil — `InView.tsx` sebebini zaten yazıyor.
+ * Bileşen iki parça döndürüyor (okuma şeridi + bulgu rafı) ve ikisi de
+ * çağıran ızgaranın DOĞRUDAN çocuğu oluyor. Bir kaba sarmak mümkün değil:
+ * kap `overflow: hidden` ile yeni bir blok biçimlendirme bağlamı açıyor ve
+ * raf tek şeritten geniş olamıyor. `display: contents` de çözüm değil —
+ * `InView.tsx` sebebini zaten yazıyor.
  */
 
-const SAMPLE =
-  "I am agree with your suggestion about the meeting of tomorrow. " +
-  "Thanks for the informations you sent me, i recieved them yesterday.";
-
 export function SampleAnalysis({
-  layout = "card",
+  variant = "broken",
 }: {
-  layout?: "card" | "flat";
+  /*
+   * `clean` aynı motordan geçen DOĞRU bir cümle ve sıfır bulgu veriyor.
+   * Ürünün kanıtlanamaz iddiası ("doğru cümleyi düzeltmiyoruz") böylece
+   * cümle olmaktan çıkıp sayfanın hesapladığı bir olaya dönüşüyor.
+   */
+  variant?: ShowcaseVariant;
 }) {
-  const { findings } = analyze(SAMPLE);
-  const parts = segment(SAMPLE, findings);
+  const text = SHOWCASE_SAMPLES[variant];
+  const { findings } = analyze(text);
+  const parts = segment(text, findings);
 
   /*
    * Hareketin ritmi GERÇEK VERİDEN geliyor: `--n` bulgu sayısı, `--i` her
@@ -74,7 +76,22 @@ export function SampleAnalysis({
     </div>
   );
 
-  const shelf = (
+  /*
+   * Sıfır bulgu ÖZEL DURUM, boş liste değil.
+   *
+   * `.sample-findings` zemini `--hairline` ve hücreleri 1px boşlukla ayrılıyor;
+   * çocuksuz çizilince ekranda dolu bir çizgi bloğu kalıyor. Boş raf "yüklenmedi"
+   * gibi okunuyor, oysa burada boşluk KANITIN KENDİSİ.
+   *
+   * Cümle "bu cümlede" diyor, "asla yanlış alarm vermez" demiyor: oran ölçülmüş
+   * bir sayı ve iki bant aşağıda, kendi koşum künyesiyle duruyor.
+   */
+  const shelf = findings.length === 0 ? (
+    <p className="sample-silent">
+      Motor bu cümlede <b>hiçbir şey</b> bulmadı. Uydurulmuş bir düzeltme yok —
+      doğru cümle sessizlikle geçiyor.
+    </p>
+  ) : (
     <div className="sample-findings">
       {findings.map((finding, i) => (
         <div
@@ -101,19 +118,19 @@ export function SampleAnalysis({
     </div>
   );
 
-  if (layout === "flat") {
-    return (
-      <>
-        {read}
-        {shelf}
-      </>
-    );
-  }
-
+  /*
+   * İki parça ızgaranın DOĞRUDAN çocuğu oluyor — tek yerleşim bu.
+   *
+   * Bir zamanlar `card` diye ikinci bir yerleşim vardı ve ikisini `.sample`
+   * kutusuna sarıyordu; anasayfa o kutuyu kullanan son yerdi. Artık iki ekran
+   * da parçaları kendi ızgarasına yerleştiriyor, çünkü raf hem kartın altından
+   * hem bölmenin içinden tam genişlikte geçmek zorunda — bir kap içinde
+   * kalırsa geçemiyor.
+   */
   return (
-    <div className="sample">
+    <>
       {read}
       {shelf}
-    </div>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 /*
- * Sadece giriş ve kayıt ekranları — hızlı tur.
+ * Herkese açık ekranlar — hızlı tur.
  *
- * Çalıştırma:  node scripts/auth-shots.mjs <klasör>
+ * Çalıştırma:  npm run shots:public -- <klasör>
  *
  * `scripts/shots.mjs` dokuz ekranı gerçek veriyle çekiyor ve dakikalar sürüyor.
  * Giriş ekranı üzerinde çalışırken her denemede o turu koşturmak işi
@@ -22,6 +22,7 @@ const BASE = process.env.SHOTS_BASE ?? "http://localhost:3000";
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 const PAGES = [
+  ["anasayfa", "/"],
   ["giris", "/login"],
   ["kayit", "/register"],
 ];
@@ -61,6 +62,7 @@ async function main() {
             .map((el) => `${el.tagName.toLowerCase()}.${(el.className || "").toString().split(" ")[0]}`);
 
           // Formun ilk alanı ekranın neresinde? Katlanmanın altına düşmemeli.
+          // Anasayfada form yok; kontrol kendiliğinden atlanıyor.
           const email = document.querySelector('input[name="email"]');
           const box = email ? email.getBoundingClientRect() : null;
 
@@ -81,7 +83,11 @@ async function main() {
           problems.push(`${tag2}: e-posta alanı katlanmanın altında (y=${check.emailTop})`);
         }
 
-        await page.screenshot({ path: `${OUT}/${tag2}.png`, fullPage: false });
+        // Anasayfa uzun: tam sayfa. Giriş/kayıt tek ekrana sığmalı.
+        await page.screenshot({
+          path: `${OUT}/${tag2}.png`,
+          fullPage: name === "anasayfa" && tag === "gs",
+        });
       }
     }
   }
