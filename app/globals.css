@@ -693,6 +693,13 @@ a.chip:hover {
   justify-content: space-between;
   gap: 12px;
   align-items: baseline;
+  /*
+   * Etiketler kendi içinde bölünmüyor ("AĞUSTOS 2026 · 3 / KAYIT" diye ikiye
+   * ayrılıyordu), ama ikisi birden sığmazsa ikincisi alt satıra iniyor.
+   * Sadece `nowrap` yazmak panoda yatay taşma üretmişti — defter başlığı
+   * daha uzun.
+   */
+  flex-wrap: wrap;
   margin: 26px 0 4px;
   padding-bottom: 7px;
   border-bottom: 1px solid var(--hairline);
@@ -701,6 +708,9 @@ a.chip:hover {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-3);
+}
+.month > span {
+  white-space: nowrap;
 }
 /* ── tek kayıt ────────────────────────────────────────────────────── */
 .entry-head {
@@ -2664,4 +2674,15 @@ textarea:focus-visible,
 }
 .note-meta a {
   color: var(--ink-3);
+}
+
+
+/* Telefonda sütun etiketi başlığa sığmıyor; harf aralığı kısılıyor. Etiketin
+   kendisi kalıyor — sayının ne olduğunu söyleyen tek şey o. */
+@media (max-width: 600px) {
+  .month {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    gap: 8px;
+  }
 }
