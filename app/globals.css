@@ -2271,6 +2271,20 @@ textarea:focus-visible,
   padding-right: var(--rail);
   background: var(--surface-2);
   border-left: 1px solid var(--hairline);
+  /*
+   * Boşluk TASARLANMIŞ olmak zorunda, artık değil. Sol bölme beş bulguyla
+   * uzarken sağ bölmede tek bir not kalıyor; akışa bırakılırsa o not tepeye
+   * yapışıp altında yüzlerce piksel kaza gibi duruyor. Ortalanınca boşluk
+   * bölmenin iki yanına dağılıyor ve "burada bir şey yok" bilinçli okunuyor.
+   *
+   * `align-self: stretch` ŞART. `.move` `align-items: start` diyor, yani bölme
+   * kendi içeriği kadar yüksek kalıyordu: ÖLÇÜLDÜ sol 949px, sağ 446px, ve
+   * aradaki 500px'lik fark bölmenin ALTINDA çıplak zemin olarak duruyordu.
+   * Uzatılınca yüzey satırın tamamını kaplıyor ve `justify-content` çalışacak
+   * boşluğu buluyor.
+   */
+  align-self: stretch;
+  justify-content: center;
   /* Sessizlik gürültüden SONRA düşüyor. Yeni keyframe yok — hareket katmanı
      `--t-enter`i zaten altı yerde okuyor. */
   --t-enter: calc(var(--beat) * 4);
@@ -2328,7 +2342,16 @@ textarea:focus-visible,
   border-top: 0;
   gap: 0 clamp(20px, 2.4vw, 36px);
 }
-.trial-pane.is-broken .sample-findings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/*
+ * TEK SÜTUN. İki sütun denendi ve ölçüldü: bu bölüm 925px'te 55 metin bloğu ve
+ * 13 çizgili öğe taşıyor, komşularının üç katı — ve beş bulgu iki sütuna
+ * bölününce göz aşağı okumak yerine zikzak çiziyor. Kalabalık hissinin kaynağı
+ * bulgu SAYISI değil, okuma yolunun kırılması.
+ *
+ * Tek sütunda bölme uzuyor ve bu ISTENEN: solda gürültü birikiyor, sağda
+ * sessizlik duruyor. Karşıtlık bölümün kendi argümanı.
+ */
+.trial-pane.is-broken .sample-findings { grid-template-columns: minmax(0, 1fr); }
 .trial-pane .sample-finding {
   background: none;
   box-shadow: none;
