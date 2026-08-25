@@ -13,10 +13,14 @@
  * bitmiş kare olmalı.
  */
 
+import { mkdirSync } from "node:fs";
 import puppeteer from "puppeteer-core";
 
 const OUT = process.argv[2];
 if (!OUT) throw new Error("çıktı klasörü gerekiyor");
+// Klasörü araç açıyor. Açmadığı sürüm bir koşumda tesadüfen çalıştı, bir
+// sonrakinde ENOENT ile düştü — "bazen çalışan" araç, çalışmayan araçtır.
+mkdirSync(OUT, { recursive: true });
 
 const BASE = process.env.SHOTS_BASE ?? "http://localhost:3000";
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
