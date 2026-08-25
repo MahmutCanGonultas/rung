@@ -29,18 +29,28 @@
    */
   --ink-3: #5f686e;
 
-  --accent: #0e9b6c;
+  /*
+   * ÖLÇÜLDÜ: eski #0e9b6c açık temada 3,14:1 veriyordu — hem butonun beyaz
+   * etiketi hem kâğıt üstündeki yeşil metin için, ve normal metnin tabanı
+   * 4,5:1. Yani kusur butonda değil TOKENDE'ydi: o yeşil bu kâğıt için fazla
+   * açıktı. `--ink-3`te olduğu gibi tek yerden düzeltildi.
+   *
+   * Ton korundu (H=160°, S=%83); yalnızca HSL parlaklığı %33,1 → %26,0.
+   * Yeni ölçüm: beyaz/buton 4,73 · yeşil/kâğıt 4,73 · yeşil/yüzey 5,08.
+   * Koyu temadaki #35d39b'ye DOKUNULMADI, o zaten 10,08:1.
+   */
+  --accent: #0b7a55;
   --model: #5b4bd6;
   --error: #8f2418;
   --suspect: #6b7680;
 
-  --accent-wash: rgba(14, 155, 108, 0.1);
+  --accent-wash: rgba(11, 122, 85, 0.1);
   --error-wash: rgba(143, 36, 24, 0.06);
-  --accent-line: rgba(14, 155, 108, 0.34);
+  --accent-line: rgba(11, 122, 85, 0.34);
   --error-line: rgba(143, 36, 24, 0.28);
 
-  --ring: rgba(14, 155, 108, 0.45);
-  --ring-soft: rgba(14, 155, 108, 0.13);
+  --ring: rgba(11, 122, 85, 0.45);
+  --ring-soft: rgba(11, 122, 85, 0.13);
   --shadow: 0 28px 56px -34px rgba(20, 23, 26, 0.3);
 
   /*
@@ -1812,8 +1822,20 @@ textarea:focus-visible,
   gap: 7px;
   align-content: start;
 }
+/*
+ * Yıkama yüzeyin ÜSTÜNE, yerine değil.
+ *
+ * Burada `background: var(--accent-wash)` yazıyordu ve kısayol `.proof-cell`in
+ * opak `--surface`ını siliyordu. Izgaranın zemini `--hairline` — boşlukları
+ * çizgi gibi göstermek için — yani %10'luk yıkamanın altından ÇİZGİ RENGİ
+ * geçiyordu. ÖLÇÜLDÜ: hücrenin gerçek zemini #c8cec2, oysa komşularınınki
+ * #f7f5f1. Ana ölçütün hücresi, diğerlerinden temiz durması gerekirken
+ * onlardan kirli duruyordu.
+ *
+ * `background-image` katman ekliyor, `background-color`a dokunmuyor.
+ */
 .proof-cell.is-lead {
-  background: var(--accent-wash);
+  background-image: linear-gradient(var(--accent-wash), var(--accent-wash));
 }
 .proof-label {
   font-family: var(--mono);
@@ -1832,6 +1854,15 @@ textarea:focus-visible,
 }
 .proof-cell.is-lead .proof-value {
   color: var(--accent);
+}
+/*
+ * Kurşun hücrenin zemini yıkanmış, o yüzden mürekkebi de bir kademe koyu.
+ * `--ink-3` düz yüzey için ayarlandı; yıkamanın üstünde ÖLÇÜLDÜ 3,54 (açık) ve
+ * 3,18 (koyu) veriyordu. Etiketin zeminiyle birlikte değişmesi gerekiyor.
+ */
+.proof-cell.is-lead .proof-label,
+.proof-cell.is-lead .proof-note {
+  color: var(--ink-2);
 }
 .proof-note {
   font-size: 11.5px;
@@ -1893,7 +1924,7 @@ textarea:focus-visible,
   --rail: clamp(20px, 5vw, 76px);
 
   /* Nabız YALNIZCA burada. `:root`taki `--t-lead`/`--t-step` ELLENMİYOR:
-     `.auth-stage` onları okuyor ve dün imzalandı. */
+     kapı ekranı (`.gate`) onları okuyor. */
   --beat: 80ms;
   --t-lead: calc(var(--beat) * 12);   /* 960ms · okuma kafası */
   --t-step: calc(var(--beat) * 3);    /* 240ms · iki hata arası */
@@ -2435,10 +2466,9 @@ textarea:focus-visible,
 
 /* ── tek kart üstünde duran sayfalar ──────────────────────────────── */
 /*
- * `/error` ve `/not-found` bu iki sınıfı kullanıyor ve ikisinin de BUGÜNE
+ * `/error` ve `/not-found` bu sınıfları kullanıyor ve ikisinin de BUGÜNE
  * KADAR hiç kuralı yoktu — iki sayfa da çıplak çıkıyordu. Giriş ve kayıt
- * ekranları `.auth-stage` içinde aynı `.auth-card`ı kullanıyor, orada sadece
- * ızgaradaki yeri değişiyor.
+ * artık burada değil: onlar `.gate` levhasında oturuyor.
  */
 .auth {
   min-height: 100dvh;
@@ -2484,372 +2514,6 @@ textarea:focus-visible,
   margin: 22px 0 0;
   font-size: 13.5px;
   color: var(--ink-3);
-}
-
-/* ── giriş / kayıt · TEK LEVHA ────────────────────────────────────── */
-/*
- * Dikey dikiş KALDIRILDI.
- *
- * Eskisi 5fr/7fr bir ızgaraydı ve tek işi iki belgenin arasına 100dvh boyunca
- * bir çizgi çekmekti: solda 380px'lik bir kutu 600px'lik sütunun ortasında
- * asılı duruyordu — ölçüldü, sütunun %76'sı boştu ve o boşluk tasarlanmış
- * değildi, `margin-block: auto`nun artığıydı. Sağda anasayfanın sıkıştırılmış
- * bir kopyası vardı. Hiçbir öğe dikişi geçmiyordu, o yüzden göz yan yana iki
- * ayrı ürün görüyordu.
- *
- * Yeni yapı TEK LEVHA:
- *   · analiz sayfanın ZEMİNİ, kenardan kenara
- *   · form o zeminin üstünde duran ve üst kenarını KIRAN yükseltilmiş nesne
- *   · beş gerçek bulgu kartın altından tam genişlikte geçiyor
- *   · ölçülen doğruluk en altta, aletin durum çubuğu gibi
- *
- * Kompozisyon üstte ayrık, altta sürekli. Dikiş artık çizilemiyor.
- *
- * Sütunlar "pano" değil RAY: adlandırılmış ızgara çizgileri sayesinde aynı
- * ızgara hem şerit genişliğinde bir kartı hem kenardan kenara bir levhayı
- * tutabiliyor.
- */
-.auth-stage {
-  --rail: clamp(20px, 5vw, 72px);
-  /* Giriş ekranı gösteri izlenecek yer değil: dizi yarı tempoda koşuyor. */
-  --t-lead: 480ms;
-  --t-step: 150ms;
-
-  min-height: 100dvh;
-  display: grid;
-  background: var(--plane);
-  grid-template-columns:
-    [bleed-start] var(--rail)
-    [rail-start] minmax(300px, 400px)
-    [lane-start] minmax(0, 1fr)
-    var(--rail) [bleed-end];
-  grid-template-rows:
-    auto /* 1 · başlık şeridi */
-    clamp(18px, 2.4vw, 34px) /* 2 · kartın levhadan taşan payı */
-    auto /* 3 · kart gövdesi ↔ okunan cümle */
-    auto /* 4 · bulgu rafı, tam genişlik */
-    1fr /* 5 · pay; dar ekranda kendiliğinden kapanıyor */
-    auto; /* 6 · ölçüm şeridi */
-}
-/* Levhanın üstündeki her şey kendi katmanında. */
-.auth-stage > *:not(.auth-plate) {
-  position: relative;
-  z-index: 1;
-}
-
-.auth-head {
-  grid-column: rail-start / -2;
-  grid-row: 1;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px 28px;
-  flex-wrap: wrap;
-  padding-block: clamp(20px, 3vw, 34px);
-}
-.auth-head .mark-link {
-  font-size: 20px;
-}
-/*
- * Tek cümlelik çerçeve. `.hero-lede`'nin tekrarı DEĞİL: ürünü değil,
- * aşağıdaki KANITI etiketliyor. Giriş ekranı ikinci bir anasayfa olmuyor.
- */
-.auth-note {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink-2);
-  max-width: 46ch;
-  text-align: right;
-}
-
-/* Levha: kanıt bir pano değil, sayfanın üstüne kurulduğu DÜZLEM. */
-.auth-plate {
-  grid-column: 1 / -1;
-  /*
-   * 3–6 arası, yani 5. satırdaki payı DA kaplıyor.
-   *
-   * Önce 3–5 yazılmıştı ve uzun ekranda hata veriyordu: 1600×1400'te rafla
-   * ölçüm şeridi arasında 375px çıplak `--plane` kalıyordu. Levha sayfanın
-   * ZEMİNİ; zemin, üstündeki içerik bitti diye kesilmiyor.
-   */
-  grid-row: 3 / 6;
-  position: relative;
-  z-index: 0;
-  background: var(--surface-2);
-  border-bottom: 1px solid var(--hairline);
-}
-/* Üst kenar ayrı bir çizgi: soldan sağa çekilebilsin diye (hareket katmanı). */
-.auth-plate::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 1px;
-  background: var(--hairline);
-  transform-origin: left center;
-}
-
-/*
- * Kart 2–3, levha 3–4 satırında: kart levhanın üst kenarından yukarı taşıyor.
- * Hiçbir şey örtülmüyor, çünkü kartın altındaki levha boş.
- */
-.auth-stage > .auth-card {
-  grid-column: rail-start / lane-start;
-  grid-row: 2 / 4;
-  z-index: 2;
-  align-self: start;
-  max-width: none;
-}
-
-/*
- * İki kapı. "Hesabın yok mu? Hesap oluştur" formun altına asılmış bir
- * cümleydi; aslında üst düzey bir seçim. Kartın alt kuralının üstünde iki eşit
- * bölme, etkin olanın üstünde vurgu çizgisi. JavaScript'siz çalışıyor.
- *
- * Formdan SONRA duruyor: bu ekrana gelen kişi kapıyı zaten seçmiş geliyor,
- * burası yanlış seçtiğini fark ettiği yer. Sekme sırası e-posta → şifre →
- * gönder → kapılar, yani form ilk.
- */
-.auth-switch {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin-top: 26px;
-  border-top: 1px solid var(--hairline);
-}
-.auth-switch a {
-  margin-top: -1px;
-  padding: 13px 8px 2px;
-  text-align: center;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  text-decoration: none;
-  border-top: 2px solid transparent;
-  transition: color 160ms ease, border-color 160ms ease;
-}
-.auth-switch a:hover {
-  color: var(--ink);
-}
-.auth-switch a[aria-current="page"] {
-  color: var(--ink);
-  border-top-color: var(--accent);
-}
-.auth-switch a:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-/*
- * Okuma şeridi: iki ucundan da bağlı. `align-self: start` olsaydı kartın
- * fazla boyu yanında görünür bir boşluk bırakırdı — bugünkü sol sütunun
- * hatasının aynadaki hâli.
- */
-.auth-stage > .sample-read {
-  grid-column: lane-start / -2;
-  grid-row: 3;
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  /*
-   * Şerit ve cümle TEK BİRİM, ve o birim alanın ortasında.
-   *
-   * İki deneme de yanlıştı ve ikisi de ölçülerek elendi. `space-between`
-   * aralarında 302px bırakıyordu — eski tasarımın "bir alan, içindekini
-   * yaslamak için var oluyor" hatasının yer değiştirmiş hâli. Cümleye
-   * `margin-block: auto` vermek boşluğu ikiye böldü ama şeridi tepede yalnız
-   * bıraktı: "K0 · deterministik" etiketi neyi etiketlediğinden 150px uzaktı.
-   */
-  justify-content: center;
-  gap: 20px;
-  padding: 20px 0 26px clamp(20px, 2.4vw, 40px);
-}
-.auth-stage .sample-head {
-  padding: 0;
-  border-bottom: 0;
-  background: none;
-  box-shadow: none;
-}
-/*
- * Mikro kat `--ink-3` ile `--surface-2` üstünde 3,3:1'de kalıyordu. Bu tasarım
- * o katı çok daha geniş gösteriyor; giriş yüzeyinde `--ink-2` (6,1:1).
- */
-.auth-stage .sample-tag,
-.auth-stage .sample-count,
-.auth-stage .sample-kind,
-.auth-stage .proof-label {
-  color: var(--ink-2);
-}
-.auth-stage .sample-text {
-  padding: 0;
-  /*
-   * Tavan 26px. 30px denendi ve fazlaydı: sayfada oynayan tek şey, duran
-   * kapıdan yüksek sesle konuşmamalı — başlık 36px'te kalıyor. 21px ise
-   * şeridi doldurmaya yetmiyordu.
-   */
-  font-size: clamp(16.5px, 1.8vw, 26px);
-  line-height: 1.95;
-  color: var(--ink-2);
-  overflow-clip-margin: 12px;
-}
-/*
- * TERS ÇEVİRME: cümle sessiz zemin, BULUNAN HATALAR yüksek sesli olan.
- * Aletin gerçekte yaptığı şey bu.
- */
-.auth-stage .sample-mark {
-  color: var(--ink);
-}
-
-/*
- * Dikişi öldüren öğe. Sol kenarı KARTIN kenarı, sağ kenarı SAYFANIN kenarı:
- * kompozisyon üstte ayrık, altta sürekli — göz tek yüzey okumak zorunda.
- */
-.auth-stage > .sample-findings {
-  grid-column: rail-start / -2;
-  grid-row: 4;
-  /*
-   * Sütun sayısı BOŞLUĞA BIRAKILMIYOR. `auto-fit` 900–1250px arasında 3+2
-   * kırıyor ve son satırı tırtıklı bırakıyordu — 13" dizüstü tam orada.
-   * Beş bulgu = taksonominin beş bandı = `Mark.tsx`in beş basamağı.
-   */
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  border-top: 1px solid var(--hairline);
-}
-/*
- * Hücreler `--surface` değil `--surface-2`: raf, levhanın ÇİZGİLENMİŞ hâli;
- * üstüne yapıştırılmış beş kutu değil.
- */
-.auth-stage .sample-finding {
-  background: var(--surface-2);
-  padding: 15px 16px 17px;
-}
-.auth-stage .sample-fix {
-  font-size: 14px;
-}
-.auth-stage .sample-why {
-  font-size: 12px;
-}
-@media (max-width: 1080px) {
-  .auth-stage > .sample-findings {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/*
- * Ölçüm şeridi: 5. satırdaki `1fr` onu ekranın alt kenarına itiyor, yani
- * aletin durum çubuğu gibi okunuyor — dördüncü bir kart gibi değil.
- *
- * Levha bu METİNDE bulunanı gösteriyor; şerit ALETİN kendi doğruluğunu.
- */
-.auth-stage > .proof {
-  grid-column: 1 / -1;
-  grid-row: 6;
-  background: var(--surface);
-  border-top: 1px solid var(--hairline);
-  padding-bottom: 22px;
-}
-.auth-stage .proof-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-}
-.auth-stage .proof-cell {
-  padding: 18px 18px 16px;
-}
-.auth-stage .proof-cell:first-child {
-  padding-left: var(--rail);
-}
-.auth-stage .proof-cell:last-child {
-  padding-right: var(--rail);
-}
-.auth-stage .proof-value {
-  font-size: clamp(26px, 2.2vw, 34px);
-}
-.auth-stage .proof-bands {
-  margin-inline: var(--rail);
-}
-.auth-stage .proof-bands .meters {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px 20px;
-}
-.auth-stage .proof-weak {
-  margin: 18px var(--rail) 0;
-}
-
-/* ── 390px: aynı ızgara tek sütuna iniyor, HİÇBİR ŞEY silinmiyor ──── */
-/*
- * Eski `@media (max-width: 900px) { .auth-aside { display: none } }` kuralı
- * KALDIRILDI. O kuralın gerekçesi ("giriş yapmak ikna olmaktan önce gelir")
- * SIRA hakkındaydı ve doğruydu — ama kanıt sütunu o zaman GENİŞLİK için
- * yarışıyordu ve gizlemek forma yer açmanın tek yoluydu.
- *
- * Tek sütunda kanıt hiçbir şeyle yarışmıyor: kart hâlâ tam genişlikte, hâlâ
- * katlamanın üstünde, DOM'da hâlâ ilk, e-posta hâlâ `autoFocus`lu. Karşılığında
- * üç şey kazanılıyor: ilk kez gelen kişi — sohbet botu olmadığını en çok
- * görmesi gereken kişi — canlı analizi telefonda da görüyor; kendi ölçülmüş
- * doğruluğunu yayımlayan bir ürün o sayıları en çok ziyaret alan cihazda
- * silmiyor; ve `Proof` çıktısı bir medya sorgusuyla çöpe gidecek bir
- * veritabanı turunu artık atmıyor.
- */
-@media (max-width: 860px) {
-  .auth-stage {
-    grid-template-columns:
-      [bleed-start] var(--rail)
-      [rail-start lane-start] minmax(0, 1fr)
-      [lane-end] var(--rail) [bleed-end];
-    grid-template-rows: auto 0 auto auto auto auto;
-  }
-  .auth-head {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .auth-note {
-    text-align: left;
-    max-width: none;
-  }
-
-  .auth-stage > .auth-card {
-    grid-column: rail-start / lane-end;
-    grid-row: 2 / 4;
-    /* Telefonda levha ekranı dolduruyor; ağır bir yükseklik kipli pencere
-       gibi okunuyor. */
-    box-shadow: var(--e1), var(--edge);
-  }
-  .auth-stage > .sample-read {
-    grid-column: rail-start / lane-end;
-    grid-row: 4;
-    padding-block: 22px;
-  }
-  .auth-stage > .sample-findings {
-    grid-column: rail-start / lane-end;
-    grid-row: 5;
-  }
-  .auth-stage > .auth-plate {
-    grid-row: 4 / 6;
-  }
-  .auth-stage > .proof {
-    grid-row: 6;
-  }
-
-  .auth-stage .proof-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .auth-stage .proof-cell {
-    padding: 15px 16px;
-  }
-  .auth-stage .proof-cell:nth-child(odd) {
-    padding-left: var(--rail);
-  }
-  .auth-stage .proof-cell:nth-child(even) {
-    padding-right: var(--rail);
-  }
-  .auth-stage .proof-bands .meters {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
-  }
 }
 
 /* ── kayıt satırı — geçmiş, pano ve kayıt detayı aynı satırı kullanıyor ────────────────────────────────────────────────── */
@@ -3132,7 +2796,7 @@ textarea:focus-visible,
  * Belirmiyor, MANDALLANIYOR — vurgu renginden kendi rengine düşüyor.
  *
  * Yalnızca `from` yazılı: örtük `to` öğenin kendi hesaplanmış rengi, yani
- * `.auth-stage`in `--ink-2` geçersiz kılması bozulmuyor. Buraya açık bir `to`
+ * bağlamın `--ink-2` geçersiz kılması bozulmuyor. Buraya açık bir `to`
  * YAZILMAMALI.
  */
 @keyframes count-latch {
@@ -3449,6 +3113,799 @@ textarea:focus-visible,
 
 
 /* ═══════════════════════════════════════════════════════════════
+   KAPI — giriş / kayıt
+
+   Üçüncü tasarım. Önceki ikisi de reddedildi ve ikisinin kusuru da aynıydı:
+   sert, soğuk, geniş boş alanlı bir alet panosu. Buradaki karar SICAKLIK.
+
+   Derinlik istiflenmiş panellerden değil TEK IŞIK KAYNAĞINDAN geliyor:
+   `--lamp` sağ üstte, tuvalin dışında. Işığın bir yönü olunca sayfadaki her
+   kenar ışığı ve her gölge birbiriyle aynı fikirde olabiliyor.
+   ═══════════════════════════════════════════════════════════════ */
+
+.gate {
+  --rail: clamp(20px, 5vw, 64px);
+  --measure: 62ch;
+  min-height: 100dvh;
+  background: var(--lamp), var(--paper);
+  color: var(--ink);
+  padding: 0 var(--rail) clamp(40px, 6vw, 84px);
+}
+
+/* ── üst şerit ─────────────────────────────────────────────────────── */
+.gate-bar {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px 28px;
+  flex-wrap: wrap;
+  padding-block: clamp(22px, 3vw, 34px) clamp(16px, 2vw, 24px);
+}
+.gate-tag {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ── katlamanın üstü: tek yükseltilmiş panel ───────────────────────── */
+/*
+ * Panel sayfanın kenarına değmiyor: her yönden pay var. Bu tek karar hem
+ * v1'in (kenardan kenara dikiş) hem v2'nin (kenardan kenara koyu levha)
+ * sorununu birden kapatıyor — ekranda artık bir NESNE var.
+ */
+.gate-hero {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(24px, 3vw, 46px);
+  align-items: start;
+  padding: clamp(24px, 3vw, 44px);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-xl);
+  background: var(--paper-2);
+  box-shadow: var(--e2), var(--edge);
+  position: relative;
+  overflow: hidden;
+}
+/* Vurgu parlaması sağ üstten — sayfanın lambasıyla aynı fikirde. */
+.gate-hero::before {
+  content: "";
+  position: absolute;
+  inset: -30% -20% auto auto;
+  width: 60%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--accent) var(--bloom), transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+.gate-hero > * {
+  position: relative;
+}
+
+/* ── kapı: cam bölme ───────────────────────────────────────────────── */
+/*
+ * Form kendi opak yüzeyinde: hiçbir metin resmin üstünde durmuyor, o yüzden
+ * kontrast bir filtreye bağlı değil. `backdrop-filter` düşerse görünüm
+ * neredeyse aynı kalıyor.
+ */
+.gate-enter {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(22px, 2.4vw, 34px);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: var(--e1), var(--edge);
+}
+@supports (backdrop-filter: blur(7px)) {
+  .gate-enter {
+    backdrop-filter: blur(7px);
+  }
+}
+.gate-kicker {
+  margin: 0 0 14px;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+/* Kitap yüzü — YALNIZCA okunacak şeylerde. */
+.gate-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(34px, 3.4vw, 46px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.018em;
+  color: var(--ink);
+}
+.gate-title i {
+  color: var(--accent);
+  font-style: normal;
+}
+.gate-lede {
+  margin: 14px 0 26px;
+  font-size: var(--fs-intro);
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 38ch;
+}
+
+/*
+ * `margin-top: auto` kapıları bölmenin dibine çiviliyor. v1'in %76 boş sütunu
+ * yapısal olarak yeniden oluşamıyor: artan boşluk formla kapılar ARASINDA
+ * değil, ikisinin dışında kalıyor.
+ */
+.gate-doors {
+  margin-top: auto;
+  padding-top: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--rule);
+}
+.gate-doors a {
+  margin-top: -1px;
+  padding: 13px 8px 3px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-decoration: none;
+  border-top: 2px solid transparent;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+.gate-doors a:hover {
+  color: var(--ink);
+}
+.gate-doors a[aria-current="page"] {
+  color: var(--ink);
+  border-top-color: var(--accent);
+}
+.gate-doors a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.gate-foot {
+  margin: 14px 0 0;
+  font-size: var(--fs-small);
+  color: var(--ink-3);
+}
+
+/* ── kadran sütunu ─────────────────────────────────────────────────── */
+.gate-instrument {
+  display: grid;
+  justify-items: center;
+  padding-top: clamp(4px, 1vw, 14px);
+}
+.gate-caption {
+  margin: 16px 0 0;
+  font-size: var(--fs-small);
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 54ch;
+}
+
+/*
+ * Cümle şeridi İKİ SÜTUNU DA kesiyor. v1'in dikey dikişi burada çizilemiyor:
+ * kompozisyon üstte iki sütun, altta tek yüzey.
+ */
+.gate-read {
+  grid-column: 1 / -1;
+  margin-top: clamp(20px, 2.4vw, 32px);
+  padding-top: clamp(20px, 2.4vw, 30px);
+  border-top: 1px solid var(--rule);
+}
+.gate-read .sample-head {
+  padding: 0 0 14px;
+  border-bottom: 0;
+  background: none;
+  box-shadow: none;
+}
+.gate-read .sample-text {
+  padding: 0;
+  font-family: var(--serif);
+  font-size: clamp(19px, 1.7vw, 26px);
+  line-height: 1.85;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+/* TERS ÇEVİRME: cümle sessiz zemin, BULUNAN HATALAR yüksek sesli olan. */
+.gate-read .sample-mark {
+  color: var(--ink);
+}
+.gate .sample-tag,
+.gate .sample-count,
+.gate .sample-kind {
+  color: var(--ink-2);
+}
+
+/* ── kaydırma daveti ───────────────────────────────────────────────── */
+.gate-scroll {
+  max-width: 1180px;
+  margin: clamp(18px, 2.4vw, 30px) auto 0;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.gate-scroll a {
+  color: var(--ink-3);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+.gate-scroll a:hover {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+/* ── ders ──────────────────────────────────────────────────────────── */
+.gate-chapter {
+  max-width: 1180px;
+  margin: clamp(56px, 8vw, 108px) auto 0;
+}
+.chapter-head {
+  max-width: var(--measure);
+  margin-bottom: clamp(30px, 4vw, 52px);
+}
+.chapter-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(26px, 2.6vw, 38px);
+  font-weight: 500;
+  line-height: 1.16;
+  letter-spacing: -0.014em;
+  color: var(--ink);
+}
+.chapter-sub {
+  margin: 14px 0 0;
+  font-size: var(--fs-intro);
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 56ch;
+}
+
+/*
+ * Adım: asılı folyo numarası dışarıda, gövde okuma ölçüsünde, omuz notu dış
+ * kenarda. Kitap sayfası düzeni — kart değil.
+ */
+.step {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) minmax(0, 250px);
+  gap: 0 clamp(20px, 2.6vw, 40px);
+  padding-block: clamp(26px, 3.4vw, 44px);
+  border-top: 1px solid var(--rule);
+}
+.step-folio {
+  grid-column: 1;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  padding-top: 4px;
+}
+.step-body {
+  grid-column: 2;
+  max-width: var(--measure);
+}
+.step-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(21px, 1.9vw, 27px);
+  font-weight: 500;
+  line-height: 1.22;
+  letter-spacing: -0.012em;
+}
+.step-text {
+  margin: 12px 0 0;
+  font-size: 15.5px;
+  line-height: 1.72;
+  color: var(--ink-2);
+}
+.step-text b {
+  color: var(--ink);
+  font-weight: 560;
+}
+.step-note {
+  grid-column: 3;
+  padding-left: 16px;
+  border-left: 2px solid var(--accent-line);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-3);
+  align-self: start;
+  margin-top: 6px;
+}
+.step-figure {
+  grid-column: 2 / -1;
+  margin-top: clamp(20px, 2.4vw, 30px);
+}
+.step-figure .gate-caption {
+  max-width: none;
+}
+
+/* Şekillerin ortak zemini: kart değil, çizgili yüzey. */
+/*
+ * Raf kitap sayfasında ÇİZGİ, kutu değil. Temel kural `gap: 1px` + koyu zemin
+ * ile ayırıcı üretiyor; kâğıt üstünde o zemin ağır bir gri blok gibi
+ * okunuyordu. Burada ayrımı gerçek kenarlıklar yapıyor.
+ */
+.step-figure .sample-findings {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  background: none;
+  border-top: 1px solid var(--rule);
+}
+.step-figure .sample-finding {
+  background: none;
+  padding: 16px 18px 18px;
+  border-bottom: 1px solid var(--rule);
+}
+.step-figure .sample-finding:nth-child(odd) {
+  border-right: 1px solid var(--rule);
+}
+/* Tek sayıda bulgu varsa sonuncusu iki sütunu da kaplıyor. */
+.step-figure .sample-finding:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  border-right: 0;
+}
+.step-figure .sample-finding:first-child {
+  padding-left: 0;
+}
+.step-rail .pipe {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
+  gap: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+.step-rail .pipe-cell {
+  background: none;
+  box-shadow: none;
+  border-top: 1px solid var(--rule);
+  border-left: 0;
+  padding: 16px 0 18px clamp(0px, 2vw, 40px);
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+/* Merdiven: her katman bir basamak içeri. */
+.step-rail .pipe-cell:nth-child(2) { padding-left: clamp(14px, 3.2vw, 66px); }
+.step-rail .pipe-cell:nth-child(3) { padding-left: clamp(28px, 4.4vw, 92px); }
+.step-rail .pipe-cell:nth-child(4) { padding-left: clamp(42px, 5.6vw, 118px); }
+.step-rail .pipe-cell:nth-child(5) { padding-left: clamp(56px, 6.8vw, 144px); }
+.step-rail .pipe-cell::before {
+  inset: 0 auto 0 0;
+  width: 2px;
+  height: auto;
+}
+.step-rail .pipe-code { grid-column: 1; }
+.step-rail .pipe-name { grid-column: 2; }
+.step-rail .pipe-tag { grid-column: 3; justify-self: end; }
+.step-rail .pipe-what { grid-column: 2 / -1; }
+
+/* ── 02 · taksonomi ────────────────────────────────────────────────── */
+.taxo {
+  display: grid;
+  gap: 18px;
+}
+.taxo-family {
+  display: grid;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+.taxo-name {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.taxo-name b {
+  color: var(--accent);
+  font-weight: 500;
+}
+.taxo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.taxo-chip {
+  font-size: 12.5px;
+  padding: 4px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink-2);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+}
+
+/* ── 04 · kayıt künyesi ────────────────────────────────────────────── */
+.stamp {
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  padding: clamp(18px, 2vw, 26px);
+  max-width: 520px;
+}
+.stamp-head {
+  margin: 0 0 14px;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.stamp-head b {
+  color: var(--accent);
+  font-weight: 500;
+}
+.stamp-rows {
+  margin: 0;
+  display: grid;
+  gap: 9px;
+}
+.stamp-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13.5px;
+}
+.stamp-row dt {
+  color: var(--ink);
+  white-space: nowrap;
+}
+/* Noktalı öncül: esneyen öğe, dar ekranda kendiliğinden kısalıyor. */
+.stamp-row::after {
+  content: "";
+  order: 1;
+  flex: 1 1 12px;
+  min-width: 12px;
+  align-self: center;
+  border-bottom: 1px dotted var(--rule);
+}
+.stamp-row dd {
+  order: 2;
+  margin: 0;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.stamp-foot {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+/* ── 05 · dört sinyal ──────────────────────────────────────────────── */
+.signals {
+  display: grid;
+  gap: 16px;
+  max-width: 620px;
+}
+.signal {
+  display: grid;
+  gap: 6px;
+}
+.signal-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13.5px;
+}
+.signal-name {
+  color: var(--ink);
+}
+.signal-band {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+}
+.signal-detail {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+.signal-sum {
+  margin: 6px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+.signal-sum b {
+  color: var(--ink);
+  font-weight: 560;
+}
+
+/* ── doğruluk bandı ────────────────────────────────────────────────── */
+.gate-accuracy {
+  max-width: 1180px;
+  margin: clamp(56px, 8vw, 104px) auto 0;
+}
+.accuracy-head {
+  max-width: var(--measure);
+}
+.accuracy-thesis {
+  margin: 18px 0 0;
+  padding-left: 16px;
+  border-left: 2px solid var(--accent);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.accuracy-thesis b {
+  color: var(--ink);
+  font-weight: 560;
+}
+.accuracy-band {
+  margin-top: clamp(24px, 3vw, 38px);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+.accuracy-band .proof-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.accuracy-band .proof-cell {
+  padding: clamp(18px, 2vw, 26px);
+}
+.accuracy-band .proof-value {
+  font-size: clamp(28px, 2.6vw, 40px);
+}
+.accuracy-band .proof-source {
+  margin: 0;
+  padding: 14px clamp(18px, 2vw, 26px) 18px;
+  border-top: 1px solid var(--rule);
+}
+
+/* ── kapanış ───────────────────────────────────────────────────────── */
+.gate-close {
+  max-width: 1180px;
+  margin: clamp(56px, 8vw, 104px) auto 0;
+  padding-top: clamp(30px, 4vw, 48px);
+  border-top: 1px solid var(--rule);
+  text-align: center;
+}
+.gate-close .chapter-title {
+  margin-inline: auto;
+  max-width: 22ch;
+}
+.gate-close .gate-scroll {
+  text-align: center;
+  margin-top: 22px;
+}
+.gate-end {
+  max-width: 1180px;
+  margin: clamp(40px, 5vw, 64px) auto 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ── 940px altı: tek sütun, hiçbir şey silinmiyor ──────────────────── */
+@media (max-width: 940px) {
+  .gate-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /*
+   * `order` YOK. Görsel sırayı DOM sırasından ayırmak, klavyeyle gezen kişiyi
+   * başka bir sayfada gezdirmek demek — bu kusur anasayfada bir kez çıktı ve
+   * düzeltildi. Tek sütunda sıra DOM'daki gibi: form → kadran → cümle.
+   */
+  .step {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+  .step-note {
+    grid-column: 2;
+    margin-top: 16px;
+  }
+  .step-figure {
+    grid-column: 2;
+  }
+  .step-figure .sample-findings {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .accuracy-band .proof-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .step {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .step-folio {
+    grid-column: 1;
+    padding-top: 0;
+    margin-bottom: 6px;
+  }
+  .step-body,
+  .step-note,
+  .step-figure {
+    grid-column: 1;
+  }
+  .step-rail .pipe-cell {
+    grid-template-columns: 40px minmax(0, 1fr);
+    padding-left: 14px !important;
+  }
+  .step-rail .pipe-tag {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+/* ── kadran ───────────────────────────────────────────────────────── */
+.dial {
+  position: relative;
+  width: min(100%, 400px);
+  aspect-ratio: 1;
+  margin-inline: auto;
+}
+/*
+ * Işık SVG’nin DIŞINDA: filtre yok, yeniden boyama yok, bedava.
+ * Tek kaynak, sağ üstten — sayfanın lambasıyla aynı fikirde.
+ */
+.dial::before {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--accent) var(--bloom), transparent),
+    transparent 72%
+  );
+  pointer-events: none;
+}
+.dial-face { position: relative; display: block; width: 100%; height: 100%; }
+
+.dial-ring { fill: none; stroke: var(--rule); stroke-width: 1; }
+/* En dış halka bir tık ağır: ölçüm hep bir üste bakıyor. */
+.dial-ring.is-top { stroke: var(--ink-3); stroke-opacity: 0.45; }
+/* Ölçülen halka: sayfadaki tek accent çember. */
+.dial-ring.is-read {
+  stroke: var(--accent);
+  stroke-opacity: 0.55;
+  stroke-width: 1.5;
+}
+.dial-ray { stroke: var(--ink-3); stroke-opacity: 0.2; stroke-width: 1; }
+.dial-read-rim { fill: none; stroke: var(--accent); stroke-opacity: 0.3; stroke-width: 1; }
+.dial-hub { fill: var(--surface); stroke: var(--rule); stroke-width: 1; }
+
+.dial-needle { stroke: var(--accent); stroke-opacity: 0.28; stroke-width: 1; }
+.dial-halo { fill: var(--accent); opacity: 0.1; }
+.dial-dot { fill: var(--accent); }
+.dial-no {
+  fill: var(--accent);
+  font-family: var(--mono);
+  font-size: 11px;
+  text-anchor: middle;
+  opacity: 0.85;
+}
+.dial-tick {
+  fill: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-anchor: middle;
+  /*
+   * Etiketin arkasındaki halka ve ışınlar KNOCK OUT ediliyor: harfin çevresine
+   * zemin renginde bir kontur çiziliyor ve `paint-order` onu yazının ALTINA
+   * koyuyor. Aksi hâlde beş etiket de çizgilerin üstünde okunuyordu.
+   */
+  stroke: var(--paper-2);
+  stroke-width: 4;
+  paint-order: stroke fill;
+}
+
+.dial-centre {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 4px;
+  text-align: center;
+  pointer-events: none;
+}
+.dial-level {
+  font-size: clamp(30px, 3vw, 44px);
+  font-weight: 620;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.dial-score {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.dial-legend {
+  margin: 18px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 18px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.dial-legend b { color: var(--ink-2); font-weight: 500; }
+/*
+ * `opacity` YOK. Buradaki renk zaten `--ink-3`, yani okunabilir en sessiz
+ * mürekkep; üstüne %72 opaklık bindirince ÖLÇÜLDÜ 2,85:1'e düşüyordu ve taban
+ * 4,5. Sessizlik zaten yanındaki `b`nin `--ink-2` olmasından geliyor, hiyerarşi
+ * opaklığa muhtaç değil.
+ */
+.dial-legend i { font-style: normal; flex-basis: 100%; text-align: center; }
+
+/* ── hareket · YALNIZCA [data-play] altında ───────────────────────── */
+/*
+ * Kadran ve cümle AYNI SAATİ kullanıyor: `.sample-mark` ile bire bir aynı
+ * gecikme formülü. Cümledeki hata işaretlenirken kadranda karşılığı yanıyor.
+ * İki gösteri değil, tek olay.
+ *
+ * Halkalar, ışınlar, dolgu ve göbek HİÇ animasyonlanmıyor: alet zaten kurulu,
+ * ölçüm onun içine düşüyor.
+ */
+@keyframes dial-light {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: none; }
+}
+[data-play="1"] .dial-hit {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dial-light 460ms var(--ease-out) both;
+  animation-delay: calc(var(--t-lead) + var(--i) * var(--t-step));
+}
+
+@media (max-width: 860px) {
+  .dial { width: min(100%, 320px); }
+  .dial-tick, .dial-no { font-size: 14px; }  /* SVG küçülünce görsel boy korunuyor */
+}
+
+/* ═══════════════════════════════════════════════════════════════
    KELİME DEFTERİ
    ═══════════════════════════════════════════════════════════════ */
 
@@ -3641,37 +4098,12 @@ textarea:focus-visible,
 }
 
 
-/* ── giriş levhası ────────────────────────────────────────────────── */
+/* ── ölçülen doğruluk · bantlar ──────────────────────────────────── */
 /*
- * Giriş dizisi YAPIYI çiziyor, METNİ değil. Bu sayfada tek bir harf bile
- * gizlenmiyor. Karta hiçbir oynatma kuralı YAZILMIYOR: insanın buraya geldiği
- * tek şey asla belirmez, ilk kareden itibaren oradadır.
+ * Bantlar cümleden SONRA doluyor: önce metin okunuyor, sonra doğruluk
+ * bildiriliyor. Aynı anda oynayan iki şey iki ayrı şey gibi okunuyor;
+ * sırayla oynayınca iki aşamalı tek süreç oluyor.
  */
-@keyframes rule-draw {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: none;
-  }
-}
-[data-play="1"] .auth-plate::before {
-  animation: rule-draw 680ms var(--ease-out) both;
-}
-
-/*
- * Sıra ANLAM taşıyor: önce cümle okunuyor, sonra doğruluk bildiriliyor.
- * Eskiden ikisi aynı anda başlıyordu — aynı anda oynayan iki şey iki ayrı şey
- * gibi okunuyor, sırayla oynayınca iki aşamalı tek süreç oluyor.
- *
- * 861px altında kapalı: orada şerit katlamanın altında ve kaydırarak gelinen
- * bir şeye yapay bekleme eklemek bozuk hissettiriyor.
- */
-@media (min-width: 861px) {
-  .auth-stage > .proof {
-    --t-enter: calc(var(--t-lead) + 240ms);
-  }
-}
 [data-play="1"] .proof-bands .meter-fill {
   animation: fill-to 620ms var(--ease-out) both;
   animation-delay: calc(var(--t-enter, 0ms) + 560ms + var(--i) * 90ms);

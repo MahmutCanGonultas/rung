@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { AuthForm } from "../components/AuthForm";
-import { AuthShell } from "../components/showcase/AuthShell";
+import { GateShell } from "../components/showcase/GateShell";
 import { loginAction } from "../lib/actions";
 import { getSessionUser } from "../lib/session";
 
@@ -14,11 +14,11 @@ export default async function LoginPage() {
   if (await getSessionUser()) redirect("/dashboard");
 
   return (
-    <AuthShell
+    <GateShell
       mode="login"
-      title="Giriş"
-      titleSoft="yap."
-      lede="Kaldığın yerden devam et."
+      kicker="Kayıtların yerinde"
+      title="Tekrar hoş geldin"
+      lede="Bıraktığın yerden devam ediyorsun. Bir kayıt, yazıldığı gün neyse o kalıyor."
     >
       <AuthForm
         action={loginAction}
@@ -26,6 +26,6 @@ export default async function LoginPage() {
         pendingLabel="Kontrol ediliyor…"
         autoComplete="current-password"
       />
-    </AuthShell>
+    </GateShell>
   );
 }

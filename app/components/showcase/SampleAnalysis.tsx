@@ -1,11 +1,8 @@
 import type { CSSProperties } from "react";
 
-import { analyze } from "../../lib/k0";
 import { segment } from "../../lib/k0/segments";
-import {
-  SHOWCASE_SAMPLES,
-  type ShowcaseVariant,
-} from "../../lib/k0/showcase-samples";
+import { type ShowcaseVariant } from "../../lib/k0/showcase-samples";
+import { showcaseAnalysis } from "../../lib/showcase-run";
 import { labelOf } from "../../lib/taxonomy";
 
 /*
@@ -27,7 +24,16 @@ import { labelOf } from "../../lib/taxonomy";
 
 export function SampleAnalysis({
   variant = "broken",
+  part = "both",
 }: {
+  /*
+   * `read` okuma şeridi, `shelf` bulgu rafı, `both` ikisi.
+   *
+   * Kapı ekranı ikisini AYRI yerlere koyuyor: cümle katlamanın üstündeki
+   * panele, beş bulgu iki adım aşağıdaki şekle. Anasayfa prop vermiyor ve
+   * `both` ile bugünkü davranışını sürdürüyor.
+   */
+  part?: "read" | "shelf" | "both";
   /*
    * `clean` aynı motordan geçen DOĞRU bir cümle ve sıfır bulgu veriyor.
    * Ürünün kanıtlanamaz iddiası ("doğru cümleyi düzeltmiyoruz") böylece
@@ -35,8 +41,7 @@ export function SampleAnalysis({
    */
   variant?: ShowcaseVariant;
 }) {
-  const text = SHOWCASE_SAMPLES[variant];
-  const { findings } = analyze(text);
+  const { text, findings } = showcaseAnalysis(variant);
   const parts = segment(text, findings);
 
   /*
@@ -127,6 +132,8 @@ export function SampleAnalysis({
    * hem bölmenin içinden tam genişlikte geçmek zorunda — bir kap içinde
    * kalırsa geçemiyor.
    */
+  if (part === "read") return read;
+  if (part === "shelf") return shelf;
   return (
     <>
       {read}

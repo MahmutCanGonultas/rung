@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { AuthForm } from "../components/AuthForm";
-import { AuthShell } from "../components/showcase/AuthShell";
+import { GateShell } from "../components/showcase/GateShell";
 import { registerAction } from "../lib/actions";
 import { getSessionUser } from "../lib/session";
 import { PASSWORD_MIN } from "../lib/validation";
@@ -16,11 +16,12 @@ export default async function RegisterPage() {
   if (await getSessionUser()) redirect("/dashboard");
 
   return (
-    <AuthShell
+    <GateShell
       mode="register"
-      title="Hesap"
-      titleSoft="oluştur."
-      lede="E-posta ve şifre. Başka bir şey istemiyoruz."
+      kicker="İlk ölçüm bugün"
+      title="Ölçmeye başla"
+      lede="E-posta ve şifre, başka bir şey yok. Yazdığın ilk paragraf aynı zamanda ilk ölçümün oluyor."
+      footnote="Doğrulama e-postası yok, kart yok."
     >
       <AuthForm
         action={registerAction}
@@ -29,6 +30,6 @@ export default async function RegisterPage() {
         autoComplete="new-password"
         passwordHint={`En az ${PASSWORD_MIN} karakter.`}
       />
-    </AuthShell>
+    </GateShell>
   );
 }
