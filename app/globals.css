@@ -81,6 +81,37 @@
 
   --r-md: 11px;
   --r-sm: 7px;
+  /* Bugüne kadar en büyük yarıçap 11px'ti ve her kutu aynı sertlikteydi. */
+  --r-lg: 20px;
+  --r-xl: 28px;
+
+  /* Kitap yüzü. Yedek yığın Georgia ile bitiyor; o da tam Türkçe kapsıyor. */
+  --serif: var(--font-serif), "Iowan Old Style", Georgia, "Times New Roman",
+    serif;
+
+  /*
+   * ── SICAK KÂĞIT — yalnızca giriş/kayıt ekranı okuyor ──────────────────
+   * Var olan hiçbir jeton DEĞİŞMİYOR, bunlar ek. Yani `docs/design/*.html`
+   * aynasına dokunmak gerekmiyor ve uygulamanın hiçbir ekranı kaymıyor.
+   */
+  --paper: #f7f4ed;
+  --paper-2: #f1ece1;
+  --rule: #e3ddd0;
+
+  /*
+   * TEK IŞIK KAYNAĞI, sağ üstte, tuvalin dışında.
+   *
+   * Derinlik istiflenmiş panellerden değil TUTARLI AYDINLATMADAN geliyor:
+   * ışığın bir yönü olunca sayfadaki her kenar ışığı ve her gölge birbiriyle
+   * aynı fikirde olabiliyor. Merkezî bir gradyan boyar, aydınlatmaz.
+   */
+  --lamp: radial-gradient(
+    120% 82% at 84% -12%,
+    rgba(255, 251, 240, 0.95) 0%,
+    rgba(255, 251, 240, 0) 62%
+  );
+  /* Vurgu parlamalarının gücü — tek yerde, iki tema. */
+  --bloom: 11%;
 }
 
 :root[data-theme="dark"] {
@@ -117,6 +148,17 @@
     0 2px 6px -2px rgba(0, 0, 0, 0.7),
     0 24px 60px -32px rgba(0, 0, 0, 0.9);
   --edge: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  --paper: #0f1216;
+  --paper-2: #151a1f;
+  --rule: #242b32;
+  /* Mum ışığı, koyu kâğıt üstünde. */
+  --lamp: radial-gradient(
+    120% 82% at 84% -12%,
+    rgba(255, 231, 190, 0.075) 0%,
+    rgba(255, 231, 190, 0) 60%
+  );
+  --bloom: 18%;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -154,6 +196,17 @@
       0 2px 6px -2px rgba(0, 0, 0, 0.7),
       0 24px 60px -32px rgba(0, 0, 0, 0.9);
     --edge: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  --paper: #0f1216;
+  --paper-2: #151a1f;
+  --rule: #242b32;
+  /* Mum ışığı, koyu kâğıt üstünde. */
+  --lamp: radial-gradient(
+    120% 82% at 84% -12%,
+    rgba(255, 231, 190, 0.075) 0%,
+    rgba(255, 231, 190, 0) 60%
+  );
+  --bloom: 18%;
   }
 }
 
@@ -194,23 +247,33 @@ h3 {
 /*
  * İşaret: merdiven profili + kelime.
  *
- * Boşluk `em` cinsinden — glif metinle birlikte ölçekleniyor, 20px'de de
- * 96px'de de aynı optik ilişki. Sabit piksel boşluk büyük boyda dağılıyordu.
+ * `align-items: baseline` — center DEĞİL. "rung." tamamen küçük harf; Inter'de
+ * 17px'te x-yüksekliği 8,8px, büyük harf yüksekliği 12,4px. Satır kutusuna
+ * ortalanan bir glif kelimenin taban çizgisinden kopuyor. Yerine kutunun altı
+ * taban çizgisine oturuyor ve kutu içindeki %5,42 pay `translateY` ile geri
+ * alınıyor, yani en alt basamak TAM taban çizgisine basıyor.
+ *
+ * Ölçüler `em`: glif metinle ölçekleniyor, 20px'de de 120px'de de aynı optik
+ * ilişki.
  */
 .mark {
   display: inline-flex;
-  align-items: center;
-  gap: 0.34em;
+  align-items: baseline;
+  gap: 0.36em;
   font-size: 17px;
-  font-weight: 680;
-  letter-spacing: -0.035em;
+  font-weight: 660;
+  line-height: 1;
+  /* -0.035em 17px'te fazla sıkıydı: "rn" kapanıp "m" gibi okunuyordu. */
+  letter-spacing: -0.012em;
+  font-kerning: normal;
   color: var(--ink);
 }
 .mark-glyph {
-  height: 1.02em;
-  width: auto;
+  /* ink boyu 0,95 × (22,7 − 1,3) / 24 = 0,85em ≈ büyük harfin bir tık üstü. */
+  height: 0.95em;
+  width: 1.306em; /* 33/24 × 0,95 */
   flex: none;
-  overflow: visible;
+  transform: translateY(0.052em);
 }
 .mark-steps {
   stroke: var(--ink-3);
@@ -222,8 +285,21 @@ h3 {
 .mark-word i {
   color: var(--accent);
   font-style: normal;
+  /* Nokta "g"nin yuvarlak karnından sonra açık kalıyor; içeri çekiliyor. */
+  margin-left: -0.02em;
 }
-/* Bağlantı olduğunda: üzerine gelince basamaklar koyulaşıyor. */
+
+/* Tek kural, üç boy: büyük punto daha az ağırlık ve daha sıkı izleme ister. */
+.mark-sm {
+  font-size: 15px;
+  letter-spacing: -0.006em;
+}
+.mark-lg {
+  font-size: clamp(21px, 1.8vw, 26px);
+  font-weight: 640;
+  letter-spacing: -0.02em;
+}
+
 .mark-link {
   text-decoration: none;
   border-radius: var(--r-sm);

@@ -1,40 +1,59 @@
 /*
  * Rung işareti.
  *
- * FİKİR: "rung" İngilizcede merdiven basamağı demek — ve bu ürün seviye
- * ölçüyor. İsim zaten ölçeği söylüyor; işaret de onu söylüyor.
+ * FİKİR AYNI: "rung" merdiven basamağı demek, ürün seviye ölçüyor, glif bir
+ * merdiven. Tek sürekli profil kararı korunuyor — beş ayrı çubuk telefon
+ * sinyal ikonu gibi okunuyordu. Değişen ÇİZİM, ve üçü de ölçülmüş kusur:
  *
- * NEDEN DEĞİŞTİ: önceki hâli beş yükselen çubuktu ve 96px'e büyütülünce sorun
- * ortaya çıktı — o glif merdiven değil, evrensel TELEFON SİNYAL İKONU gibi
- * okunuyordu. Dört aday çizilip üç ölçüde karşılaştırıldı; iki raylı merdiven
- * 20px'de hamburger menüye, genişleyen yatay çubuklar "hizala" ikonuna
- * benziyordu. Kazanan: tek sürekli yolla çizilmiş merdiven profili. Tek şekil
- * olduğu için 20px'de dağılmıyor, ve hiçbir yaygın ikonla karışmıyor.
+ *   1 · Beşinci parça artık gerçekten BİR ÜST: rıht + basamak. Eskisi
+ *       dördüncü basamakla AYNI y'de yatay bir kuyruktu; yorum "ölçüm hep bir
+ *       üste bakıyor" diyordu, çizim demiyordu.
+ *   2 · Renk teslimi KÖŞEDE. Eskiden iki yol aynı x'te bitip başlıyordu ve
+ *       yuvarlak kapaklar 2,6 birim örtüşüyordu — düz çizginin ortasında
+ *       çamurlu bir geçiş. Şimdi iki kapak aynı köşe diskini paylaşıyor.
+ *   3 · `miter` birleşim. Aralık 5 / kalınlık 2,6'da yuvarlatma her köşenin
+ *       %26'sını yiyordu ve 20px'te merdiven çapraz bir lekeye dönüyordu.
+ *       Merdiven mimaridir; köşesi diktir.
  *
- * Son basamak vurgu renginde ve DİĞERLERİNDEN AYRI bir yol: ölçüm hep bir
- * sonraki basamağa bakıyor.
+ * Eğim de 45°'den 37,5°'ye indi (6 basamak / 4,6 rıht): 45° mümkün olan en
+ * dik merdiven ve küçük boyda en çok düz çapraza benzeyen açı.
  *
- * `currentColor` kullanılmıyor, `--ink-3` kullanılıyor: işaret metnin içinde
- * ama metin kadar yüksek sesli değil. Vurgu basamağı kendi rengini taşıyor.
+ * Kutuya oturma dört yanda simetrik (1,0 / 1,0 / 1,3 / 1,3), o yüzden
+ * `overflow: visible` gerekmiyor.
  */
 
-export function Mark({ className }: { className?: string }) {
+/** Merdivendeki basamak sayısı. Kenar kertikleri de bu sayıdan besleniyor. */
+export const RUNGS = 5;
+
+export function Mark({
+  className,
+  size = "md",
+}: {
+  className?: string;
+  /** `sm` dar üst çubuk · `md` varsayılan · `lg` kapı ekranının maştı. */
+  size?: "sm" | "md" | "lg";
+}) {
   return (
-    <span className={className ? `mark ${className}` : "mark"}>
+    <span
+      className={["mark", `mark-${size}`, className].filter(Boolean).join(" ")}
+    >
       <svg
         className="mark-glyph"
-        viewBox="0 0 26 20"
+        viewBox="0 0 33 24"
         fill="none"
-        strokeWidth="2.6"
+        strokeWidth="3"
         strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeLinejoin="miter"
         aria-hidden="true"
         focusable="false"
       >
         {/* Dört basamak, tek yol: sol alttan sağ üste. */}
-        <path className="mark-steps" d="M2 18h5v-5h5V8h5V3h2.5" />
-        {/* Beşinci basamak — sıradaki. */}
-        <path className="mark-next" d="M19.5 3H24" />
+        <path
+          className="mark-steps"
+          d="M2.5 21.2H8.5V16.6H14.5V12H20.5V7.4H24.5"
+        />
+        {/* Beşinci: rıht + basamak. Renk teslimi tam köşede. */}
+        <path className="mark-next" d="M24.5 7.4V2.8H30.5" />
       </svg>
       <span className="mark-word">
         rung<i>.</i>

@@ -1,17 +1,25 @@
 <!--
-  Sekme ikonu — uygulamadaki işaretin aynısı: merdiven profili, son basamak
-  vurgu renginde.
+  Sekme ikonu — uygulamadaki işaretin aynı kuralları: miter köşe, renk teslimi
+  KÖŞEDE, son basamak vurgu renginde.
 
-  Şeffaf değil, dolu bir karo: şeffaf ikon açık sekme çubuğunda kayboluyor,
-  koyuda ince çizgiler okunmuyor. Karo iki temada da aynı görünüyor.
+  ÜÇ basamak, beş değil. Ölçüldü: 32'lik karoda beş basamak 1,25 birimlik
+  açıklık bırakıyor, 16px sekme ikonunda 0,6 CSS px — kapanıyor ve merdiven
+  gri bir bloğa dönüyor. Üçte açıklık 4,1 birim, 16px'te 2,05 px. Bir logo
+  ailesinde ikonun sadeleşmesi normaldir: aynı fikir, başka punto.
 
-  Çizgi kalınlığı 20 kutuya göre değil 32'ye göre yeniden ölçüldü — küçültünce
-  ince kalıyordu.
+  Şeffaf değil dolu karo: şeffaf ikon açık sekme çubuğunda kayboluyor.
+  Paylar dört yanda simetrik (4,3 · 4,3 · 6,8 · 6,8).
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="7" fill="#12161a"/>
-  <g fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M6 25h5.5v-6H17v-6h5.5V7H24" stroke="#e8edf1" stroke-opacity="0.55"/>
-    <path d="M24.5 7H26.5" stroke="#35d39b"/>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#181d23"/>
+      <stop offset="1" stop-color="#0d1115"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="7.4" fill="url(#tile)"/>
+  <g fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="miter">
+    <path d="M6 23.5H14V16H22" stroke="#e8edf1" stroke-opacity="0.5"/>
+    <path d="M22 16V8.5H26" stroke="#35d39b"/>
   </g>
 </svg>
