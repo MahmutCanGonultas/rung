@@ -56,17 +56,20 @@ export default async function HomePage() {
         <p className="claim-kicker">Türkçe konuşanlar için</p>
 
         {/*
-          Başlık ürünün kendi dilbilgisini kendine uyguluyor: önce "tahmin
-          etme" hata rengiyle dalgalı çiziliyor, sonra üstü çiziliyor, sonra
-          "Ölç." vurgu rengine dönüyor — düzeltme kabul edildi.
+          Sessiz öncül, yüksek sesli fiil.
 
-          Sınıf adları DEĞİŞMİYOR: hareket katmanı ve hareketi azalt listesi
-          tam olarak bu üç adı anıyor.
+          Eskiden "İngilizceni tahmin etme."nin üstü çiziliyor ve altına hata
+          rengiyle dalgalı çizgi geliyordu — ürünün kendi hata dilbilgisi kendi
+          başlığına uygulanıyordu. Kaldırıldı: sayfaya ilk bakan kişi o kırmızı
+          çizgileri ürünün kendi hatası sanabiliyordu, ve dalga "Ölç."ün
+          noktalarına giriyordu.
+
+          Farkı artık boyut ve ağırlık taşıyor. `.hero-was` bir öncül, `<h1>`
+          gövdesi ise tek kelime: Ölç.
         */}
         <h1 className="hero-title">
           <span className="hero-was">İngilizceni tahmin etme.</span>
-          <br />
-          <span className="hero-em">Ölç.</span>
+          Ölç.
         </h1>
 
         <p className="claim-intro">
@@ -163,7 +166,7 @@ export default async function HomePage() {
             %100 doğruluk mümkün değil — dil modelleri olasılıksal çalışır.
             Bunu garanti eden herkes yanılıyor. Yapılabilecek tek şey ölçmek.
           </p>
-          <Proof layout="flat" bands />
+          <Proof layout="flat" />
         </InView>
       </section>
 

@@ -1545,8 +1545,6 @@ textarea:focus-visible,
   [data-play] *::after,
   .sample-text::before,
   .pipe::after,
-  .hero-was,
-  .hero-em,
   .btn-primary:disabled::after {
     animation: none !important;
   }
@@ -1818,6 +1816,7 @@ textarea:focus-visible,
   --fs-display: clamp(44px, 5.8vw, 82px);   /* yalnızca h1 */
   --fs-move: clamp(26px, 2.9vw, 40px);      /* şerit başlığı */
   --fs-read: clamp(17px, 1.9vw, 27px);      /* ÖLÇÜLEN İngilizce */
+  --fs-lede: clamp(24px, 2.4vw, 34px);      /* başlığın sessiz öncülü */
   --fs-intro: clamp(17px, 1.35vw, 21px);
   --fs-body: 15.5px;
   --fs-small: 13.5px;
@@ -1904,25 +1903,20 @@ textarea:focus-visible,
   color: var(--accent);
 }
 .hero-title {
-  font-size: var(--fs-display);
   /*
-   * 1.24, ve bu sefer GERÇEKTEN ölçüldü.
+   * Başlığın gövdesi artık YALNIZCA fiil: "Ölç." Öncül (`.hero-was`) kendi
+   * küçük ölçüsünde, kendi satırında ve sessiz renkte duruyor.
    *
-   * Önce 1.09 yazıp yanına "ölçüldü" diye not düşülmüştü; ölçülmemişti.
-   * `.hero-was` altındaki dalgalı çizgi (0.13em ötelemeli, ~5,5px genlikli)
-   * bir sonraki satırın kutusuna giriyordu ve 4× büyütmede görülen şuydu:
-   * dalga tam olarak "Ölç."ün Ö harfinin iki noktasının ARASINDAN geçiyordu —
-   * yani düzeltmenin kabul edildiğini gösteren kelimenin üstü, hata rengiyle
-   * çiziliyormuş gibi duruyordu. Anlamın tersi.
-   *
-   * Ölçüm ölçek bağımsız (satır kutusu em, öteleme em), o yüzden 360'tan
-   * 1440'a kadar HER genişlikte oluyordu — telefona özgü değildi.
-   * 1.24'te 390px'de dalga y≈272, noktalar y≈281: temiz.
+   * Eskiden ikisi aynı puntodaydı ve aradaki fark yalnızca renk ile üstü
+   * çizili bir çizgiydi. Çizgi kalktı; farkı artık boyut ve ağırlık taşıyor,
+   * ki bu daha güçlü ve hiçbir şeyi hata gibi göstermiyor.
    */
-  line-height: 1.24;
+  font-size: var(--fs-display);
+  line-height: 1.02;
   letter-spacing: -0.045em;
   font-weight: 680;
   margin: 0;
+  color: var(--accent);
 }
 .claim-intro {
   grid-row: 3;
@@ -2270,7 +2264,7 @@ textarea:focus-visible,
    `.land-h`, `.land-sub`, `.land-cta`, `.hero`, `.hero-kicker`, `.hero-lede`,
    `.hero-actions`, `.hero-note`, ve "yükseklik uygulaması" bloğundaki
    `` satırı.
-   KALIYOR, aynen: `.hero-title` (yalnız boyu değişti), `.hero-was`, `.hero-em`. */
+   KALIYOR: `.hero-title` (gövdesi artık yalnız fiil) ve `.hero-was` (öncül). */
 
 
 /* ── 860px altı: aynı ızgara tek sütuna, HİÇBİR ŞEY silinmeden ─────
@@ -3364,67 +3358,27 @@ textarea:focus-visible,
   }
 }
 
-/* ── başlık kendini düzeltiyor ────────────────────────────────────── */
-@keyframes hero-flag {
-  from {
-    text-decoration-color: transparent;
-  }
-  to {
-    text-decoration-color: var(--error-line);
-  }
-}
+/* ── başlık ───────────────────────────────────────────────────────── */
 /*
- * Üstü çizme, mutlak konumlu bir çubukla DEĞİL arka plan çizgisiyle.
+ * Başlık: sessiz öncül, yüksek sesli fiil.
  *
- * Önce `::after` ile 2px'lik mutlak konumlu bir çubuk vardı ve 470px altında
- * bozuluyordu: başlık iki satıra kayınca satır içi kutu iki parçaya bölünüyor,
- * `top: 55%` iki satırın ortasına — yani boşluğa — düşüyordu. Ekranda hiçbir
- * şeyin üstünü çizmeyen kırmızı bir çubuk kalıyordu, ve bu hareketin geçici
- * bir karesi değil kalıcı hâliydi. Her telefon genişliğinde.
+ * Önce başlığın üstü çiziliyordu — ürünün kendi hata dilbilgisi kendi adına
+ * uygulanıyordu. Fikir güzeldi ama iki sorunu vardı: dalgalı çizgi "Ölç."ün
+ * noktalarına giriyordu (ölçüldü, düzeltildi), ve daha önemlisi sayfaya ilk
+ * bakan kişi kırmızı çizgileri ürünün kendi hatası sanabiliyordu.
  *
- * `box-decoration-break: clone` ile arka plan her satır parçasına AYRI
- * uygulanıyor, yani çizgi her satırın kendi ortasından geçiyor.
+ * Yerine SAYI ve AĞIRLIK karşıtlığı: öncül küçük, hafif ve sessiz; fiil
+ * büyük, kalın ve vurgu renginde. Hiçbir süs yok — kontrastın tamamı
+ * tipografiden geliyor, ve satır aralığı sorunu da kendiliğinden gidiyor.
  */
 .hero-was {
-  text-decoration: underline wavy var(--error-line);
-  text-decoration-thickness: 2px;
-  /* `em` — başlık clamp ile 40'tan 68px'e çıkıyor, sabit piksel küçük
-     boyutta orantısız uzak kalıyordu. */
-  text-underline-offset: 0.13em;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-  background-image: linear-gradient(var(--error), var(--error));
-  background-repeat: no-repeat;
-  background-position: 0 58%;
-  background-size: 100% 2px;
-  animation:
-    hero-flag 500ms var(--ease-out) both 420ms,
-    hero-strike 380ms var(--ease-out) both 900ms;
-}
-@keyframes hero-strike {
-  from {
-    background-size: 0 2px;
-  }
-  to {
-    background-size: 100% 2px;
-  }
-}
-/*
- * Yazılı renk = BİTMİŞ renk. `both` dolgusu gecikme boyunca `from` karesini
- * tutuyor, yani hareket kapalıyken kelime ilk kareden itibaren vurgu renginde.
- * Sayfa üstte olduğu için gözcü gerekmiyor; gecikmeler yüklenmeyle başlıyor.
- */
-.hero-em {
-  color: var(--accent);
-  animation: hero-accept 420ms var(--ease-out) both 1180ms;
-}
-@keyframes hero-accept {
-  from {
-    color: var(--ink);
-  }
-  to {
-    color: var(--accent);
-  }
+  display: block;
+  font-size: var(--fs-lede);
+  line-height: 1.2;
+  font-weight: 420;
+  letter-spacing: -0.02em;
+  color: var(--ink-2);
+  margin-bottom: clamp(6px, 0.8vw, 12px);
 }
 
 

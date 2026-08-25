@@ -68,9 +68,13 @@ Seviye kırılımıyla — çünkü tek ortalama sayı zayıf yeri gizler:
 | yakalama | %100 | %100 | %100 | %100 | **%66,7** |
 | yanlış alarm | %7,1 | **%11,1** | %0 | %0 | %0 |
 
-**Zayıf yer gizlenmiyor:** C1'de her üç hatadan biri kaçıyor. Nüans hataları
-(kayıt uyumu, doğal olmayan edat) modeller için gerçekten zor. Uygulama bunu
-kendi doğruluk ekranında da yazıyor.
+**En zayıf yer C1:** her üç hatadan biri kaçıyor. Nüans hataları (kayıt uyumu,
+doğal olmayan edat) modeller için gerçekten zor.
+
+Bu kırılım uygulamanın **kendi Doğruluk ekranında** tam hâliyle duruyor —
+tek ortalama sayının arkasına saklanan bir ölçüm, ölçüm değil rapordur.
+Tanıtım sayfasında yok: ürün sahibinin kararı, ilk karşılaşmada en kötü sayıyı
+öne çıkarmamak.
 
 ![Giriş ekranı](docs/shots/login.png)
 

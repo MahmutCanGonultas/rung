@@ -88,7 +88,7 @@ export function AuthShell({
         </div>
 
         <SampleAnalysis />
-        <Proof bands compact />
+        <Proof compact />
       </InView>
     </main>
   );
