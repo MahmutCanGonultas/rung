@@ -119,7 +119,7 @@ export default async function HomePage() {
             burası. Hareket A1'den C1'e tırmanıyor — ürünün ne yaptığının
             kendisi.
           */}
-          <InView className="stair-hold">
+          <InView className="model-hold">
             <Stair />
           </InView>
           <div className="claim-thesis">

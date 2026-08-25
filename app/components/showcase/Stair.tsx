@@ -5,40 +5,28 @@ import { estimateLevel } from "../../lib/k3/estimate";
 import { showcaseAnalysis } from "../../lib/showcase-run";
 
 /*
- * Merdiven — logonun kendisi, ürün ölçeğinde.
+ * Merdiven — logonun kendisi, gerçek üç boyutta.
  *
  * "Rung" İngilizcede merdiven basamağı demek ve ürün seviye ölçüyor. Marka
  * işareti beş basamak çiziyor; burada aynı beş basamak sayfanın en büyük
- * nesnesi oluyor. Yeni bir metafor icat edilmiyor, var olanı büyütülüyor.
+ * nesnesi. Yeni bir metafor icat edilmiyor, var olan büyütülüyor.
+ *
+ * ÜÇ BOYUT SAHİCİ. İlk sürüm izometrik SVG'ydi — üç boyutlu GÖRÜNEN düz bir
+ * çizim. Burada her basamak `transform-style: preserve-3d` ile kurulmuş, beş
+ * yüzü olan gerçek bir kutu; sahnenin `perspective`i var ve model kendi
+ * ekseninde dönüyor. Örtüşmeyi boyama sırası değil tarayıcının kendi derinlik
+ * hesabı çözüyor: model döndükçe yüzler doğru sırayla birbirinin önüne geçiyor,
+ * uzak basamak yakınının arkasında kalıyor. WebGL yok, kütüphane yok — yirmi
+ * beş `div` ve yüz başına bir renk.
  *
  * BASAMAK SAYISI VERİDEN: `BAND_ORDER` neyse o. Ölçeğe C2 eklenirse merdivene
  * basamak eklenir; burada sabit yazılmış bir "5" yok.
  *
  * YANAN BASAMAK ÖLÇÜM: aşağıdaki "Aynı motor, iki cümle" bölümündeki bozuk
  * cümle, sayfa çizilirken `estimateLevel`den geçiyor ve çıkan bant yanıyor.
- * Yani merdiven bir ikon değil, o cümlenin ölçüldüğü yeri gösteren bir okuma —
- * ve okuduğu cümle 600px aşağıda, kontrol edilebilir yerde duruyor.
- *
- * Hacim SVG'de izometrik: her basamak üç yüzü olan bir kutu (ön, üst, sağ).
- * Boyama sırası 0'dan 4'e, yani her basamak bir öncekinin sağ yüzünü kapatıyor
- * — gerçek 3B'deki örtüşmenin ta kendisi. WebGL yok, kütüphane yok, üç yüz
- * rengi var.
+ * Merdiven ikon değil, o cümlenin ölçüldüğü yeri gösteren bir okuma — ve
+ * okuduğu cümle 600px aşağıda, kontrol edilebilir yerde duruyor.
  */
-
-/** Basamak eni, yüksekliği; ve derinliğin ekrandaki iki bileşeni. */
-const W = 76;
-const H = 52;
-const DX = 40;
-/** 30°'lik izometri: tan(30°) ≈ 0,577. */
-const DY = Math.round(DX * 0.577);
-
-const N = BAND_ORDER.length;
-const BASE = N * H;
-const VW = N * W + DX;
-const VH = BASE + DY;
-
-const pts = (...p: Array<[number, number]>) => p.map(([x, y]) => `${x},${y}`).join(" ");
-
 export function Stair() {
   const run = showcaseAnalysis("broken");
   const level = estimateLevel(
@@ -48,81 +36,43 @@ export function Stair() {
   const lit = BAND_ORDER.indexOf(level.level as (typeof BAND_ORDER)[number]);
 
   return (
-    <div className="stair">
-      <svg
-        className="stair-art"
-        viewBox={`0 0 ${VW} ${VH + 26}`}
+    <div className="model">
+      <div
+        className="model-stage"
         role="img"
         aria-label={
-          `Rung'un seviye ölçeği beş basamak olarak: ` +
+          `Rung'un seviye ölçeği üç boyutlu beş basamak olarak: ` +
           `${BAND_ORDER.join(", ")}. Aşağıdaki örnek cümle ` +
           `${level.level} ölçüldü, o basamak yanıyor.`
         }
-        focusable="false"
       >
-        {BAND_ORDER.map((band, i) => {
-          const x0 = i * W;
-          const x1 = x0 + W;
-          const top = BASE - (i + 1) * H + DY;
-          const bottom = BASE + DY;
-          const isLit = i === lit;
-
-          return (
-            <g
-              key={band}
-              className={isLit ? "stair-step is-lit" : "stair-step"}
-              style={{ "--i": String(i) } as CSSProperties}
-            >
-              {/* sağ yüz — bir sonraki basamak bunu kapatıyor, sonuncusu hariç */}
-              <polygon
-                className="stair-side"
-                points={pts(
-                  [x1, top],
-                  [x1 + DX, top - DY],
-                  [x1 + DX, bottom - DY],
-                  [x1, bottom]
-                )}
-              />
-              {/* üst yüz — basamağın basılan yeri */}
-              <polygon
-                className="stair-tread"
-                points={pts(
-                  [x0, top],
-                  [x1, top],
-                  [x1 + DX, top - DY],
-                  [x0 + DX, top - DY]
-                )}
-              />
-              {/* ön yüz */}
-              <polygon
-                className="stair-riser"
-                points={pts([x0, top], [x1, top], [x1, bottom], [x0, bottom])}
-              />
-            </g>
-          );
-        })}
-
-        {/*
-          Etiketler hareket eden gruptan DIŞARIDA. İçeride olsalardı basamak
-          tabandan yükselirken `scaleY` yazıyı da ezerdi.
-        */}
         {BAND_ORDER.map((band, i) => (
-          <text
-            key={`t-${band}`}
-            className={i === lit ? "stair-label is-lit" : "stair-label"}
-            x={i * W + W / 2}
-            y={BASE + DY + 20}
+          <div
+            key={band}
+            className={i === lit ? "mstep is-lit" : "mstep"}
+            style={{ "--n": String(i) } as CSSProperties}
           >
-            {band}
-          </text>
+            {/*
+              Yüzler tek tek yazılı, çünkü her birinin kendi ışığı var: üst yüz
+              en açık, ön yüz orta, yan ve arka en koyu. Sıra iki temada da
+              korunuyor — jetonlar tema başına tanımlı.
+            */}
+            <div className="mbox">
+              <i className="f-back" />
+              <i className="f-left" />
+              <i className="f-right" />
+              <i className="f-top" />
+              {/* Etiket ön yüze BASILI: modelin parçası, yanında duran yazı değil. */}
+              <span className="f-front">{band}</span>
+            </div>
+          </div>
         ))}
-      </svg>
+      </div>
 
       {/*
-        Şerh olmadan merdiven bir ikon olurdu. Bu satır onu OKUMAYA çeviriyor
-        ve okuduğu şey aşağıda, kontrol edilebilir yerde duruyor.
+        Şerh olmadan merdiven bir ikon olurdu. Bu satır onu OKUMAYA çeviriyor.
       */}
-      <p className="stair-note">
+      <p className="model-read">
         Aşağıdaki cümle <b>{level.level}</b> ölçüldü
       </p>
     </div>

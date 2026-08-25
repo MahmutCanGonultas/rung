@@ -123,12 +123,19 @@
    * `color-mix(--ink, --plane)` ile türetilmiyor — koyu temada o formül
    * ışığı ters çevirirdi (daha çok mürekkep = daha AÇIK).
    */
-  --step-tread: #ddd9ce;
-  --step-riser: #c7c2b4;
-  --step-side: #adaa9c;
+  --step-tread: #cdc7b7;
+  --step-riser: #ada695;
+  --step-side: #8b8474;
   --step-lit-tread: #3fd7a2;
   --step-lit-riser: #0b7a55;
   --step-lit-side: #075b40;
+  /*
+   * ÖLÇÜLDÜ: açık etiket (#efece5) taş rengi riser üstünde 2,05:1'de kalıyordu,
+   * taban 4,5. Nötr basamakta etiket KOYU, yanan basamakta AÇIK — çünkü yanan
+   * basamağın ön yüzü koyu yeşil.
+   */
+  --step-label: #34302a;
+  --step-lit-label: #eafff6;
 
   --band: #101613;
   --band-ink: #f2f5f2;
@@ -205,6 +212,8 @@
   --step-lit-tread: #62e8b8;
   --step-lit-riser: #35d39b;
   --step-lit-side: #1d8f68;
+  --step-label: #93a0ab;
+  --step-lit-label: #06251a;
 
   --band: #242e35;
   --band-ink: #eef2f6;
@@ -274,6 +283,8 @@
   --step-lit-tread: #62e8b8;
   --step-lit-riser: #35d39b;
   --step-lit-side: #1d8f68;
+  --step-label: #93a0ab;
+  --step-lit-label: #06251a;
 
   --band: #242e35;
   --band-ink: #eef2f6;
@@ -2172,49 +2183,136 @@ textarea:focus-visible,
 }
 .claim-metric b { color: var(--accent); }
 
-/* ── merdiven · logonun kendisi, ürün ölçeğinde ───────────────────── */
+/* ── merdiven · GERÇEK üç boyut ───────────────────────────────────── */
 /*
- * Beş basamak: A1, A2, B1, B2, C1. Sayı `BAND_ORDER`dan geliyor, CSS'te
- * sabit yazılı değil.
+ * Beş basamak: A1, A2, B1, B2, C1. Sayı `BAND_ORDER`dan geliyor, CSS'te sabit
+ * yazılı değil — `--n` her basamağa React'ten iniyor.
  *
- * Hacim izometrik: her basamak üç yüzlü bir kutu ve boyama sırası 0'dan 4'e,
- * yani her basamak bir öncekinin sağ yüzünü kapatıyor. Gerçek 3B'deki
- * örtüşmenin ta kendisi — kütüphane yok, WebGL yok, üç yüz rengi var.
+ * KUTU KURULUŞU. Her basamak `--w` × `--h` × `--d`lik bir kutu ve `--h` kendi
+ * sırasından türüyor, yani merdiven yükseliyor. Beş yüz:
+ *   ön   → `translateZ(d/2)`
+ *   arka → `translateZ(-d/2) rotateY(180deg)`
+ *   sağ  → `translateX(w/2) rotateY(90deg)`      (eni `--d`)
+ *   sol  → `translateX(-w/2) rotateY(-90deg)`    (eni `--d`)
+ *   üst  → `translateY(-h/2) rotateX(90deg)`     (boyu `--d`)
+ * Alt yüz yok: zemine bakıyor, hiçbir açıdan görünmüyor.
+ *
+ * `opacity` HİÇBİR YERDE kullanılmıyor. 1'in altındaki bir opaklık yığın
+ * bağlamı açıyor ve `preserve-3d` zincirini DÜZLEŞTİRİYOR — model o an düz bir
+ * çizime dönüp animasyon bitince yerine oturuyordu. Bütün hareket `transform`.
  */
-.stair-hold { grid-row: 1; }
-.stair { margin: 0; }
-.stair-art {
-  display: block;
+.model-hold { grid-row: 1; }
+.model {
+  --w: clamp(40px, 5.6vw, 82px);
+  --u: clamp(22px, 3vw, 44px);
+  --d: clamp(40px, 5.6vw, 82px);
+
+  /*
+   * Uzak perspektif BİLEREK. 1150px denendi: 500px'lik bir nesnede sağ kenar
+   * sol kenardan belirgin büyük çıkıyor, model "ürün görseli" değil balık gözü
+   * gibi duruyordu. 2000px neredeyse ortografik — teknik çizim ile fotoğraf
+   * arası, aletin kendisine yakışan yer.
+   */
+  perspective: 2000px;
+  perspective-origin: 50% 46%;
+  margin-top: 6px;
+}
+/*
+ * Yükseklik SAHNEDE. `.model` üzerindeyken şerh kutunun dışına taşıyordu:
+ * ÖLÇÜLDÜ şerh y 519–535, tez y 521–651 — iki metin üst üste biniyordu.
+ */
+.model-stage {
+  position: relative;
   width: 100%;
-  max-width: 420px;
-  height: auto;
-  overflow: visible;
+  height: calc(var(--u) * 5 + var(--d) * 1.5);
+  transform-style: preserve-3d;
+  /* Duruş: üstten ve soldan. Üç yüz görünüyor — üst, ön, sağ. */
+  /*
+   * ÖLÇÜLDÜ: `rotateX(17deg)` ile kutunun arka-alt kenarı ön-alt kenardan
+   * AŞAĞIDA çıkıyordu (f-back y 443, f-front y 427) — yani kamera alttan
+   * bakıyordu ve her basamağın altından koyu bir kuyruk sarkıyordu. CSS'te Y
+   * ekseni aşağı bakıyor, o yüzden üstten bakmak için işaret negatif.
+   */
+  transform: rotateX(-17deg) rotateY(-24deg);
 }
-.stair-tread { fill: var(--step-tread); }
-.stair-riser { fill: var(--step-riser); }
-.stair-side { fill: var(--step-side); }
-.stair-step.is-lit .stair-tread { fill: var(--step-lit-tread); }
-.stair-step.is-lit .stair-riser { fill: var(--step-lit-riser); }
-.stair-step.is-lit .stair-side { fill: var(--step-lit-side); }
-
-.stair-label {
+.mstep {
+  --h: calc(var(--u) * (var(--n) + 1));
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  width: var(--w);
+  height: var(--h);
+  /* Beş basamaklık koşu sahnenin ortasına yaslanıyor. */
+  margin-left: calc(var(--w) * (var(--n) - 2.5));
+  transform-style: preserve-3d;
+}
+/* Hareket AYRI katmanda: `.mstep` yerleşimi tutuyor, `.mbox` oynuyor. */
+.mbox {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.mbox > * {
+  position: absolute;
+  display: block;
+  backface-visibility: hidden;
+}
+.f-front,
+.f-back {
+  inset: 0;
+}
+.f-front {
+  transform: translateZ(calc(var(--d) / 2));
+  background: var(--step-riser);
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding-bottom: 7px;
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-anchor: middle;
-  fill: var(--ink-3);
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  color: var(--step-label);
 }
-.stair-label.is-lit { fill: var(--accent); }
+.f-back {
+  transform: translateZ(calc(var(--d) / -2)) rotateY(180deg);
+  background: var(--step-side);
+}
+.f-right,
+.f-left {
+  top: 0;
+  height: 100%;
+  width: var(--d);
+  left: 50%;
+  margin-left: calc(var(--d) / -2);
+  background: var(--step-side);
+}
+.f-right { transform: translateX(calc(var(--w) / 2)) rotateY(90deg); }
+.f-left { transform: translateX(calc(var(--w) / -2)) rotateY(-90deg); }
+.f-top {
+  left: 0;
+  width: 100%;
+  height: var(--d);
+  top: 50%;
+  margin-top: calc(var(--d) / -2);
+  transform: translateY(calc(var(--h) / -2)) rotateX(90deg);
+  background: var(--step-tread);
+}
 
-.stair-note {
-  margin: 18px 0 0;
+.mstep.is-lit .f-front { background: var(--step-lit-riser); color: var(--step-lit-label); }
+.mstep.is-lit .f-top { background: var(--step-lit-tread); }
+.mstep.is-lit .f-back,
+.mstep.is-lit .f-right,
+.mstep.is-lit .f-left { background: var(--step-lit-side); }
+
+.model-read {
+  margin: 26px 0 0;
   font-family: var(--mono);
   font-size: var(--fs-micro);
   letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
-.stair-note b { color: var(--accent); font-weight: 500; }
+.model-read b { color: var(--accent); font-weight: 500; }
 
 /*
  * Ölçütün sayısı iddianın SONUNDA. Kahramanda eskiden 41 çentiklik bir alan
@@ -2640,22 +2738,19 @@ textarea:focus-visible,
    kenarlık taşıyor, kenarlık renkleri korunuyor. */
 @media (forced-colors: active) {
   /*
-   * Zorlanmış renklerde `fill` düzleşiyor: üç yüz aynı renge çöküyor ve
-   * merdiven düz bir lekeye dönüyor. Yüzler çizgiyle ayrılıyor, yanan basamak
+   * Zorlanmış renklerde `background` düzleşiyor: beş yüz aynı renge çöküyor ve
+   * model tek bir lekeye dönüyor. Yüzler çizgiyle ayrılıyor, yanan basamak
    * sistem vurgu rengiyle.
    */
-  .stair-tread,
-  .stair-riser,
-  .stair-side {
+  .mbox > * {
     forced-color-adjust: none;
-    fill: Canvas;
-    stroke: CanvasText;
-    stroke-width: 2;
+    background: Canvas;
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
   }
-  .stair-step.is-lit .stair-tread,
-  .stair-step.is-lit .stair-riser,
-  .stair-step.is-lit .stair-side { fill: Highlight; }
-  .stair-label { fill: CanvasText; }
+  .mstep.is-lit .mbox > * { background: Highlight; }
+  .f-front { color: CanvasText; }
+  .mstep.is-lit .f-front { color: HighlightText; }
 
   .measure .proof-cell.is-lead { border-top-width: 3px; }
   .measure > .proof-weak { border-left-width: 3px; }
@@ -4416,23 +4511,36 @@ textarea:focus-visible,
  * sırayla oynayınca iki aşamalı tek süreç oluyor.
  */
 /*
- * Basamaklar A1'den C1'e SIRAYLA tabandan yükseliyor — ürünün ne yaptığının
- * kendisi. 5 × 110ms ≈ 550ms, sonra duruyor; döngü yok.
+ * İki hareket, ikisi de `[data-play="1"]` altında.
  *
- * `scaleY` tabandan: basamak "beliren bir şey" değil, "yerden çıkan bir şey".
- * Etiketler gruptan dışarıda, yoksa yazı da ezilirdi.
+ * 1 · KURULUŞ: basamaklar yukarıdan A1'den C1'e sırayla yerine iniyor. Aşağıdan
+ *     yükselmek daha uygun bir metafor olurdu ama üç boyutta kırpma yok — alttan
+ *     gelen basamak zeminin altına, şerhin üstüne taşıyordu. `overflow: hidden`
+ *     çözüm değil: `preserve-3d` zincirini düzleştiriyor.
+ * 2 · YÖRÜNGE: model kendi ekseninde ağır ağır salınıyor. Bu, ürün sahibinin
+ *     açık isteği ("3B model tarzı olsun"). Sonsuz döngü bu dosyada başka
+ *     hiçbir yerde yok ve olmamalı; buradaki nesne ölçüm göstermiyor, ölçeğin
+ *     KENDİSİ — dönerken hiçbir sayı değişmiyor.
  *
- * BİTMİŞ KARE: bütün basamaklar tam boyda. Kural `[data-play="1"]` altında.
+ * BİTMİŞ KARE: beş basamak yerinde, sahne duruşunda. Hareket hiç oynamazsa
+ * ekranda tam ve okunabilir bir model duruyor.
+ * `prefers-reduced-motion` ikisini de kapatıyor (:1694 `animation: none`).
  */
-@keyframes stair-climb {
-  from { transform: scaleY(0.04); }
+@keyframes model-set {
+  from { transform: translate3d(0, -90px, 0); }
   to { transform: none; }
 }
-[data-play="1"] .stair-step {
-  transform-box: fill-box;
-  transform-origin: bottom;
-  animation: stair-climb 420ms var(--ease-out) both;
-  animation-delay: calc(var(--i) * 110ms);
+[data-play="1"] .mbox {
+  animation: model-set 560ms cubic-bezier(0.22, 0.9, 0.3, 1.06) both;
+  animation-delay: calc(var(--n) * 120ms);
+}
+@keyframes model-orbit {
+  0% { transform: rotateX(-17deg) rotateY(-24deg); }
+  50% { transform: rotateX(-13deg) rotateY(-10deg); }
+  100% { transform: rotateX(-17deg) rotateY(-24deg); }
+}
+[data-play="1"] .model-stage {
+  animation: model-orbit 19s ease-in-out 1.4s infinite;
 }
 
 [data-play="1"] .proof-bands .meter-fill {
