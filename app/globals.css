@@ -134,8 +134,8 @@
    * taban 4,5. Nötr basamakta etiket KOYU, yanan basamakta AÇIK — çünkü yanan
    * basamağın ön yüzü koyu yeşil.
    */
-  --step-label: #34302a;
-  --step-lit-label: #eafff6;
+  --step-edge: rgba(255, 255, 255, 0.34);
+  --step-shadow: rgba(58, 50, 32, 0.26);
 
   --band: #101613;
   --band-ink: #f2f5f2;
@@ -212,8 +212,8 @@
   --step-lit-tread: #62e8b8;
   --step-lit-riser: #35d39b;
   --step-lit-side: #1d8f68;
-  --step-label: #93a0ab;
-  --step-lit-label: #06251a;
+  --step-edge: rgba(255, 255, 255, 0.11);
+  --step-shadow: rgba(0, 0, 0, 0.55);
 
   --band: #242e35;
   --band-ink: #eef2f6;
@@ -283,8 +283,8 @@
   --step-lit-tread: #62e8b8;
   --step-lit-riser: #35d39b;
   --step-lit-side: #1d8f68;
-  --step-label: #93a0ab;
-  --step-lit-label: #06251a;
+  --step-edge: rgba(255, 255, 255, 0.11);
+  --step-shadow: rgba(0, 0, 0, 0.55);
 
   --band: #242e35;
   --band-ink: #eef2f6;
@@ -2185,9 +2185,6 @@ textarea:focus-visible,
 
 /* ── merdiven · GERÇEK üç boyut ───────────────────────────────────── */
 /*
- * Beş basamak: A1, A2, B1, B2, C1. Sayı `BAND_ORDER`dan geliyor, CSS'te sabit
- * yazılı değil — `--n` her basamağa React'ten iniyor.
- *
  * KUTU KURULUŞU. Her basamak `--w` × `--h` × `--d`lik bir kutu ve `--h` kendi
  * sırasından türüyor, yani merdiven yükseliyor. Beş yüz:
  *   ön   → `translateZ(d/2)`
@@ -2197,15 +2194,15 @@ textarea:focus-visible,
  *   üst  → `translateY(-h/2) rotateX(90deg)`     (boyu `--d`)
  * Alt yüz yok: zemine bakıyor, hiçbir açıdan görünmüyor.
  *
- * `opacity` HİÇBİR YERDE kullanılmıyor. 1'in altındaki bir opaklık yığın
- * bağlamı açıyor ve `preserve-3d` zincirini DÜZLEŞTİRİYOR — model o an düz bir
- * çizime dönüp animasyon bitince yerine oturuyordu. Bütün hareket `transform`.
+ * `opacity` HİÇBİR YERDE. 1'in altındaki bir opaklık yığın bağlamı açıyor ve
+ * `preserve-3d` zincirini DÜZLEŞTİRİYOR — model o an düz bir çizime dönüyordu.
+ * Aynı sebeple `filter` de yok: zemin gölgesi bulanık bir gradyan, blur değil.
  */
 .model-hold { grid-row: 1; }
 .model {
-  --w: clamp(40px, 5.6vw, 82px);
-  --u: clamp(22px, 3vw, 44px);
-  --d: clamp(40px, 5.6vw, 82px);
+  --w: clamp(42px, 5.9vw, 86px);
+  --u: clamp(20px, 2.6vw, 38px);
+  --d: clamp(42px, 5.9vw, 86px);
 
   /*
    * Uzak perspektif BİLEREK. 1150px denendi: 500px'lik bir nesnede sağ kenar
@@ -2226,7 +2223,6 @@ textarea:focus-visible,
   width: 100%;
   height: calc(var(--u) * 5 + var(--d) * 1.5);
   transform-style: preserve-3d;
-  /* Duruş: üstten ve soldan. Üç yüz görünüyor — üst, ön, sağ. */
   /*
    * ÖLÇÜLDÜ: `rotateX(17deg)` ile kutunun arka-alt kenarı ön-alt kenardan
    * AŞAĞIDA çıkıyordu (f-back y 443, f-front y 427) — yani kamera alttan
@@ -2235,6 +2231,23 @@ textarea:focus-visible,
    */
   transform: rotateX(-17deg) rotateY(-24deg);
 }
+
+/* Zemin teması. Model havada durursa maket gibi değil kesilmiş gibi duruyor. */
+.model-ground {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  width: calc(var(--w) * 5 + var(--d) * 2.2);
+  height: calc(var(--d) * 2.2);
+  margin-left: calc((var(--w) * 5 + var(--d) * 2.2) / -2);
+  transform: translateY(50%) rotateX(90deg);
+  background: radial-gradient(
+    52% 58% at 46% 50%,
+    var(--step-shadow),
+    transparent 74%
+  );
+}
+
 .mstep {
   --h: calc(var(--u) * (var(--n) + 1));
   position: absolute;
@@ -2256,6 +2269,16 @@ textarea:focus-visible,
   position: absolute;
   display: block;
   backface-visibility: hidden;
+  /*
+   * Düz renk yerine ince bir düşüş. Renk jetonu `background-color`da kalıyor,
+   * gradyan `background-image`da — böylece ışık dolaşırken yalnızca renk
+   * değişiyor, doku duruyor. Beyaz/siyah katman iki temada da doğru çalışıyor.
+   */
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.07),
+    rgba(0, 0, 0, 0.07)
+  );
 }
 .f-front,
 .f-back {
@@ -2263,19 +2286,13 @@ textarea:focus-visible,
 }
 .f-front {
   transform: translateZ(calc(var(--d) / 2));
-  background: var(--step-riser);
-  display: grid;
-  align-items: end;
-  justify-items: center;
-  padding-bottom: 7px;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.09em;
-  color: var(--step-label);
+  background-color: var(--step-riser);
+  /* Basamağın üst kenarında aydınlık bir iz: iki yüzün buluştuğu yer. */
+  box-shadow: inset 0 1px 0 var(--step-edge);
 }
 .f-back {
   transform: translateZ(calc(var(--d) / -2)) rotateY(180deg);
-  background: var(--step-side);
+  background-color: var(--step-side);
 }
 .f-right,
 .f-left {
@@ -2284,10 +2301,13 @@ textarea:focus-visible,
   width: var(--d);
   left: 50%;
   margin-left: calc(var(--d) / -2);
-  background: var(--step-side);
+  background-color: var(--step-side);
 }
 .f-right { transform: translateX(calc(var(--w) / 2)) rotateY(90deg); }
-.f-left { transform: translateX(calc(var(--w) / -2)) rotateY(-90deg); }
+.f-left {
+  transform: translateX(calc(var(--w) / -2)) rotateY(-90deg);
+  box-shadow: inset 0 1px 0 var(--step-edge);
+}
 .f-top {
   left: 0;
   width: 100%;
@@ -2295,24 +2315,25 @@ textarea:focus-visible,
   top: 50%;
   margin-top: calc(var(--d) / -2);
   transform: translateY(calc(var(--h) / -2)) rotateX(90deg);
-  background: var(--step-tread);
+  background-color: var(--step-tread);
 }
 
-.mstep.is-lit .f-front { background: var(--step-lit-riser); color: var(--step-lit-label); }
-.mstep.is-lit .f-top { background: var(--step-lit-tread); }
-.mstep.is-lit .f-back,
-.mstep.is-lit .f-right,
-.mstep.is-lit .f-left { background: var(--step-lit-side); }
-
-.model-read {
-  margin: 26px 0 0;
+/* Ölçek satırı: model temiz kalsın, okuma buraya insin. */
+.model-scale {
+  display: flex;
+  justify-content: space-between;
+  width: calc(var(--w) * 5);
+  max-width: 100%;
+  margin: 20px auto 0;
   font-family: var(--mono);
-  font-size: var(--fs-micro);
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
   color: var(--ink-3);
 }
-.model-read b { color: var(--accent); font-weight: 500; }
+.model-scale span {
+  flex: 1 1 0;
+  text-align: center;
+}
 
 /*
  * Ölçütün sayısı iddianın SONUNDA. Kahramanda eskiden 41 çentiklik bir alan
@@ -2739,18 +2760,19 @@ textarea:focus-visible,
 @media (forced-colors: active) {
   /*
    * Zorlanmış renklerde `background` düzleşiyor: beş yüz aynı renge çöküyor ve
-   * model tek bir lekeye dönüyor. Yüzler çizgiyle ayrılıyor, yanan basamak
-   * sistem vurgu rengiyle.
+   * model tek bir lekeye dönüyor. Yüzler çizgiyle ayrılıyor; zemin gölgesi
+   * anlam taşımadığı için kalkıyor.
    */
   .mbox > * {
     forced-color-adjust: none;
     background: Canvas;
+    background-image: none;
     outline: 1px solid CanvasText;
     outline-offset: -1px;
+    box-shadow: none;
   }
-  .mstep.is-lit .mbox > * { background: Highlight; }
-  .f-front { color: CanvasText; }
-  .mstep.is-lit .f-front { color: HighlightText; }
+  .model-ground { display: none; }
+  .model-scale span { color: CanvasText; }
 
   .measure .proof-cell.is-lead { border-top-width: 3px; }
   .measure > .proof-weak { border-left-width: 3px; }
@@ -4511,20 +4533,25 @@ textarea:focus-visible,
  * sırayla oynayınca iki aşamalı tek süreç oluyor.
  */
 /*
- * İki hareket, ikisi de `[data-play="1"]` altında.
+ * ÜÇ HAREKET, üçü de `[data-play="1"]` altında.
  *
  * 1 · KURULUŞ: basamaklar yukarıdan A1'den C1'e sırayla yerine iniyor. Aşağıdan
  *     yükselmek daha uygun bir metafor olurdu ama üç boyutta kırpma yok — alttan
  *     gelen basamak zeminin altına, şerhin üstüne taşıyordu. `overflow: hidden`
  *     çözüm değil: `preserve-3d` zincirini düzleştiriyor.
- * 2 · YÖRÜNGE: model kendi ekseninde ağır ağır salınıyor. Bu, ürün sahibinin
- *     açık isteği ("3B model tarzı olsun"). Sonsuz döngü bu dosyada başka
- *     hiçbir yerde yok ve olmamalı; buradaki nesne ölçüm göstermiyor, ölçeğin
- *     KENDİSİ — dönerken hiçbir sayı değişmiyor.
+ * 2 · TIRMANIŞ: ışık A1'den C1'e basamak basamak dolaşıyor ve HİÇBİRİNDE
+ *     durmuyor. Ürünün vaadi bu: aynı ölçekte, aylar boyunca yukarı.
+ *     Beş basamak × 1,2s = 6s, yani döngü tam kapanıyor.
+ *     Yalnızca ÖN ve ÜST yüz yanıyor — ışık ön-üstten geliyor, ve yalnız iki
+ *     yüzü boyamak yirmi beş yerine on öğeyi yeniden çizdiriyor.
+ * 3 · YÖRÜNGE: model kendi ekseninde ağır ağır salınıyor.
  *
- * BİTMİŞ KARE: beş basamak yerinde, sahne duruşunda. Hareket hiç oynamazsa
- * ekranda tam ve okunabilir bir model duruyor.
- * `prefers-reduced-motion` ikisini de kapatıyor (:1694 `animation: none`).
+ * 2 ve 3 sonsuz döngü ve bu, bu dosyanın "süs hareket yok" kuralına BİLİNÇLİ
+ * bir istisna: nesne bir ölçüm göstermiyor, ölçeğin KENDİSİ — dönerken ya da
+ * yanarken hiçbir sayı değişmiyor. Ölçüm gösteren hiçbir şey döngüye alınmadı.
+ *
+ * BİTMİŞ KARE: beş basamak yerinde, sahne duruşunda, hepsi taş renginde.
+ * `prefers-reduced-motion` üçünü de kapatıyor (:1694 `animation: none`).
  */
 @keyframes model-set {
   from { transform: translate3d(0, -90px, 0); }
@@ -4534,6 +4561,50 @@ textarea:focus-visible,
   animation: model-set 560ms cubic-bezier(0.22, 0.9, 0.3, 1.06) both;
   animation-delay: calc(var(--n) * 120ms);
 }
+
+@keyframes climb-front {
+  0%, 4% { background-color: var(--step-riser); }
+  9%, 15% { background-color: var(--step-lit-riser); }
+  22%, 100% { background-color: var(--step-riser); }
+}
+@keyframes climb-top {
+  0%, 4% { background-color: var(--step-tread); }
+  9%, 15% { background-color: var(--step-lit-tread); }
+  22%, 100% { background-color: var(--step-tread); }
+}
+/*
+ * Yan yüzler de yanıyor. Yalnızca ön ve üst yanarken SON basamağın sağ yüzü
+ * taş renginde kalıyordu: C1'in sağ yüzü tek görünen yan yüz, çünkü onu
+ * kapatacak bir sonraki basamak yok. Arka yüz listede yok — `backface-
+ * visibility: hidden` onu her açıdan gizliyor, boşuna çizdirmenin anlamı yok.
+ */
+@keyframes climb-side {
+  0%, 4% { background-color: var(--step-side); }
+  9%, 15% { background-color: var(--step-lit-side); }
+  22%, 100% { background-color: var(--step-side); }
+}
+@keyframes climb-label {
+  0%, 4% { color: var(--ink-3); }
+  9%, 15% { color: var(--accent); }
+  22%, 100% { color: var(--ink-3); }
+}
+[data-play="1"] .f-front,
+[data-play="1"] .f-top,
+[data-play="1"] .f-left,
+[data-play="1"] .f-right,
+[data-play="1"] .model-scale span {
+  animation-duration: 6s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  /* Kuruluş bitmeden tırmanış başlamıyor: 5 × 120ms + 560ms ≈ 1,2s. */
+  animation-delay: calc(1200ms + var(--n) * 1200ms);
+}
+[data-play="1"] .f-front { animation-name: climb-front; }
+[data-play="1"] .f-top { animation-name: climb-top; }
+[data-play="1"] .f-left,
+[data-play="1"] .f-right { animation-name: climb-side; }
+[data-play="1"] .model-scale span { animation-name: climb-label; }
+
 @keyframes model-orbit {
   0% { transform: rotateX(-17deg) rotateY(-24deg); }
   50% { transform: rotateX(-13deg) rotateY(-10deg); }

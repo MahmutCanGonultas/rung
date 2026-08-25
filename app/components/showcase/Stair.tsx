@@ -1,79 +1,77 @@
 import type { CSSProperties } from "react";
 
 import { BAND_ORDER } from "../../lib/k0/bands";
-import { estimateLevel } from "../../lib/k3/estimate";
-import { showcaseAnalysis } from "../../lib/showcase-run";
 
 /*
  * Merdiven — logonun kendisi, gerçek üç boyutta.
  *
  * "Rung" İngilizcede merdiven basamağı demek ve ürün seviye ölçüyor. Marka
  * işareti beş basamak çiziyor; burada aynı beş basamak sayfanın en büyük
- * nesnesi. Yeni bir metafor icat edilmiyor, var olan büyütülüyor.
+ * nesnesi. Yeni metafor icat edilmiyor, var olan büyütülüyor.
  *
- * ÜÇ BOYUT SAHİCİ. İlk sürüm izometrik SVG'ydi — üç boyutlu GÖRÜNEN düz bir
- * çizim. Burada her basamak `transform-style: preserve-3d` ile kurulmuş, beş
- * yüzü olan gerçek bir kutu; sahnenin `perspective`i var ve model kendi
- * ekseninde dönüyor. Örtüşmeyi boyama sırası değil tarayıcının kendi derinlik
- * hesabı çözüyor: model döndükçe yüzler doğru sırayla birbirinin önüne geçiyor,
- * uzak basamak yakınının arkasında kalıyor. WebGL yok, kütüphane yok — yirmi
- * beş `div` ve yüz başına bir renk.
+ * ÜÇ BOYUT SAHİCİ: her basamak `transform-style: preserve-3d` ile kurulmuş beş
+ * yüzlü bir kutu, sahnenin `perspective`i var, derinlik sırasını tarayıcı
+ * hesaplıyor. Model dönerken yüzler doğru sırayla birbirinin önüne geçiyor.
+ * WebGL yok, kütüphane yok — yirmi beş `div`, yüz başına bir renk.
  *
- * BASAMAK SAYISI VERİDEN: `BAND_ORDER` neyse o. Ölçeğe C2 eklenirse merdivene
- * basamak eklenir; burada sabit yazılmış bir "5" yok.
+ * BASAMAK SAYISI VE ETİKETLER VERİDEN: `BAND_ORDER` neyse o. Ölçeğe C2
+ * eklenirse merdivene basamak ve ölçeğe etiket eklenir; burada sabit yazılmış
+ * bir "5" yok. Nesne bir ölçüm göstermiyor, ÖLÇEĞİN KENDİSİ — o yüzden üstünde
+ * bir sayı da yok, dönerken değişebilecek bir şey de.
  *
- * YANAN BASAMAK ÖLÇÜM: aşağıdaki "Aynı motor, iki cümle" bölümündeki bozuk
- * cümle, sayfa çizilirken `estimateLevel`den geçiyor ve çıkan bant yanıyor.
- * Merdiven ikon değil, o cümlenin ölçüldüğü yeri gösteren bir okuma — ve
- * okuduğu cümle 600px aşağıda, kontrol edilebilir yerde duruyor.
+ * Işık basamaklarda dolaşıyor, birinde durmuyor. Önceki sürümde A2 sabit
+ * yanıyordu (o sayfadaki örnek cümlenin ölçülen bandı); ürün sahibi ışığın
+ * takılı kalmasını istemedi. Ölçüm bilgisi kaybolmadı — aynı cümlenin bandı
+ * "Aynı motor, iki cümle" bölümünde, bulgularıyla birlikte duruyor.
  */
 export function Stair() {
-  const run = showcaseAnalysis("broken");
-  const level = estimateLevel(
-    run.text,
-    run.findings.map((f) => f.subcategory)
-  );
-  const lit = BAND_ORDER.indexOf(level.level as (typeof BAND_ORDER)[number]);
-
   return (
     <div className="model">
       <div
         className="model-stage"
         role="img"
         aria-label={
-          `Rung'un seviye ölçeği üç boyutlu beş basamak olarak: ` +
-          `${BAND_ORDER.join(", ")}. Aşağıdaki örnek cümle ` +
-          `${level.level} ölçüldü, o basamak yanıyor.`
+          `Rung'un seviye ölçeği üç boyutlu bir merdiven olarak: ` +
+          `${BAND_ORDER.join(", ")}. En alt basamak A1, en üst basamak C1.`
         }
       >
+        {/* Zemin teması: model havada durmasın. Bulanıklık `filter` ile
+            DEĞİL radyal gradyanla — `filter` `preserve-3d`yi düzleştiriyor. */}
+        <i className="model-ground" />
+
         {BAND_ORDER.map((band, i) => (
           <div
             key={band}
-            className={i === lit ? "mstep is-lit" : "mstep"}
+            className="mstep"
             style={{ "--n": String(i) } as CSSProperties}
           >
             {/*
-              Yüzler tek tek yazılı, çünkü her birinin kendi ışığı var: üst yüz
-              en açık, ön yüz orta, yan ve arka en koyu. Sıra iki temada da
-              korunuyor — jetonlar tema başına tanımlı.
+              Beş yüz, her birinin kendi ışığı: üst en açık, ön orta, yan ve
+              arka en koyu. Sıra iki temada da korunuyor.
             */}
             <div className="mbox">
               <i className="f-back" />
               <i className="f-left" />
               <i className="f-right" />
               <i className="f-top" />
-              {/* Etiket ön yüze BASILI: modelin parçası, yanında duran yazı değil. */}
-              <span className="f-front">{band}</span>
+              <i className="f-front" />
             </div>
           </div>
         ))}
       </div>
 
       {/*
-        Şerh olmadan merdiven bir ikon olurdu. Bu satır onu OKUMAYA çeviriyor.
+        Etiketler modelin DIŞINDA. Riser'lara basılıyken 10px'e sıkışıyor,
+        eğik yüzeyde okunması zorlaşıyor ve modeli kalabalıklaştırıyorlardı.
+        Burada düz bir ölçek satırı: okunur, sakin, ve basamaklarla aynı
+        ritimde yanıyor.
       */}
-      <p className="model-read">
-        Aşağıdaki cümle <b>{level.level}</b> ölçüldü
+      <p className="model-scale" aria-hidden="true">
+        {BAND_ORDER.map((band, i) => (
+          <span key={band} style={{ "--n": String(i) } as CSSProperties}>
+            {band}
+          </span>
+        ))}
       </p>
     </div>
   );
