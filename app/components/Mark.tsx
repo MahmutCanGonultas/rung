@@ -2,45 +2,39 @@
  * Rung işareti.
  *
  * FİKİR: "rung" İngilizcede merdiven basamağı demek — ve bu ürün seviye
- * ölçüyor. Yani isim zaten ölçeği söylüyor; logo da onu söylesin.
+ * ölçüyor. İsim zaten ölçeği söylüyor; işaret de onu söylüyor.
  *
- * Glif beş basamak: A1, A2, B1, B2, C1. Ürünün içinde zaten olan bant ölçeği,
- * hem merdiven hem ölçüm çubuğu olarak okunuyor. Süs değil — logonun anlattığı
- * şey, aletin yaptığı şey.
+ * NEDEN DEĞİŞTİ: önceki hâli beş yükselen çubuktu ve 96px'e büyütülünce sorun
+ * ortaya çıktı — o glif merdiven değil, evrensel TELEFON SİNYAL İKONU gibi
+ * okunuyordu. Dört aday çizilip üç ölçüde karşılaştırıldı; iki raylı merdiven
+ * 20px'de hamburger menüye, genişleyen yatay çubuklar "hizala" ikonuna
+ * benziyordu. Kazanan: tek sürekli yolla çizilmiş merdiven profili. Tek şekil
+ * olduğu için 20px'de dağılmıyor, ve hiçbir yaygın ikonla karışmıyor.
  *
- * En üst basamak vurgu renginde: ölçüm hep bir sonraki basamağa bakıyor.
- * Diğerleri tek renk — palet zaten kısıtlı ve beş ayrı renk gürültü olurdu.
+ * Son basamak vurgu renginde ve DİĞERLERİNDEN AYRI bir yol: ölçüm hep bir
+ * sonraki basamağa bakıyor.
  *
- * `currentColor` kullanılıyor: işaret hangi metnin içindeyse onun rengini
- * alıyor, iki temada da ayrı kural gerekmiyor.
+ * `currentColor` kullanılmıyor, `--ink-3` kullanılıyor: işaret metnin içinde
+ * ama metin kadar yüksek sesli değil. Vurgu basamağı kendi rengini taşıyor.
  */
-
-/** Basamak yükseklikleri (yüzde). Alttan üste doğru artıyor. */
-const STEPS = [34, 50, 66, 82, 100];
 
 export function Mark({ className }: { className?: string }) {
   return (
     <span className={className ? `mark ${className}` : "mark"}>
       <svg
         className="mark-glyph"
-        viewBox="0 0 22 18"
+        viewBox="0 0 26 20"
+        fill="none"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         aria-hidden="true"
         focusable="false"
       >
-        {STEPS.map((h, i) => {
-          const top = 18 - (18 * h) / 100;
-          return (
-            <rect
-              key={h}
-              x={i * 4.6}
-              y={top}
-              width="2.6"
-              height={18 - top}
-              rx="1.3"
-              className={i === STEPS.length - 1 ? "mark-top" : undefined}
-            />
-          );
-        })}
+        {/* Dört basamak, tek yol: sol alttan sağ üste. */}
+        <path className="mark-steps" d="M2 18h5v-5h5V8h5V3h2.5" />
+        {/* Beşinci basamak — sıradaki. */}
+        <path className="mark-next" d="M19.5 3H24" />
       </svg>
       <span className="mark-word">
         rung<i>.</i>

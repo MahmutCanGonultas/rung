@@ -1,16 +1,17 @@
 <!--
-  Sekme ikonu. Uygulamadaki işaretin aynısı: beş basamak, en üstü vurgu renginde.
+  Sekme ikonu — uygulamadaki işaretin aynısı: merdiven profili, son basamak
+  vurgu renginde.
 
   Şeffaf değil, dolu bir karo: şeffaf ikon açık sekme çubuğunda kayboluyor,
-  koyuda ince çubuklar okunmuyor. Karo iki temada da aynı görünüyor.
+  koyuda ince çizgiler okunmuyor. Karo iki temada da aynı görünüyor.
+
+  Çizgi kalınlığı 20 kutuya göre değil 32'ye göre yeniden ölçüldü — küçültünce
+  ince kalıyordu.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <rect width="32" height="32" rx="7" fill="#12161a"/>
-  <g fill="#e8edf1" opacity="0.42">
-    <rect x="4.2" y="21.2" width="3.4" height="6.6" rx="1.7"/>
-    <rect x="9.25" y="18.2" width="3.4" height="9.6" rx="1.7"/>
-    <rect x="14.3" y="15.1" width="3.4" height="12.7" rx="1.7"/>
-    <rect x="19.35" y="12.0" width="3.4" height="15.8" rx="1.7"/>
+  <g fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 25h5.5v-6H17v-6h5.5V7H24" stroke="#e8edf1" stroke-opacity="0.55"/>
+    <path d="M24.5 7H26.5" stroke="#35d39b"/>
   </g>
-  <rect x="24.4" y="8.2" width="3.4" height="19.6" rx="1.7" fill="#35d39b"/>
 </svg>

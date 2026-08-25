@@ -192,57 +192,47 @@ h3 {
 }
 
 /*
- * İşaret: beş basamaklı glif + kelime.
+ * İşaret: merdiven profili + kelime.
  *
- * Glif `currentColor` ile çiziliyor, o yüzden ayrı tema kuralı yok — hangi
- * metnin içindeyse onun rengini alıyor.
+ * Boşluk `em` cinsinden — glif metinle birlikte ölçekleniyor, 20px'de de
+ * 96px'de de aynı optik ilişki. Sabit piksel boşluk büyük boyda dağılıyordu.
  */
 .mark {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 0.34em;
   font-size: 17px;
   font-weight: 680;
   letter-spacing: -0.035em;
   color: var(--ink);
 }
 .mark-glyph {
-  width: 22px;
-  height: 18px;
+  height: 1.02em;
+  width: auto;
   flex: none;
-  fill: currentColor;
+  overflow: visible;
 }
-/*
- * Saydamlık KÖKTE DEĞİL, basamaklarda.
- *
- * Önce `.mark-glyph { opacity: .32 }` yazılmıştı ve bu bir hataydı: grup
- * saydamlığı çocuklara ÇARPILIYOR, yani üst basamağa yazılan `opacity: 1`
- * hiçbir şey yapmıyordu. Vurgu rengi %32'ye iniyor, koyu temada dört
- * komşusundan DAHA SÖNÜK çıkıyordu — logonun tek fikri tersine dönüyordu.
- */
-.mark-glyph rect {
-  opacity: 0.32;
-  transition: opacity 200ms ease;
+.mark-steps {
+  stroke: var(--ink-3);
 }
-/* Üst basamak vurgu renginde: ölçüm hep bir sonraki basamağa bakıyor. */
-.mark-glyph .mark-top {
-  fill: var(--accent);
-  opacity: 1;
+/* Sıradaki basamak: ölçüm hep bir üste bakıyor. */
+.mark-next {
+  stroke: var(--accent);
 }
 .mark-word i {
   color: var(--accent);
   font-style: normal;
 }
-/* Bağlantı olduğunda: üzerine gelince basamaklar tamamen beliriyor. */
+/* Bağlantı olduğunda: üzerine gelince basamaklar koyulaşıyor. */
 .mark-link {
   text-decoration: none;
   border-radius: var(--r-sm);
 }
-.mark-link:hover .mark-glyph rect {
-  opacity: 0.6;
+.mark-link .mark-steps {
+  transition: stroke 200ms ease;
 }
-.mark-link:hover .mark-glyph .mark-top {
-  opacity: 1;
+.mark-link:hover .mark-steps {
+  stroke: var(--ink-2);
 }
 
 /* ── düğmeler ─────────────────────────────────────────────────── */
