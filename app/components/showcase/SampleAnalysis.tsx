@@ -59,7 +59,11 @@ export function SampleAnalysis({
     >
       <div className="sample-head">
         <span className="sample-tag">K0 · deterministik · model yok</span>
-        <span className="sample-count">{findings.length} bulgu</span>
+        <span className="sample-count">
+          {/* Sayı kendi öğesinde: duruşma şeridi onu 52px'e çıkarıyor,
+              başka hiçbir yerde ölçüsü değişmiyor. */}
+          <b>{findings.length}</b> bulgu
+        </span>
       </div>
 
       <p className="sample-text" lang="en">

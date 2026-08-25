@@ -5,6 +5,8 @@ import { InView } from "./components/showcase/InView";
 import { Pipeline } from "./components/showcase/Pipeline";
 import { Proof } from "./components/showcase/Proof";
 import { SampleAnalysis } from "./components/showcase/SampleAnalysis";
+import { FalseAlarm } from "./components/showcase/FalseAlarm";
+import { Stair } from "./components/showcase/Stair";
 import { getSessionUser } from "./lib/session";
 
 /*
@@ -102,19 +104,35 @@ export default async function HomePage() {
         </p>
 
         {/*
-          Ürünün tek zor iddiası, başlığın yanında. Aşağıdaki deneme bunu
-          kanıtlayacak; okuyan, sessizliğin ne değerde olduğunu önceden
-          bilsin diye burada duruyor.
+          Sağ sütun: önce ÖLÇÜM, sonra o ölçümün neden bu ölçüt olduğunu
+          söyleyen cümle. Sıra bilerek böyle — insan önce kırk bir çentiği ve
+          içindeki iki kırmızıyı görüyor, sonra "neden yanlış alarm?" sorusunun
+          cevabını okuyor. Ters sırada iddia, kanıtı olmayan bir cümle olurdu.
+
+          Burası eskiden BOŞTU: tez dibe yaslıydı ve üstünde ~700×360'lık
+          tasarlanmamış bir boşluk duruyordu.
         */}
-        <aside className="claim-thesis">
-          <p>
-            Bir hatayı kaçırmak telafi edilir. Doğru bir cümleyi{" "}
-            <strong>&ldquo;düzeltmek&rdquo; edilmez</strong> — o an alete olan
-            güven biter.
-          </p>
-          <p className="claim-metric">
-            Ana ölçüt: <b>false alarm (yanlış alarm)</b> oranı
-          </p>
+        <aside className="claim-plate">
+          {/*
+            Kahramanda bugüne kadar HİÇ hareket yoktu. Basamaklar ekrana girer
+            girmez sırayla yükseliyor ve bu doğru: sayfanın ilk görülen yeri
+            burası. Hareket A1'den C1'e tırmanıyor — ürünün ne yaptığının
+            kendisi.
+          */}
+          <InView className="stair-hold">
+            <Stair />
+          </InView>
+          <div className="claim-thesis">
+            <p>
+              Bir hatayı kaçırmak telafi edilir. Doğru bir cümleyi{" "}
+              <strong>&ldquo;düzeltmek&rdquo; edilmez</strong> — o an alete olan
+              güven biter.
+            </p>
+            <p className="claim-metric">
+              Ana ölçüt: <b>false alarm (yanlış alarm)</b> oranı
+              <FalseAlarm />
+            </p>
+          </div>
         </aside>
       </section>
 

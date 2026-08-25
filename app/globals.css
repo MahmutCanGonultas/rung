@@ -104,6 +104,39 @@
    * Var olan hiçbir jeton DEĞİŞMİYOR, bunlar ek. Yani `docs/design/*.html`
    * aynasına dokunmak gerekmiyor ve uygulamanın hiçbir ekranı kaymıyor.
    */
+  /*
+   * BANT — sayfanın TEK ters düzlemi.
+   *
+   * ÖLÇÜLDÜ: `--plane` ↔ `--surface` farkı 1,072:1. Bir zemin kenarının
+   * kenarlıksız okunması için pratik eşik ~1,15, kaydırırken ~1,25 — yani
+   * sayfadaki dönüşümlü zeminlerin HİÇBİRİ görünmüyordu. Altı bölüm bu yüzden
+   * tek bir yüzey gibi okunuyordu.
+   *
+   * Çözüm daha fazla küçük adım değil, TEK BÜYÜK adım: açık temada koyu bir
+   * bant (16,4:1). Bant sayfada bir kez ve ürünün en zor iddiasını taşıyan
+   * bölümde — ölçülen doğrulukta. Dönüşümlü kullanılsa koyu temanın kötü bir
+   * taklidi olurdu.
+   */
+  /*
+   * MERDİVENİN ÜÇ YÜZÜ. Işık üstten geliyor: üst yüz en açık, ön yüz orta,
+   * sağ yüz en koyu. Bu sıra iki temada da korunmak zorunda, o yüzden yüzler
+   * `color-mix(--ink, --plane)` ile türetilmiyor — koyu temada o formül
+   * ışığı ters çevirirdi (daha çok mürekkep = daha AÇIK).
+   */
+  --step-tread: #ddd9ce;
+  --step-riser: #c7c2b4;
+  --step-side: #adaa9c;
+  --step-lit-tread: #3fd7a2;
+  --step-lit-riser: #0b7a55;
+  --step-lit-side: #075b40;
+
+  --band: #101613;
+  --band-ink: #f2f5f2;
+  --band-ink-2: #b3bfb8;
+  --band-ink-3: #93a19a;
+  --band-accent: #35d39b;
+  --band-rule: #2c342f;
+
   --paper: #f7f4ed;
   --paper-2: #f1ece1;
   --rule: #e3ddd0;
@@ -159,6 +192,27 @@
     0 24px 60px -32px rgba(0, 0, 0, 0.9);
   --edge: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
+  /*
+   * Koyu temada bant AŞAĞI inemez: #0b0e11'in altında yer yok. Yükseltilmiş
+   * bir levha oluyor. ÖLÇÜLDÜ: plane'e karşı 1,39:1 — kenarlıksız okunma eşiği
+   * ~1,15, kaydırırken ~1,25. İlk denenen #1c242a 1,23'te kalıyordu, yani
+   * açık temadaki 16,3'lük adımın yanında bant neredeyse yoktu. Vurgu her iki
+   * temada da aynı yeşil, çünkü bandın zemini iki temada da koyu.
+   */
+  --step-tread: #2e3941;
+  --step-riser: #232c33;
+  --step-side: #1a2127;
+  --step-lit-tread: #62e8b8;
+  --step-lit-riser: #35d39b;
+  --step-lit-side: #1d8f68;
+
+  --band: #242e35;
+  --band-ink: #eef2f6;
+  --band-ink-2: #a8b4be;
+  --band-ink-3: #8e9ba6;
+  --band-accent: #35d39b;
+  --band-rule: #333d45;
+
   --paper: #0f1216;
   --paper-2: #151a1f;
   --rule: #242b32;
@@ -206,6 +260,27 @@
       0 2px 6px -2px rgba(0, 0, 0, 0.7),
       0 24px 60px -32px rgba(0, 0, 0, 0.9);
     --edge: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  /*
+   * Koyu temada bant AŞAĞI inemez: #0b0e11'in altında yer yok. Yükseltilmiş
+   * bir levha oluyor. ÖLÇÜLDÜ: plane'e karşı 1,39:1 — kenarlıksız okunma eşiği
+   * ~1,15, kaydırırken ~1,25. İlk denenen #1c242a 1,23'te kalıyordu, yani
+   * açık temadaki 16,3'lük adımın yanında bant neredeyse yoktu. Vurgu her iki
+   * temada da aynı yeşil, çünkü bandın zemini iki temada da koyu.
+   */
+  --step-tread: #2e3941;
+  --step-riser: #232c33;
+  --step-side: #1a2127;
+  --step-lit-tread: #62e8b8;
+  --step-lit-riser: #35d39b;
+  --step-lit-side: #1d8f68;
+
+  --band: #242e35;
+  --band-ink: #eef2f6;
+  --band-ink-2: #a8b4be;
+  --band-ink-3: #8e9ba6;
+  --band-accent: #35d39b;
+  --band-rule: #333d45;
 
   --paper: #0f1216;
   --paper-2: #151a1f;
@@ -2046,13 +2121,42 @@ textarea:focus-visible,
  * Kenar payında duruyor: başlık kendini düzeltiyor, bu da neden bu kadar
  * dikkatli olmak zorunda olduğunu şerh ediyor.
  */
-.claim-thesis {
+/*
+ * SAĞ SÜTUN ARTIK TEK LEVHA.
+ *
+ * Eskiden burada yalnızca tez vardı: `grid-row: 2 / 6`e yayılıp `align-self:
+ * end` ile dibe yaslanıyordu, yani ÖLÇÜLDÜ 91px içerik 460px'lik bir hücrede
+ * asılı duruyordu ve üstündeki ~700×360 boşluk tasarlanmış değildi.
+ *
+ * Şimdi levha üç satır: çetele · nefes · tez. Ortadaki `1fr` boşluğu ARTIK
+ * OLMAKTAN ÇIKARIYOR — iki nesnenin arasındaki tanımlı aralık. Kenar çizgisi
+ * levhanın kendisinde, çünkü kenar payında duran şey artık ikisi birden.
+ */
+.claim-plate {
   grid-column: mid / rail-end;
-  grid-row: 2 / 6;
-  align-self: end;
-  margin-bottom: 8px;
+  /*
+   * 1'den başlıyor: levhanın üst kenarı SOL SÜTUNUN üst kenarıyla aynı yerde,
+   * yani kenar çizgisi kicker'ın hizasından iniyor. `2 / 6` denendi ve
+   * reddedildi — çizgi 192'de başlayıp 616'da bitiyordu, solda ise içerik
+   * 73'te başlayıp 530'da bitiyordu: çizginin iki ucu da hiçbir şeye
+   * değmiyordu.
+   */
+  grid-row: 1 / 6;
+  /*
+   * İçerik boyunda, esnetilmiş DEĞİL. `stretch` + `1fr` ara boşluk denendi:
+   * çetele tepede, tez dipte, ortada ÖLÇÜLDÜ 165px'lik bir delik kalıyordu.
+   * İki nesne tek blok; boşluk bloğun ALTINDA, yani başlığın nefes aldığı
+   * yerde — orası boşluğun normal olduğu yer, delik değil.
+   */
+  align-self: start;
+  display: grid;
+  grid-template-rows: auto auto;
+  row-gap: clamp(20px, 3vh, 38px);
   padding-left: clamp(24px, 3vw, 52px);
   border-left: 1px solid var(--hairline);
+}
+.claim-thesis {
+  grid-row: 2;
 }
 /* `.claim-thesis p` (0,1,1), `.claim-metric`i (0,1,0) yeniyordu: ikincinin
    üst boşluğu hiç uygulanmıyor, iki paragraf birbirine yapışıyordu. */
@@ -2067,6 +2171,80 @@ textarea:focus-visible,
   color: var(--ink-3);
 }
 .claim-metric b { color: var(--accent); }
+
+/* ── merdiven · logonun kendisi, ürün ölçeğinde ───────────────────── */
+/*
+ * Beş basamak: A1, A2, B1, B2, C1. Sayı `BAND_ORDER`dan geliyor, CSS'te
+ * sabit yazılı değil.
+ *
+ * Hacim izometrik: her basamak üç yüzlü bir kutu ve boyama sırası 0'dan 4'e,
+ * yani her basamak bir öncekinin sağ yüzünü kapatıyor. Gerçek 3B'deki
+ * örtüşmenin ta kendisi — kütüphane yok, WebGL yok, üç yüz rengi var.
+ */
+.stair-hold { grid-row: 1; }
+.stair { margin: 0; }
+.stair-art {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  overflow: visible;
+}
+.stair-tread { fill: var(--step-tread); }
+.stair-riser { fill: var(--step-riser); }
+.stair-side { fill: var(--step-side); }
+.stair-step.is-lit .stair-tread { fill: var(--step-lit-tread); }
+.stair-step.is-lit .stair-riser { fill: var(--step-lit-riser); }
+.stair-step.is-lit .stair-side { fill: var(--step-lit-side); }
+
+.stair-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-anchor: middle;
+  fill: var(--ink-3);
+}
+.stair-label.is-lit { fill: var(--accent); }
+
+.stair-note {
+  margin: 18px 0 0;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.stair-note b { color: var(--accent); font-weight: 500; }
+
+/*
+ * Ölçütün sayısı iddianın SONUNDA. Kahramanda eskiden 41 çentiklik bir alan
+ * duruyordu; ölçüt doğruydu ama sağ sütun kalabalıklaşmıştı. Alan gitti, sayı
+ * kaldı.
+ */
+/*
+ * Sayı KENDİ SATIRINDA. Aynı satıra eklendiğinde ÖLÇÜLDÜ: "ANA ÖLÇÜT: FALSE
+ * ALARM (YANLIŞ ALARM) ORANI · %4,9 · 41 BULGUNUN 2'Sİ" 612px'lik sütunda
+ * sarıyor ve "2'Sİ" tek başına alta düşüyordu.
+ */
+.claim-figure {
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+  margin-top: 7px;
+  font-size: 19px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--accent);
+}
+.claim-figure i {
+  font-style: normal;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: var(--ink-3);
+}
 
 /* ── şerit 2 · DURUŞMA · aynı motor, iki cümle ────────────────────── */
 .trial {
@@ -2097,7 +2275,37 @@ textarea:focus-visible,
      `--t-enter`i zaten altı yerde okuyor. */
   --t-enter: calc(var(--beat) * 4);
 }
-.trial-pane .sample-head { padding: 0; border-bottom: 0; background: none; box-shadow: none; }
+/*
+ * ÖLÇEK SIÇRAMASI. Sayfanın en önemli hesaplanmış olgusu — aynı motorun doğru
+ * cümlede SIFIR bulgu vermesi — bugüne kadar sağ üst köşede 9,5px mono büyük
+ * harfle duruyordu. Bir bölümü komşusundan ayıran en ucuz şey, o bölümde
+ * sayfanın hiçbir yerinde olmayan bir puntonun bulunması.
+ *
+ * `5` ve `0` gerçek: `showcaseAnalysis` render anında hesaplıyor ve
+ * `showcase.test.ts` iki sayıyı da kilitliyor.
+ */
+.trial-pane .sample-head {
+  padding: 0;
+  border-bottom: 0;
+  background: none;
+  box-shadow: none;
+  align-items: baseline;
+}
+.trial-pane .sample-count {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+.trial-pane .sample-count b {
+  font-family: var(--sans);
+  font-size: clamp(34px, 3.8vw, 54px);
+  font-weight: 660;
+  line-height: 0.85;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+}
+/* Sıfır vurgu renginde: sessizlik bu sayfanın kanıtı, gürültü değil. */
+.trial-pane.is-clean .sample-count b { color: var(--accent); }
 /* `--ink-3` mikro katı bu yüzeylerde 3,3:1'de kalıyor. */
 .trial-pane .sample-tag,
 .trial-pane .sample-count,
@@ -2205,10 +2413,32 @@ textarea:focus-visible,
 
 /* ── şerit 4 · ÖLÇÜM ──────────────────────────────────────────────── */
 .measure {
-  background: var(--surface);
-  border-bottom: 1px solid var(--hairline);
-  padding-top: clamp(44px, 6vw, 86px);
-  row-gap: clamp(24px, 3vw, 40px);
+  /*
+   * Jetonlar BÖLÜM İÇİNDE yeniden tanımlanıyor. Böylece var olan bütün
+   * `.proof-*` kuralları tek satır değişmeden bandın paletinde çalışıyor —
+   * ikinci bir "koyu varyant" dili yazılmıyor.
+   */
+  --ink: var(--band-ink);
+  --ink-2: var(--band-ink-2);
+  --ink-3: var(--band-ink-3);
+  --accent: var(--band-accent);
+  --hairline: var(--band-rule);
+
+  background: var(--band);
+  /*
+   * `color` AÇIKÇA yazılmak zorunda. Devralma jetonu değil ÇÖZÜLMÜŞ RENGİ
+   * taşıyor: `body`deki `color: var(--ink)` gövde seviyesinde #14171a'ya
+   * çözülüyor ve `.measure`da `--ink`i yeniden tanımlamak o mirası
+   * değiştirmiyor. ÖLÇÜLDÜ: başlık koyu bantta 1,02:1 kalmıştı.
+   */
+  color: var(--ink);
+  border-bottom: 0;
+  /*
+   * Nefes payı komşusunun ~1,8 katı (`.mech` 36–72). Zemin değişip dolgu
+   * değişmezse göz zemin değişimini kaza sanıyor.
+   */
+  padding-block: clamp(64px, 9vw, 128px) 0;
+  row-gap: clamp(18px, 2.2vw, 30px);
 }
 /*
  * KOŞUM YOKSA ŞERİT HİÇ ÇİZİLMİYOR. `Proof` hata hâlinde `null` dönüyor;
@@ -2218,18 +2448,33 @@ textarea:focus-visible,
  */
 .measure:not(:has(.proof-grid)) { display: none; }
 
-.measure > .move-h { grid-column: rail-start / mid; grid-row: 1; }
-.measure > .move-sub {
-  grid-column: mid / rail-end;
+/*
+ * EKSEN KAYIYOR. `.mech` ile `.measure` bugüne kadar BİREBİR AYNI beş
+ * bildirimi kullanıyordu (başlık solda satır 1, alt metin sağda satır 1,
+ * `align-self: end`, aynı `padding-left`) — yani "her şey birbirine benziyor"
+ * şikâyeti bir his değil, kopyalanmış bir bloktu. Bant kendi eksenini
+ * kuruyor: tek sütun, ortalı, alt alta.
+ */
+.measure > .move-h {
+  grid-column: rail-start / rail-end;
   grid-row: 1;
-  align-self: end;
+  justify-self: center;
+  text-align: center;
+  max-width: 24ch;
+}
+.measure > .move-sub {
+  grid-column: rail-start / rail-end;
+  grid-row: 2;
+  justify-self: center;
+  text-align: center;
+  max-width: 62ch;
   margin: 0;
-  padding-left: clamp(24px, 3vw, 52px);
+  padding-left: 0;
 }
 
 .measure > .proof-grid {
   grid-column: rail-start / rail-end;
-  grid-row: 2;
+  grid-row: 3;
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   gap: 0;
   border: 0;
@@ -2257,7 +2502,11 @@ textarea:focus-visible,
 .measure .proof-cell.is-lead {
   grid-column: 1;
   grid-row: 1 / span 3;
-  align-content: end;
+  /*
+   * `end` denendi ve reddedildi: sayı dibe yaslanınca üstünde ÖLÇÜLDÜ 160px'lik
+   * bir delik kalıyordu, ve koyu bantta o delik daha da görünür.
+   */
+  align-content: center;
   background: none;
   border-top: 2px solid var(--accent);
   padding: 0 clamp(28px, 3vw, 52px) clamp(22px, 2.4vw, 34px) 0;
@@ -2275,7 +2524,7 @@ textarea:focus-visible,
 /* ── şerit 4b · İTİRAF · kendi zemini, kendi genişliği, kendi sesi ─── */
 .measure > .proof-bands {
   grid-column: bleed-start / mid;
-  grid-row: 3;
+  grid-row: 4;
   margin: 0;
   background: var(--surface-2);
   border-top: 1px solid var(--hairline);
@@ -2287,7 +2536,7 @@ textarea:focus-visible,
 }
 .measure > .proof-weak {
   grid-column: mid / bleed-end;
-  grid-row: 3;
+  grid-row: 4;
   margin: 0;
   max-width: none;
   align-self: stretch;
@@ -2310,7 +2559,7 @@ textarea:focus-visible,
 }
 .measure > .proof-source {
   grid-column: rail-start / rail-end;
-  grid-row: 4;
+  grid-row: 5;
   margin: 0;
   padding-bottom: clamp(26px, 3vw, 42px);
 }
@@ -2324,6 +2573,22 @@ textarea:focus-visible,
   text-align: center;
 }
 .close > * { grid-column: rail-start / rail-end; margin: 0; max-width: 26ch; }
+/*
+ * Sayfanın TEK serif anı. Bant ortalı hâle geldiği için "ortalı olmak" artık
+ * kapanışı tek başına ayırmıyor; ayrımı yüz taşıyor. Source Serif 4 depoda
+ * zaten yüklü (giriş ekranı için), yeni bağımlılık yok.
+ *
+ * Burada ürün konuşmuyor: altı ay sonra dönüp bakacak olan kişiye söylenen tek
+ * cümle bu.
+ */
+.close > .move-h {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(30px, 3.4vw, 48px);
+  line-height: 1.16;
+  letter-spacing: -0.014em;
+  max-width: 20ch;
+}
 .close .claim-actions { padding-top: 0; }
 .close-note {
   max-width: 42ch;
@@ -2351,6 +2616,24 @@ textarea:focus-visible,
 /* Büyük rakamın vurgu rengi zorlanmış renklerde düzleşiyor — kimliği
    kenarlık taşıyor, kenarlık renkleri korunuyor. */
 @media (forced-colors: active) {
+  /*
+   * Zorlanmış renklerde `fill` düzleşiyor: üç yüz aynı renge çöküyor ve
+   * merdiven düz bir lekeye dönüyor. Yüzler çizgiyle ayrılıyor, yanan basamak
+   * sistem vurgu rengiyle.
+   */
+  .stair-tread,
+  .stair-riser,
+  .stair-side {
+    forced-color-adjust: none;
+    fill: Canvas;
+    stroke: CanvasText;
+    stroke-width: 2;
+  }
+  .stair-step.is-lit .stair-tread,
+  .stair-step.is-lit .stair-riser,
+  .stair-step.is-lit .stair-side { fill: Highlight; }
+  .stair-label { fill: CanvasText; }
+
   .measure .proof-cell.is-lead { border-top-width: 3px; }
   .measure > .proof-weak { border-left-width: 3px; }
   .sample-silent { border-top-width: 2px; }
@@ -2397,7 +2680,7 @@ textarea:focus-visible,
   }
 
   /* Sağ sütunda duran her şey akışa geri dönüyor, SIRASI korunarak. */
-  .claim-thesis,
+  .claim-plate,
   .mech > .move-sub,
   .measure > .move-sub {
     grid-column: rail-start / mid;
@@ -2405,7 +2688,12 @@ textarea:focus-visible,
     align-self: start;
     padding-left: 16px;   /* çizgi kalıyor, daralıyor */
   }
-  .claim-thesis { margin: 4px 0 0; }
+  /*
+   * Tek sütunda araya konmuş nefes GEREKSİZ: masaüstünde iki nesneyi 460px'lik
+   * bir hücrede birbirinden ayırmak içindi, burada zaten alt alta duruyorlar.
+   */
+  .claim-plate { grid-template-rows: auto auto; row-gap: 22px; }
+  .claim-thesis { grid-row: auto; margin: 0; }
   .claim-actions .btn { width: 100%; justify-content: center; }
 
   /*
@@ -4104,6 +4392,26 @@ textarea:focus-visible,
  * bildiriliyor. Aynı anda oynayan iki şey iki ayrı şey gibi okunuyor;
  * sırayla oynayınca iki aşamalı tek süreç oluyor.
  */
+/*
+ * Basamaklar A1'den C1'e SIRAYLA tabandan yükseliyor — ürünün ne yaptığının
+ * kendisi. 5 × 110ms ≈ 550ms, sonra duruyor; döngü yok.
+ *
+ * `scaleY` tabandan: basamak "beliren bir şey" değil, "yerden çıkan bir şey".
+ * Etiketler gruptan dışarıda, yoksa yazı da ezilirdi.
+ *
+ * BİTMİŞ KARE: bütün basamaklar tam boyda. Kural `[data-play="1"]` altında.
+ */
+@keyframes stair-climb {
+  from { transform: scaleY(0.04); }
+  to { transform: none; }
+}
+[data-play="1"] .stair-step {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: stair-climb 420ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 110ms);
+}
+
 [data-play="1"] .proof-bands .meter-fill {
   animation: fill-to 620ms var(--ease-out) both;
   animation-delay: calc(var(--t-enter, 0ms) + 560ms + var(--i) * 90ms);

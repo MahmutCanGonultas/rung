@@ -30,7 +30,7 @@ function requireDatabaseUrl() {
   if (!url) {
     throw new Error(
       "DATABASE_URL tanımlı değil. `npm run migrate` bunu .env.local'den okur; " +
-        "dosya yerinde mi ve içinde DATABASE_URL var mı diye bak."
+        "dosya yerinde mi ve içinde DATABASE_URL var mı diye bak.",
     );
   }
   return url;
