@@ -129,6 +129,26 @@
    * `color-mix(--ink, --plane)` ile türetilmiyor — koyu temada o formül
    * ışığı ters çevirirdi (daha çok mürekkep = daha AÇIK).
    */
+  /*
+   * DURUŞMA ŞERİDİNİN İKİ KÂĞIDI.
+   *
+   * Bölümün zemini `--surface`tı ve ÖLÇÜLDÜ: `--plane`e karşı 1,07:1 — bir
+   * zemin kenarının kenarlıksız okunması için pratik eşik ~1,15, kaydırırken
+   * ~1,25. Yani şerit ekranda hiç ayrışmıyordu.
+   *
+   * Yeni ayrım bölümün KENDİ ARGÜMANINI taşıyor: gürültülü cümle kullanılmış,
+   * donuk kâğıtta; doğru cümle temiz kâğıtta. Aynı motor, iki kâğıt.
+   */
+  --trial: #e2ddd0;
+  --trial-clean: #fbf9f5;
+  /*
+   * Donuk kâğıt mürekkebi de yutuyor. ÖLÇÜLDÜ: `--ink-3` bu zeminde 4,19:1'e,
+   * vurgu rengi 3,94'e düşüyordu; taban 4,5. Bölüm kendi kâğıdını aldıysa kendi
+   * mürekkebini de alıyor — koyu bantta yapılanın aynısı.
+   */
+  --trial-ink-3: #565f65;
+  --trial-accent: #096a4a;
+
   --step-tread: #cdc7b7;
   --step-riser: #ada695;
   --step-side: #8b8474;
@@ -149,6 +169,13 @@
   --band-ink-3: #93a19a;
   --band-accent: #35d39b;
   --band-rule: #2c342f;
+  /*
+   * İmleç yüzeyi de bandın kendi paletinden. Tanımlanmadığında `.proof-cell`
+   * temel `--surface-2`yi okuyordu ve ÖLÇÜLDÜ: koyu bandın (#101613) üstüne
+   * imleçle rgb(240,238,232) — neredeyse BEYAZ bir blok basılıyordu.
+   * Yükseltiyor, çökertmiyor: banda karşı 1,24:1.
+   */
+  --band-hover: #202a24;
 
   --paper: #f7f4ed;
   --paper-2: #f1ece1;
@@ -212,6 +239,15 @@
    * açık temadaki 16,3'lük adımın yanında bant neredeyse yoktu. Vurgu her iki
    * temada da aynı yeşil, çünkü bandın zemini iki temada da koyu.
    */
+  /*
+   * Koyu temada aşağı yer yok, o yüzden şerit YUKARI çıkıyor — ama koyu banttan
+   * (`--band`) daha az. Üç kademe: plane → duruşma → bant.
+   */
+  --trial: #191f26;
+  --trial-clean: #232c34;
+  --trial-ink-3: #8d98a1;
+  --trial-accent: #35d39b;
+
   --step-tread: #2e3941;
   --step-riser: #232c33;
   --step-side: #1a2127;
@@ -227,6 +263,8 @@
   --band-ink-3: #8e9ba6;
   --band-accent: #35d39b;
   --band-rule: #333d45;
+  /* Koyu temada da YUKARI: tanımsızken hücre imleçte bandan koyu çıkıyordu. */
+  --band-hover: #303c45;
 
   --paper: #0f1216;
   --paper-2: #151a1f;
@@ -283,6 +321,15 @@
    * açık temadaki 16,3'lük adımın yanında bant neredeyse yoktu. Vurgu her iki
    * temada da aynı yeşil, çünkü bandın zemini iki temada da koyu.
    */
+  /*
+   * Koyu temada aşağı yer yok, o yüzden şerit YUKARI çıkıyor — ama koyu banttan
+   * (`--band`) daha az. Üç kademe: plane → duruşma → bant.
+   */
+  --trial: #191f26;
+  --trial-clean: #232c34;
+  --trial-ink-3: #8d98a1;
+  --trial-accent: #35d39b;
+
   --step-tread: #2e3941;
   --step-riser: #232c33;
   --step-side: #1a2127;
@@ -298,6 +345,8 @@
   --band-ink-3: #8e9ba6;
   --band-accent: #35d39b;
   --band-rule: #333d45;
+  /* Koyu temada da YUKARI: tanımsızken hücre imleçte bandan koyu çıkıyordu. */
+  --band-hover: #303c45;
 
   --paper: #0f1216;
   --paper-2: #151a1f;
@@ -2548,7 +2597,9 @@ textarea:focus-visible,
 
 /* ── şerit 2 · DURUŞMA · aynı motor, iki cümle ────────────────────── */
 .trial {
-  background: var(--surface);
+  --ink-3: var(--trial-ink-3);
+  --accent: var(--trial-accent);
+  background: var(--trial);
   border-bottom: 1px solid var(--hairline);
   padding-top: clamp(40px, 5.5vw, 78px);
   row-gap: clamp(18px, 2.4vw, 32px);
@@ -2566,10 +2617,13 @@ textarea:focus-visible,
   padding: clamp(22px, 2.6vw, 34px) clamp(22px, 2.6vw, 40px) clamp(28px, 3.2vw, 46px);
 }
 .trial-pane.is-broken { grid-column: bleed-start / mid; padding-left: var(--rail); }
+/* Gürültülü bölme şeridin kendi kâğıdında: ayrı bir kutu değil, zeminin ta kendisi. */
+.trial-pane.is-broken { background: none; }
 .trial-pane.is-clean {
   grid-column: mid / bleed-end;
   padding-right: var(--rail);
-  background: var(--surface-2);
+  /* Temiz cümle TEMİZ KÂĞITTA. Bölümün cümlesi, malzeme olarak. */
+  background: var(--trial-clean);
   border-left: 1px solid var(--hairline);
   /*
    * Boşluk TASARLANMIŞ olmak zorunda, artık değil. Sol bölme beş bulguyla
@@ -2758,6 +2812,7 @@ textarea:focus-visible,
   --ink-3: var(--band-ink-3);
   --accent: var(--band-accent);
   --hairline: var(--band-rule);
+  --surface-2: var(--band-hover);
 
   background: var(--band);
   /*
