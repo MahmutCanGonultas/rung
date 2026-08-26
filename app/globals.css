@@ -49,7 +49,13 @@
   --accent-line: rgba(11, 122, 85, 0.34);
   --error-line: rgba(143, 36, 24, 0.28);
 
-  --ring: rgba(11, 122, 85, 0.45);
+  /*
+   * ÖLÇÜLDÜ: %45 alfa halkayı kâğıt zeminde 1,94:1'e düşürüyordu; WCAG odak
+   * göstergesi için 3:1 istiyor. Jeton `.btn`, `.input` ve bulgu satırındaki
+   * halkaların hepsini besliyor, yani düzeltme tek yerden bütün ürünü
+   * kaldırıyor. Tam opak vurgu rengi kâğıda karşı 4,73:1.
+   */
+  --ring: #0b7a55;
   --ring-soft: rgba(11, 122, 85, 0.13);
   --shadow: 0 28px 56px -34px rgba(20, 23, 26, 0.3);
 
@@ -3483,6 +3489,28 @@ textarea:focus-visible,
     var(--t-enter, 0ms) + var(--t-lead) + 320ms + var(--i) * 160ms
   );
 }
+/*
+ * ODAK VARSA KIRPMA YOK.
+ *
+ * `finding-wipe` satırı `clip-path: inset(0 100% 0 0)` ile sıfır genişliğe
+ * kırpıyor ve `both` dolgusu bunu gecikme boyunca GERİYE DOĞRU uyguluyor. Bulgu
+ * satırı `<details>` olduğundan beri kutunun içinde odaklanabilir bir öğe var,
+ * ve sıra şöyle işliyordu: Tab odağı `<summary>`ye indiriyor → tarayıcı satırı
+ * görünüme kaydırıyor → IntersectionObserver o kaydırmayla tetikleniyor →
+ * `data-play="1"` basılıyor → kırpma odaklı satırın üstüne kapanıyor.
+ *
+ * ÖLÇÜLDÜ: anasayfada soğuk açılıştan sonra ALTINCI Tab tam bu satıra iniyor;
+ * `:focus-visible` true kalıyor ama halka kırpılan kutunun içinde olduğu için
+ * ÇİZİLMİYOR, ve `elementFromPoint` satırı değil kabı döndürüyor — yani fare de
+ * erişemiyor. Pencere 1,76–2,40 saniye ve beş ardışık klavye durağının BEŞİ DE
+ * bu durumda. WCAG 2.4.7 ihlali.
+ *
+ * `finding-wipe` bu kutuda odaklanabilir hiçbir şey yokken yazılmıştı; kusur
+ * çekmeceyle birlikte doğdu.
+ */
+[data-play="1"] .sample-finding:focus-within {
+  animation: none;
+}
 
 /* Zorlanmış renklerde arka plan yıkaması tamamen düşüyor — bulgu yalnızca
    altı çizgi ve numarayla taşınmalı. */
@@ -4052,16 +4080,29 @@ textarea:focus-visible,
  * yan yana — göz bunu kural değil kaza olarak okuyor. Bir şekil içinde
  * tutarlılık, tek satıra sığmaktan önemli.
  */
-.step-figure .sample-line {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas:
-    "no  fix  mark"
-    ".   kind kind";
-  row-gap: 6px;
-  align-items: start;
+/*
+ * Bu kural YALNIZCA iki sütunlu rejimde. Gerekçesi oradan geliyor: raf iki
+ * sütunken dört satır 543px, beşincisi `grid-column: 1 / -1` ile 1087px, yani
+ * container sorgusu dördünü katlıyor birini katlamıyordu.
+ *
+ * 940px'in altında raf TEK SÜTUNA iniyor ve beş satır aynı genişlikte oluyor —
+ * korunacak tutarsızlık kalmıyor. Kural koşulsuz yazıldığında (0,2,0) container
+ * sorgusunu (0,1,0) her genişlikte eziyordu: ÖLÇÜLDÜ, 820–940px arasında satır
+ * kutusu 676–782px, yani 620 eşiğinin çok üstünde, ama beşi de katlanıyordu ve
+ * raf 646,88px yerine olabileceği 538,52px'in 108 piksel üstünde duruyordu.
+ */
+@media (min-width: 941px) {
+  .step-figure .sample-line {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "no  fix  mark"
+      ".   kind kind";
+    row-gap: 6px;
+    align-items: start;
+  }
+  .step-figure .sample-kind { white-space: normal; }
+  .step-figure .sample-no { margin-top: 1px; }
 }
-.step-figure .sample-kind { white-space: normal; }
-.step-figure .sample-no { margin-top: 1px; }
 
 /*
  * Dolgu KARTTA değil SATIRDA.
