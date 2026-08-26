@@ -23,8 +23,10 @@ export async function FalseAlarm() {
   return (
     <span className="claim-figure">
       {pct(run.falsePositive / run.found)}
+      {/* Ayraç metnin kendisinde: CSS boşluğu iki sayıyı ayırmaya yetmiyor,
+          ekran okuyucu da tek sayı gibi okuyordu. */}
       <i>
-        {run.found} bulgunun {run.falsePositive}&rsquo;si
+        &middot; {run.found} bulgunun {run.falsePositive}&rsquo;si
       </i>
     </span>
   );
