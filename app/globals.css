@@ -1841,6 +1841,43 @@ textarea:focus-visible,
   border-radius: var(--r-md);
   overflow: hidden;
 }
+/* ── taksonomi yuvaları ───────────────────────────────────────────── */
+/*
+ * Beş aile, yirmi bir yuva. İki bölme aynı şeridi taşıyor: solda beş yuva
+ * dolu, sağda hiçbiri. Karşılaştırma bölümün argümanının kendisi.
+ *
+ * Yuva 7×7: sayılabilecek kadar büyük, kalabalık yapmayacak kadar küçük.
+ * Aile arası boşluk yuva arası boşluğun üç katı — göz beş öbeği ayırıyor.
+ */
+.slots {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px 15px;
+  margin: 18px 0 0;
+}
+.slot-family {
+  display: flex;
+  gap: 4px;
+}
+.slot {
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  background: var(--hairline);
+}
+.slot.is-hit {
+  background: var(--error);
+}
+.slots b {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
 /* ── hat · akış çizimi ────────────────────────────────────────────── */
 /*
  * Beş istasyonlu bir ray. Metin soldan giriyor, jeton rayda ilerliyor, geçtiği
@@ -2843,6 +2880,10 @@ textarea:focus-visible,
   .flow-node.is-ai { border-style: double; border-width: 4px; }
   .flow-rail { background: CanvasText; }
   .flow-pulse { forced-color-adjust: none; background: Highlight; }
+
+  /* Yuvalar: dolu ile boş aynı renge çökmesin. */
+  .slot { forced-color-adjust: none; background: Canvas; outline: 1px solid CanvasText; outline-offset: -1px; }
+  .slot.is-hit { background: Highlight; }
 
   .measure .proof-cell.is-lead { border-top-width: 3px; }
   .measure > .proof-weak { border-left-width: 3px; }

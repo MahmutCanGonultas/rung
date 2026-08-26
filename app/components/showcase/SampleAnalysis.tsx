@@ -3,7 +3,13 @@ import type { CSSProperties } from "react";
 import { segment } from "../../lib/k0/segments";
 import { type ShowcaseVariant } from "../../lib/k0/showcase-samples";
 import { showcaseAnalysis } from "../../lib/showcase-run";
-import { labelOf } from "../../lib/taxonomy";
+import {
+  FAMILIES,
+  SUBCATEGORIES,
+  labelOf,
+  type Family,
+  type Subcategory,
+} from "../../lib/taxonomy";
 
 /*
  * Vitrin analizi.
@@ -21,6 +27,54 @@ import { labelOf } from "../../lib/taxonomy";
  * raf tek şeritten geniş olamıyor. `display: contents` de çözüm değil —
  * `InView.tsx` sebebini zaten yazıyor.
  */
+
+/* Kadranla aynı sıra: Türkçe kaynaklı aile başta, çünkü alet onlar için. */
+const ORDER: Family[] = ["turkish", "grammar", "lexis", "mechanics", "discourse"];
+const subsOf = (family: Family) =>
+  (Object.keys(SUBCATEGORIES) as Subcategory[]).filter(
+    (s) => SUBCATEGORIES[s].family === family
+  );
+
+/*
+ * Taksonominin kendisi, yuva yuva.
+ *
+ * Ürünün merkezindeki iddia şu: bulunan her şey ÖNCEDEN KİLİTLENMİŞ bir listede
+ * tam bir yere yazılıyor. Bu şerit o listeyi gösteriyor — beş aile, yirmi bir
+ * yuva — ve hangilerinin dolduğunu.
+ *
+ * Asıl işi KARŞILAŞTIRMA: iki bölme aynı şeridi taşıyor. Solda beş yuva dolu,
+ * sağda hiçbiri. Aynı ızgara, aynı motor, iki sonuç. Bölümün cümlesi bu ve
+ * artık cümle olmaktan çıkıp görülebilen bir şey.
+ *
+ * Yuva sayısı `SUBCATEGORIES`ten geliyor; taksonomiye alt kategori eklenirse
+ * şeride yuva ekleniyor.
+ */
+function Slots({ hit }: { hit: Set<Subcategory> }) {
+  const toplam = (Object.keys(SUBCATEGORIES) as Subcategory[]).length;
+  return (
+    <p
+      className="slots"
+      role="img"
+      aria-label={
+        `Taksonomi: beş ailede ${toplam} alt kategori. ` +
+        (hit.size === 0
+          ? "Bu cümlede hiçbirine yazılmadı."
+          : `Bu cümlede ${hit.size} tanesine yazıldı.`)
+      }
+    >
+      {ORDER.map((family) => (
+        <span key={family} className="slot-family" title={FAMILIES[family]}>
+          {subsOf(family).map((sub) => (
+            <i key={sub} className={hit.has(sub) ? "slot is-hit" : "slot"} />
+          ))}
+        </span>
+      ))}
+      <b>
+        {toplam} yuva · {hit.size === 0 ? "hiçbiri" : hit.size} dolu
+      </b>
+    </p>
+  );
+}
 
 export function SampleAnalysis({
   variant = "broken",
@@ -82,6 +136,15 @@ export function SampleAnalysis({
           )
         )}
       </p>
+
+      {/*
+        Şerit YALNIZCA anasayfada (`both`). Kapı ekranı cümleyi ve rafı ayrı
+        yerlere koyuyor ve orada taksonomi zaten kendi adımında, yirmi bir
+        jetonuyla anlatılıyor — aynı şeyi iki kez göstermenin anlamı yok.
+      */}
+      {part === "both" ? (
+        <Slots hit={new Set(findings.map((f) => f.subcategory))} />
+      ) : null}
     </div>
   );
 
