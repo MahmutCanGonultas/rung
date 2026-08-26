@@ -149,6 +149,30 @@
   --trial-ink-3: #565f65;
   --trial-accent: #096a4a;
   /* Şeridin başlık levhası: markanın yeşili, koyu tonda. */
+  /*
+   * MEKANİZMA ŞERİDİNİN KÂĞIDI — soğuk.
+   *
+   * Sayfadaki tek kimliksiz bölümdü: zemini `--plane`, yani kahramanla aynı.
+   * Ton bölümün kendi anlamından geliyor — `--model` moru bu şeritte "bunu bir
+   * model üretti" diyen tek jeton — ama çok seyreltilmiş: beş katmanın ÜÇÜ
+   * model kullanmıyor, o yüzden şerit mor bir blok olamaz.
+   *
+   * Ayrım DEĞERDEN değil SICAKLIKTAN geliyor. Açık paletin değer aralığı
+   * kalabalık (kâğıt 0,724 · temiz kâğıt 0,939 · plane 0,880) ve aralarına
+   * görünür bir kademe sığmıyor; sıcak bejden soğuk lavantaya geçiş ise tam
+   * genişlikte bir bantta okunuyor.
+   */
+  --mech: #e6e4ef;
+  --mech-line: #cfcbdd;
+  /*
+   * Mor yıkanmış hücre (#d9d6ec) mürekkebi yutuyor. ÖLÇÜLDÜ: `--ink-3` orada
+   * 4,00:1'e, `--model` jetonu 4,32'ye düşüyordu; taban 4,5. Şerit kendi
+   * kâğıdını aldıysa kendi mürekkebini de alıyor — kâğıt ve bant şeridinde
+   * yapılanın aynısı.
+   */
+  --mech-ink-3: #565f65;
+  --mech-model: #5544cc;
+
   --trial-head: #0f4d38;
   --trial-head-ink: #eef6f1;
   --trial-head-ink-2: #a9cabb;
@@ -251,6 +275,12 @@
   --trial-clean: #232c34;
   --trial-ink-3: #8d98a1;
   --trial-accent: #35d39b;
+  --mech: #12141c;
+  --mech-line: #232538;
+  /* Koyu temada ölçüm zaten tabanın üstünde; jetonlar olduğu gibi. */
+  --mech-ink-3: #7f8b95;
+  --mech-model: #9a8cf5;
+
   --trial-head: #0c3729;
   --trial-head-ink: #e8f4ed;
   --trial-head-ink-2: #97c2ae;
@@ -336,6 +366,12 @@
   --trial-clean: #232c34;
   --trial-ink-3: #8d98a1;
   --trial-accent: #35d39b;
+  --mech: #12141c;
+  --mech-line: #232538;
+  /* Koyu temada ölçüm zaten tabanın üstünde; jetonlar olduğu gibi. */
+  --mech-ink-3: #7f8b95;
+  --mech-model: #9a8cf5;
+
   --trial-head: #0c3729;
   --trial-head-ink: #e8f4ed;
   --trial-head-ink-2: #97c2ae;
@@ -2769,8 +2805,11 @@ textarea:focus-visible,
 
 /* ── şerit 3 · MEKANİZMA · hat kenardan kenara ────────────────────── */
 .mech {
-  background: var(--plane);
-  border-bottom: 1px solid var(--hairline);
+  --hairline: var(--mech-line);
+  --ink-3: var(--mech-ink-3);
+  --model: var(--mech-model);
+  background: var(--mech);
+  border-bottom: 1px solid var(--mech-line);
   padding-block: clamp(36px, 5vw, 72px);
   row-gap: clamp(18px, 2.2vw, 28px);
 }
@@ -2821,7 +2860,7 @@ textarea:focus-visible,
 .mech .pipe-cell:first-child { border-left: 0; padding-left: 0; }
 .mech .pipe-cell:last-child { padding-right: 0; }
 /* `--model` moru olduğu gibi: burada gerçekten "bunu bir model üretti" diyor. */
-.mech .pipe-cell.is-ai { background: color-mix(in srgb, var(--model) 6%, transparent); }
+.mech .pipe-cell.is-ai { background: color-mix(in srgb, var(--model) 9%, transparent); }
 .mech .pipe-name { font-size: 15px; }
 .mech .pipe-what { font-size: 12.5px; }
 @media (max-width: 820px) {
