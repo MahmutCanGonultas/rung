@@ -139,14 +139,14 @@
    * Yeni ayrım bölümün KENDİ ARGÜMANINI taşıyor: gürültülü cümle kullanılmış,
    * donuk kâğıtta; doğru cümle temiz kâğıtta. Aynı motor, iki kâğıt.
    */
-  --trial: #e2ddd0;
+  --trial: #e9e3d6;
   --trial-clean: #fbf9f5;
   /*
    * Donuk kâğıt mürekkebi de yutuyor. ÖLÇÜLDÜ: `--ink-3` bu zeminde 4,19:1'e,
    * vurgu rengi 3,94'e düşüyordu; taban 4,5. Bölüm kendi kâğıdını aldıysa kendi
    * mürekkebini de alıyor — koyu bantta yapılanın aynısı.
    */
-  --trial-ink-3: #565f65;
+  --trial-ink-3: #5b6469;
   --trial-accent: #096a4a;
   /* Şeridin başlık levhası: markanın yeşili, koyu tonda. */
   /*
@@ -162,14 +162,14 @@
    * Yeni ton kâğıdın kendisi, koyulaşmış hâli. Sayfa böylece bir rampa oluyor:
    * kâğıt → koyu kil → siyaha yakın bant. Aynı malzeme, gitgide derinleşiyor.
    */
-  --mech: #d2c9b6;
-  --mech-line: #beb49f;
+  --mech: #e3efe9;
+  --mech-line: #c3d8cd;
   /*
    * Kil zemin mürekkebi yutuyor; şerit kendi kâğıdını aldıysa kendi mürekkebini
    * de alıyor — duruşma kâğıdı ve koyu bantta yapılanın aynısı.
    */
-  --mech-ink-2: #495359;
-  --mech-ink-3: #454c46;
+  --mech-ink-2: #3f5a4e;
+  --mech-ink-3: #4c6659;
   --mech-model: #4534b8;
 
   --trial-head: #0f4d38;
@@ -185,9 +185,9 @@
    * Üç yüz arasındaki adım BİLEREK geniş: gerçek bir cismin üst yüzü ile yan
    * yüzü arasındaki fark büyüktür, ve model o farkla katı görünüyor.
    */
-  --step-tread: #b7b3a8;
-  --step-riser: #8a8579;
-  --step-side: #625d53;
+  --step-tread: #efece5;
+  --step-riser: #cbc5b9;
+  --step-side: #a09889;
   --step-lit-tread: #3fd7a2;
   --step-lit-riser: #0b7a55;
   --step-lit-side: #075b40;
@@ -288,8 +288,9 @@
    * Koyu temada rampa ters yönde kuruluyor: mekanizma plane'e en yakın, sonra
    * duruşma, sonra bant. Aşağı yer olmadığı için mesafe yukarıdan alınıyor.
    */
-  --mech: #0f1114;
-  --mech-line: #232830;
+  --mech: #0d1512;
+  --mech-line: #22322a;
+  --mech-ink-2: #9aa7b1;
   --mech-ink-3: #7f8b95;
   --mech-model: #9a8cf5;
 
@@ -297,9 +298,9 @@
   --trial-head-ink: #e8f4ed;
   --trial-head-ink-2: #97c2ae;
 
-  --step-tread: #39444d;
-  --step-riser: #262f37;
-  --step-side: #171d23;
+  --step-tread: #454f58;
+  --step-riser: #2b343c;
+  --step-side: #191f25;
   --step-lit-tread: #62e8b8;
   --step-lit-riser: #35d39b;
   --step-lit-side: #1d8f68;
@@ -383,8 +384,8 @@
    * Koyu temada rampa ters yönde: mekanizma plane'e en yakın, sonra duruşma,
    * sonra bant. Aşağı yer olmadığı için mesafe yukarıdan alınıyor.
    */
-  --mech: #0f1114;
-  --mech-line: #232830;
+  --mech: #0d1512;
+  --mech-line: #22322a;
   --mech-ink-2: #9aa7b1;
   --mech-ink-3: #7f8b95;
   --mech-model: #9a8cf5;
@@ -393,13 +394,13 @@
   --trial-head-ink: #e8f4ed;
   --trial-head-ink-2: #97c2ae;
 
-  --step-tread: #2e3941;
-  --step-riser: #232c33;
-  --step-side: #1a2127;
+  --step-tread: #454f58;
+  --step-riser: #2b343c;
+  --step-side: #191f25;
   --step-lit-tread: #62e8b8;
   --step-lit-riser: #35d39b;
   --step-lit-side: #1d8f68;
-  --step-edge: rgba(255, 255, 255, 0.11);
+  --step-edge: rgba(255, 255, 255, 0.16);
   --step-shadow: rgba(0, 0, 0, 0.5);
   --step-contact: rgba(0, 0, 0, 0.7);
 
@@ -5100,14 +5101,14 @@ textarea:focus-visible,
 }
 
 @keyframes climb-front {
-  0%, 4% { background-color: var(--step-riser); }
-  9%, 15% { background-color: var(--step-lit-riser); }
-  22%, 100% { background-color: var(--step-riser); }
+  0% { background-color: var(--step-riser); }
+  3%, 22% { background-color: var(--step-lit-riser); }
+  25%, 100% { background-color: var(--step-riser); }
 }
 @keyframes climb-top {
-  0%, 4% { background-color: var(--step-tread); }
-  9%, 15% { background-color: var(--step-lit-tread); }
-  22%, 100% { background-color: var(--step-tread); }
+  0% { background-color: var(--step-tread); }
+  3%, 22% { background-color: var(--step-lit-tread); }
+  25%, 100% { background-color: var(--step-tread); }
 }
 /*
  * Yan yüzler de yanıyor. Yalnızca ön ve üst yanarken SON basamağın sağ yüzü
@@ -5116,14 +5117,23 @@ textarea:focus-visible,
  * visibility: hidden` onu her açıdan gizliyor, boşuna çizdirmenin anlamı yok.
  */
 @keyframes climb-side {
-  0%, 4% { background-color: var(--step-side); }
-  9%, 15% { background-color: var(--step-lit-side); }
-  22%, 100% { background-color: var(--step-side); }
+  0% { background-color: var(--step-side); }
+  3%, 22% { background-color: var(--step-lit-side); }
+  25%, 100% { background-color: var(--step-side); }
 }
+/*
+ * IŞIK PENCERESİ GENİŞ: devir teslim neredeyse kesintisiz.
+ *
+ * İlk sürümde pencere %9–15'ti, yani 6 saniyelik döngüde basamak başına 360ms.
+ * Basamaklar arası 1200ms olduğu için ÖLÇÜLDÜ: zamanın üçte ikisinde model
+ * tamamen nötr kalıyordu — rastgele bir kare yakalandığında merdivende hiç
+ * yeşil olmuyordu. %3–22 penceresi 1140ms sürüyor ve bir sonraki basamak
+ * sönmeden yanıyor: ışık duruyor değil, YÜRÜYOR.
+ */
 @keyframes climb-label {
-  0%, 4% { color: var(--ink-3); }
-  9%, 15% { color: var(--accent); }
-  22%, 100% { color: var(--ink-3); }
+  0% { color: var(--ink-3); }
+  3%, 22% { color: var(--accent); }
+  25%, 100% { color: var(--ink-3); }
 }
 /*
  * Sabit kipte tırmanış YOK: kapı ekranında merdiven bir okuma, ışığın gezmesi
