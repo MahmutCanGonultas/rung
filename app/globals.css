@@ -2658,6 +2658,14 @@ textarea:focus-visible,
 }
 
 /* Ölçek satırı: model temiz kalsın, okuma buraya insin. */
+/* Sabit kipte yanan basamak: ölçülen bant. Işık gezmiyor, duruyor. */
+.mstep.is-lit .f-front { background-color: var(--step-lit-riser); }
+.mstep.is-lit .f-top { background-color: var(--step-lit-tread); }
+.mstep.is-lit .f-left,
+.mstep.is-lit .f-right,
+.mstep.is-lit .f-back { background-color: var(--step-lit-side); }
+.model-scale span.is-lit { color: var(--accent); }
+
 .model-scale {
   display: flex;
   justify-content: space-between;
@@ -4591,12 +4599,37 @@ textarea:focus-visible,
   color: var(--ink);
   font-weight: 560;
 }
+/*
+ * Doğruluk levhası anasayfadaki koyu bandın DİLİNİ alıyor — aynı jetonlar,
+ * aynı imleç yüzeyi. Kâğıt üstünde duran tek koyu nesne, ve sayfanın en zor
+ * iddiasını o taşıyor.
+ *
+ * `color` AÇIKÇA yazılıyor: devralma jetonu değil çözülmüş rengi taşıyor,
+ * `--ink`i yeniden tanımlamak `body`den gelen mirası değiştirmiyor. Aynı kusur
+ * anasayfadaki bantta bir kez ölçüldü ve 1,02:1 çıkmıştı.
+ */
 .accuracy-band {
+  --ink: var(--band-ink);
+  --ink-2: var(--band-ink-2);
+  --ink-3: var(--band-ink-3);
+  --accent: var(--band-accent);
+  --hairline: var(--band-rule);
+  --surface-2: var(--band-hover);
+  /*
+   * `--surface` ŞART: `.proof-cell`in kendi zemini o ve devredilmezse hücreler
+   * koyu bandın üstünde AÇIK kalıyor. ÖLÇÜLDÜ: sayı #f2f5f2 / #faf9f6 =
+   * 1,04:1 — beyaz üstünde beyaz.
+   */
+  --surface: var(--band);
+  --accent-wash: color-mix(in srgb, var(--band-accent) 12%, transparent);
+
   margin-top: clamp(24px, 3vw, 38px);
-  border: 1px solid var(--rule);
+  border: 0;
   border-radius: var(--r-lg);
   overflow: hidden;
-  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  background: var(--band);
+  color: var(--ink);
+  box-shadow: var(--e2), var(--edge);
 }
 .accuracy-band .proof-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -4613,7 +4646,7 @@ textarea:focus-visible,
 .accuracy-band .proof-source {
   margin: 0;
   padding: 14px clamp(18px, 2vw, 26px) 18px;
-  border-top: 1px solid var(--rule);
+  border-top: 1px solid var(--band-rule);
 }
 
 /* ── kapanış ───────────────────────────────────────────────────────── */
@@ -5092,22 +5125,26 @@ textarea:focus-visible,
   9%, 15% { color: var(--accent); }
   22%, 100% { color: var(--ink-3); }
 }
-[data-play="1"] .f-front,
-[data-play="1"] .f-top,
-[data-play="1"] .f-left,
-[data-play="1"] .f-right,
-[data-play="1"] .model-scale span {
+/*
+ * Sabit kipte tırmanış YOK: kapı ekranında merdiven bir okuma, ışığın gezmesi
+ * o okumayı yalanlar. Kuruluş dizisi (`model-set`) ikisinde de oynuyor.
+ */
+[data-play="1"] .model:not(.is-fixed) .f-front,
+[data-play="1"] .model:not(.is-fixed) .f-top,
+[data-play="1"] .model:not(.is-fixed) .f-left,
+[data-play="1"] .model:not(.is-fixed) .f-right,
+[data-play="1"] .model:not(.is-fixed) .model-scale span {
   animation-duration: 6s;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   /* Kuruluş bitmeden tırmanış başlamıyor: 5 × 120ms + 560ms ≈ 1,2s. */
   animation-delay: calc(1200ms + var(--n) * 1200ms);
 }
-[data-play="1"] .f-front { animation-name: climb-front; }
-[data-play="1"] .f-top { animation-name: climb-top; }
-[data-play="1"] .f-left,
-[data-play="1"] .f-right { animation-name: climb-side; }
-[data-play="1"] .model-scale span { animation-name: climb-label; }
+[data-play="1"] .model:not(.is-fixed) .f-front { animation-name: climb-front; }
+[data-play="1"] .model:not(.is-fixed) .f-top { animation-name: climb-top; }
+[data-play="1"] .model:not(.is-fixed) .f-left,
+[data-play="1"] .model:not(.is-fixed) .f-right { animation-name: climb-side; }
+[data-play="1"] .model:not(.is-fixed) .model-scale span { animation-name: climb-label; }
 
 @keyframes model-orbit {
   0% { transform: rotateX(-17deg) rotateY(-24deg); }

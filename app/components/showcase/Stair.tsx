@@ -24,15 +24,26 @@ import { BAND_ORDER } from "../../lib/k0/bands";
  * takılı kalmasını istemedi. Ölçüm bilgisi kaybolmadı — aynı cümlenin bandı
  * "Aynı motor, iki cümle" bölümünde, bulgularıyla birlikte duruyor.
  */
-export function Stair() {
+export function Stair({ lit = "climb" }: { lit?: "climb" | number }) {
+  /*
+   * İKİ DAVRANIŞ, TEK NESNE.
+   *
+   * `climb` — ışık A1'den C1'e yürüyor ve hiçbirinde durmuyor. Anasayfa böyle
+   * kullanıyor: orada merdiven bir VAAT, aylar boyunca yukarı.
+   *
+   * bir sayı — o basamak sabit yanıyor. Kapı ekranı böyle kullanıyor: orada
+   * merdiven bir OKUMA, aşağıdaki cümlenin ölçüldüğü yeri gösteriyor.
+   */
+  const sabit = typeof lit === "number";
   return (
-    <div className="model">
+    <div className={sabit ? "model is-fixed" : "model"}>
       <div
         className="model-stage"
         role="img"
         aria-label={
           `Rung'un seviye ölçeği üç boyutlu bir merdiven olarak: ` +
-          `${BAND_ORDER.join(", ")}. En alt basamak A1, en üst basamak C1.`
+          `${BAND_ORDER.join(", ")}. En alt basamak A1, en üst basamak C1.` +
+          (sabit ? ` Ölçülen basamak: ${BAND_ORDER[lit]}.` : "")
         }
       >
         {/* Zemin teması: model havada durmasın. Bulanıklık `filter` ile
@@ -42,7 +53,7 @@ export function Stair() {
         {BAND_ORDER.map((band, i) => (
           <div
             key={band}
-            className="mstep"
+            className={sabit && i === lit ? "mstep is-lit" : "mstep"}
             style={{ "--n": String(i) } as CSSProperties}
           >
             {/*
@@ -68,7 +79,11 @@ export function Stair() {
       */}
       <p className="model-scale" aria-hidden="true">
         {BAND_ORDER.map((band, i) => (
-          <span key={band} style={{ "--n": String(i) } as CSSProperties}>
+          <span
+            key={band}
+            className={sabit && i === lit ? "is-lit" : undefined}
+            style={{ "--n": String(i) } as CSSProperties}
+          >
             {band}
           </span>
         ))}

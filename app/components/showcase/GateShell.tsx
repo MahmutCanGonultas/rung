@@ -1,8 +1,11 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
+import { BAND_ORDER } from "../../lib/k0/bands";
+import { estimateLevel } from "../../lib/k3/estimate";
+import { showcaseAnalysis } from "../../lib/showcase-run";
 import { Mark } from "../Mark";
-import { Dial, DialLegend } from "./Dial";
+import { Stair } from "./Stair";
 import { TaxonomyChips, RecordStamp, LevelSignals } from "./Figures";
 import { InView } from "./InView";
 import { Pipeline } from "./Pipeline";
@@ -39,6 +42,20 @@ export function GateShell({
   footnote?: string;
   children: ReactNode;
 }) {
+  /*
+   * Merdivende yanan basamak: aşağıdaki örnek cümlenin ÖLÇÜLEN bandı. Aynı
+   * motor, aynı çalıştırma — cümle şeridiyle birebir aynı ölçüm.
+   */
+  const run = showcaseAnalysis("broken");
+  const level = estimateLevel(
+    run.text,
+    run.findings.map((f) => f.subcategory)
+  );
+  const litIndex = Math.max(
+    0,
+    BAND_ORDER.indexOf(level.level as (typeof BAND_ORDER)[number])
+  );
+
   return (
     <main className="gate" id="main">
       <header className="gate-bar">
@@ -86,14 +103,22 @@ export function GateShell({
         </div>
 
         <div className="gate-instrument">
-          <Dial />
-          <DialLegend />
+          {/*
+            Aletin ölçeği, üç boyutta. Anasayfadaki merdivenin AYNISI — ama
+            orada ışık tırmanıyor (vaat), burada ölçülen basamakta duruyor
+            (okuma). Tek nesne, iki davranış.
+
+            Burada eskiden düz çizgili bir kadran vardı; taksonomiyi çevre
+            ekseninde gösteriyordu ve o iş zaten 02. adımda yirmi bir jetonla
+            yapılıyor. Aynı şeyi iki kez söylemek yerine ürünün kendi nesnesi
+            büyütüldü.
+          */}
+          <Stair lit={litIndex} />
           <p className="gate-caption">
-            Aletin yüzü. Çevrede yirmi bir alt kategori, beş aile hâlinde —
-            bulunan her şey bunlardan tam birine yazılıyor. Merkezden dışa
-            doğru A1&rsquo;den C1&rsquo;e seviye ölçeği. Yanan beş nokta, bu
-            sayfa açılırken gerçek K0 katmanının aşağıdaki cümlede bulduğu beş
-            hata. Dolgunun durduğu yer ham skorun kendisi.
+            Aletin ölçeği: beş bant, A1&rsquo;den C1&rsquo;e. Yanan basamak, bu
+            sayfa açılırken gerçek K0 katmanının aşağıdaki cümleyi ölçtüğü yer.
+            Her bant aynı ölçekte kalıyor, o yüzden altı ay sonraki ölçüm
+            bugünküyle karşılaştırılabiliyor.
           </p>
         </div>
 
