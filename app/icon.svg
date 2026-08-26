@@ -1,25 +1,44 @@
 <!--
-  Sekme ikonu — uygulamadaki işaretin aynı kuralları: miter köşe, renk teslimi
-  KÖŞEDE, son basamak vurgu renginde.
+  Sekme ikonu.
+
+  ÇİZGİ DEĞİL BLOK. Önceki sürüm 3,4 birimlik konturla çiziliyordu; 32'lik
+  karoda iyi duruyor ama 16px'lik sekmede o kontur 1,7 CSS piksele iniyor ve
+  bulanıklaşıyor. Katı dikdörtgen aynı boyutta keskin kalıyor — ve marka artık
+  katı hacim diliyle konuşuyor: anasayfadaki üç boyutlu merdiven de bloklardan
+  kurulu.
+
+  BLOKLAR BİTİŞİK. Aralarında boşluk bırakılan bir sürüm çizildi ve gözle
+  karşılaştırıldı: ayrık bloklar ÇUBUK GRAFİĞİ gibi okunuyor, merdiven gibi
+  değil. Bitişikken siluet basamak basamak yükseliyor ve isim yerine oturuyor —
+  "rung" merdiven basamağı demek.
 
   ÜÇ basamak, beş değil. Ölçüldü: 32'lik karoda beş basamak 1,25 birimlik
-  açıklık bırakıyor, 16px sekme ikonunda 0,6 CSS px — kapanıyor ve merdiven
-  gri bir bloğa dönüyor. Üçte açıklık 4,1 birim, 16px'te 2,05 px. Bir logo
-  ailesinde ikonun sadeleşmesi normaldir: aynı fikir, başka punto.
+  açıklık bırakıyor, 16px'te 0,6 CSS px — kapanıyor ve merdiven gri bir bloğa
+  dönüyor. Üçte her basamak 7,3 birim, 16px'te 3,7 px. Bir logo ailesinde
+  ikonun sadeleşmesi normaldir: aynı fikir, başka punto.
+
+  Basamakların üstünde ince aydınlık iz: 3B modeldeki tread ışığının aynısı.
+  16px'te görünmüyor ama zarar da vermiyor; 96px ve üstünde basamağın üst
+  yüzünü ayırıyor.
+
+  Son basamak vurgu renginde: uygulamadaki işaretin kuralı, ölçüm hep bir
+  sonraki basamağa bakıyor.
 
   Şeffaf değil dolu karo: şeffaf ikon açık sekme çubuğunda kayboluyor.
-  Paylar dört yanda simetrik (4,3 · 4,3 · 6,8 · 6,8).
+  Bloklar 5..27 arasında (iki yanda 5 birim pay), taban 26'da.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <defs>
     <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#181d23"/>
-      <stop offset="1" stop-color="#0d1115"/>
+      <stop offset="0" stop-color="#1a2027"/>
+      <stop offset="1" stop-color="#0c1014"/>
     </linearGradient>
   </defs>
   <rect width="32" height="32" rx="7.4" fill="url(#tile)"/>
-  <g fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="miter">
-    <path d="M6 23.5H14V16H22" stroke="#e8edf1" stroke-opacity="0.5"/>
-    <path d="M22 16V8.5H26" stroke="#35d39b"/>
-  </g>
+  <rect x="5" y="18.5" width="7.34" height="7.5" fill="#e8edf1" fill-opacity="0.40"/>
+  <rect x="12.34" y="13.5" width="7.32" height="12.5" fill="#e8edf1" fill-opacity="0.62"/>
+  <rect x="19.66" y="8.5" width="7.34" height="17.5" fill="#35d39b"/>
+  <rect x="5" y="18.5" width="7.34" height="1.1" fill="#e8edf1" fill-opacity="0.30"/>
+  <rect x="12.34" y="13.5" width="7.32" height="1.1" fill="#e8edf1" fill-opacity="0.30"/>
+  <rect x="19.66" y="8.5" width="7.34" height="1.1" fill="#ffffff" fill-opacity="0.42"/>
 </svg>

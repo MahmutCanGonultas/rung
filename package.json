@@ -31,7 +31,8 @@
     "shots": "node --env-file=.env.local scripts/shots.mjs",
     "shots:public": "node scripts/public-shots.mjs",
     "contrast": "node scripts/contrast.mjs",
-    "og": "node scripts/og-image.mjs"
+    "og": "node scripts/og-image.mjs",
+    "icon": "node scripts/apple-icon.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",

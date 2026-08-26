@@ -1781,19 +1781,102 @@ textarea:focus-visible,
 }
 .sample-finding {
   background: var(--surface);
-  padding: 15px 22px;
+  /*
+   * Ölçüm birimi SATIRIN KENDİSİ.
+   *
+   * Önce görünüm sorgusu denendi: 1024px'lik ekranda bölme 490px kalıyor, yani
+   * ekran genişken satır dardı. Sonra container `.sample-findings`e kondu ve
+   * kapı ekranında yanıldı — orada blok İKİ SÜTUN, yani 839px ölçülürken her
+   * satıra 410px düşüyordu ve satır 189 piksele çıkıyordu. Container satırın
+   * kendisinde olunca ölçülen şey ile katlanan şey aynı kutu.
+   */
+  container-type: inline-size;
 }
-.sample-kind {
-  display: flex;
+/*
+ * KAPALI SATIRDA GÖRÜNEN ŞEY DÜZELTME. Numara solda, düzeltme ortada, kategori
+ * sağda; gerekçe aşağıda ve kapalı.
+ *
+ * `list-style: none` + `::-webkit-details-marker` birlikte gerekiyor: Safari
+ * varsayılan üçgeni ikincisi olmadan silmiyor ve satırın başına kaçıyor.
+ */
+.sample-line {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-areas: "no fix kind mark";
   align-items: center;
-  gap: 9px;
+  gap: 12px;
+  padding: 13px 22px;
+  cursor: pointer;
+  list-style: none;
+}
+.sample-no { grid-area: no; }
+.sample-fix { grid-area: fix; }
+.sample-kind { grid-area: kind; }
+.sample-line::-webkit-details-marker { display: none; }
+/* Klavyeyle gezen kişi satırın açılabildiğini görmek zorunda. */
+.sample-line:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+/*
+ * Açılma işareti: kapalıyken artı, açıkken eksi. Tek psödo-öğe, iki gradyan
+ * çizgi — yeni DOM öğesi yok.
+ *
+ * DÖNME YOK. Önce `transform: rotate(180deg)` yazılmıştı ve hiçbir şey
+ * yapmıyordu: artı da eksi de 180°'de kendine eşit. Görünmeyen bir geçişi
+ * canlandırmanın anlamı yok.
+ */
+.sample-line::after {
+  content: "";
+  grid-area: mark;
+  width: 9px;
+  height: 9px;
+  background:
+    linear-gradient(var(--ink-3), var(--ink-3)) center / 9px 1px no-repeat,
+    linear-gradient(var(--ink-3), var(--ink-3)) center / 1px 9px no-repeat;
+}
+.sample-finding[open] .sample-line::after {
+  background: linear-gradient(var(--ink-3), var(--ink-3)) center / 9px 1px no-repeat;
+}
+/*
+ * Temel `.sample-kind` bloğu `@container`dan ÖNCE yazılmak zorunda.
+ * `@container` ÖZGÜLLÜK EKLEMİYOR: iki kural da (0,1,0) ve kaynak sırası karar
+ * veriyor. Sonra yazıldığında `white-space: nowrap` katlanmış satırdaki
+ * `normal`ı eziyordu — ÖLÇÜLDÜ, 320px'te katlama uygulanıyor ama kategori hâlâ
+ * sarmıyordu, yani katlamanın tek sebebi boşa gidiyordu.
+ */
+.sample-kind {
   font-family: var(--mono);
   font-size: 9.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-3);
-  margin-bottom: 8px;
+  white-space: nowrap;
 }
+
+/*
+ * Blok 620px'in altına düştüğünde satır KATLANIYOR: üstte numara + düzeltme +
+ * işaret, altta kategori.
+ *
+ * ÖLÇÜLDÜ, ve tam da bu yüzden: tek satırda kategori `nowrap` olduğu için
+ * ~200px alıyor, geriye düzeltmeye 40px kalıyor ve metin harf harf sarıyordu.
+ * Satır yüksekliği 320px'te 787 PİKSELE çıkıyordu — bir satır, neredeyse tam
+ * ekran. Taşma yoktu, o yüzden taşma kontrolü bunu yakalamıyor; yakalayan şey
+ * satır yüksekliğini ölçmek oldu.
+ */
+@container (max-width: 620px) {
+  .sample-line {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "no  fix  mark"
+      ".   kind kind";
+    row-gap: 6px;
+    align-items: start;
+  }
+  .sample-kind { white-space: normal; }
+  .sample-no { margin-top: 1px; }
+}
+
 .sample-no {
   display: grid;
   place-items: center;
@@ -1802,13 +1885,12 @@ textarea:focus-visible,
   border-radius: 4px;
   border: 1px solid var(--error-line);
   color: var(--error);
+  font-family: var(--mono);
   font-size: 10px;
-  flex: none;
 }
 .sample-fix {
   font-size: 15.5px;
   line-height: 1.5;
-  margin-bottom: 6px;
   overflow-wrap: anywhere;
 }
 .sample-fix .was {
@@ -1826,8 +1908,10 @@ textarea:focus-visible,
 }
 .sample-why {
   font-size: 13px;
+  line-height: 1.55;
   color: var(--ink-2);
   margin: 0;
+  padding: 0 22px 16px 51px;   /* numara genişliği + boşluk kadar içeri */
   max-width: 62ch;
 }
 
@@ -2565,9 +2649,11 @@ textarea:focus-visible,
 .trial-pane .sample-finding {
   background: none;
   box-shadow: none;
-  padding: 14px 0 16px;
   border-top: 1px solid var(--hairline);
 }
+/* Kartsız bölmede satır kendi kenarına kadar açılıyor. */
+.trial-pane .sample-line { padding-inline: 0; }
+.trial-pane .sample-why { padding: 0 0 14px 29px; }
 .trial-pane .sample-fix { font-size: 14.5px; }
 .trial-pane .sample-why { font-size: 12.5px; max-width: 44ch; }
 
@@ -2880,6 +2966,24 @@ textarea:focus-visible,
   .flow-node.is-ai { border-style: double; border-width: 4px; }
   .flow-rail { background: CanvasText; }
   .flow-pulse { forced-color-adjust: none; background: Highlight; }
+
+  /*
+   * Açılma işareti gradyanla çiziliyor ve zorlanmış renklerde gradyanlar
+   * DÜŞÜYOR. ÖLÇÜLDÜ: `backgroundImage` "none, none" oluyor, yani işaret
+   * tamamen kayboluyor ve satırın açılabildiğini söyleyen tek görsel ipucu
+   * gidiyor. Karakter metin, metin ise düşmüyor.
+   */
+  .sample-line::after {
+    content: "+";
+    width: auto;
+    height: auto;
+    background: none;
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1;
+    color: CanvasText;
+  }
+  .sample-finding[open] .sample-line::after { content: "\2212"; }
 
   /* Yuvalar: dolu ile boş aynı renge çökmesin. */
   .slot { forced-color-adjust: none; background: Canvas; outline: 1px solid CanvasText; outline-offset: -1px; }
@@ -3939,11 +4043,41 @@ textarea:focus-visible,
   background: none;
   border-top: 1px solid var(--rule);
 }
+/*
+ * Kapı rafında BÜTÜN satırlar aynı düzende.
+ *
+ * Container sorgusu satır başına doğru ölçüyor ama burada sonuç tutarsız
+ * görünüyordu: raf iki sütunlu, ilk dört satır 543px (katlanıyor), beşinci
+ * satır `grid-column: 1 / -1` ile 1087px (katlanmıyor). Dördü alt alta, biri
+ * yan yana — göz bunu kural değil kaza olarak okuyor. Bir şekil içinde
+ * tutarlılık, tek satıra sığmaktan önemli.
+ */
+.step-figure .sample-line {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "no  fix  mark"
+    ".   kind kind";
+  row-gap: 6px;
+  align-items: start;
+}
+.step-figure .sample-kind { white-space: normal; }
+.step-figure .sample-no { margin-top: 1px; }
+
+/*
+ * Dolgu KARTTA değil SATIRDA.
+ *
+ * Eskiden `.sample-finding` dolguyu taşıyordu ve buradaki (0,2,0) kural temel
+ * (0,1,0) kuralı EZİYORDU — kapı rafının bilerek daraltılmış 18px'lik iç
+ * boşluğu böyle kuruluyordu. Dolgu satıra taşınınca ezme ilişkisi koptu ve
+ * ikisi ÜST ÜSTE bindi: ÖLÇÜLDÜ, iç boşluk 18 yerine 40px oldu, her hücrede
+ * 44px okuma alanı kayboldu.
+ */
 .step-figure .sample-finding {
   background: none;
-  padding: 16px 18px 18px;
   border-bottom: 1px solid var(--rule);
 }
+.step-figure .sample-line { padding: 16px 18px 13px; }
+.step-figure .sample-why { padding: 0 18px 18px 47px; }
 .step-figure .sample-finding:nth-child(odd) {
   border-right: 1px solid var(--rule);
 }
@@ -3952,9 +4086,16 @@ textarea:focus-visible,
   grid-column: 1 / -1;
   border-right: 0;
 }
-.step-figure .sample-finding:first-child {
-  padding-left: 0;
-}
+/*
+ * İLK HÜCRE İSTİSNASI KALDIRILDI.
+ *
+ * `:first-child { padding-left: 0 }` ilk kartı kitap sayfasının kenarına
+ * dayamak için yazılmıştı ve tek sütunlu bir rafta doğruydu. Raf İKİ SÜTUNLU:
+ * birinci sütunda 1., 3. ve 5. satır var ve ÖLÇÜLDÜ, rozetleri 223, 241, 241'e
+ * düşüyordu — aynı sütunun üç satırı üç farklı yerden başlıyordu. Göz bunu
+ * kural değil kaza olarak okuyor. Bir şekil içinde tutarlılık, gövde metniyle
+ * hizalanmaktan önemli.
+ */
 .step-rail .pipe {
   border: 0;
   border-radius: 0;
@@ -4054,12 +4195,19 @@ textarea:focus-visible,
 .stamp-row {
   display: flex;
   align-items: baseline;
+  /*
+   * `wrap` ŞART. İki taraf da `nowrap` iken ve noktalı öncülün `min-width`i
+   * 12px iken satır hiçbir şekilde kısalamıyordu: ÖLÇÜLDÜ, 320px'lik ekranda
+   * kapı ekranı 49 piksel YATAY TAŞIYORDU. Uzun olan taraf etiket, o yüzden
+   * sarma izni ona veriliyor; değer kısa ve tek parça kalıyor.
+   */
+  flex-wrap: wrap;
   gap: 8px;
   font-size: 13.5px;
 }
 .stamp-row dt {
   color: var(--ink);
-  white-space: nowrap;
+  min-width: 0;
 }
 /* Noktalı öncül: esneyen öğe, dar ekranda kendiliğinden kısalıyor. */
 .stamp-row::after {

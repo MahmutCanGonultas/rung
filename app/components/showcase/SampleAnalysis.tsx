@@ -79,6 +79,7 @@ function Slots({ hit }: { hit: Set<Subcategory> }) {
 export function SampleAnalysis({
   variant = "broken",
   part = "both",
+  open = "first",
 }: {
   /*
    * `read` okuma şeridi, `shelf` bulgu rafı, `both` ikisi.
@@ -94,6 +95,16 @@ export function SampleAnalysis({
    * cümle olmaktan çıkıp sayfanın hesapladığı bir olaya dönüşüyor.
    */
   variant?: ShowcaseVariant;
+  /*
+   * `first` yalnızca ilk bulgunun gerekçesi açık, gerisi çekmecede — anasayfa
+   * böyle kullanıyor, çünkü orada bölüm sayfanın üçte biriydi.
+   *
+   * `all` beşi de açık. Kapı ekranı böyle kullanıyor: orası bir DERS ve adımın
+   * gövde cümlesi "beş bulgu aşağıda, motorun kendi açıklamalarıyla duruyor"
+   * diyor. Dördü kapalıyken metin ile şekil ayrışıyordu — bu sayfanın kendi
+   * kuralı "ekranda maket bir şey yok" ve ayrışma tam da onu deliyor.
+   */
+  open?: "first" | "all";
 }) {
   const { text, findings } = showcaseAnalysis(variant);
   const parts = segment(text, findings);
@@ -166,26 +177,42 @@ export function SampleAnalysis({
   ) : (
     <div className="sample-findings">
       {findings.map((finding, i) => (
-        <div
+        /*
+         * Her bulgu KENDİ AÇILIR SATIRI.
+         *
+         * Beşi birden açıkken bölüm sayfanın %34'ünü kaplıyordu: ÖLÇÜLDÜ 1230px'in
+         * 646'sı bulgu bloğu, onun da 227'si gerekçe metniydi. Ekranda aynı anda on
+         * beş satır açıklama duruyordu ve hiçbiri istenmemişti.
+         *
+         * Kapalı satırda görünen şey DÜZELTMENİN KENDİSİ — okuyanın aradığı o.
+         * Gerekçe bir tık ötede, ve İLKİ AÇIK geliyor: bir örnek görmeden neyin
+         * açılacağı bilinmiyor.
+         *
+         * `<details>` bilerek: JavaScript'siz çalışıyor, klavyeyle açılıyor, ekran
+         * okuyucu durumu bildiriyor ve metin DOM'da kalıyor — `display: none` ile
+         * gizlemek değil, kullanıcının açtığı bir çekmece.
+         */
+        <details
           key={`${finding.start}-${i}`}
           className="sample-finding"
+          open={open === "all" || i === 0}
           style={{ "--i": String(i) } as CSSProperties}
         >
-          <div className="sample-kind">
+          <summary className="sample-line">
             <span className="sample-no">{i + 1}</span>
-            {labelOf(finding.subcategory)}
-          </div>
-          <div className="sample-fix" lang="en">
-            <span className="was">{finding.original}</span>
-            {finding.suggestion ? (
-              <>
-                <span className="arrow">→</span>
-                <span className="now">{finding.suggestion}</span>
-              </>
-            ) : null}
-          </div>
+            <span className="sample-fix" lang="en">
+              <span className="was">{finding.original}</span>
+              {finding.suggestion ? (
+                <>
+                  <span className="arrow">→</span>
+                  <span className="now">{finding.suggestion}</span>
+                </>
+              ) : null}
+            </span>
+            <span className="sample-kind">{labelOf(finding.subcategory)}</span>
+          </summary>
           <p className="sample-why">{finding.explanation}</p>
-        </div>
+        </details>
       ))}
     </div>
   );

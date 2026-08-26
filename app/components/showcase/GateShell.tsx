@@ -133,7 +133,7 @@ export function GateShell({
           caption="K0 motorunun bu sayfa çizilirken ürettiği beş bulgu."
           figure={
             <InView>
-              <SampleAnalysis part="shelf" />
+              <SampleAnalysis part="shelf" open="all" />
             </InView>
           }
         >
