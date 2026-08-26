@@ -159,19 +159,38 @@
   --step-shadow: rgba(48, 41, 26, 0.3);
   --step-contact: rgba(34, 28, 17, 0.5);
 
-  --band: #101613;
+  /*
+   * SAHNE — kahramanın kendi zemini.
+   *
+   * Bir önceki tur bütün zeminleri silmişti ve sayfanın üst yarısı tek düz bir
+   * bej oldu; ürün sahibi "üst tarafta her şeyin rengi aynı" dedi ve haklıydı.
+   * Zeminleri silmek doğru düzeltme değildi — kusur zeminlerin VARLIĞI değil,
+   * aralarında 0px boşluk olmasıydı. Dikiş 96px olduğuna göre zemin geri
+   * gelebilir: artık üst üste yığılmıyor, yan yana duruyor.
+   *
+   * Kahraman koyu, çünkü sayfanın en büyük nesnesi orada duruyor ve alçı model
+   * ışığını koyu zeminde gösteriyor.
+   */
+  --stage: #14120f;
+  --stage-ink: #f4f1ea;
+  --stage-ink-2: #bdb6a8;
+  --stage-ink-3: #9a9284;
+  --stage-accent: #4ee0ad;
+  --stage-rule: #2d2922;
+
+  --band: #0d4e39;
   --band-ink: #f2f5f2;
-  --band-ink-2: #b3bfb8;
-  --band-ink-3: #93a19a;
-  --band-accent: #35d39b;
-  --band-rule: #2c342f;
+  --band-ink-2: #b6d9c9;
+  --band-ink-3: #97c1ad;
+  --band-accent: #7df0c4;
+  --band-rule: #256a51;
   /*
    * İmleç yüzeyi de bandın kendi paletinden. Tanımlanmadığında `.proof-cell`
    * temel `--surface-2`yi okuyordu ve ÖLÇÜLDÜ: koyu bandın (#101613) üstüne
    * imleçle rgb(240,238,232) — neredeyse BEYAZ bir blok basılıyordu.
    * Yükseltiyor, çökertmiyor: banda karşı 1,24:1.
    */
-  --band-hover: #202a24;
+  --band-hover: #126047;
 
   --paper: #f7f4ed;
   --paper-2: #f1ece1;
@@ -245,14 +264,22 @@
   --step-shadow: rgba(0, 0, 0, 0.5);
   --step-contact: rgba(0, 0, 0, 0.7);
 
-  --band: #242e35;
+  /* Koyu temada sahne AŞAĞI inemez; yükseltilmiş bir levha oluyor. */
+  --stage: #171d23;
+  --stage-ink: #eef2f6;
+  --stage-ink-2: #a8b4be;
+  --stage-ink-3: #8e9ba6;
+  --stage-accent: #4ee0ad;
+  --stage-rule: #2b343d;
+
+  --band: #0b3d2e;
   --band-ink: #eef2f6;
-  --band-ink-2: #a8b4be;
-  --band-ink-3: #8e9ba6;
-  --band-accent: #35d39b;
-  --band-rule: #333d45;
+  --band-ink-2: #a9d2c1;
+  --band-ink-3: #8bb8a5;
+  --band-accent: #7df0c4;
+  --band-rule: #1c5843
   /* Koyu temada da YUKARI: tanımsızken hücre imleçte bandan koyu çıkıyordu. */
-  --band-hover: #303c45;
+  --band-hover: #0f4d3a;
 
   --paper: #0f1216;
   --paper-2: #151a1f;
@@ -319,14 +346,22 @@
   --step-shadow: rgba(0, 0, 0, 0.5);
   --step-contact: rgba(0, 0, 0, 0.7);
 
-  --band: #242e35;
+  /* Koyu temada sahne AŞAĞI inemez; yükseltilmiş bir levha oluyor. */
+  --stage: #171d23;
+  --stage-ink: #eef2f6;
+  --stage-ink-2: #a8b4be;
+  --stage-ink-3: #8e9ba6;
+  --stage-accent: #4ee0ad;
+  --stage-rule: #2b343d;
+
+  --band: #0b3d2e;
   --band-ink: #eef2f6;
-  --band-ink-2: #a8b4be;
-  --band-ink-3: #8e9ba6;
-  --band-accent: #35d39b;
-  --band-rule: #333d45;
+  --band-ink-2: #a9d2c1;
+  --band-ink-3: #8bb8a5;
+  --band-accent: #7df0c4;
+  --band-rule: #1c5843
   /* Koyu temada da YUKARI: tanımsızken hücre imleçte bandan koyu çıkıyordu. */
-  --band-hover: #303c45;
+  --band-hover: #0f4d3a;
 
   --paper: #0f1216;
   --paper-2: #151a1f;
@@ -2355,10 +2390,20 @@ textarea:focus-visible,
 }
 
 /* ── şerit 0 · ray satırı ─────────────────────────────────────────── */
+/*
+ * RAY SATIRI SAHNENİN İÇİNDE: logo ile açılış aynı zeminde durmak zorunda,
+ * yoksa sayfa koyu bir bandın üstüne oturmuş açık bir çubukla başlıyor.
+ */
 .land-bar {
-  background: none;          /* kâğıt zaten `.land`de */
-  border-bottom: 0;          /* dikiş artık 144px boşluk */
-  padding-block: var(--v3);
+  --ink: var(--stage-ink);
+  --ink-2: var(--stage-ink-2);
+  --ink-3: var(--stage-ink-3);
+  --accent: var(--stage-accent);
+  --hairline: var(--stage-rule);
+  background: var(--stage);
+  color: var(--ink);
+  border-bottom: 0;
+  padding-block: var(--v5) var(--v3);
   align-items: center;
 }
 .land-bar > .mark { grid-column: rail-start / mid; grid-row: 1; }
@@ -2375,13 +2420,33 @@ textarea:focus-visible,
 .land-nav .btn-primary { width: auto; }
 
 /* ── şerit 1 · İDDİA ──────────────────────────────────────────────── */
+/*
+ * KAHRAMAN KENDİ SAHNESİNDE.
+ *
+ * Zemini olmayan bir açılış, altındaki bölümle aynı kâğıtta duruyordu ve
+ * sayfanın üst yarısı tek düz bir renk oluyordu. Sahne koyu: alçı model ışığını
+ * orada gösteriyor, ve yeşil fiil koyu zeminde yanıyor.
+ *
+ * 9. KURAL: kendi zemini olan bölüm kendi jetonlarını da alıyor — bu ders bu
+ * dosyada dört kez ölçüldü.
+ */
 .claim {
-  background: none;
+  --ink: var(--stage-ink);
+  --ink-2: var(--stage-ink-2);
+  --ink-3: var(--stage-ink-3);
+  --accent: var(--stage-accent);
+  --hairline: var(--stage-rule);
+
+  background: var(--stage);
+  /* `color` AÇIKÇA: devralma jetonu değil çözülmüş rengi taşıyor. */
+  color: var(--ink);
   border-bottom: 0;
   /* Zemini olmayan bir bölümün dikey dolgusu dikişten AYIRT EDİLEMEZ: ikisi de
      aynı kâğıt. Nefesin tamamını `.land`in `row-gap`i taşıyor. */
-  padding-block: 0;
-  margin-top: calc(var(--v6) - var(--v5));   /* 96 + 48 = 144 */
+  /* Zeminli bölüm dolgusunu KENDİ taşıyor: kâğıt zeminli bölümlerde dolgu
+     dikişten ayırt edilemiyordu, burada ayırt ediliyor. */
+  padding-block: var(--v5);
+  margin-top: calc(-1 * var(--v5));   /* sahne tek parça: barla arasında dikiş yok */
   row-gap: var(--v2);
 }
 .claim > * { grid-column: read-start / mid; margin: 0; }
@@ -2500,6 +2565,47 @@ textarea:focus-visible,
  * `preserve-3d` zincirini DÜZLEŞTİRİYOR — model o an düz bir çizime dönüyordu.
  * Aynı sebeple `filter` de yok: zemin gölgesi bulanık bir gradyan, blur değil.
  */
+/*
+ * MODEL SAHNEDE. Koyu zeminde alçı fazla parlıyordu; sahne kendi basamak
+ * paletini veriyor — açık temada da koyu temanın yüzleri, çünkü altındaki
+ * zemin iki temada da koyu.
+ */
+.claim .model {
+  --step-tread: #454f58;
+  --step-riser: #2b343c;
+  --step-side: #191f25;
+  --step-lit-tread: #62e8b8;
+  --step-lit-riser: #35d39b;
+  --step-lit-side: #1d8f68;
+  --step-edge: rgba(255, 255, 255, 0.16);
+  --step-shadow: rgba(0, 0, 0, 0.5);
+  --step-contact: rgba(0, 0, 0, 0.7);
+}
+/*
+ * SAHNENİN DÜĞMELERİ. Taban düğme açık kâğıt için kurulu: birincil düğmenin
+ * etiketi `--plane`, ikincil düğmenin zemini `--surface`. Koyu sahnede ikisi de
+ * çöküyordu — ÖLÇÜLDÜ: 1,48:1 ve 1,91:1, taban 4,5.
+ *
+ * Birincil düğme parlak yeşil zeminde KOYU etiket taşıyor; ikincil düğme
+ * zeminini bırakıp çizgiye iniyor. İkisi de sahnenin kendi paletinden.
+ */
+.claim .btn,
+.land-bar .btn {
+  background: none;
+  color: var(--stage-ink);
+  border-color: var(--stage-rule);
+}
+.claim .btn:hover,
+.land-bar .btn:hover { border-color: var(--stage-ink-3); background: rgba(255, 255, 255, 0.04); }
+.claim .btn-primary,
+.claim .btn-primary:hover,
+.land-bar .btn-primary,
+.land-bar .btn-primary:hover {
+  background: var(--stage-accent);
+  border-color: var(--stage-accent);
+  color: #0a2019;
+}
+
 .model-hold { grid-row: 1; }
 .model {
   --w: clamp(42px, 5.9vw, 86px);
