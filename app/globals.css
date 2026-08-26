@@ -130,51 +130,10 @@
    * ışığı ters çevirirdi (daha çok mürekkep = daha AÇIK).
    */
   /*
-   * DURUŞMA ŞERİDİNİN İKİ KÂĞIDI.
-   *
-   * Bölümün zemini `--surface`tı ve ÖLÇÜLDÜ: `--plane`e karşı 1,07:1 — bir
-   * zemin kenarının kenarlıksız okunması için pratik eşik ~1,15, kaydırırken
-   * ~1,25. Yani şerit ekranda hiç ayrışmıyordu.
-   *
-   * Yeni ayrım bölümün KENDİ ARGÜMANINI taşıyor: gürültülü cümle kullanılmış,
-   * donuk kâğıtta; doğru cümle temiz kâğıtta. Aynı motor, iki kâğıt.
-   */
-  --trial: #e9e3d6;
-  --trial-clean: #fbf9f5;
-  /*
-   * Donuk kâğıt mürekkebi de yutuyor. ÖLÇÜLDÜ: `--ink-3` bu zeminde 4,19:1'e,
-   * vurgu rengi 3,94'e düşüyordu; taban 4,5. Bölüm kendi kâğıdını aldıysa kendi
-   * mürekkebini de alıyor — koyu bantta yapılanın aynısı.
-   */
-  --trial-ink-3: #5b6469;
-  --trial-accent: #096a4a;
-  /* Şeridin başlık levhası: markanın yeşili, koyu tonda. */
-  /*
-   * MEKANİZMA ŞERİDİNİN KÂĞIDI.
-   *
-   * Sayfadaki tek kimliksiz bölümdü: zemini `--plane`, yani kahramanla aynı.
-   *
-   * SOĞUK LAVANTA DENENDİ VE REDDEDİLDİ. Fikir `--model` morundan türetmekti
-   * ama sayfaya yabancı düştü: bu sitenin bütün yüzeyleri sıcak kâğıt, tek
-   * soğuk yüzey her şeyden kopuyordu. Ayrımı sıcaklık farkına yıkmak da yanlış
-   * çıktı — mesele adım değil AİLE.
-   *
-   * Yeni ton kâğıdın kendisi, koyulaşmış hâli. Sayfa böylece bir rampa oluyor:
-   * kâğıt → koyu kil → siyaha yakın bant. Aynı malzeme, gitgide derinleşiyor.
-   */
-  --mech: #e3efe9;
-  --mech-line: #c3d8cd;
-  /*
    * Kil zemin mürekkebi yutuyor; şerit kendi kâğıdını aldıysa kendi mürekkebini
    * de alıyor — duruşma kâğıdı ve koyu bantta yapılanın aynısı.
    */
-  --mech-ink-2: #3f5a4e;
-  --mech-ink-3: #4c6659;
-  --mech-model: #4534b8;
 
-  --trial-head: #0f4d38;
-  --trial-head-ink: #eef6f1;
-  --trial-head-ink-2: #a9cabb;
 
   /*
    * MODELİN MALZEMESİ. İlk palet kâğıda çok yakındı (kum taşı) ve model
@@ -276,28 +235,6 @@
    * açık temadaki 16,3'lük adımın yanında bant neredeyse yoktu. Vurgu her iki
    * temada da aynı yeşil, çünkü bandın zemini iki temada da koyu.
    */
-  /*
-   * Koyu temada aşağı yer yok, o yüzden şerit YUKARI çıkıyor — ama koyu banttan
-   * (`--band`) daha az. Üç kademe: plane → duruşma → bant.
-   */
-  --trial: #191f26;
-  --trial-clean: #232c34;
-  --trial-ink-3: #8d98a1;
-  --trial-accent: #35d39b;
-  /*
-   * Koyu temada rampa ters yönde kuruluyor: mekanizma plane'e en yakın, sonra
-   * duruşma, sonra bant. Aşağı yer olmadığı için mesafe yukarıdan alınıyor.
-   */
-  --mech: #0d1512;
-  --mech-line: #22322a;
-  --mech-ink-2: #9aa7b1;
-  --mech-ink-3: #7f8b95;
-  --mech-model: #9a8cf5;
-
-  --trial-head: #0c3729;
-  --trial-head-ink: #e8f4ed;
-  --trial-head-ink-2: #97c2ae;
-
   --step-tread: #454f58;
   --step-riser: #2b343c;
   --step-side: #191f25;
@@ -372,28 +309,6 @@
    * açık temadaki 16,3'lük adımın yanında bant neredeyse yoktu. Vurgu her iki
    * temada da aynı yeşil, çünkü bandın zemini iki temada da koyu.
    */
-  /*
-   * Koyu temada aşağı yer yok, o yüzden şerit YUKARI çıkıyor — ama koyu banttan
-   * (`--band`) daha az. Üç kademe: plane → duruşma → bant.
-   */
-  --trial: #191f26;
-  --trial-clean: #232c34;
-  --trial-ink-3: #8d98a1;
-  --trial-accent: #35d39b;
-  /*
-   * Koyu temada rampa ters yönde: mekanizma plane'e en yakın, sonra duruşma,
-   * sonra bant. Aşağı yer olmadığı için mesafe yukarıdan alınıyor.
-   */
-  --mech: #0d1512;
-  --mech-line: #22322a;
-  --mech-ink-2: #9aa7b1;
-  --mech-ink-3: #7f8b95;
-  --mech-model: #9a8cf5;
-
-  --trial-head: #0c3729;
-  --trial-head-ink: #e8f4ed;
-  --trial-head-ink-2: #97c2ae;
-
   --step-tread: #454f58;
   --step-riser: #2b343c;
   --step-side: #191f25;
@@ -530,7 +445,9 @@ h3 {
 /* ── düğmeler ─────────────────────────────────────────────────── */
 .btn {
   font: inherit;
-  font-size: 14px;
+  /* Ölçekten. 14 ve 15 kendi başlarına bir kademe kurmuyordu; ikisi de
+     `--fs-small` ve `--fs-body`nin yarım pikselinde duruyordu. */
+  font-size: var(--fs-small);
   font-weight: 550;
   padding: 9px 15px;
   border-radius: var(--r-sm);
@@ -1838,7 +1755,7 @@ textarea:focus-visible,
 
 /* ── ortak parçalar ───────────────────────────────────────────────── */
 .btn-lg {
-  font-size: 15px;
+  font-size: var(--fs-body);
   padding: 13px 24px;
 }
 .btn-primary.btn-lg {
@@ -1888,7 +1805,7 @@ textarea:focus-visible,
 }
 .sample-mark sup {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: var(--fs-micro);
   color: var(--error);
   margin-left: 2px;
   text-decoration: none;
@@ -2027,7 +1944,7 @@ textarea:focus-visible,
   font-weight: 620;
 }
 .sample-why {
-  font-size: 13px;
+  font-size: var(--fs-small);
   line-height: 1.55;
   color: var(--ink-2);
   margin: 0;
@@ -2249,17 +2166,6 @@ textarea:focus-visible,
   font-size: 11.5px;
   color: var(--ink-3);
 }
-.proof-weak {
-  margin: 14px 0 0;
-  padding-left: 13px;
-  border-left: 2px solid var(--error);
-  font-size: 13px;
-  color: var(--ink-2);
-  max-width: 66ch;
-}
-.proof-weak b {
-  color: var(--ink);
-}
 .proof-source {
   margin: 12px 0 0;
   font-family: var(--mono);
@@ -2293,6 +2199,12 @@ textarea:focus-visible,
   --fs-figure: clamp(56px, 7.4vw, 108px);   /* ölçülen sayı — sayfanın en büyüğü */
   --fs-display: clamp(44px, 5.8vw, 82px);   /* yalnızca h1 */
   --fs-move: clamp(26px, 2.9vw, 40px);      /* şerit başlığı */
+  /*
+   * İKİNCİ BASAMAK. `.trial`, `.mech` ve `.measure` üçü de 40px / 640 / Inter /
+   * x=72 idi; "her şey birbirine benziyor" bir his değil, kopyalanmış bir
+   * bloktu. Mekanizma iki yavaş bölüm arasındaki hızlı vuruş — başlığı da öyle.
+   */
+  --fs-move-2: clamp(22px, 2.2vw, 30px);
   --fs-read: clamp(17px, 1.9vw, 27px);      /* ÖLÇÜLEN İngilizce */
   --fs-lede: clamp(24px, 2.4vw, 34px);      /* başlığın sessiz öncülü */
   --fs-intro: clamp(17px, 1.35vw, 21px);
@@ -2304,6 +2216,47 @@ textarea:focus-visible,
 .land {
   --rail: clamp(20px, 5vw, 76px);
 
+  /*
+   * ÖLÇÜM PAYI — sayfanın omurgası.
+   *
+   * 72 ile 216 arasındaki bu şeritte yukarıdan aşağı YALNIZCA ÖLÇÜLEN SAYILAR
+   * duruyor: 5 (duruşmada bulunan hata) · 3 (model kullanmayan katman) · %4,9
+   * (yanlış alarm). Gövde metni oraya asla girmiyor. Bir ölçüm aletinin sol
+   * çizgisi ölçümlerden oluşuyor; payda ölçülmemiş bir şey belirirse omurga
+   * yalan söylüyor demektir.
+   *
+   * 1240px'te açılıyor ve ARADA DEĞER ALMIYOR: yarım bir pay, 54px'lik rakamı
+   * kesen bir sütun demek olurdu. Eşik ölçümden geliyor — `.sample-finding`
+   * 620px'in altında satırını katlıyor ve pay açıkken gürültülü bölmenin bulgu
+   * bloğu 1440'ta 648px kalıyor, eşiğin 28px üstünde.
+   */
+  --hang: 0px;
+  /* Sütun oluğu ve dikey çizginin girintisi. Dikey ölçekten AYRI: teşhiste
+     ölçülen belirsizlik (bant içi 114 > bant çıkışı 47) yalnızca dikeydi. */
+  --gut: clamp(24px, 3.3vw, 48px);
+
+  /* ── DİKEY ÖLÇEK ───────────────────────────────────────────────────
+     ÖLÇÜLDÜ: sayfada 12 ayrı boşluk değeri vardı, 41 boşluğun 23'ü 10px'in
+     altındaydı, ve 10 ile 66 arasında hiçbir kademe yoktu — yani yalnızca iki
+     hâl vardı: yapışık ve kopuk.
+
+     32 İLE 96 ARASINDA HİÇBİR ŞEY YOK, VE BU BİLEREK. Ara kademe koymak,
+     bugünkü ters hiyerarşinin tam kaynağı: duruşma bandının İÇİNDEKİ 114px'lik
+     boşluk, altı bölüm sınırından üçünden (103 · 47 · 24) genişti. İki paragrafı
+     ayıran boşluk iki bölümü ayıran boşluktan büyükse göz paragrafı bölüm sanır.
+
+     KURAL: bir bölümün İÇİNDEKİ hiçbir dikey boşluk `--v4`ü geçemez; bölüm
+     sınırı HER ZAMAN `--v5`tir. Oran her genişlikte ≥ 2,39.
+
+     `:root`a DEĞİL `.land`e yazılıyor: kapı ekranı ve pano kendi ritimlerini
+     kullanıyor — `--beat` için 24 Ağustos'ta imzalanan gerekçenin aynısı. */
+  --v1: 8px;
+  --v2: 16px;
+  --v3: 24px;
+  --v4: clamp(24px, 2.8vw, 32px);
+  --v5: clamp(64px, 6.7vw, 96px);
+  --v6: clamp(88px, 10vw, 144px);
+
   /* Nabız YALNIZCA burada. `:root`taki `--t-lead`/`--t-step` ELLENMİYOR:
      kapı ekranı (`.gate`) onları okuyor. */
   --beat: 80ms;
@@ -2311,21 +2264,50 @@ textarea:focus-visible,
   --t-step: calc(var(--beat) * 3);    /* 240ms · iki hata arası */
   --t-cell: calc(var(--beat) * 4);    /* 320ms · hattın bir katmanı */
 
+  /*
+   * DİKİŞ BİR DEĞER, KURA DEĞİL. Altı sınır tek satırdan besleniyor ve bölüm
+   * başına dolgu aritmetiği kalmıyor. Eskiden: 103 · 166 · 143 · 235 · 47 · 24 —
+   * tekrar eden tek bir sayı yoktu, o yüzden göz bir sonraki sınırın ne kadar
+   * uzakta olacağını öğrenemiyordu.
+   */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--v5);
+  align-content: start;
+
   max-width: none;
   margin: 0;
   padding: 0;
   background: var(--plane);
 }
 
-/* Her şeridin ızgarası. Sütun boşluğu YOK: bitişik bölmeler dikişsiz
-   buluşsun diye ayrım kenarlıkla yapılıyor. */
+@media (min-width: 1240px) {
+  .land { --hang: 144px; }
+  /*
+   * Payın etiketi paya SIĞMAK zorunda. ÖLÇÜLDÜ: 173px genişliğindeki bir
+   * etiket 144px'lik payı aşıp okuma sütununa giriyor ve başlıkla çakışıyordu.
+   * Sarıyor — kesilmiyor: payda duran şey ölçülen sayı, kırpılmış bir kelime
+   * değil.
+   */
+  .hang-fig i { max-width: calc(var(--hang) - var(--v3)); }
+}
+
+/* Her şeridin ızgarası. Sütun boşluğu YOK: oluk dolguyla veriliyor, çünkü
+   bitişik hücreler dikişsiz buluşmak zorunda.
+
+   1440'ta aritmetik: 1440 − 72 − 144 − 72 = 1152 · ×9/16 = 648 → `mid` 864 ·
+   ×7/16 = 504 → `rail-end` 1368.
+
+   `--hang: 0` iken `read-start` `rail-start`a çakışıyor ve her yerleştirme
+   kendiliğinden 72'ye düşüyor — şablon değişmiyor, yalnızca pay kapanıyor. */
 .move {
   display: grid;
   grid-template-columns:
     [bleed-start] var(--rail)
-    [rail-start] minmax(0, 7fr)
-    [mid] minmax(0, 5fr)
-    [rail-end] var(--rail) [bleed-end];
+    [rail-start]  var(--hang)
+    [read-start]  minmax(0, 9fr)
+    [mid]         minmax(0, 7fr)
+    [rail-end]    var(--rail) [bleed-end];
   align-items: start;
 }
 .move-h {
@@ -2336,20 +2318,48 @@ textarea:focus-visible,
   font-weight: 640;
   text-wrap: balance;
 }
+/* Boşluğu `row-gap` taşıyor; `margin` onun ÜSTÜNE binerdi. */
 .move-sub {
-  margin: 10px 0 0;
+  margin: 0;
   font-size: var(--fs-body);
   line-height: 1.6;
   color: var(--ink-2);
   max-width: 56ch;
 }
 
+/*
+ * ÖLÇÜM PAYININ ORTAK DİLİ — payda duran her şey aynı görünüyor.
+ * Üç yerde: 5 (duruşma) · 3 (mekanizma) · %4,9 (ölçüm, kendi `--fs-figure`ıyla).
+ */
+.hang-fig {
+  display: grid;
+  justify-items: start;
+  gap: var(--v1);
+  margin: 0;
+}
+.hang-fig b {
+  font-family: var(--sans);
+  font-size: clamp(34px, 3.8vw, 54px);
+  font-weight: 660;
+  line-height: 0.85;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+}
+.hang-fig i {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
 /* ── şerit 0 · ray satırı ─────────────────────────────────────────── */
 .land-bar {
-  background: var(--plane);
-  padding-block: 18px;
+  background: none;          /* kâğıt zaten `.land`de */
+  border-bottom: 0;          /* dikiş artık 144px boşluk */
+  padding-block: var(--v3);
   align-items: center;
-  border-bottom: 1px solid var(--hairline);
 }
 .land-bar > .mark { grid-column: rail-start / mid; grid-row: 1; }
 .land-nav {
@@ -2357,7 +2367,7 @@ textarea:focus-visible,
   grid-row: 1;
   justify-self: end;
   display: flex;
-  gap: 8px;
+  gap: var(--v1);
 }
 .land-nav .btn { white-space: nowrap; }
 /* `.btn-primary` temeli `width: 100%`; yalnızca `.btn-lg` onu nötrlüyor.
@@ -2366,12 +2376,15 @@ textarea:focus-visible,
 
 /* ── şerit 1 · İDDİA ──────────────────────────────────────────────── */
 .claim {
-  background: var(--plane);
-  border-bottom: 1px solid var(--hairline);
-  padding-block: clamp(44px, 7vh, 88px) clamp(48px, 8vh, 96px);
-  row-gap: clamp(16px, 2vw, 26px);
+  background: none;
+  border-bottom: 0;
+  /* Zemini olmayan bir bölümün dikey dolgusu dikişten AYIRT EDİLEMEZ: ikisi de
+     aynı kâğıt. Nefesin tamamını `.land`in `row-gap`i taşıyor. */
+  padding-block: 0;
+  margin-top: calc(var(--v6) - var(--v5));   /* 96 + 48 = 144 */
+  row-gap: var(--v2);
 }
-.claim > * { grid-column: rail-start / mid; margin: 0; }
+.claim > * { grid-column: read-start / mid; margin: 0; }
 .claim-kicker {
   grid-row: 1;
   font-family: var(--mono);
@@ -2398,7 +2411,7 @@ textarea:focus-visible,
 }
 .claim-intro {
   grid-row: 3;
-  margin-top: 6px;
+  margin-top: var(--v1);
   font-size: var(--fs-intro);
   line-height: 1.55;
   color: var(--ink-2);
@@ -2413,11 +2426,12 @@ textarea:focus-visible,
 .claim-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  padding-top: 8px;
+  gap: var(--v2);
+  padding-top: 0;
 }
 .claim > .claim-actions {
   grid-row: 4;
+  margin-top: var(--v2);
 }
 .claim-note { grid-row: 5; font-size: var(--fs-small); color: var(--ink-3); }
 
@@ -2438,40 +2452,33 @@ textarea:focus-visible,
  * OLMAKTAN ÇIKARIYOR — iki nesnenin arasındaki tanımlı aralık. Kenar çizgisi
  * levhanın kendisinde, çünkü kenar payında duran şey artık ikisi birden.
  */
+/*
+ * KENAR ÇİZGİSİ VE DOLGU GİTTİ. Sağ sütun 864'te BAŞLIYOR, 907'de değil —
+ * ÖLÇÜLDÜ: sayfada sağ sütun üç ayrı x'te (828 / 866 / 872) başlıyordu, yani
+ * dördüncü bir dikey eksen vardı. Yan kazanç da ölçüldü: `.model-ground`
+ * 789→1460 ile görüntü alanını 20px aşıyordu; dolgunun kalkması onu içeri çekti.
+ */
 .claim-plate {
   grid-column: mid / rail-end;
-  /*
-   * 1'den başlıyor: levhanın üst kenarı SOL SÜTUNUN üst kenarıyla aynı yerde,
-   * yani kenar çizgisi kicker'ın hizasından iniyor. `2 / 6` denendi ve
-   * reddedildi — çizgi 192'de başlayıp 616'da bitiyordu, solda ise içerik
-   * 73'te başlayıp 530'da bitiyordu: çizginin iki ucu da hiçbir şeye
-   * değmiyordu.
-   */
   grid-row: 1 / 6;
-  /*
-   * İçerik boyunda, esnetilmiş DEĞİL. `stretch` + `1fr` ara boşluk denendi:
-   * çetele tepede, tez dipte, ortada ÖLÇÜLDÜ 165px'lik bir delik kalıyordu.
-   * İki nesne tek blok; boşluk bloğun ALTINDA, yani başlığın nefes aldığı
-   * yerde — orası boşluğun normal olduğu yer, delik değil.
-   */
   align-self: start;
   display: grid;
   grid-template-rows: auto auto;
-  row-gap: clamp(20px, 3vh, 38px);
-  padding-left: clamp(24px, 3vw, 52px);
-  border-left: 1px solid var(--hairline);
+  row-gap: var(--v4);
+  padding-left: 0;
+  border-left: 0;
 }
 .claim-thesis {
   grid-row: 2;
 }
 /* `.claim-thesis p` (0,1,1), `.claim-metric`i (0,1,0) yeniyordu: ikincinin
    üst boşluğu hiç uygulanmıyor, iki paragraf birbirine yapışıyordu. */
-.claim-thesis > p:first-child { margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink-2); }
+.claim-thesis > p:first-child { margin: 0; font-size: var(--fs-body); line-height: 1.55; color: var(--ink-2); }
 .claim-thesis strong { color: var(--ink); font-weight: 620; }
 .claim-metric {
-  margin-top: 14px;
+  margin-top: var(--v2);
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
   letter-spacing: 0.11em;
   text-transform: uppercase;
   color: var(--ink-3);
@@ -2696,8 +2703,8 @@ textarea:focus-visible,
 .claim-figure {
   display: flex;
   align-items: baseline;
-  gap: 11px;
-  margin-top: 7px;
+  gap: var(--v2);
+  margin-top: var(--v1);
   font-size: 19px;
   font-weight: 620;
   letter-spacing: -0.01em;
@@ -2714,81 +2721,84 @@ textarea:focus-visible,
 }
 
 /* ── şerit 2 · DURUŞMA · aynı motor, iki cümle ────────────────────── */
-.trial {
-  --ink-3: var(--trial-ink-3);
-  --accent: var(--trial-accent);
-  background: var(--trial);
-  border-bottom: 1px solid var(--hairline);
-  /* Üst dolgu LEVHANIN içinde: levha şeridin üst kenarına dayanmak zorunda. */
-  padding-top: 0;
-  row-gap: 0;
-}
 /*
- * BAŞLIK LEVHASI — şeridin yeşili.
+ * YEŞİL LEVHA SİLİNDİ. Dolu bir bandın içine, aynı genişlikte, başka renkte
+ * ikinci bir dolu bant koymak — "her şey iç içe" şikâyetinin birebir tarifi.
+ * Başlık ve alt cümle artık kâğıdın üstünde; ikisini tek nesne yapan şey levha
+ * değil, altındaki 32px'lik boşluk ve yanlarındaki 96px'lik dikiş.
  *
- * Başlık ve alt cümle şeridin kâğıdının üstünde serbest duruyordu; başlık,
- * cümle ve altındaki iki bölme aynı zeminde art arda gelince üçü üst üste
- * yazılmış gibi okunuyordu. Levha ikisini tek nesne yapıyor, kendi nefesini
- * veriyor ve aşağıdaki iki kâğıttan kesin bir kenarla ayırıyor.
- *
- * Renk markanın kendi yeşili. Sayfadaki koyu bant (`.measure`) yeşile çalan
- * bir siyah; bu ise doğrudan yeşil — akraba ama aynı değil, ve ikisinin arasına
- * `.mech`in açık şeridi giriyor.
+ * JETON DEVRİ DE GİTTİ. Bölümün kendi zemini kalmadığına göre bölüme özel
+ * mürekkep yamaları gerekçesiz bir renk sapması olurdu; taban jetonlar kâğıt
+ * üstünde zaten 4,03–4,86, vurgu 4,73 ölçülmüştü.
  */
-.trial-head {
-  grid-column: bleed-start / bleed-end;
-  grid-row: 1;
-  display: grid;
-  gap: clamp(12px, 1.4vw, 18px);
-  padding: clamp(38px, 5vw, 68px) var(--rail) clamp(40px, 5.2vw, 72px);
-  background: var(--trial-head);
-  color: var(--trial-head-ink);
+.trial {
+  background: none;
+  border-bottom: 0;
+  padding-block: 0;
+  row-gap: var(--v4);                 /* başlık → bölmeler: 114 → 32 */
 }
-.trial-head .move-h {
-  max-width: 18ch;
-  color: var(--trial-head-ink);
-}
-.trial-head .move-sub {
-  max-width: 62ch;
-  color: var(--trial-head-ink-2);
-}
-
+.trial > .move-h { grid-column: read-start / mid; grid-row: 1; max-width: 18ch; }
+.trial > .move-sub { grid-column: mid / rail-end; grid-row: 1; max-width: none; }
 .trial-pane {
   grid-row: 2;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(14px, 1.8vw, 22px);
-  border-top: 1px solid var(--hairline);
-  padding: clamp(22px, 2.6vw, 34px) clamp(22px, 2.6vw, 40px) clamp(28px, 3.2vw, 46px);
+  display: grid;
+  row-gap: var(--v3);
+  border-top: 0;
+  padding: 0;
+  background: none;
 }
+
+/*
+ * GÜRÜLTÜLÜ BÖLME — ölçüm payını kullanan tek bölme. Künye ve "5 BULGU" paya
+ * geçiyor, cümle ve bulgular okuma sütununda kalıyor.
+ *
+ * `.sample-read` hiçbir CSS kuralı taşımıyor, o yüzden `display: contents`
+ * bedava; `--n` özel özelliği miras kaldığı için hareketin ritmi bozulmuyor.
+ * `InView`in `display: contents` yasağı GÖZLENEN kutu için geçerli ve gözlenen
+ * kutu `.trial-pane`in kendisi.
+ */
+.trial-pane .sample-read { display: contents; }
+.trial-pane.is-broken {
+  grid-column: rail-start / mid;
+  grid-template-columns: var(--hang) minmax(0, 1fr);
+}
+.trial-pane.is-broken .sample-head {
+  grid-column: 1;
+  grid-row: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--v2);
+}
+.trial-pane.is-broken .sample-text { grid-column: 2; grid-row: 1; }
+.trial-pane.is-broken .slots { grid-column: 2; grid-row: 2; margin: 0; }
+.trial-pane.is-broken .sample-findings { grid-column: 2; grid-row: 3; }
 .trial-pane.is-broken { grid-column: bleed-start / mid; padding-left: var(--rail); }
 /* Gürültülü bölme şeridin kendi kâğıdında: ayrı bir kutu değil, zeminin ta kendisi. */
 .trial-pane.is-broken { background: none; }
+/*
+ * TEMİZ BÖLME — kâğıdın üstünde, payı yok: `0` kendi sütununun BAŞI.
+ *
+ * `justify-content: center` GERİ ALINDI. O numara 500px'lik bir deliği yönetmek
+ * içindi; artık delik yok. `align-self: stretch` kalıyor ki çizgi satırın
+ * tamamını çizsin, ama içerik tepede duruyor — sessizliğin kısa olması
+ * argümanın kendisi.
+ *
+ * Sayfanın iki dikey çizgisinden biri, x=864. Zemin farkı 1,20:1'de zaten zar
+ * zor okunuyordu; kimliği artık çizgi ve girinti taşıyor, ikisi de
+ * `forced-colors`ta hayatta kalıyor.
+ */
 .trial-pane.is-clean {
-  grid-column: mid / bleed-end;
-  padding-right: var(--rail);
-  /* Temiz cümle TEMİZ KÂĞITTA. Bölümün cümlesi, malzeme olarak. */
-  background: var(--trial-clean);
-  border-left: 1px solid var(--hairline);
-  /*
-   * Boşluk TASARLANMIŞ olmak zorunda, artık değil. Sol bölme beş bulguyla
-   * uzarken sağ bölmede tek bir not kalıyor; akışa bırakılırsa o not tepeye
-   * yapışıp altında yüzlerce piksel kaza gibi duruyor. Ortalanınca boşluk
-   * bölmenin iki yanına dağılıyor ve "burada bir şey yok" bilinçli okunuyor.
-   *
-   * `align-self: stretch` ŞART. `.move` `align-items: start` diyor, yani bölme
-   * kendi içeriği kadar yüksek kalıyordu: ÖLÇÜLDÜ sol 949px, sağ 446px, ve
-   * aradaki 500px'lik fark bölmenin ALTINDA çıplak zemin olarak duruyordu.
-   * Uzatılınca yüzey satırın tamamını kaplıyor ve `justify-content` çalışacak
-   * boşluğu buluyor.
-   */
+  grid-column: mid / rail-end;
   align-self: stretch;
-  justify-content: center;
-  /* Sessizlik gürültüden SONRA düşüyor. Yeni keyframe yok — hareket katmanı
-     `--t-enter`i zaten altı yerde okuyor. */
+  align-content: start;
+  background: none;
+  border-left: 1px solid var(--hairline);
+  padding-left: var(--gut);
   --t-enter: calc(var(--beat) * 4);
 }
+.trial-pane.is-clean .sample-head { justify-content: flex-start; }
 /*
  * ÖLÇEK SIÇRAMASI. Sayfanın en önemli hesaplanmış olgusu — aynı motorun doğru
  * cümlede SIFIR bulgu vermesi — bugüne kadar sağ üst köşede 9,5px mono büyük
@@ -2823,7 +2833,7 @@ textarea:focus-visible,
 /* `--ink-3` mikro katı bu yüzeylerde 3,3:1'de kalıyor. */
 .trial-pane .sample-tag,
 .trial-pane .sample-count,
-.trial-pane .sample-kind { color: var(--ink-2); }
+.trial-pane .sample-kind { font-size: var(--fs-micro); color: var(--ink-2); }
 .trial-pane .sample-text {
   padding: 0;
   font-size: var(--fs-read);
@@ -2859,8 +2869,8 @@ textarea:focus-visible,
 }
 /* Kartsız bölmede satır kendi kenarına kadar açılıyor. */
 .trial-pane .sample-line { padding-inline: 0; }
-.trial-pane .sample-why { padding: 0 0 14px 29px; }
-.trial-pane .sample-fix { font-size: 14.5px; }
+.trial-pane .sample-why { font-size: var(--fs-small); padding: 0 0 var(--v2) 29px; }
+.trial-pane .sample-fix { font-size: var(--fs-body); }
 .trial-pane .sample-why { font-size: 12.5px; max-width: 44ch; }
 
 /* Boşluğun KENDİSİ kanıt — ama boş bırakılmıyor, söyleniyor. */
@@ -2875,67 +2885,110 @@ textarea:focus-visible,
 }
 .sample-silent b { color: var(--accent); font-weight: 620; }
 
-/* ── şerit 3 · MEKANİZMA · hat kenardan kenara ────────────────────── */
-.mech {
-  --hairline: var(--mech-line);
-  --ink-2: var(--mech-ink-2);
-  --ink-3: var(--mech-ink-3);
-  --model: var(--mech-model);
-  background: var(--mech);
-  border-bottom: 1px solid var(--mech-line);
-  padding-block: clamp(36px, 5vw, 72px);
-  row-gap: clamp(18px, 2.2vw, 28px);
+/*
+ * PAY KAPALIYKEN BÖLME TEK SÜTUN.
+ *
+ * `var(--hang)` 0 olunca künye ve rakam sıfır genişlikte bir sütuna sıkışıyor:
+ * ÖLÇÜLDÜ, 390px'te bulgu bloğu 648 yerine 125px'e düşüyordu. `display: none`
+ * YOK, `order` YOK — yalnızca sütun sayısı ve satır numaraları değişiyor,
+ * okuma sırası DOM sırasının aynısı kalıyor.
+ */
+@media (max-width: 1239px) {
+  .trial-pane.is-broken { grid-template-columns: minmax(0, 1fr); }
+  .trial-pane.is-broken .sample-head {
+    grid-column: 1;
+    grid-row: 1;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--v2);
+  }
+  .trial-pane.is-broken .sample-text { grid-column: 1; grid-row: 2; }
+  .trial-pane.is-broken .slots { grid-column: 1; grid-row: 3; }
+  .trial-pane.is-broken .sample-findings { grid-column: 1; grid-row: 4; }
 }
-.mech > .move-h { grid-column: rail-start / mid; grid-row: 1; }
+
+/* ── şerit 3 · MEKANİZMA · hat kenardan kenara ────────────────────── */
+/*
+ * NANE ZEMİN VE JETON DEVRİ SİLİNDİ. Zemin, dikiş 0px olduğu için tek ayrım
+ * taşıyıcısıydı; dikiş 96 olunca tek işi altıncı sert kenar olmak kalıyordu.
+ *
+ * Bu bölüm iki gün içinde ÜÇ zemin denedi — lavanta reddedildi, koyu kil
+ * reddedildi, nane. Üç turda kendi yüzeyini bulamayan bir bölümün ihtiyacı
+ * yüzey değil YER'di. Aldığı yer: ölçüm payındaki kendi sayısı.
+ */
+.mech {
+  background: none;
+  border-bottom: 0;
+  padding-block: 0;
+  row-gap: var(--v3);
+}
+.mech-hang { grid-column: rail-start / mid; grid-row: 1; }
+.mech > .move-h {
+  grid-column: read-start / mid;
+  grid-row: 1;
+  /* Sayfadaki hızlı vuruş: 40px değil 30px. `--fs-move` böylece sayfada TAM
+     BİR KEZ görünüyor. */
+  font-size: var(--fs-move-2);
+  max-width: 16ch;
+}
 /* Tek taban çizgisinde başlık + alt cümle: bu ritmi başka hiçbir şerit
    kullanmıyor. 260px'lik alçak şerit iki yavaş şerit arasındaki hızlı vuruş. */
 .mech > .move-sub {
-  grid-column: mid / rail-end;
-  grid-row: 1;
-  align-self: end;
-  margin: 0;
-  padding-left: clamp(24px, 3vw, 52px);
+  grid-column: read-start / mid;
+  grid-row: 2;
+  align-self: start;
+  padding-left: 0;
+  max-width: 52ch;
 }
-.mech-rail { grid-column: rail-start / rail-end; grid-row: 2; }
 /*
- * Çizim ile hücreler AYNI sütun boşluğunu kullanmak zorunda. Eşleşmediğinde
- * ÖLÇÜLDÜ: istasyonlar kendi hücrelerinin ortasından 10px'e kadar kayıyordu.
+ * ÇİZGİ KÂĞIDIN KENARINDAN ÇIKAR, SAYI ÇIKMAZ (1/2). Ray 216'dan 1440'a
+ * gidiyor, hücreler 1368'de duruyor. Cetvelin çentikleri kenardan taşar; okunan
+ * sayı taşmaz. İstasyon noktaları hücre ızgarasında kaldığı için hizalama
+ * bozulmuyor — o kusur bir kez ölçülmüştü (10px kayma).
  */
-.mech .pipe-flow { column-gap: clamp(14px, 2vw, 24px); }
+.mech-rail {
+  grid-column: read-start / bleed-end;
+  grid-row: 3;
+  padding-right: var(--rail);
+}
+.mech .flow-rail { inset-inline: 0 calc(-1 * var(--rail)); }
 
-/* Kart kabuğu düşüyor: bu bir sergi parçası değil, aletin omurgası. */
+/*
+ * KART KABUĞU DÜŞÜYOR: bu bir sergi parçası değil, aletin omurgası.
+ *
+ * `.pipe` temel kuralı `background: var(--hairline)` + `gap: 1px` ile ayırıcı
+ * üretiyor; bu bölümde ayrımı gerçek kenarlıklar yapıyor. Kabuk silinmezse
+ * hücrelerin zemini saç teli rengi kalıyor ve ÖLÇÜLDÜ: mürekkep 3,61–4,04:1'e
+ * düşüyor, taban 4,5.
+ *
+ * 481–820px arasında ızgara iki sütuna düşüyor ve orada iki METİN sütunu hiç
+ * boşluk bırakmadan yan yana geliyordu. Satır boşluğu sıfır kalıyor, sütun
+ * boşluğu değil — `gap` KISAYOLU YAZILAMAZ, ikisini birden sıfırlar.
+ */
 .mech .pipe {
   border: 0;
   border-radius: 0;
   box-shadow: none;
-  /*
-   * 481–820px arasında ızgara iki sütuna düşüyor ve orada iki METİN sütunu
-   * hiç boşluk bırakmadan yan yana geliyordu. Satır boşluğu sıfır kalıyor
-   * (şeritler dikişsiz buluşsun diye), sütun boşluğu değil.
-   */
   background: none;
-  /*
-   * `gap` KISAYOLU SİLİNDİ. Burada önce `column-gap` yazılıp arkasından
-   * `gap: 0` geliyordu; kısayol sütun boşluğunu da sıfırlıyor, yani yukarıdaki
-   * yorumun anlattığı düzeltme sessizce geri alınmıştı — 481–820px arasında iki
-   * METİN sütunu yine hiç boşluk bırakmadan yan yana geliyordu.
-   */
+  overflow: visible;
   column-gap: clamp(14px, 2vw, 24px);
   row-gap: 0;
-  overflow: visible;
 }
 .mech .pipe-cell {
   background: none;
   box-shadow: none;
-  padding: 22px clamp(14px, 1.6vw, 26px) 24px;
+  padding: var(--v3) 18px var(--v3);
   border-left: 1px solid var(--hairline);
 }
 .mech .pipe-cell:first-child { border-left: 0; padding-left: 0; }
 .mech .pipe-cell:last-child { padding-right: 0; }
 /* `--model` moru olduğu gibi: burada gerçekten "bunu bir model üretti" diyor. */
 .mech .pipe-cell.is-ai { background: color-mix(in srgb, var(--model) 6%, transparent); }
-.mech .pipe-name { font-size: 15px; }
-.mech .pipe-what { font-size: 12.5px; }
+.mech .pipe-code { font-size: var(--fs-micro); }
+.mech .pipe-tag { font-size: var(--fs-micro); }
+.mech .pipe-name { font-size: var(--fs-body); }
+.mech .pipe-what { font-size: var(--fs-small); }
 @media (max-width: 820px) {
   /*
    * İki sütuna düşünce dikey ayraç anlamını yitiriyor — ama sol boşluk
@@ -2952,11 +3005,7 @@ textarea:focus-visible,
 
 /* ── şerit 4 · ÖLÇÜM ──────────────────────────────────────────────── */
 .measure {
-  /*
-   * Jetonlar BÖLÜM İÇİNDE yeniden tanımlanıyor. Böylece var olan bütün
-   * `.proof-*` kuralları tek satır değişmeden bandın paletinde çalışıyor —
-   * ikinci bir "koyu varyant" dili yazılmıyor.
-   */
+  /* 9. KURAL: kendi zemini olan bölüm kendi jetonlarını da alıyor. */
   --ink: var(--band-ink);
   --ink-2: var(--band-ink-2);
   --ink-3: var(--band-ink-3);
@@ -2965,28 +3014,22 @@ textarea:focus-visible,
   --surface-2: var(--band-hover);
 
   background: var(--band);
-  /*
-   * `color` AÇIKÇA yazılmak zorunda. Devralma jetonu değil ÇÖZÜLMÜŞ RENGİ
-   * taşıyor: `body`deki `color: var(--ink)` gövde seviyesinde #14171a'ya
-   * çözülüyor ve `.measure`da `--ink`i yeniden tanımlamak o mirası
-   * değiştirmiyor. ÖLÇÜLDÜ: başlık koyu bantta 1,02:1 kalmıştı.
-   */
+  /* `color` AÇIKÇA: devralma jetonu değil ÇÖZÜLMÜŞ rengi taşıyor. Bu ders iki
+     kez ölçüldü — 1,02:1 ve 1,04:1. */
   color: var(--ink);
   border-bottom: 0;
-  /*
-   * Nefes payı komşusunun ~1,8 katı (`.mech` 36–72). Zemin değişip dolgu
-   * değişmezse göz zemin değişimini kaza sanıyor.
-   */
-  padding-block: clamp(64px, 9vw, 128px) 0;
-  row-gap: clamp(18px, 2.2vw, 30px);
+  padding-block: var(--v5);
+  row-gap: 0;
 }
+/* Sarmalayıcıya taşındı: `.land` artık ızgara ve koşum yoksa boş bir satır
+   96px ölü kâğıt bırakırdı. */
+.measure-hold:not(:has(.proof-grid)) { display: none; }
 /*
  * KOŞUM YOKSA ŞERİT HİÇ ÇİZİLMİYOR. `Proof` hata hâlinde `null` dönüyor;
  * şerit kendi h2'sini taşıdığı için `:empty` eşleşmez — parçaya bakılıyor.
  * Ölçülmemiş bir sayı göstermemek gibi, ölçülmemiş bir başlık da
  * gösterilmiyor.
  */
-.measure:not(:has(.proof-grid)) { display: none; }
 
 /*
  * EKSEN KAYIYOR. `.mech` ile `.measure` bugüne kadar BİREBİR AYNI beş
@@ -2995,62 +3038,70 @@ textarea:focus-visible,
  * şikâyeti bir his değil, kopyalanmış bir bloktu. Bant kendi eksenini
  * kuruyor: tek sütun, ortalı, alt alta.
  */
+/*
+ * ORTALAMA GİDİYOR. Göz ilk üç bölüm boyunca 216'da bir dikey çizgi öğreniyor;
+ * burada onu kaybediyordu. Ve bandın başlığı ÖLÇÜMÜN KENDİSİ (108px): h2
+ * semantiği duruyor, sesi aletin kazınmış etiketine iniyor.
+ */
 .measure > .move-h {
-  grid-column: rail-start / rail-end;
+  grid-column: read-start / mid;
   grid-row: 1;
-  justify-self: center;
-  text-align: center;
-  max-width: 24ch;
+  justify-self: start;
+  text-align: start;
+  max-width: none;
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 .measure > .move-sub {
-  grid-column: rail-start / rail-end;
+  grid-column: read-start / mid;
   grid-row: 2;
-  justify-self: center;
-  text-align: center;
-  max-width: 62ch;
-  margin: 0;
+  justify-self: start;
+  text-align: start;
+  max-width: 52ch;
+  margin-top: var(--v3);
   padding-left: 0;
 }
 
-.measure > .proof-grid {
-  grid-column: rail-start / rail-end;
-  grid-row: 3;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  gap: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-}
+/*
+ * Dört hücre doğrudan BANDIN ızgarasına oturuyor ki `mid` 864'te kalsın. Kendi
+ * 7/5'ini kursaydı bölünme 828'e düşer ve sayfanın sağ ekseni ikiye ayrılırdı.
+ * `.proof-grid` rolsüz bir div, erişilebilirlik ağacında kayıp yok; öğe DOM'da
+ * durduğu için `:has(.proof-grid)` kontrolü çalışmaya devam ediyor.
+ *
+ * Yerleştirme AÇIK: bu dosyada otomatik yerleşim bir kez sessizce kaymıştı.
+ */
+.measure > .proof-grid { display: contents; }
 .measure .proof-cell {
   background: none;
   box-shadow: none;
-  padding: 16px 0 20px;
+  padding: var(--v2) 0 var(--v3);
   border-top: 1px solid var(--hairline);
 }
-/* Açık yerleştirme: otomatik yerleşime bırakılırsa sessizce kayabiliyor. */
-.measure .proof-cell:not(.is-lead) {
-  grid-column: 2;
-  padding-left: clamp(28px, 3vw, 52px);
+.measure .proof-cell:nth-child(1) {
+  /* %4,9 ÖLÇÜM PAYINDAN başlıyor: payın üçüncü ve son sayısı. */
+  grid-column: rail-start / mid;
+  grid-row: 3 / span 3;
+  align-content: center;
+  border-top: 2px solid var(--accent);
+  padding: 0 var(--gut) var(--v4) 0;
+  margin-top: var(--v4);
+}
+/* ÇİZGİ KENARDAN ÇIKAR, SAYI ÇIKMAZ (2/2). Kural 864→1440, metin 1368'de. */
+.measure .proof-cell:nth-child(2),
+.measure .proof-cell:nth-child(3),
+.measure .proof-cell:nth-child(4) {
+  grid-column: mid / bleed-end;
+  padding-left: var(--gut);
+  padding-right: var(--rail);
   border-left: 1px solid var(--hairline);
 }
-/*
- * Kurşun hücre `--accent-wash` yıkamasını BIRAKIYOR: bu ölçekte gereksiz.
- * Kimliği 2px vurgu kuralı, vurgu rengi ve oranın KENDİSİ olan çubuk taşıyor —
- * bunlar zorlanmış renklerde de hayatta kalıyor, bir zemin yıkaması kalmıyor.
- */
-.measure .proof-cell.is-lead {
-  grid-column: 1;
-  grid-row: 1 / span 3;
-  /*
-   * `end` denendi ve reddedildi: sayı dibe yaslanınca üstünde ÖLÇÜLDÜ 160px'lik
-   * bir delik kalıyordu, ve koyu bantta o delik daha da görünür.
-   */
-  align-content: center;
-  background: none;
-  border-top: 2px solid var(--accent);
-  padding: 0 clamp(28px, 3vw, 52px) clamp(22px, 2.4vw, 34px) 0;
-}
+.measure .proof-cell:nth-child(2) { grid-row: 3; margin-top: var(--v4); }
+.measure .proof-cell:nth-child(3) { grid-row: 4; }
+.measure .proof-cell:nth-child(4) { grid-row: 5; }
 .measure .proof-cell.is-lead .proof-value {
   font-size: var(--fs-figure);
   line-height: 0.84;
@@ -3059,49 +3110,15 @@ textarea:focus-visible,
 /* ~340px'lik hücrenin dibinde %4,9 = 37px. Çubuk oranın KENDİSİ; sayacı
    sıfırdan çıkaran bir animasyon yok, gerekçesi :1690'da yazılı. */
 .measure .proof-cell.is-lead .proof-fill { height: 5px; }
-.measure .proof-label { color: var(--ink-2); }
+.measure .proof-label { color: var(--ink-2); font-size: var(--fs-micro); }
+.measure .proof-note { font-size: var(--fs-small); }
 
-/* ── şerit 4b · İTİRAF · kendi zemini, kendi genişliği, kendi sesi ─── */
-.measure > .proof-bands {
-  grid-column: bleed-start / mid;
-  grid-row: 4;
-  margin: 0;
-  background: var(--surface-2);
-  border-top: 1px solid var(--hairline);
-  padding: clamp(24px, 2.8vw, 38px) clamp(28px, 3vw, 52px) clamp(28px, 3.2vw, 42px) var(--rail);
-}
-.measure .proof-bands .meters {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px 22px;
-}
-.measure > .proof-weak {
-  grid-column: mid / bleed-end;
-  grid-row: 4;
-  margin: 0;
-  max-width: none;
-  align-self: stretch;
-  display: grid;
-  align-content: center;
-  background: var(--surface-2);
-  border-top: 1px solid var(--hairline);
-  border-left: 2px solid var(--error);
-  padding: clamp(24px, 2.8vw, 38px) var(--rail) clamp(28px, 3.2vw, 42px) clamp(24px, 3vw, 46px);
-  font-size: var(--fs-body);
-  line-height: 1.6;
-}
-/* İkisi de KOŞULLU. Bantlar yoksa (`run.levels` boş) itiraf tek başına tam
-   genişliğe açılıyor; itiraf yoksa (C1 %90'ı geçmiş) bantlar açılıyor.
-   Hiçbir gün yarısı boş bir şerit çıkmıyor. */
-.measure > .proof-grid + .proof-weak { grid-column: bleed-start / bleed-end; }
-.measure > .proof-bands:not(:has(+ .proof-weak)) {
-  grid-column: bleed-start / bleed-end;
-  padding-right: var(--rail);
-}
 .measure > .proof-source {
-  grid-column: rail-start / rail-end;
-  grid-row: 5;
-  margin: 0;
-  padding-bottom: clamp(26px, 3vw, 42px);
+  grid-column: read-start / rail-end;
+  grid-row: 6;
+  margin-top: var(--v4);              /* 90 → 32 */
+  padding-bottom: 0;
+  font-size: var(--fs-micro);
 }
 
 /* ── şerit 5 · KAPANIŞ · sayfadaki tek fotoğraf ───────────────────── */
@@ -3116,10 +3133,17 @@ textarea:focus-visible,
 .closing {
   position: relative;
   isolation: isolate;
-  min-height: clamp(340px, 38vw, 560px);
+  min-height: clamp(320px, 33vw, 475px);
   align-content: center;
-  padding-block: clamp(40px, 5vw, 72px);
+  padding-block: var(--v5);
   overflow: hidden;
+}
+@media (min-width: 861px) {
+  /* 9. KURALIN ÜÇÜNCÜ YERİ. Kendi zemini var (fotoğraf), o hâlde jetonlarını
+     kendi alt ağacında tanımlıyor; bugüne kadar renkler doğrudan yazılıydı ve
+     telefon kırılmasında tek tek geri boyanıyordu. İki temada da aynı, çünkü
+     altındaki fotoğraf iki temada da aynı — o yüzden tema bloklarına girmiyor. */
+  .closing { --ink: #241f18; --ink-2: #3b342a; --ink-3: #5c5348; }
 }
 .closing-photo {
   position: absolute;
@@ -3142,7 +3166,7 @@ textarea:focus-visible,
   grid-column: mid / rail-end;
   display: grid;
   justify-items: start;
-  gap: 18px;
+  gap: var(--v3);
 }
 .closing-say > * { margin: 0; max-width: 24ch; }
 /* Künye tek satır kalmalı: 24ch onu "KAYITLAR / DEĞİŞTİRİLEMEZ" diye bölüyordu. */
@@ -3152,12 +3176,12 @@ textarea:focus-visible,
  * değil doğrudan: bant kendi ışığını taşıyor ve iki temada da açık kâğıt.
  */
 .closing .move-h {
+  color: var(--ink);
   font-family: var(--serif);
   font-weight: 400;
   font-size: clamp(30px, 3.4vw, 48px);
   line-height: 1.16;
   letter-spacing: -0.014em;
-  color: #241f18;
 }
 .closing .claim-actions { padding-top: 0; }
 .close-note {
@@ -3165,7 +3189,7 @@ textarea:focus-visible,
   font-size: var(--fs-micro);
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: #5c5348;
+  color: var(--ink-3);
 }
 
 /*
@@ -3199,9 +3223,12 @@ textarea:focus-visible,
 }
 
 .land-foot {
-  background: var(--plane);
-  border-top: 1px solid var(--hairline);
-  padding-block: 20px 28px;
+  background: none;
+  border-top: 0;
+  /* KAPANIŞ TEK NESNE: fotoğraf ile künye arasında 0px, bilerek. Sayfanın kendi
+     ritmini anlam için kırdığı tek yer, ve bir kez. */
+  margin-top: calc(-1 * var(--v5));
+  padding-block: var(--v3) var(--v4);
   font-family: var(--mono);
   font-size: var(--fs-micro);
   letter-spacing: 0.13em;
@@ -3259,11 +3286,6 @@ textarea:focus-visible,
   .slot { forced-color-adjust: none; background: Canvas; outline: 1px solid CanvasText; outline-offset: -1px; }
   .slot.is-hit { background: Highlight; }
 
-  .measure .proof-cell.is-lead { border-top-width: 3px; }
-  .measure > .proof-weak { border-left-width: 3px; }
-  .sample-silent { border-top-width: 2px; }
-}
-
 /* SİLİNİYOR (grep edildi, yalnızca `app/page.tsx` kullanıyor, `public-shots.mjs`
    hiçbir seçiciye bağlı değil): `.land`in eski gövdesi, `.land-section`,
    `.land-h`, `.land-sub`, `.land-cta`, `.hero`, `.hero-kicker`, `.hero-lede`,
@@ -3271,6 +3293,7 @@ textarea:focus-visible,
    `` satırı.
    KALIYOR: `.hero-title` (gövdesi artık yalnız fiil) ve `.hero-was` (öncül). */
 
+}
 
 /* ── 860px altı: aynı ızgara tek sütuna, HİÇBİR ŞEY silinmeden ─────
  *
@@ -3288,9 +3311,10 @@ textarea:focus-visible,
   .move {
     grid-template-columns:
       [bleed-start] var(--rail)
-      [rail-start] minmax(0, 1fr)
+      [rail-start] 0
+      [read-start] minmax(0, 1fr)
       [mid] 0 [rail-end] var(--rail) [bleed-end];
-    row-gap: 18px;
+    row-gap: var(--v3);
   }
 
   /* Ray satırı ve altbilgi esnek satıra dönüyor: 0px'lik orta iz iki öğeyi
@@ -3306,18 +3330,19 @@ textarea:focus-visible,
 
   /* Sağ sütunda duran her şey akışa geri dönüyor, SIRASI korunarak. */
   .claim-plate,
-  .mech > .move-sub,
+  .trial > .move-sub,
+  .mech-hang,
   .measure > .move-sub {
-    grid-column: rail-start / mid;
+    grid-column: read-start / mid;
     grid-row: auto;
     align-self: start;
-    padding-left: 16px;   /* çizgi kalıyor, daralıyor */
+    padding-left: 0;
   }
   /*
    * Tek sütunda araya konmuş nefes GEREKSİZ: masaüstünde iki nesneyi 460px'lik
    * bir hücrede birbirinden ayırmak içindi, burada zaten alt alta duruyorlar.
    */
-  .claim-plate { grid-template-rows: auto auto; row-gap: 22px; }
+  .claim-plate { grid-template-rows: auto auto; row-gap: var(--v3); }
   .claim-thesis { grid-row: auto; margin: 0; }
   .claim-actions .btn { width: 100%; justify-content: center; }
 
@@ -3344,51 +3369,23 @@ textarea:focus-visible,
   }
   .trial-pane.is-broken .sample-findings { grid-template-columns: minmax(0, 1fr); }
 
-  /* Ölçüm: dev rakam üstte, defter altında, tek sütun. */
-  .measure > .proof-grid { grid-template-columns: minmax(0, 1fr); }
-  .measure .proof-cell.is-lead {
-    grid-column: 1;
+  /*
+   * Ölçüm: dört hücre tek sütuna, hepsi okuma sütununda. Masaüstünde ikisi
+   * `mid / bleed-end` ile kenardan çıkıyor; burada çıkarlarsa sayfa taşar —
+   * ÖLÇÜLDÜ, 390px'te 25 piksel.
+   */
+  .measure .proof-cell:nth-child(1),
+  .measure .proof-cell:nth-child(2),
+  .measure .proof-cell:nth-child(3),
+  .measure .proof-cell:nth-child(4) {
+    grid-column: read-start / mid;
     grid-row: auto;
-    padding-right: 0;
-    padding-bottom: 24px;
-  }
-  .measure .proof-cell:not(.is-lead) {
-    grid-column: 1;
-    padding-left: 0;
+    padding-inline: 0;
     border-left: 0;
+    margin-top: 0;
   }
-
-  /* İtiraf tek blok: hata kuralı sola geçiyor. */
-  .measure > .proof-bands {
-    grid-column: bleed-start / bleed-end;
-    grid-row: auto;
-    padding: 26px var(--rail) 6px;
-  }
-  .measure .proof-bands .meters { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-  .measure > .proof-weak {
-    grid-column: bleed-start / bleed-end;
-    grid-row: auto;
-    border-top: 0;
-    border-left: 0;
-    border-inline-start: 2px solid var(--error);
-    margin-inline: var(--rail);
-    padding: 16px var(--rail) 28px 14px;
-  }
-  .measure > .proof-source { grid-row: auto; }
-}
-
-/* ── tek kart üstünde duran sayfalar ──────────────────────────────── */
-/*
- * `/error` ve `/not-found` bu sınıfları kullanıyor ve ikisinin de BUGÜNE
- * KADAR hiç kuralı yoktu — iki sayfa da çıplak çıkıyordu. Giriş ve kayıt
- * artık burada değil: onlar `.gate` levhasında oturuyor.
- */
-.auth {
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: clamp(20px, 5vw, 48px);
-  background: var(--plane);
+  .measure .proof-cell:nth-child(1) { align-content: start; }
+  .measure > .proof-source { grid-column: read-start / mid; grid-row: auto; }
 }
 .auth-card {
   width: 100%;
@@ -3822,15 +3819,29 @@ textarea:focus-visible,
   from {
     opacity: 0;
   }
+  /*
+   * `to` AÇIKÇA YAZILI. Örtük bırakıldığında ÖLÇÜLDÜ: dördüncü hücrenin sayısı
+   * (`41`) animasyon "finished" durumdayken bile `opacity: 0`da kalıyordu —
+   * ekranda ölçülmüş bir sayının yeri boş duruyordu. 1ms'lik `steps(1, end)` ile
+   * örtük `to`nun çözülmesi tarayıcıya kalıyor; açık yazmak belirsizliği
+   * kapatıyor.
+   */
+  to {
+    opacity: 1;
+  }
 }
 [data-play="1"] .proof-value {
-  animation: value-latch 1ms steps(1, end) both;
+  /*
+   * `steps(1, end)` DEĞİL. O zamanlama fonksiyonunda bitiş değerinin nasıl
+   * çözüleceği belirsiz kalıyor ve ÖLÇÜLDÜ: dördüncü hücrenin sayısı (`41`)
+   * animasyon "finished" durumdayken bile `opacity: 0`da kalıyordu. Sayfada
+   * ölçülmüş bir sayının yeri boş duruyordu. 1ms'lik doğrusal geçiş gözle
+   * ayırt edilemiyor — mandal yine mandal — ama bitişi kesin.
+   */
+  animation: value-latch 1ms linear both;
   animation-delay: calc(var(--t-enter, 0ms) + var(--i) * 140ms + 640ms);
 }
 /* Zayıf yer cümlesi en sona, tek başına: iyi sayıların arasında kaybolmasın. */
-[data-play="1"] .proof-weak {
-  animation: weak-in 520ms var(--ease-out) both calc(var(--t-enter, 0ms) + 1200ms);
-}
 @keyframes weak-in {
   from {
     opacity: 0;
@@ -3843,18 +3854,6 @@ textarea:focus-visible,
 }
 [data-play="1"] .proof-source {
   animation: fade-rise 320ms var(--ease-out) both calc(var(--t-enter, 0ms) + 1600ms);
-}
-
-.proof-bands {
-  margin-top: 20px;
-}
-.proof-bands-cap {
-  margin: 0 0 10px;
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-2);
 }
 
 /* ── beş katman sırayla yanıyor ───────────────────────────────────── */
@@ -5199,12 +5198,6 @@ textarea:focus-visible,
 [data-play="1"] .flow-node.is-ai {
   animation-name: flow-hit-ai;
 }
-
-[data-play="1"] .proof-bands .meter-fill {
-  animation: fill-to 620ms var(--ease-out) both;
-  animation-delay: calc(var(--t-enter, 0ms) + 560ms + var(--i) * 90ms);
-}
-
 
 /* Seviyesi hiç ölçülmemiş kayıt. */
 .level-none {

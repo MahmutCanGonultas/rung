@@ -80,6 +80,7 @@ export function SampleAnalysis({
   variant = "broken",
   part = "both",
   open = "first",
+  tag = true,
 }: {
   /*
    * `read` okuma şeridi, `shelf` bulgu rafı, `both` ikisi.
@@ -105,6 +106,12 @@ export function SampleAnalysis({
    * kuralı "ekranda maket bir şey yok" ve ayrışma tam da onu deliyor.
    */
   open?: "first" | "all";
+  /*
+   * Temiz bölmede künye render EDİLMİYOR: aynı dizge solda zaten duruyor ve
+   * bölümün alt cümlesi de "model çağrısı yok" diyor. CSS ile GİZLENMİYOR —
+   * öğe hiç üretilmiyor, yani telefonda da yok.
+   */
+  tag?: boolean;
 }) {
   const { text, findings } = showcaseAnalysis(variant);
   const parts = segment(text, findings);
@@ -123,7 +130,9 @@ export function SampleAnalysis({
       style={{ "--n": String(findings.length) } as CSSProperties}
     >
       <div className="sample-head">
-        <span className="sample-tag">K0 · deterministik · model yok</span>
+        {tag ? (
+          <span className="sample-tag">K0 · deterministik · model yok</span>
+        ) : null}
         <span className="sample-count">
           {/* Sayı kendi öğesinde: duruşma şeridi onu 52px'e çıkarıyor,
               başka hiçbir yerde ölçüsü değişmiyor. */}

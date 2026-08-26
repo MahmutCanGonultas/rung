@@ -5,7 +5,7 @@ import foto from "../docs/shots/rung-foto.png";
 
 import { Mark } from "./components/Mark";
 import { InView } from "./components/showcase/InView";
-import { Pipeline } from "./components/showcase/Pipeline";
+import { LAYERS, Pipeline } from "./components/showcase/Pipeline";
 import { Proof } from "./components/showcase/Proof";
 import { SampleAnalysis } from "./components/showcase/SampleAnalysis";
 import { FalseAlarm } from "./components/showcase/FalseAlarm";
@@ -34,6 +34,13 @@ import { getSessionUser } from "./lib/session";
  */
 export default async function HomePage() {
   const user = await getSessionUser();
+
+  /*
+   * Ölçüm payındaki ikinci sayı. `LAYERS`ten render anında sayılıyor: bir
+   * katman eklenirse ya da bir katman modele geçerse sayı kendiliğinden
+   * değişiyor. Payda ölçülmemiş bir şey duramaz.
+   */
+  const modelsiz = LAYERS.filter((l) => !l.model).length;
 
   return (
     <main className="land" id="main">
@@ -140,41 +147,40 @@ export default async function HomePage() {
       </section>
 
       <section className="move trial" aria-labelledby="trial-h">
-        {/*
-          Başlık ve alt cümle KENDİ LEVHASINDA. Şeridin kâğıdının üstünde
-          serbest dururken üçü — başlık, cümle, bölmeler — üst üste yazılmış
-          gibi okunuyordu. Levha onları tek nesne yapıyor ve aşağıdaki iki
-          kâğıttan ayırıyor.
-        */}
-        <div className="trial-head">
-          <h2 className="move-h" id="trial-h">
-            Aynı motor, iki cümle
-          </h2>
-          <p className="move-sub">
-            İkisi de bu sayfa açılırken gerçek K0 katmanından geçti — maket
-            değil. Model çağrısı yok: aynı metin her zaman aynı sonucu veriyor.
-          </p>
-        </div>
+        <h2 className="move-h" id="trial-h">
+          Aynı motor, iki cümle
+        </h2>
+        <p className="move-sub">
+          İkisi de bu sayfa açılırken gerçek K0 katmanından geçti — maket
+          değil. Model çağrısı yok: aynı metin her zaman aynı sonucu veriyor.
+        </p>
 
-        {/*
-          İki ayrı gözlemci: masaüstünde yan yana oldukları için birlikte,
-          telefonda alt alta oldukları için ayrı ayrı ateşleniyorlar.
-        */}
         <InView className="trial-pane is-broken">
           <SampleAnalysis variant="broken" />
         </InView>
         <InView className="trial-pane is-clean">
-          <SampleAnalysis variant="clean" />
+          <SampleAnalysis variant="clean" tag={false} />
         </InView>
       </section>
 
       <section className="move mech" aria-labelledby="mech-h">
+        {/*
+          Pay bloğu DOM'da BAŞLIKTAN ÖNCE: görsel sıra ile okuma sırası aynı
+          kalsın diye — `.claim-kicker` ile aynı kalıp.
+
+          "Beş katmanın üçü model kullanmıyor." cümlesi SİLİNDİ: pay onu sayı
+          olarak söylüyor ve iki kez söylemek teşhisin şikâyet ettiği tekrarın
+          ta kendisi.
+        */}
+        <p className="mech-hang hang-fig">
+          <b>{modelsiz}</b>
+          <i>model kullanmayan katman</i>
+        </p>
         <h2 className="move-h" id="mech-h">
           Sessiz kalabilmesinin sebebi
         </h2>
         <p className="move-sub">
-          Beş katmanın üçü model kullanmıyor. Neyin modele verilmeyeceğini
-          bilmek, model çağırabilmekten daha zor.
+          Neyin modele verilmeyeceğini bilmek, model çağırabilmekten daha zor.
         </p>
         <InView className="mech-rail">
           <Pipeline />
@@ -186,7 +192,7 @@ export default async function HomePage() {
         zorunda: dört parça ızgaranın doğrudan çocuğu oluyor. Yer imi için
         dıştan sarılıyor.
       */}
-      <section aria-labelledby="measure-h">
+      <section className="measure-hold" aria-labelledby="measure-h">
         <InView className="move measure">
           <h2 className="move-h" id="measure-h">
             Ve kendi doğruluğunu ölçüyor

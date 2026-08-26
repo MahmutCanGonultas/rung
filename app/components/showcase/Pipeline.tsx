@@ -7,7 +7,7 @@ import type { CSSProperties } from "react";
  * Mor olanlar modele giden iki katman — göz bir bakışta ayırsın diye.
  */
 
-const LAYERS = [
+export const LAYERS = [
   {
     code: "K0",
     name: "Deterministik",
