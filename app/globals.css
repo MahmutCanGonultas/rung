@@ -1706,7 +1706,6 @@ textarea:focus-visible,
   [data-play] *::before,
   [data-play] *::after,
   .sample-text::before,
-  .pipe::after,
   .btn-primary:disabled::after {
     animation: none !important;
   }
@@ -1842,6 +1841,61 @@ textarea:focus-visible,
   border-radius: var(--r-md);
   overflow: hidden;
 }
+/* ── hat · akış çizimi ────────────────────────────────────────────── */
+/*
+ * Beş istasyonlu bir ray. Metin soldan giriyor, jeton rayda ilerliyor, geçtiği
+ * istasyon yanıyor. Modele giden iki istasyon mor halkalı — jeton `--model`
+ * jetonunun ürün genelindeki anlamını taşıyor: "bunu bir model üretti".
+ *
+ * Kahramandaki merdiven HACİMLİ, bu ÇİZGİSEL. Aynı sayfada iki farklı görsel
+ * dil olması bilerek: bölümler birbirine benzemesin.
+ */
+.pipe-wrap { display: grid; }
+.pipe-flow {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: center;
+  justify-items: center;
+  height: 62px;
+  margin-bottom: 2px;
+}
+.flow-rail {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--hairline);
+}
+.flow-node {
+  position: relative;
+  z-index: 1;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1.5px solid var(--ink-3);
+}
+.flow-node.is-ai {
+  border-color: var(--model);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--model) 15%, transparent);
+}
+/*
+ * Jeton BİTMİŞ KAREDE de duruyor — rayın girişinde, yani "metin buradan
+ * giriyor" diyor. Gizlenmiyor: hareket kapalıyken kaybolan bir şey olmasın.
+ */
+.flow-pulse {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
 .pipe-cell {
   background: var(--surface);
   padding: 16px 16px 14px;
@@ -2510,6 +2564,11 @@ textarea:focus-visible,
   padding-left: clamp(24px, 3vw, 52px);
 }
 .mech-rail { grid-column: rail-start / rail-end; grid-row: 2; }
+/*
+ * Çizim ile hücreler AYNI sütun boşluğunu kullanmak zorunda. Eşleşmediğinde
+ * ÖLÇÜLDÜ: istasyonlar kendi hücrelerinin ortasından 10px'e kadar kayıyordu.
+ */
+.mech .pipe-flow { column-gap: clamp(14px, 2vw, 24px); }
 
 /* Kart kabuğu düşüyor: bu bir sergi parçası değil, aletin omurgası. */
 .mech .pipe {
@@ -2521,10 +2580,15 @@ textarea:focus-visible,
    * hiç boşluk bırakmadan yan yana geliyordu. Satır boşluğu sıfır kalıyor
    * (şeritler dikişsiz buluşsun diye), sütun boşluğu değil.
    */
+  background: none;
+  /*
+   * `gap` KISAYOLU SİLİNDİ. Burada önce `column-gap` yazılıp arkasından
+   * `gap: 0` geliyordu; kısayol sütun boşluğunu da sıfırlıyor, yani yukarıdaki
+   * yorumun anlattığı düzeltme sessizce geri alınmıştı — 481–820px arasında iki
+   * METİN sütunu yine hiç boşluk bırakmadan yan yana geliyordu.
+   */
   column-gap: clamp(14px, 2vw, 24px);
   row-gap: 0;
-  background: none;
-  gap: 0;
   overflow: visible;
 }
 .mech .pipe-cell {
@@ -2773,6 +2837,12 @@ textarea:focus-visible,
   }
   .model-ground { display: none; }
   .model-scale span { color: CanvasText; }
+
+  /* Akış çizimi: halka ve ray çizgiyle taşınıyor, dolgu ve gölge düşüyor. */
+  .flow-node { forced-color-adjust: none; background: Canvas; border-color: CanvasText; box-shadow: none; }
+  .flow-node.is-ai { border-style: double; border-width: 4px; }
+  .flow-rail { background: CanvasText; }
+  .flow-pulse { forced-color-adjust: none; background: Highlight; }
 
   .measure .proof-cell.is-lead { border-top-width: 3px; }
   .measure > .proof-weak { border-left-width: 3px; }
@@ -3354,36 +3424,15 @@ textarea:focus-visible,
 .pipe {
   position: relative;
 }
-[data-play="1"] .pipe::after {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  top: 0;
-  height: 2px;
-  z-index: 1;
-  pointer-events: none;
-  background-image: linear-gradient(
-    90deg,
-    transparent 0 calc(100% - 44px),
-    var(--accent) calc(100% - 44px) 100%
-  );
-  background-repeat: no-repeat;
-  background-size: 0% 100%;
-  animation: pipe-flow 1600ms linear both;
-}
-@keyframes pipe-flow {
-  from {
-    background-size: 0% 100%;
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  to {
-    background-size: 100% 100%;
-    opacity: 0;
-  }
-}
+/*
+ * ESKİ YATAY SÜPÜRME KALDIRILDI. `.pipe::after` hattın üst kenarında 2px'lik
+ * bir ışık yürütüyordu. Artık hattın ÜSTÜNDE gerçek bir akış çizimi var ve
+ * rayda ilerleyen jeton aynı fikri daha açık anlatıyor. İkisi birlikte
+ * dursaydı, birkaç piksel arayla paralel iki çizgi olurdu — biri diğerinin
+ * tekrarı. Hücre içi iz (`.pipe-cell::before`) duruyor: o, ışığın hangi
+ * hücreye vardığını hücrenin KENDİ üstünde gösteriyor.
+ */
+
 /*
  * Işık geçtiği yerde İZ bırakıyor — hücre metninin saydamlığı DEĞİŞMİYOR.
  *
@@ -3410,65 +3459,35 @@ textarea:focus-visible,
   background: var(--hairline);
   transform-origin: left;
 }
-@keyframes arm-x {
-  from {
-    transform: scaleX(0);
-    background: var(--accent);
-  }
-}
-@keyframes arm-y {
-  from {
-    transform: scaleY(0);
-    background: var(--accent);
-  }
-}
-[data-play="1"] .pipe-cell::before {
-  animation: arm-x var(--t-cell, 320ms) var(--ease-out) both;
-  animation-delay: calc(var(--i) * var(--t-cell, 320ms));
-}
+/*
+ * HÜCRE İÇİ ARMA İZİ KALDIRILDI (hareket olarak; çizgi duruyor).
+ *
+ * `.pipe-cell::before` sırayla vurgu renginde açılıyordu. Hattın ÜSTÜNDE artık
+ * gerçek bir akış rayı var ve aynı fikri — "metin katmanlardan sırayla geçiyor"
+ * — daha açık anlatıyor. İkisi birlikte, iki piksel arayla paralel iki ışıktı.
+ *
+ * ÖLÇÜLDÜ, ve bakarak değil pikselden: ekran görüntüsünde hücre üst kenarında
+ * 82 piksel genişliğinde bir yeşil parça duruyordu — `getComputedStyle` saç
+ * teli rengi bildirdiği hâlde. Yarım kalmış bir kare, rayın hemen altında,
+ * hiçbir şey anlatmadan.
+ *
+ * `.pipe-cell::before` KURALI DURUYOR: kartsız bir hattın ihtiyacı olan üst
+ * çizgi o, ve `.step-rail` onu dikey çevirerek kullanıyor.
+ */
+
 
 /*
- * 820px altında ızgara iki, sonra tek sütuna düşüyor. Işığı SİLMEK yerine 90°
- * ÇEVİRİYORUZ: "metin beş katmandan sırayla geçiyor" fikrini anlatan tek
- * grafik oydu ve telefonda tamamen kayboluyordu.
- *
- * Temel kural `[data-play="1"] .pipe::after` (0,2,1). Buraya çıplak
- * `.pipe::after` (0,1,1) yazılırsa sessizce hiçbir şey yapmaz.
+ * 820px altında hücreler iki, sonra tek sütuna düşüyor. Akış RAYI yatay
+ * kalıyor: beş istasyonluk çizim orada da okunuyor, yani "metin beş katmandan
+ * sırayla geçiyor" fikri telefonda kaybolmuyor. Eskiden bu fikri taşıyan tek
+ * grafik `.pipe::after` süpürmesiydi ve kaybolmamak için 90° çevrilmek
+ * zorundaydı; artık çevrilecek bir şey yok.
  */
-@keyframes pipe-flow-y {
-  from {
-    background-size: 100% 0%;
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  to {
-    background-size: 100% 100%;
-    opacity: 0;
-  }
-}
 @media (max-width: 820px) {
-  [data-play="1"] .pipe::after {
-    inset: 0 auto 0 0;
-    width: 2px;
-    height: auto;
-    background-image: linear-gradient(
-      180deg,
-      transparent 0 calc(100% - 44px),
-      var(--accent) calc(100% - 44px) 100%
-    );
-    background-size: 100% 0%;
-    animation-name: pipe-flow-y;
-  }
   .pipe-cell::before {
     inset: 0 auto 0 0;
     width: 2px;
     height: auto;
-    transform-origin: top;
-  }
-  [data-play="1"] .pipe-cell::before {
-    animation-name: arm-y;
   }
 }
 
@@ -4612,6 +4631,41 @@ textarea:focus-visible,
 }
 [data-play="1"] .model-stage {
   animation: model-orbit 19s ease-in-out 1.4s infinite;
+}
+
+/*
+ * Jeton rayı beş saniyede geçiyor; istasyon n, jeton üstünden geçerken yanıyor.
+ * İstasyon n rayın (2n+1)/10'unda duruyor, yani 0,5s + n × 1s.
+ *
+ * Bu hareket AÇIKLIYOR, süslemiyor: bölümün tek cümlesi "metin beş katmandan
+ * sırayla geçiyor" ve çizim tam olarak onu gösteriyor.
+ *
+ * BİTMİŞ KARE: ray, beş istasyon ve girişte duran jeton. Hiçbir bilgi
+ * yalnızca harekette değil.
+ */
+@keyframes flow-run {
+  0% { left: 0; }
+  100% { left: 100%; }
+}
+@keyframes flow-hit {
+  0%, 6% { border-color: var(--ink-3); transform: none; }
+  10%, 15% { border-color: var(--accent); transform: scale(1.5); }
+  22%, 100% { border-color: var(--ink-3); transform: none; }
+}
+@keyframes flow-hit-ai {
+  0%, 6% { border-color: var(--model); transform: none; }
+  10%, 15% { border-color: var(--model); transform: scale(1.5); }
+  22%, 100% { border-color: var(--model); transform: none; }
+}
+[data-play="1"] .flow-pulse {
+  animation: flow-run 5s linear 700ms infinite;
+}
+[data-play="1"] .flow-node {
+  animation: flow-hit 5s ease-out infinite;
+  animation-delay: calc(700ms + 500ms + var(--i) * 1000ms);
+}
+[data-play="1"] .flow-node.is-ai {
+  animation-name: flow-hit-ai;
 }
 
 [data-play="1"] .proof-bands .meter-fill {

@@ -42,21 +42,45 @@ const LAYERS = [
 
 export function Pipeline() {
   return (
-    <div className="pipe" aria-label="Analiz hattı: beş katman">
-      {LAYERS.map((layer, i) => (
-        <div
-          key={layer.code}
-          className={layer.model ? "pipe-cell is-ai" : "pipe-cell"}
-          style={{ "--i": String(i) } as CSSProperties}
-        >
-          <span className="pipe-code">{layer.code}</span>
-          <span className="pipe-name">{layer.name}</span>
-          <span className="pipe-what">{layer.what}</span>
-          <span className="pipe-tag">
-            {layer.model ? "model" : "yapay zekâ yok"}
-          </span>
-        </div>
-      ))}
+    <div className="pipe-wrap">
+      {/*
+        HAT'IN KENDİSİ, çizim olarak. Bu bölüm bugüne kadar beş sütun saf
+        metindi — ÖLÇÜLDÜ: 80 kelime, sıfır görsel nesne. Oysa anlattığı şey bir
+        AKIŞ: metin soldan giriyor, beş istasyondan geçiyor, bulgu çıkıyor.
+        Çizim o akışı gösteriyor; alttaki metin onu açıklıyor.
+
+        Süs değil: istasyon sayısı `LAYERS`ten, hangi ikisinin mor olduğu
+        `layer.model`den. Bir katman eklenirse raya istasyon eklenir.
+      */}
+      <div className="pipe-flow" aria-hidden="true">
+        <i className="flow-rail" />
+        {LAYERS.map((layer, i) => (
+          <i
+            key={layer.code}
+            className={layer.model ? "flow-node is-ai" : "flow-node"}
+            style={{ "--i": String(i) } as CSSProperties}
+          />
+        ))}
+        {/* Metnin kendisi: rayda ilerleyen jeton. */}
+        <i className="flow-pulse" />
+      </div>
+
+      <div className="pipe" aria-label="Analiz hattı: beş katman">
+        {LAYERS.map((layer, i) => (
+          <div
+            key={layer.code}
+            className={layer.model ? "pipe-cell is-ai" : "pipe-cell"}
+            style={{ "--i": String(i) } as CSSProperties}
+          >
+            <span className="pipe-code">{layer.code}</span>
+            <span className="pipe-name">{layer.name}</span>
+            <span className="pipe-what">{layer.what}</span>
+            <span className="pipe-tag">
+              {layer.model ? "model" : "yapay zekâ yok"}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
