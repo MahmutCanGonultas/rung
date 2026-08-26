@@ -150,36 +150,44 @@
   --trial-accent: #096a4a;
   /* Şeridin başlık levhası: markanın yeşili, koyu tonda. */
   /*
-   * MEKANİZMA ŞERİDİNİN KÂĞIDI — soğuk.
+   * MEKANİZMA ŞERİDİNİN KÂĞIDI.
    *
    * Sayfadaki tek kimliksiz bölümdü: zemini `--plane`, yani kahramanla aynı.
-   * Ton bölümün kendi anlamından geliyor — `--model` moru bu şeritte "bunu bir
-   * model üretti" diyen tek jeton — ama çok seyreltilmiş: beş katmanın ÜÇÜ
-   * model kullanmıyor, o yüzden şerit mor bir blok olamaz.
    *
-   * Ayrım DEĞERDEN değil SICAKLIKTAN geliyor. Açık paletin değer aralığı
-   * kalabalık (kâğıt 0,724 · temiz kâğıt 0,939 · plane 0,880) ve aralarına
-   * görünür bir kademe sığmıyor; sıcak bejden soğuk lavantaya geçiş ise tam
-   * genişlikte bir bantta okunuyor.
+   * SOĞUK LAVANTA DENENDİ VE REDDEDİLDİ. Fikir `--model` morundan türetmekti
+   * ama sayfaya yabancı düştü: bu sitenin bütün yüzeyleri sıcak kâğıt, tek
+   * soğuk yüzey her şeyden kopuyordu. Ayrımı sıcaklık farkına yıkmak da yanlış
+   * çıktı — mesele adım değil AİLE.
+   *
+   * Yeni ton kâğıdın kendisi, koyulaşmış hâli. Sayfa böylece bir rampa oluyor:
+   * kâğıt → koyu kil → siyaha yakın bant. Aynı malzeme, gitgide derinleşiyor.
    */
-  --mech: #e6e4ef;
-  --mech-line: #cfcbdd;
+  --mech: #d2c9b6;
+  --mech-line: #beb49f;
   /*
-   * Mor yıkanmış hücre (#d9d6ec) mürekkebi yutuyor. ÖLÇÜLDÜ: `--ink-3` orada
-   * 4,00:1'e, `--model` jetonu 4,32'ye düşüyordu; taban 4,5. Şerit kendi
-   * kâğıdını aldıysa kendi mürekkebini de alıyor — kâğıt ve bant şeridinde
-   * yapılanın aynısı.
+   * Kil zemin mürekkebi yutuyor; şerit kendi kâğıdını aldıysa kendi mürekkebini
+   * de alıyor — duruşma kâğıdı ve koyu bantta yapılanın aynısı.
    */
-  --mech-ink-3: #565f65;
-  --mech-model: #5544cc;
+  --mech-ink-2: #495359;
+  --mech-ink-3: #454c46;
+  --mech-model: #4534b8;
 
   --trial-head: #0f4d38;
   --trial-head-ink: #eef6f1;
   --trial-head-ink-2: #a9cabb;
 
-  --step-tread: #cdc7b7;
-  --step-riser: #ada695;
-  --step-side: #8b8474;
+  /*
+   * MODELİN MALZEMESİ. İlk palet kâğıda çok yakındı (kum taşı) ve model
+   * nesne gibi değil karton gibi okunuyordu. Daha derin ve daha soğuk bir
+   * grafit: kâğıttan ayrılıyor, üç yüz arasındaki fark artıyor, ve yanan
+   * basamağın yeşili üstünde daha çok patlıyor.
+   *
+   * Üç yüz arasındaki adım BİLEREK geniş: gerçek bir cismin üst yüzü ile yan
+   * yüzü arasındaki fark büyüktür, ve model o farkla katı görünüyor.
+   */
+  --step-tread: #b7b3a8;
+  --step-riser: #8a8579;
+  --step-side: #625d53;
   --step-lit-tread: #3fd7a2;
   --step-lit-riser: #0b7a55;
   --step-lit-side: #075b40;
@@ -188,8 +196,9 @@
    * taban 4,5. Nötr basamakta etiket KOYU, yanan basamakta AÇIK — çünkü yanan
    * basamağın ön yüzü koyu yeşil.
    */
-  --step-edge: rgba(255, 255, 255, 0.34);
-  --step-shadow: rgba(58, 50, 32, 0.26);
+  --step-edge: rgba(255, 255, 255, 0.46);
+  --step-shadow: rgba(48, 41, 26, 0.3);
+  --step-contact: rgba(34, 28, 17, 0.5);
 
   --band: #101613;
   --band-ink: #f2f5f2;
@@ -275,9 +284,12 @@
   --trial-clean: #232c34;
   --trial-ink-3: #8d98a1;
   --trial-accent: #35d39b;
-  --mech: #12141c;
-  --mech-line: #232538;
-  /* Koyu temada ölçüm zaten tabanın üstünde; jetonlar olduğu gibi. */
+  /*
+   * Koyu temada rampa ters yönde kuruluyor: mekanizma plane'e en yakın, sonra
+   * duruşma, sonra bant. Aşağı yer olmadığı için mesafe yukarıdan alınıyor.
+   */
+  --mech: #0f1114;
+  --mech-line: #232830;
   --mech-ink-3: #7f8b95;
   --mech-model: #9a8cf5;
 
@@ -285,14 +297,15 @@
   --trial-head-ink: #e8f4ed;
   --trial-head-ink-2: #97c2ae;
 
-  --step-tread: #2e3941;
-  --step-riser: #232c33;
-  --step-side: #1a2127;
+  --step-tread: #39444d;
+  --step-riser: #262f37;
+  --step-side: #171d23;
   --step-lit-tread: #62e8b8;
   --step-lit-riser: #35d39b;
   --step-lit-side: #1d8f68;
-  --step-edge: rgba(255, 255, 255, 0.11);
-  --step-shadow: rgba(0, 0, 0, 0.55);
+  --step-edge: rgba(255, 255, 255, 0.16);
+  --step-shadow: rgba(0, 0, 0, 0.5);
+  --step-contact: rgba(0, 0, 0, 0.7);
 
   --band: #242e35;
   --band-ink: #eef2f6;
@@ -366,9 +379,13 @@
   --trial-clean: #232c34;
   --trial-ink-3: #8d98a1;
   --trial-accent: #35d39b;
-  --mech: #12141c;
-  --mech-line: #232538;
-  /* Koyu temada ölçüm zaten tabanın üstünde; jetonlar olduğu gibi. */
+  /*
+   * Koyu temada rampa ters yönde: mekanizma plane'e en yakın, sonra duruşma,
+   * sonra bant. Aşağı yer olmadığı için mesafe yukarıdan alınıyor.
+   */
+  --mech: #0f1114;
+  --mech-line: #232830;
+  --mech-ink-2: #9aa7b1;
   --mech-ink-3: #7f8b95;
   --mech-model: #9a8cf5;
 
@@ -383,7 +400,8 @@
   --step-lit-riser: #35d39b;
   --step-lit-side: #1d8f68;
   --step-edge: rgba(255, 255, 255, 0.11);
-  --step-shadow: rgba(0, 0, 0, 0.55);
+  --step-shadow: rgba(0, 0, 0, 0.5);
+  --step-contact: rgba(0, 0, 0, 0.7);
 
   --band: #242e35;
   --band-ink: #eef2f6;
@@ -2508,20 +2526,46 @@ textarea:focus-visible,
   transform: rotateX(-17deg) rotateY(-24deg);
 }
 
-/* Zemin teması. Model havada durursa maket gibi değil kesilmiş gibi duruyor. */
+/*
+ * ZEMİN GÖLGESİ — İKİ KATMAN.
+ *
+ * Tek yumuşak leke yetmiyordu: model yere basmıyor, havada asılı duruyordu.
+ * Gerçek bir gölgenin iki bileşeni var ve ikisi de burada:
+ *   · TEMAS — cismin oturduğu yerde dar, koyu ve keskin
+ *   · YAYILIM — uzaklaştıkça genişleyen, sönük
+ * Işık sol üstten geldiği için ikisi de sağa kaçık (%54 ve %58).
+ *
+ * Bulanıklık `filter` ile DEĞİL gradyanla: `filter` de `opacity` gibi
+ * `preserve-3d` zincirini düzleştiriyor.
+ */
 .model-ground {
   position: absolute;
   left: 50%;
   bottom: 22%;
-  width: calc(var(--w) * 5 + var(--d) * 2.2);
-  height: calc(var(--d) * 2.2);
-  margin-left: calc((var(--w) * 5 + var(--d) * 2.2) / -2);
+  width: calc(var(--w) * 5 + var(--d) * 2.6);
+  height: calc(var(--d) * 2.6);
+  margin-left: calc((var(--w) * 5 + var(--d) * 2.6) / -2);
   transform: translateY(50%) rotateX(90deg);
-  background: radial-gradient(
-    52% 58% at 46% 50%,
-    var(--step-shadow),
-    transparent 74%
-  );
+  /*
+   * Gölge düzlemin ÖN yarısında.
+   *
+   * Merkezdeyken görünmüyordu ve sebebi basitti: blokların kendisi onu
+   * kapatıyor. Düzlem `--d * 2.6` derinliğinde ve bloklar z ekseninde onun
+   * ortadaki %38'ini kaplıyor (%30,8–%69,2); geriye kalan iki şerit görünür.
+   * Işık sol üstten geldiği için gölge ÖNE ve SAĞA düşüyor, yani düzlemin
+   * %74–%84 bandına.
+   */
+  background:
+    radial-gradient(
+      38% 9% at 54% 71%,
+      var(--step-contact),
+      transparent 72%
+    ),
+    radial-gradient(
+      72% 38% at 60% 80%,
+      var(--step-shadow),
+      transparent 78%
+    );
 }
 
 .mstep {
@@ -2546,14 +2590,18 @@ textarea:focus-visible,
   display: block;
   backface-visibility: hidden;
   /*
-   * Düz renk yerine ince bir düşüş. Renk jetonu `background-color`da kalıyor,
+   * Düz renk yerine ışık düşüşü. Renk jetonu `background-color`da kalıyor,
    * gradyan `background-image`da — böylece ışık dolaşırken yalnızca renk
    * değişiyor, doku duruyor. Beyaz/siyah katman iki temada da doğru çalışıyor.
+   *
+   * Düşüş YÜZ BAŞINA farklı, çünkü gerçek bir cisimde de öyle: üst yüz ışığı
+   * en dik alıyor ve arkaya doğru azalıyor, ön yüz yukarıdan aşağı hafifçe
+   * kararıyor, yan yüz zaten gölgede ve en sert düşüşü o taşıyor.
    */
   background-image: linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.07),
-    rgba(0, 0, 0, 0.07)
+    rgba(255, 255, 255, 0.06),
+    rgba(0, 0, 0, 0.06)
   );
 }
 .f-front,
@@ -2584,6 +2632,15 @@ textarea:focus-visible,
   transform: translateX(calc(var(--w) / -2)) rotateY(-90deg);
   box-shadow: inset 0 1px 0 var(--step-edge);
 }
+/* Yan yüzler zaten gölgede; en sert düşüşü onlar taşıyor. */
+.f-right,
+.f-left {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.05),
+    rgba(0, 0, 0, 0.14)
+  );
+}
 .f-top {
   left: 0;
   width: 100%;
@@ -2592,6 +2649,12 @@ textarea:focus-visible,
   margin-top: calc(var(--d) / -2);
   transform: translateY(calc(var(--h) / -2)) rotateX(90deg);
   background-color: var(--step-tread);
+  /* Üst yüzde düşüş DERİNLİK boyunca: ön kenar aydınlık, arka kenar sönük. */
+  background-image: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.14),
+    rgba(0, 0, 0, 0.1)
+  );
 }
 
 /* Ölçek satırı: model temiz kalsın, okuma buraya insin. */
@@ -2806,6 +2869,7 @@ textarea:focus-visible,
 /* ── şerit 3 · MEKANİZMA · hat kenardan kenara ────────────────────── */
 .mech {
   --hairline: var(--mech-line);
+  --ink-2: var(--mech-ink-2);
   --ink-3: var(--mech-ink-3);
   --model: var(--mech-model);
   background: var(--mech);
@@ -2860,7 +2924,7 @@ textarea:focus-visible,
 .mech .pipe-cell:first-child { border-left: 0; padding-left: 0; }
 .mech .pipe-cell:last-child { padding-right: 0; }
 /* `--model` moru olduğu gibi: burada gerçekten "bunu bir model üretti" diyor. */
-.mech .pipe-cell.is-ai { background: color-mix(in srgb, var(--model) 9%, transparent); }
+.mech .pipe-cell.is-ai { background: color-mix(in srgb, var(--model) 6%, transparent); }
 .mech .pipe-name { font-size: 15px; }
 .mech .pipe-what { font-size: 12.5px; }
 @media (max-width: 820px) {
