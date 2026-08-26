@@ -2899,39 +2899,98 @@ textarea:focus-visible,
   padding-bottom: clamp(26px, 3vw, 42px);
 }
 
-/* ── şerit 5 · KAPANIŞ · sayfadaki TEK ortalı an ──────────────────── */
-.close {
-  background: var(--plane);
-  padding-block: clamp(48px, 6.5vw, 92px);
-  row-gap: 18px;
-  justify-items: center;
-  text-align: center;
-}
-.close > * { grid-column: rail-start / rail-end; margin: 0; max-width: 26ch; }
+/* ── şerit 5 · KAPANIŞ · sayfadaki tek fotoğraf ───────────────────── */
 /*
- * Sayfanın TEK serif anı. Bant ortalı hâle geldiği için "ortalı olmak" artık
- * kapanışı tek başına ayırmıyor; ayrımı yüz taşıyor. Source Serif 4 depoda
- * zaten yüklü (giriş ekranı için), yeni bağımlılık yok.
+ * Kenardan kenara fotoğraf bandı. Sayfadaki bütün diğer görseller ölçülmüş
+ * veriden çiziliyor; burada bilerek bir FOTOĞRAF var, çünkü kapanış bir ölçüm
+ * değil davet. Gösterdiği şey de yabancı değil: aynı merdiven, gerçek taştan.
  *
- * Burada ürün konuşmuyor: altı ay sonra dönüp bakacak olan kişiye söylenen tek
- * cümle bu.
+ * Metin fotoğrafın sağ üçte ikisindeki boş kâğıda oturuyor — çekim böyle
+ * kurgulandı, sonradan yer aranmadı.
  */
-.close > .move-h {
+.closing {
+  position: relative;
+  isolation: isolate;
+  min-height: clamp(340px, 38vw, 560px);
+  align-content: center;
+  padding-block: clamp(40px, 5vw, 72px);
+  overflow: hidden;
+}
+.closing-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /*
+   * Kadraj yatayda bloklara, dikeyde TABANA yaslanıyor.
+   *
+   * `50%` ortadan kırpıyordu ve blokların oturduğu yer ile gölgesi bandın alt
+   * kenarından taşıyordu — merdiven havada kesilmiş gibi duruyordu. `%82` fazla
+   * olan yüksekliği ağırlıklı olarak ÜSTTEN atıyor: taban ve gölge kadraja
+   * giriyor, üstteki palmiye gölgesi ile konuşma balonu çıkıyor.
+   */
+  object-position: 24% 82%;
+}
+.closing-say {
+  grid-column: mid / rail-end;
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+}
+.closing-say > * { margin: 0; max-width: 24ch; }
+/* Künye tek satır kalmalı: 24ch onu "KAYITLAR / DEĞİŞTİRİLEMEZ" diye bölüyordu. */
+.closing .close-note { max-width: none; }
+/*
+ * Sayfanın TEK serif anı. Fotoğrafın üstünde duruyor, o yüzden rengi jetondan
+ * değil doğrudan: bant kendi ışığını taşıyor ve iki temada da açık kâğıt.
+ */
+.closing .move-h {
   font-family: var(--serif);
   font-weight: 400;
   font-size: clamp(30px, 3.4vw, 48px);
   line-height: 1.16;
   letter-spacing: -0.014em;
-  max-width: 20ch;
+  color: #241f18;
 }
-.close .claim-actions { padding-top: 0; }
+.closing .claim-actions { padding-top: 0; }
 .close-note {
-  max-width: 42ch;
   font-family: var(--mono);
   font-size: var(--fs-micro);
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: #5c5348;
+}
+
+/*
+ * 860px altında fotoğraf metnin ARKASINDAN çıkıp ÜSTÜNE geçiyor.
+ *
+ * Tek sütunda metin fotoğrafın ortasına düşüyor ve orada bloklar var: ölçüldü,
+ * kâğıdın boş kısmı 390px'lik kadrajda kalmıyor. Üst üste bindirmek yerine
+ * ayırmak; fotoğraf kendi bandını alıyor, cümle kendi zeminini.
+ */
+@media (max-width: 860px) {
+  .closing {
+    min-height: 0;
+    padding-block: 0 clamp(34px, 7vw, 52px);
+    background: var(--plane);
+  }
+  .closing-photo {
+    position: static;
+    z-index: auto;
+    grid-column: bleed-start / bleed-end;
+    height: clamp(200px, 52vw, 300px);
+    margin-bottom: clamp(26px, 5vw, 40px);
+  }
+  .closing-say {
+    grid-column: rail-start / rail-end;
+    justify-items: center;
+    text-align: center;
+  }
+  .closing-say > * { max-width: 26ch; }
+  .closing .move-h { color: var(--ink); }
+  .close-note { color: var(--ink-3); }
 }
 
 .land-foot {

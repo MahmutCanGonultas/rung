@@ -90,22 +90,42 @@ const parlaklik = ([r, g, b]) => 0.2126 * dogrusal(r) + 0.7152 * dogrusal(g) + 0
 const oran = (a, b) => { const x = parlaklik(a), y = parlaklik(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
 const hex = ([r, g, b]) => "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
 
-/** Metin satırının GERÇEK zemini: kutudaki en sık piksel rengi. */
-function zeminOku(resim, kutu) {
+/*
+ * Metin satırının GERÇEK zemini: kutudaki en sık piksel rengi — AMA metnin
+ * kendi rengine yakın pikseller elenerek.
+ *
+ * Çıplak "en sık renk" varsayımı büyük puntoda ÇÖKÜYOR. ÖLÇÜLDÜ: 48px'lik
+ * serif bir başlıkta harf pikselleri 2493, zemin pikselleri 1387 — yani en sık
+ * renk metnin kendisi çıkıyor ve araç kontrastı 1:1 bildiriyordu. Ürün
+ * kusursuzdu (gerçek oran 10,45:1), yanlış ölçen araçtı.
+ *
+ * Metin rengini zaten CSS'ten biliyoruz; ona yakın pikselleri saymamak
+ * tahmin değil, elimizdeki bilgiyi kullanmak. Tırtıklama ara tonlarını da
+ * kapsasın diye eşik geniş tutuldu.
+ */
+function zeminOku(resim, kutu, metinRengi) {
   const x0 = Math.max(0, Math.round(kutu.x)), y0 = Math.max(0, Math.round(kutu.y));
   const x1 = Math.min(resim.w, Math.round(kutu.x + kutu.w));
   const y1 = Math.min(resim.h, Math.round(kutu.y + kutu.h));
   if (x1 - x0 < 2 || y1 - y0 < 2) return null;
   const say = new Map();
+  const hepsi = new Map();
+  const [mr, mg, mb] = metinRengi;
   for (let y = y0; y < y1; y++) {
     for (let x = x0; x < x1; x++) {
       const i = (y * resim.w + x) * 4;
-      const k = (resim.px[i] << 16) | (resim.px[i + 1] << 8) | resim.px[i + 2];
+      const r = resim.px[i], g = resim.px[i + 1], b = resim.px[i + 2];
+      const k = (r << 16) | (g << 8) | b;
+      hepsi.set(k, (hepsi.get(k) ?? 0) + 1);
+      const d = (r - mr) ** 2 + (g - mg) ** 2 + (b - mb) ** 2;
+      if (d < 3600) continue;              // metnin kendisi ve tırtıkları
       say.set(k, (say.get(k) ?? 0) + 1);
     }
   }
+  // Her şey elendiyse (kutu baştan sona metin rengi) çıplak kipe düş.
+  const kaynak = say.size ? say : hepsi;
   let en = -1, enCok = -1;
-  for (const [k, n] of say) if (n > enCok) { enCok = n; en = k; }
+  for (const [k, n] of kaynak) if (n > enCok) { enCok = n; en = k; }
   return [(en >> 16) & 255, (en >> 8) & 255, en & 255];
 }
 
@@ -127,6 +147,22 @@ for (const tema of ["light", "dark"]) {
   ]);
   for (const yol of YOLLAR) {
     await page.goto(BASE + yol, { waitUntil: "networkidle0" });
+    /*
+     * TEMBEL GÖRSELLER YÜKLENSİN. `networkidle0` yetmiyor: ekran dışındaki
+     * `next/image` yüklemeye sayfanın altına inilene kadar başlamıyor ve ölçüm
+     * bulanık yer tutucunun üstünde yapılıyordu.
+     */
+    await page.evaluate(async () => {
+      window.scrollTo(0, document.body.scrollHeight);
+      await new Promise((r) => setTimeout(r, 300));
+      window.scrollTo(0, 0);
+      await Promise.all(
+        [...document.images].map((g) =>
+          g.complete ? null : new Promise((r) => { g.onload = g.onerror = r; })
+        )
+      );
+    });
+    await new Promise((r) => setTimeout(r, 350));
     // Kendi imlecimiz ölçüme girmesin.
     await page.evaluate(() => document.activeElement?.blur?.());
     const kutular = await page.evaluate(() => {
@@ -172,7 +208,7 @@ for (const tema of ["light", "dark"]) {
     const resim = pngCoz(await page.screenshot({ fullPage: true, type: "png" }));
     const gorulen = new Set();
     for (const k of kutular) {
-      const zemin = zeminOku(resim, { x: k.x, y: k.y, w: k.w2, h: k.h });
+      const zemin = zeminOku(resim, { x: k.x, y: k.y, w: k.w2, h: k.h }, k.renk);
       if (!zemin) continue;
       const metin = harmanla(k.renk, k.alfa, zemin);
       const o = +oran(metin, zemin).toFixed(2);

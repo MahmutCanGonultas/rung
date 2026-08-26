@@ -1,4 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
+
+import foto from "../docs/shots/rung-foto.png";
 
 import { Mark } from "./components/Mark";
 import { InView } from "./components/showcase/InView";
@@ -188,19 +191,43 @@ export default async function HomePage() {
         </InView>
       </section>
 
-      <section className="move close" aria-labelledby="close-h">
-        <h2 className="move-h" id="close-h">
-          Bugün yaz, altı ay sonra bak
-        </h2>
-        <div className="claim-actions">
-          <Link
-            className="btn btn-primary btn-lg"
-            href={user ? "/write" : "/register"}
-          >
-            {user ? "Yazmaya başla" : "Hesap oluştur"}
-          </Link>
+      {/*
+        KAPANIŞ — sayfanın tek fotoğrafı.
+        
+        Sayfadaki her şey ölçülmüş veriden çiziliyor; burada bilerek başka bir
+        şey var. Kapanış bir ÖLÇÜM DEĞİL, bir davet — ve fotoğrafın kendisi de
+        merdiveni gösteriyor, yani sayfanın açılışındaki üç boyutlu modelin
+        gerçek dünyadaki karşılığı.
+
+        Fotoğrafın sağ üçte ikisi boş kâğıt; cümle ve düğme oraya oturuyor.
+        Yer bulunmuş değil, çekim böyle kurgulanmış.
+
+        `next/image` statik içe aktarma ile: ölçüler dosyadan okunuyor, boyut
+        varyantları üretiliyor ve sayfa altında olduğu için tembel yükleniyor.
+        Yeni bağımlılık yok, Next'in kendi bileşeni.
+      */}
+      <section className="move closing" aria-labelledby="close-h">
+        <Image
+          className="closing-photo"
+          src={foto}
+          alt=""
+          sizes="100vw"
+          placeholder="blur"
+        />
+        <div className="closing-say">
+          <h2 className="move-h" id="close-h">
+            Bugün yaz, altı ay sonra bak
+          </h2>
+          <div className="claim-actions">
+            <Link
+              className="btn btn-primary btn-lg"
+              href={user ? "/write" : "/register"}
+            >
+              {user ? "Yazmaya başla" : "Hesap oluştur"}
+            </Link>
+          </div>
+          <p className="close-note">Kayıtlar değiştirilemez</p>
         </div>
-        <p className="close-note">Kayıtlar değiştirilemez</p>
       </section>
 
       <footer className="move land-foot">
