@@ -30,7 +30,8 @@
     "gold:from-feedback": "node --env-file=.env.local scripts/feedback-to-gold.mjs",
     "shots": "node --env-file=.env.local scripts/shots.mjs",
     "shots:public": "node scripts/public-shots.mjs",
-    "contrast": "node scripts/contrast.mjs"
+    "contrast": "node scripts/contrast.mjs",
+    "og": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",

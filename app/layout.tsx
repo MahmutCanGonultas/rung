@@ -33,11 +33,27 @@ const serif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
+  /*
+   * `metadataBase` ŞART. Paylaşım etiketleri MUTLAK adres istiyor; bu olmadan
+   * Next göreli bir yol yazıyor ve WhatsApp, LinkedIn, X hiçbiri onu çözemiyor
+   * — link önizlemesi görselsiz çıkıyor.
+   */
+  metadataBase: new URL("https://rung-plum.vercel.app"),
   title: {
     default: "Rung",
     template: "%s",
   },
   description: "Türkçe konuşanlar için İngilizce ölçüm aleti",
+  /*
+   * Görselin kendisi burada YAZILI DEĞİL: `app/opengraph-image.jpg` dosya adı
+   * Next'in kuralı ve etiketi o üretiyor. Dosya değişince meta kendiliğinden
+   * değişiyor, elle güncellenecek bir yol kalmıyor. `npm run og` kartı kaynak
+   * fotoğraftan türetiyor.
+   *
+   * X, `twitter:image` yoksa `og:image`e düşüyor — ama yalnızca kart tipi
+   * bildirilmişse. Bu satır olmadan büyük görsel yerine küçük özet çıkıyor.
+   */
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
