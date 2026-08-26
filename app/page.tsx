@@ -140,13 +140,21 @@ export default async function HomePage() {
       </section>
 
       <section className="move trial" aria-labelledby="trial-h">
-        <h2 className="move-h" id="trial-h">
-          Aynı motor, iki cümle
-        </h2>
-        <p className="move-sub">
-          İkisi de bu sayfa açılırken gerçek K0 katmanından geçti — maket
-          değil. Model çağrısı yok: aynı metin her zaman aynı sonucu veriyor.
-        </p>
+        {/*
+          Başlık ve alt cümle KENDİ LEVHASINDA. Şeridin kâğıdının üstünde
+          serbest dururken üçü — başlık, cümle, bölmeler — üst üste yazılmış
+          gibi okunuyordu. Levha onları tek nesne yapıyor ve aşağıdaki iki
+          kâğıttan ayırıyor.
+        */}
+        <div className="trial-head">
+          <h2 className="move-h" id="trial-h">
+            Aynı motor, iki cümle
+          </h2>
+          <p className="move-sub">
+            İkisi de bu sayfa açılırken gerçek K0 katmanından geçti — maket
+            değil. Model çağrısı yok: aynı metin her zaman aynı sonucu veriyor.
+          </p>
+        </div>
 
         {/*
           İki ayrı gözlemci: masaüstünde yan yana oldukları için birlikte,

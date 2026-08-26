@@ -148,6 +148,10 @@
    */
   --trial-ink-3: #565f65;
   --trial-accent: #096a4a;
+  /* Şeridin başlık levhası: markanın yeşili, koyu tonda. */
+  --trial-head: #0f4d38;
+  --trial-head-ink: #eef6f1;
+  --trial-head-ink-2: #a9cabb;
 
   --step-tread: #cdc7b7;
   --step-riser: #ada695;
@@ -247,6 +251,9 @@
   --trial-clean: #232c34;
   --trial-ink-3: #8d98a1;
   --trial-accent: #35d39b;
+  --trial-head: #0c3729;
+  --trial-head-ink: #e8f4ed;
+  --trial-head-ink-2: #97c2ae;
 
   --step-tread: #2e3941;
   --step-riser: #232c33;
@@ -329,6 +336,9 @@
   --trial-clean: #232c34;
   --trial-ink-3: #8d98a1;
   --trial-accent: #35d39b;
+  --trial-head: #0c3729;
+  --trial-head-ink: #e8f4ed;
+  --trial-head-ink-2: #97c2ae;
 
   --step-tread: #2e3941;
   --step-riser: #232c33;
@@ -2601,14 +2611,42 @@ textarea:focus-visible,
   --accent: var(--trial-accent);
   background: var(--trial);
   border-bottom: 1px solid var(--hairline);
-  padding-top: clamp(40px, 5.5vw, 78px);
-  row-gap: clamp(18px, 2.4vw, 32px);
+  /* Üst dolgu LEVHANIN içinde: levha şeridin üst kenarına dayanmak zorunda. */
+  padding-top: 0;
+  row-gap: 0;
 }
-.trial > .move-h { grid-column: rail-start / mid; grid-row: 1; }
-.trial > .move-sub { grid-column: rail-start / mid; grid-row: 2; }
+/*
+ * BAŞLIK LEVHASI — şeridin yeşili.
+ *
+ * Başlık ve alt cümle şeridin kâğıdının üstünde serbest duruyordu; başlık,
+ * cümle ve altındaki iki bölme aynı zeminde art arda gelince üçü üst üste
+ * yazılmış gibi okunuyordu. Levha ikisini tek nesne yapıyor, kendi nefesini
+ * veriyor ve aşağıdaki iki kâğıttan kesin bir kenarla ayırıyor.
+ *
+ * Renk markanın kendi yeşili. Sayfadaki koyu bant (`.measure`) yeşile çalan
+ * bir siyah; bu ise doğrudan yeşil — akraba ama aynı değil, ve ikisinin arasına
+ * `.mech`in açık şeridi giriyor.
+ */
+.trial-head {
+  grid-column: bleed-start / bleed-end;
+  grid-row: 1;
+  display: grid;
+  gap: clamp(12px, 1.4vw, 18px);
+  padding: clamp(38px, 5vw, 68px) var(--rail) clamp(40px, 5.2vw, 72px);
+  background: var(--trial-head);
+  color: var(--trial-head-ink);
+}
+.trial-head .move-h {
+  max-width: 18ch;
+  color: var(--trial-head-ink);
+}
+.trial-head .move-sub {
+  max-width: 62ch;
+  color: var(--trial-head-ink-2);
+}
 
 .trial-pane {
-  grid-row: 3;
+  grid-row: 2;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -3174,7 +3212,7 @@ textarea:focus-visible,
   /*
    * İki bölme alt alta; sıra doğru: gürültü önce, sessizlik sonra.
    *
-   * SATIRLARI AÇIKÇA VERMEK ŞART. Masaüstünde `.trial-pane { grid-row: 3 }`
+   * SATIRLARI AÇIKÇA VERMEK ŞART. Masaüstünde `.trial-pane { grid-row: 2 }`
    * ikisini de üçüncü satıra çiviliyor ve orada yan yana duruyorlar. Sütun
    * genişliğini tek başına değiştirmek yetmiyordu: ikisi de 3. satırda
    * kalıyor, aynı hücrede ÜST ÜSTE biniyorlardı — iki cümle iç içe
@@ -3187,10 +3225,10 @@ textarea:focus-visible,
     border-left: 0;
   }
   .trial-pane.is-broken {
-    grid-row: 3;
+    grid-row: 2;
   }
   .trial-pane.is-clean {
-    grid-row: 4;
+    grid-row: 3;
   }
   .trial-pane.is-broken .sample-findings { grid-template-columns: minmax(0, 1fr); }
 
