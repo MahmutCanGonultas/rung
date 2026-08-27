@@ -20,12 +20,19 @@ export const metadata: Metadata = { title: "Yaz · Rung" };
 type Search = { context?: string; task?: string; skip?: string };
 
 /*
- * Görev rastgele seçiliyor — ama seçim adresin İÇİNE yazılıyor.
+ * YAZMA EKRANI.
  *
- * Yazılmasaydı sayfa her çizilişte başka bir görev gösterirdi: kullanıcı
- * metnini yazar, doğrulama hatası alır, sayfa yeniden çizilir ve karşısında
- * bambaşka bir görev bulurdu. `/write?context=daily&task=12` ile sayfa
- * belirli hâle geliyor; yenilemek de paylaşmak da aynı görevi veriyor.
+ * Görev rastgele seçiliyor — ama seçim adresin İÇİNE yazılıyor. Yazılmasaydı
+ * sayfa her çizilişte başka bir görev gösterirdi: kullanıcı metnini yazar,
+ * doğrulama hatası alır, sayfa yeniden çizilir ve karşısında bambaşka bir
+ * görev bulurdu.
+ *
+ * KELİME DEFTERİ AŞAĞI İNDİ. Görev ile yazma alanının ARASINDA duruyordu:
+ * "Bu görevde B1 bandının üstünde kelime yok. Yine de takıldığın bir kelime
+ * varsa deftere al" + bir metin kutusu + bir düğme. Yani buraya yazmaya gelen
+ * kişinin gözü, göreve baktıktan sonra yazma alanına inerken üç nesnelik bir
+ * kutuya çarpıyordu. Defter kayboldu değil; ihtiyaç duyulan ana taşındı —
+ * yazarken takılınca aşağıda duruyor.
  */
 export default async function WritePage({
   searchParams,
@@ -45,9 +52,8 @@ export default async function WritePage({
     contexts[0];
 
   /*
-   * Görev artık sabit bir seviyeden değil, KULLANICININ ölçülmüş
-   * seviyesinden seçiliyor (plan §06). Hiç kaydı olmayan yeni
-   * kullanıcı varsayılan seviyeden başlıyor.
+   * Görev sabit bir seviyeden değil, KULLANICININ ölçülmüş seviyesinden
+   * seçiliyor (plan §06). Hiç kaydı olmayan kullanıcı varsayılandan başlıyor.
    */
   const [level, chosen] = await Promise.all([
     currentLevel(user.id),
@@ -55,12 +61,9 @@ export default async function WritePage({
   ]);
 
   /*
-   * Görev yoksa, ya da adresteki görev bu bağlama ait değilse: yeniden seç.
-   *
-   * Bu dal neredeyse HER ilk istekte çalışıyor — uygulamadaki bütün bağlantılar
-   * `?task=` olmadan `/write` diyor. Deftere alınmış kelimeler bu yüzden
-   * yönlendirmeden SONRA çekiliyor: önce çekilirse her ziyarette bir sorgu
-   * boşa gidiyordu.
+   * Bu dal neredeyse HER ilk istekte çalışıyor — uygulamadaki bütün
+   * bağlantılar `?task=` olmadan `/write` diyor. Deftere alınmış kelimeler bu
+   * yüzden yönlendirmeden SONRA çekiliyor.
    */
   if (!chosen || chosen.contextId !== context.id) {
     const picked = await pickTask(context.id, level, params.skip);
@@ -75,7 +78,7 @@ export default async function WritePage({
   const noted = await notedWords(user.id);
 
   return (
-    <section className="panel panel-reading">
+    <section className="write">
       <nav className="chips" aria-label="Bağlam">
         {contexts.map((c) => (
           <Link
@@ -88,29 +91,24 @@ export default async function WritePage({
         ))}
       </nav>
 
-      <p className="context-note">{context.description}</p>
-
       <div className="task">
-        <h1 className="task-title" lang="en">{chosen.prompt}</h1>
+        <h1 className="task-title" lang="en">
+          {chosen.prompt}
+        </h1>
         <p className="task-meta">
-          {chosen.hint} · Hedef {chosen.minWords}–{chosen.maxWords} kelime ·
+          {chosen.hint}
+          <span className="task-sep">·</span>
+          {chosen.minWords}–{chosen.maxWords} kelime
+          <span className="task-sep">·</span>
           Seviye {chosen.level}
+          <Link
+            className="task-swap"
+            href={`/write?context=${context.slug}&skip=${chosen.id}`}
+          >
+            başka görev
+          </Link>
         </p>
-        <Link
-          className="task-swap"
-          href={`/write?context=${context.slug}&skip=${chosen.id}`}
-        >
-          Başka görev ver
-        </Link>
       </div>
-
-      <OffBandStrip
-        prompt={chosen.prompt}
-        level={level}
-        taskId={chosen.id}
-        back={`/write?context=${context.slug}&task=${chosen.id}`}
-        noted={noted}
-      />
 
       <Composer
         action={saveEntryAction}
@@ -119,10 +117,17 @@ export default async function WritePage({
         maxWords={chosen.maxWords}
       />
 
-      <p className="panel-next">
-        Kaydettiğin metin <b>değiştirilemez</b> — yazdığın hâliyle duruyor.
-        Analiz hemen ardından çalışıyor; sonucu kaydın sayfasında görürsün.
-      </p>
+      {/*
+        Yazarken takılınan kelime buraya. Yazma alanının ÜSTÜNDE değil ALTINDA:
+        önce yaz, takılırsan aşağısı burada.
+      */}
+      <OffBandStrip
+        prompt={chosen.prompt}
+        level={level}
+        taskId={chosen.id}
+        back={`/write?context=${context.slug}&task=${chosen.id}`}
+        noted={noted}
+      />
     </section>
   );
 }

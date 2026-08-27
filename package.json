@@ -32,7 +32,8 @@
     "shots:public": "node scripts/public-shots.mjs",
     "contrast": "node scripts/contrast.mjs",
     "og": "node scripts/og-image.mjs",
-    "icon": "node scripts/favicon.mjs"
+    "icon": "node scripts/favicon.mjs",
+    "styles": "node scripts/style-coverage.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",

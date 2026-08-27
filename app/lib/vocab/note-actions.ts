@@ -131,7 +131,7 @@ export async function noteWordAction(formData: FormData): Promise<void> {
     `;
   }
 
-  revalidatePath("/dashboard");
+  revalidatePath("/write");
   if (back.startsWith("/") && !back.startsWith("//")) revalidatePath(back);
 }
 
@@ -157,5 +157,5 @@ export async function resolveNoteAction(formData: FormData): Promise<void> {
     WHERE id = ${id} AND user_id = ${user.id}
   `;
 
-  revalidatePath("/dashboard");
+  revalidatePath("/write");
 }

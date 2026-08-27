@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LoginPage() {
-  if (await getSessionUser()) redirect("/dashboard");
+  if (await getSessionUser()) redirect("/write");
 
   return (
     <GateShell

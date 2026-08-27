@@ -92,7 +92,7 @@ export default async function HomePage() {
 
             <div className="tool-go">
               {user ? (
-                <Link className="btn btn-primary btn-lg" href="/dashboard">
+                <Link className="btn btn-primary btn-lg" href="/write">
                   Panoya git
                 </Link>
               ) : (

@@ -58,18 +58,18 @@ function LevelTrace({
       aria-label="Seviye tahmininin zaman içindeki seyri">
       {LEVEL_INDEX.map((label, i) => (
         <g key={label}>
-          <line x1={L} y1={y(i)} x2={R} y2={y(i)} stroke="var(--hairline)" strokeWidth="1" />
+          <line x1={L} y1={y(i)} x2={R} y2={y(i)} className="plot-grid" strokeWidth="1" />
           <text x={L - 8} y={y(i) + 4} textAnchor="end" className="plot-tick">
             {label}
           </text>
         </g>
       ))}
 
-      <path d={path} fill="none" stroke="var(--accent)" strokeWidth="2"
+      <path className="plot-line" d={path} fill="none" strokeWidth="2"
         strokeLinejoin="round" strokeLinecap="round" />
 
       {points.map((p, i) => (
-        <circle key={i} cx={x(i)} cy={y(p.score)} r="3" fill="var(--accent)" />
+        <circle className="plot-dot" key={i} cx={x(i)} cy={y(p.score)} r="3" />
       ))}
 
       <text x={L} y={H - 8} className="plot-tick">
@@ -293,20 +293,27 @@ export default async function ProgressPage() {
               {task.attempts.map((attempt, i) => {
                 const previous = i > 0 ? task.attempts[i - 1] : null;
                 const better = previous !== null && attempt.per100 < previous.per100;
+                /*
+                 * Kendi sınıfları var. Burada `entry-row` kullanılıyordu ama
+                 * ÇOCUKLARI farklıydı (`day`/`name`/`num` yerine
+                 * `entry-day`/`entry-main`/`entry-dens`) — yani üç sınıf hiç
+                 * biçimlenmiyordu ve on sekiz satırın her biri dört satıra
+                 * sarıyordu. `npm run styles` bunu yakaladı.
+                 */
                 return (
                   <Link
                     key={attempt.entryId}
-                    className="entry-row"
+                    className="try"
                     href={`/entries/${attempt.entryId}`}
                   >
-                    <span className="day">{DAY.format(attempt.createdAt)}</span>
-                    <span className="name">
+                    <span className="try-day">{DAY.format(attempt.createdAt)}</span>
+                    <span className="try-what">
                       {attempt.wordCount} kelime · {attempt.findings} bulgu
                     </span>
-                    <span className="num">{num(attempt.per100)} / 100 kelime</span>
-                    <span className="num">
+                    <span className="try-num">{num(attempt.per100)}</span>
+                    <span className="try-delta">
                       {previous === null ? (
-                        "ilk"
+                        <span className="tone-flat">ilk</span>
                       ) : (
                         <span className={better ? "tone-good" : "tone-bad"}>
                           {better ? "↓ daha az" : "↑ daha çok"}

@@ -6,7 +6,7 @@ import { listContexts } from "../../lib/content";
 import { countEntries, listEntries, type EntrySummary } from "../../lib/entries";
 import { requireUser } from "../../lib/guard";
 
-export const metadata: Metadata = { title: "Geçmiş · Rung" };
+export const metadata: Metadata = { title: "Kayıtlar · Rung" };
 
 const MONTH = new Intl.DateTimeFormat("tr-TR", {
   month: "long",
@@ -21,16 +21,23 @@ function groupByMonth(entries: EntrySummary[]) {
   for (const entry of entries) {
     const label = MONTH.format(entry.createdAt);
     const last = groups[groups.length - 1];
-    if (last && last.label === label) {
-      last.entries.push(entry);
-    } else {
-      groups.push({ label, entries: [entry] });
-    }
+    if (last && last.label === label) last.entries.push(entry);
+    else groups.push({ label, entries: [entry] });
   }
 
   return groups;
 }
 
+/*
+ * KAYITLAR — eskiden "Geçmiş".
+ *
+ * Ad değişti çünkü ekranın gösterdiği şey geçmiş değil, KAYIT: değiştirilemez
+ * metinler ve her birinin ölçümü. "Geçmiş" bir arşiv çağrıştırıyor; bu liste
+ * ürünün asıl varlığı.
+ *
+ * Sondaki "kayıtlar değiştirilemez" paragrafı kabuğun altbilgisine taşındı —
+ * her ekranda geçerli bir kural, tek bir ekranın dip notu değil.
+ */
 export default async function HistoryPage({
   searchParams,
 }: {
@@ -55,8 +62,21 @@ export default async function HistoryPage({
   const groups = groupByMonth(entries);
 
   return (
-    <section className="panel">
-      <h1 className="panel-title">Geçmiş</h1>
+    <section className="log">
+      <header className="log-head">
+        <h1 className="log-title">Kayıtlar</h1>
+        <p className="log-count">
+          <b>{totals.entries}</b> kayıt
+          <span className="log-sep">·</span>
+          <b>{totals.words.toLocaleString("tr-TR")}</b> kelime
+          {filtered ? (
+            <>
+              <span className="log-sep">·</span>
+              süzülmüş {entries.length}
+            </>
+          ) : null}
+        </p>
+      </header>
 
       {/*
         Düz bir GET formu: JavaScript kapalıyken de çalışıyor, sonuç adres
@@ -68,8 +88,8 @@ export default async function HistoryPage({
           type="search"
           name="q"
           defaultValue={search}
-          placeholder="Metinlerde ara — örn. deposit"
-          aria-label="Geçmişte ara"
+          placeholder="Metinlerde ara"
+          aria-label="Kayıtlarda ara"
         />
 
         <select
@@ -97,11 +117,6 @@ export default async function HistoryPage({
         ) : null}
       </form>
 
-      <p className="totals">
-        <b>{totals.entries}</b> kayıt · <b>{totals.words.toLocaleString("tr-TR")}</b> kelime
-        {filtered ? ` · süzülmüş sonuç: ${entries.length}` : ""}
-      </p>
-
       {entries.length === 0 ? (
         <p className="empty">
           {filtered ? (
@@ -116,13 +131,11 @@ export default async function HistoryPage({
         </p>
       ) : (
         groups.map((group) => (
-          <div key={group.label}>
-            <div className="month">
-              <span>
-                {group.label} · {group.entries.length} kayıt
-              </span>
-              <span>100 kelimede bulgu</span>
-            </div>
+          <div className="log-month" key={group.label}>
+            <h2 className="month">
+              <span>{group.label}</span>
+              <span className="month-scale">100 kelimede bulgu</span>
+            </h2>
 
             {group.entries.map((entry) => (
               <EntryRow key={entry.id} entry={entry} />
@@ -130,12 +143,6 @@ export default async function HistoryPage({
           </div>
         ))
       )}
-
-      <p className="panel-next">
-        Kayıtlar <b>değiştirilemez</b>. Altı ay sonraki karşılaştırmanın doğru
-        olmasının tek yolu bu — sonradan düzeltilen metin ilerleme grafiğini
-        sessizce yalancı yapar.
-      </p>
     </section>
   );
 }

@@ -117,9 +117,9 @@ async function main() {
     console.log(`test hesabı: ${EMAIL}\n`);
 
     console.log("1 · giriş yapmadan korumalı sayfa");
-    await page.goto(`${BASE}/dashboard`, { waitUntil: "networkidle0" });
+    await page.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
     check(
-      "/dashboard → /login yönlendirmesi",
+      "/write → /login yönlendirmesi",
       page.url().includes("/login"),
       page.url()
     );
@@ -127,9 +127,9 @@ async function main() {
     console.log("\n2 · kayıt");
     await page.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
     await submitAuthForm(page, EMAIL, PASSWORD);
-    check("kayıt sonrası /dashboard", page.url().includes("/dashboard"), page.url());
+    check("kayıt sonrası /write", page.url().includes("/write"), page.url());
     check(
-      "panoda e-posta görünüyor",
+      "kabukta e-posta görünüyor",
       (await page.content()).includes(EMAIL)
     );
 
@@ -142,13 +142,13 @@ async function main() {
     console.log("\n3 · aynı e-postayla tekrar kayıt");
     await page.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
     check(
-      "giriş yapmışken /register → /dashboard",
-      page.url().includes("/dashboard"),
+      "giriş yapmışken /register → /write",
+      page.url().includes("/write"),
       page.url()
     );
 
     console.log("\n4 · çıkış");
-    await page.goto(`${BASE}/dashboard`, { waitUntil: "networkidle0" });
+    await page.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
     await Promise.all([
       page.waitForNavigation({ waitUntil: "networkidle0" }).catch(() => {}),
       page.click('form button[type="submit"]'),
@@ -162,7 +162,7 @@ async function main() {
     );
 
     console.log("\n5 · çıkıştan sonra korumalı sayfa");
-    await page.goto(`${BASE}/dashboard`, { waitUntil: "networkidle0" });
+    await page.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
     check("tekrar /login'e düşüyor", page.url().includes("/login"), page.url());
 
     console.log("\n6 · yanlış şifreyle giriş");
@@ -180,7 +180,7 @@ async function main() {
     console.log("\n7 · doğru şifreyle giriş");
     await page.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
     await submitAuthForm(page, EMAIL, PASSWORD);
-    check("giriş sonrası /dashboard", page.url().includes("/dashboard"), page.url());
+    check("giriş sonrası /write", page.url().includes("/write"), page.url());
 
     console.log("\n8 · zayıf şifreyle kayıt reddi");
     const page2 = await browser.createBrowserContext().then((c) => c.newPage());
@@ -202,9 +202,9 @@ async function main() {
     const page3 = await ctx.newPage();
     await page3.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
     await submitAuthForm(page3, trTyped, PASSWORD);
-    check("İ'li adresle kayıt oldu", page3.url().includes("/dashboard"), page3.url());
+    check("İ'li adresle kayıt oldu", page3.url().includes("/write"), page3.url());
 
-    await page3.goto(`${BASE}/dashboard`, { waitUntil: "networkidle0" });
+    await page3.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
     check(
       "kayıt küçük harfli hâliyle saklandı",
       (await page3.content()).includes(trBase)
@@ -216,7 +216,7 @@ async function main() {
     await submitAuthForm(page4, trBase, PASSWORD);
     check(
       "küçük harfle giriş yapılabiliyor",
-      page4.url().includes("/dashboard"),
+      page4.url().includes("/write"),
       page4.url()
     );
     extraAccounts.push(trBase);
@@ -327,7 +327,7 @@ async function main() {
     const otherPage = await otherCtx.newPage();
     await otherPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
     await submitAuthForm(otherPage, otherEmail, PASSWORD);
-    check("ikinci hesap açıldı", otherPage.url().includes("/dashboard"), otherPage.url());
+    check("ikinci hesap açıldı", otherPage.url().includes("/write"), otherPage.url());
     extraAccounts.push(otherEmail);
 
     const stolen = await otherPage.goto(`${BASE}/entries/${entryId}`, {
@@ -368,13 +368,29 @@ async function main() {
     // ══════════ AŞAMA 03 · deterministik analiz (K0) ══════════
     console.log("\n21 · K0 şeridi ve bulgular");
     await page.goto(entryUrl, { waitUntil: "networkidle0" });
-    const k0 = await readText(page, ".k0");
-    check("K0 şeridi görünüyor", Boolean(k0 && k0.includes("kelime")), String(k0).slice(0, 60));
+    /*
+     * Ham ölçüler artık ekranın üstünde bir şerit değil, "Ölçüm ayrıntısı"
+     * katlanır kutusunun içinde. `<details>` kapalıyken de DOM'da duruyor —
+     * `display: none` ile gizlenmiş bir şey değil, açılmamış bir çekmece.
+     */
+    const olcu = await readText(page, ".read-detail .pairs");
+    check("ham ölçüler okunabiliyor", Boolean(olcu && olcu.includes("kelime")), String(olcu).slice(0, 60));
     check("kelime bandı çubuğu var", (await page.$$(".bands-slice")).length > 0);
+    /*
+     * Sayılan şey KURAL katmanının bulguları.
+     *
+     * Kayıt sayfası açılınca model katmanı artık KENDİLİĞİNDEN koşuyor ve
+     * yoruma dayalı bir bulgu üretebiliyor — bu testin ölçmek istediği şey
+     * o değil: deterministik katman temiz bir cümlede susmalı. Satırın
+     * künyesi hangi katmanın ürettiğini yazıyor, sayım oradan.
+     */
+    const kuralBulgulari = await page.$$eval(".fix-src", (els) =>
+      els.filter((el) => (el.textContent ?? "").startsWith("kural")).length
+    );
     check(
-      "temiz metinde bulgu yok",
-      (await page.$$(".finding")).length === 0,
-      `${(await page.$$(".finding")).length} bulgu`
+      "temiz metinde kural katmanı susuyor",
+      kuralBulgulari === 0,
+      `${kuralBulgulari} kural bulgusu`
     );
 
     console.log("\n22 · hatalı metin gerçekten bulgu üretiyor");
@@ -389,7 +405,7 @@ async function main() {
     await waitForUrl(page, (u) => /\/entries\/\d+$/.test(u) && u !== entryUrl, 20000);
     await new Promise((r) => setTimeout(r, 600));
 
-    const kinds = await page.$$eval(".finding-kind", (els) =>
+    const kinds = await page.$$eval(".fix-kind", (els) =>
       els.map((el) => el.textContent ?? "")
     );
     const joined = kinds.join(" | ");
@@ -399,10 +415,10 @@ async function main() {
     check("yazım hatası yakalandı", /Yazım|yazım/.test(joined), joined);
     check("tekrar yakalandı", /tekrar/i.test(joined), joined);
 
-    const marks = await page.$$eval(".mark-finding", (els) => els.length);
+    const marks = await page.$$eval(".read-mark", (els) => els.length);
     check("metinde işaretler var", marks >= 6, `${marks} işaret`);
 
-    const suggestions = await page.$$eval(".finding-fix .now", (els) =>
+    const suggestions = await page.$$eval(".fix-now", (els) =>
       els.map((el) => el.textContent)
     );
     check("düzeltme önerisi veriliyor", suggestions.includes("I agree"), suggestions.join(", "));
@@ -412,10 +428,22 @@ async function main() {
     await page.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
 
     // Atlama bağlantısı: odaklanmadan gizli, odaklanınca görünür.
-    const skipHidden = await page.$eval(".skip", (el) => el.getBoundingClientRect().left < -1000);
+    /*
+     * Şart: bağlantı ekranın DIŞINDA olsun. Hangi eksende olduğu bir
+     * uygulama ayrıntısı — eski stil sayfası sola, yenisi yukarı atıyor ve
+     * ikisi de aynı erişilebilirlik kuralını karşılıyor. Test kuralı
+     * ölçüyor, uygulamayı değil.
+     */
+    const skipHidden = await page.$eval(".skip", (el) => {
+      const r = el.getBoundingClientRect();
+      return r.bottom < 0 || r.right < 0 || r.top > window.innerHeight || r.left > window.innerWidth;
+    });
     check("atlama bağlantısı normalde gizli", skipHidden);
     await page.keyboard.press("Tab");
-    const skipShown = await page.$eval(".skip", (el) => el.getBoundingClientRect().left >= 0);
+    const skipShown = await page.$eval(".skip", (el) => {
+      const r = el.getBoundingClientRect();
+      return r.top >= 0 && r.left >= 0 && r.bottom <= window.innerHeight;
+    });
     check("ilk Tab'da atlama bağlantısı görünüyor", skipShown);
 
     // Her form alanının erişilebilir bir adı olmalı.

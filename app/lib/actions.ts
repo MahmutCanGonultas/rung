@@ -49,7 +49,7 @@ export async function registerAction(
     return { error: reportUnexpected("kayıt", error), email };
   }
 
-  redirect("/dashboard");
+  redirect("/write");
 }
 
 export async function loginAction(
@@ -89,7 +89,7 @@ export async function loginAction(
     return { error: reportUnexpected("giriş", error), email };
   }
 
-  redirect("/dashboard");
+  redirect("/write");
 }
 
 export async function logoutAction(): Promise<void> {

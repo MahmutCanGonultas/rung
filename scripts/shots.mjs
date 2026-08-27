@@ -176,7 +176,6 @@ const PAGES = [
   ["anasayfa", "/", false],
   ["giris", "/login", false],
   ["kayit", "/register", false],
-  ["pano", "/dashboard", true],
   ["yaz", "/write", true],
   ["gecmis", "/history", true],
   ["ilerleme", "/progress", true],

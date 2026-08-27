@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default async function RegisterPage() {
   // Giriş yapmış birinin kayıt sayfasında işi yok.
-  if (await getSessionUser()) redirect("/dashboard");
+  if (await getSessionUser()) redirect("/write");
 
   return (
     <GateShell

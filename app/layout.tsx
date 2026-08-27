@@ -1,35 +1,53 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import { Inter, Source_Serif_4 } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin", "latin-ext"], // latin-ext: ş ğ ı İ ö ü ç
-  display: "swap",
-  variable: "--font-inter",
-});
-
 /*
- * Kitap yüzü — YALNIZCA okunacak şeylerde: başlıklar ve ölçülen İngilizce
- * cümle. İşletilen her şey (etiket, düğme, mono künye, sayı) Inter kalıyor:
- * okunan serif, kullanılan sans.
+ * İKİ YÜZ, VE ARALARINDAKİ SINIR BİR ANLAM SINIRI.
  *
- * TÜRKÇE KAPSAMI DİSKTEN DOĞRULANDI — `next/font`un kendi `font-data.json`
- * dosyasında Source Serif 4 için `latin-ext` var (İ Ğ ş Ş); ı ç ö ü zaten
- * `latin` içinde. Yedek Georgia da tam Türkçe kapsıyor.
+ *   Türkçe olan her şey  → sans
+ *   Ölçülen İngilizce metin, HER SAYI, ve künyeler (K0, tense, prompt v1) → mono
  *
- * `axes: ["opsz"]` var, `weight` YOK: ikisi birlikte verilseydi Next tek bir
- * statik kesit indirir ve 25px başlıkla 50px başlık aynı çizimi kullanırdı.
+ * "Türkçe YAZILIR; İngilizce ve sayı OKUNUR." Önceki sürümde bu ayrımı bir
+ * kitap serifi yapıyordu (Source Serif 4) ve ayrım DEKORATİFTİ — başlıklar
+ * serif, gövde sans. Şimdi ayrım işlevsel: numune, aletin ekran yüzüyle
+ * gösteriliyor. Ürün bir ölçüm aleti; ölçtüğü şey ekranında mono görünür.
+ *
+ * Aynı süperailenin iki üyesi: ölçüleri, tonu ve rakam çizimi birlikte
+ * tasarlanmış. Plex bir MÜHENDİSLİK yüzü — düz yanlı `a`, açılı sonlanmalar,
+ * kusursuz tabular rakam.
+ *
+ * TÜRKÇE KAPSAMI DİSKTEN DOĞRULANDI: `next/font`un kendi `font-data.json`
+ * dosyasında iki yüz için de `latin-ext` var (ş ğ İ ı Ş Ğ); ç ö ü zaten
+ * `latin` içinde.
  *
  * Font DERLEME ANINDA kendi sunucumuza iniyor — çalışma zamanında Google'a
  * hiçbir istek gitmiyor.
  */
-const serif = Source_Serif_4({
+const sans = IBM_Plex_Sans({
   subsets: ["latin", "latin-ext"],
   display: "swap",
-  variable: "--font-serif",
-  axes: ["opsz"],
+  variable: "--font-sans",
+  /*
+   * `axes` var, `weight` YOK: ikisi birlikte verilseydi Next tek bir STATİK
+   * kesit indirirdi ve 400 ile 700 arasındaki her ağırlık taklit edilirdi.
+   * Böyle tek dosyada bütün ağırlık ve genişlikler geliyor.
+   */
+  axes: ["wdth"],
+});
+
+/*
+ * Mono'nun değişken ekseni yok — ağırlıklar tek tek isteniyor. Üçü de
+ * kullanılıyor: 400 numune metni, 500 künye ve kalibrasyon rakamı, 600 büyük
+ * okuma.
+ */
+const mono = IBM_Plex_Mono({
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  variable: "--font-mono",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -58,7 +76,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="tr" className={`${inter.variable} ${serif.variable}`}>
+    <html lang="tr" className={`${sans.variable} ${mono.variable}`}>
       <body>
         {/*
           Klavyeyle gezen ve ekran okuyucu kullananlar için: her sayfada
