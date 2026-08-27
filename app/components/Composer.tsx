@@ -15,9 +15,11 @@ import { countWords } from "../lib/words";
 
 type Props = {
   action: (prev: SaveState, formData: FormData) => Promise<SaveState>;
+  /** Boş dizgi: kendi konusunda yazıyor, görev yok. */
   taskId: string;
   minWords: number;
   maxWords: number;
+  placeholder?: string;
 };
 
 function SaveButton({ words, min }: { words: number; min: number }) {
@@ -34,7 +36,13 @@ function SaveButton({ words, min }: { words: number; min: number }) {
   );
 }
 
-export function Composer({ action, taskId, minWords, maxWords }: Props) {
+export function Composer({
+  action,
+  taskId,
+  minWords,
+  maxWords,
+  placeholder,
+}: Props) {
   const [state, formAction] = useActionState(action, EMPTY_SAVE_STATE);
   const [text, setText] = useState(state.body);
 
@@ -57,7 +65,10 @@ export function Composer({ action, taskId, minWords, maxWords }: Props) {
         name="body"
         value={text}
         onChange={(event) => setText(event.target.value)}
-        placeholder="Buraya İngilizce yaz. Sözlük kullanma — ölçtüğümüz şey şu anki hâlin."
+        placeholder={
+          placeholder ??
+          "Buraya İngilizce yaz. Sözlük kullanma — ölçtüğümüz şey şu anki hâlin."
+        }
         rows={14}
         lang="en"
         spellCheck={false}
@@ -67,10 +78,14 @@ export function Composer({ action, taskId, minWords, maxWords }: Props) {
       <div className="composer-foot">
         <span className="composer-count">
           <b>{words}</b> kelime
-          <span className="composer-target">
-            {" · hedef "}
-            {minWords}–{maxWords}
-          </span>
+          {/* Hedef aralık GÖREVDEN geliyor; kendi konusunda yazarken böyle bir
+              hedef yok ve uydurulmuş bir aralık göstermek yanlış olurdu. */}
+          {taskId ? (
+            <span className="composer-target">
+              {" · hedef "}
+              {minWords}–{maxWords}
+            </span>
+          ) : null}
           {short ? <span className="composer-flag">kısa</span> : null}
           {long ? <span className="composer-flag">uzun</span> : null}
         </span>

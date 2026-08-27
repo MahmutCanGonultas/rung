@@ -906,6 +906,37 @@ a.chip:hover {
   color: var(--on-accent);
   font-weight: 700;
 }
+/* Henüz ölçüm yok: hiçbir bant yanmıyor ve neden yanmadığı yazıyor. */
+.rule-none {
+  font-size: var(--t-micro);
+  color: var(--ink-3);
+}
+
+/*
+ * "Kendi konum" bir bağlam DEĞİL, bir kip.
+ *
+ * Yanındaki "Serbest" bağlamı açık uçlu GÖREV veriyor ("Write about something
+ * you did yesterday"); bu kip hiç görev vermiyor. İkisi yan yana dururken aynı
+ * şeyi söylüyor gibi okunuyordu — araya gerçek bir ayraç kondu ve jeton kesik
+ * çerçeveyle ayrıldı: farklı türden bir şey olduğu görünsün.
+ */
+.chip.is-own {
+  margin-inline-start: var(--s-4);
+  border-style: dashed;
+  border-color: var(--hair-2);
+  position: relative;
+}
+.chip.is-own::before {
+  content: "";
+  position: absolute;
+  inset-block: 6px;
+  inset-inline-start: calc(var(--s-4) / -2);
+  inline-size: 1px;
+  background: var(--hair-2);
+}
+.chip.is-own.is-on {
+  border-style: solid;
+}
 
 
 /* ═══════════════════════════════════════════════════════════════════

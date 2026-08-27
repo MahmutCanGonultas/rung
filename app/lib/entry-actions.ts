@@ -1,9 +1,10 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { log } from "./log";
 
-import { findTaskById } from "./content";
+import { findContextBySlug, findTaskById } from "./content";
 import { createEntry } from "./entries";
 import type { SaveState } from "./save-state";
 import { getSessionUser } from "./session";
@@ -33,6 +34,9 @@ import { saveEstimate } from "./k3/store";
  * gösteriliyor ama zorlanmıyor — kısa yazana "kaydetmiyorum" demek, yazmayı
  * bırakmasının en kısa yolu.
  */
+/** Görevsiz kayıtların bağlamı. `scripts/seed-data.mjs` ile aynı slug. */
+const FREE_CONTEXT = "free";
+
 const MIN_WORDS = 10;
 const MAX_CHARS = 20000;
 
@@ -44,7 +48,20 @@ export async function saveEntryAction(
   if (!user) redirect("/login");
 
   const body = readField(formData, "body").trim();
-  const taskId = readField(formData, "taskId");
+  /*
+   * Görev İSTEĞE BAĞLI.
+   *
+   * Ürün bugüne kadar yalnızca verilen görev üzerinden yazmaya izin
+   * veriyordu; boş `taskId` "görev bulunamadı" hatasıyla dönüyordu. Oysa
+   * insanların İngilizce yazma ihtiyacı çoğunlukla kendi konularında çıkıyor
+   * — bir e-posta, bir mesaj, aklından geçen bir şey. Ölçüm aleti orada da
+   * çalışmalı.
+   *
+   * Boş gelirse kayıt "Serbest" bağlamına, görevsiz yazılıyor. Ölçüm zinciri
+   * değişmiyor: K0 metni zaten görevden bağımsız okuyor, model katmanının
+   * istemi de görev satırlarını yalnızca VARSA ekliyor.
+   */
+  const taskId = readField(formData, "taskId").trim();
 
   if (body.length === 0) {
     return { error: "Önce bir şeyler yaz.", body };
@@ -64,15 +81,25 @@ export async function saveEntryAction(
 
   let entryId: string;
   try {
-    const task = await findTaskById(taskId);
-    if (!task) {
+    /*
+     * Bağlam İSTEMCİDEN ALINMIYOR. Görev varsa görevin kendisinden, yoksa
+     * sunucudaki sabit "free" bağlamından okunuyor: istemci "hangi görev"
+     * diyebilir, o görevin hangi bağlama ait olduğunu söyleyemez.
+     */
+    const task = taskId ? await findTaskById(taskId) : null;
+    if (taskId && !task) {
       return { error: "Görev bulunamadı. Sayfayı yenileyip tekrar dene.", body };
+    }
+
+    const context = task ? null : await findContextBySlug(FREE_CONTEXT);
+    if (!task && !context) {
+      return { error: "Serbest bağlam bulunamadı — `npm run seed` gerekiyor.", body };
     }
 
     entryId = await createEntry({
       userId: user.id,
-      contextId: task.contextId, // istemciden değil, görevden
-      taskId: task.id,
+      contextId: task ? task.contextId : context!.id,
+      taskId: task ? task.id : null,
       body,
       wordCount,
     });
@@ -99,6 +126,19 @@ export async function saveEntryAction(
         signals: estimate.signals,
         reliable: estimate.reliable,
       });
+      /*
+       * KABUĞU DA TAZELE.
+       *
+       * Seviye cetveli `(app)/layout.tsx` içinde ve Next, aynı layout altındaki
+       * gezinmede layout'u YENİDEN ÇİZMİYOR — `/write`ten `/entries/123`e
+       * gidince kabuk ilk çizimdeki hâliyle kalıyor. Sonuç ÖLÇÜLDÜ: ilk kaydını
+       * yazan kullanıcının tahmini veritabanına yazılıyor ama cetvelde hiçbir
+       * bant yanmıyordu; ancak tam sayfa yenilemede görünüyordu.
+       *
+       * Ölçüm kabuk düzeyinde bir durum değiştirdiği için geçersiz kılınacak
+       * olan da layout.
+       */
+      revalidatePath("/", "layout");
     } catch (error) {
       log.error("level_estimate_failed", error, { userId: user.id, entryId });
     }

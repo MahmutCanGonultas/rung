@@ -6,7 +6,7 @@ import { Mark } from "../components/Mark";
 import { NavLink } from "../components/NavLink";
 import { logoutAction } from "../lib/actions";
 import { requireUser } from "../lib/guard";
-import { currentLevel } from "../lib/k3/store";
+import { latestEstimate } from "../lib/k3/store";
 
 /*
  * Giriş yapmış kullanıcının kabuğu.
@@ -35,7 +35,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
    * `requireUser()` oturum çerezini zaten okumuş oluyor.
    */
   const user = await requireUser();
-  const level = await currentLevel(user.id);
+  /*
+   * `currentLevel()` DEĞİL: o, ölçüm bulamayınca varsayılana düşüyor ve hiç
+   * yazmamış birine kendi seviyesi olarak B1 gösteriyordu. Burada ölçümün
+   * kendisi okunuyor; yoksa yok.
+   */
+  const estimate = await latestEstimate(user.id);
 
   return (
     <div className="shell">
@@ -50,7 +55,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <NavLink href="/progress">İlerleme</NavLink>
         </nav>
 
-        <LevelRule level={level} />
+        <LevelRule level={estimate?.level ?? null} />
 
         <div className="shell-who">
           <span className="shell-user">{user.email}</span>

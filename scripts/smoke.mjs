@@ -240,8 +240,17 @@ async function main() {
     const firstTask = await readText(page, ".task-title");
     check("görev gösteriliyor", Boolean(firstTask && firstTask.length > 5), String(firstTask));
 
-    const contextCount = await page.$$eval(".chips .chip", (els) => els.length);
+    /*
+     * Bağlam sayısı ile KİP sayısı ayrı. Jeton satırında beş bağlam ve bir de
+     * "kendi konum" kipi var; ikisi aynı türden şey değil ve tek bir sayıyla
+     * ölçülünce bu test kip eklendiğinde patlamıştı.
+     */
+    const contextCount = await page.$$eval(
+      ".chips .chip:not(.is-own)",
+      (els) => els.length
+    );
     check("beş bağlam listeleniyor", contextCount === 5, `${contextCount} bağlam`);
+    check("kendi konum kipi var", (await page.$$(".chip.is-own")).length === 1);
 
     console.log("\n12 · başka görev ver");
     /*
@@ -302,7 +311,23 @@ async function main() {
 
     console.log("\n15 · geçmiş");
     await page.goto(`${BASE}/history`, { waitUntil: "networkidle0" });
-    check("kayıt listede", (await page.content()).includes("deposit"), "");
+    /*
+     * KAYDIN KENDİSİ aranıyor, metninden bir kelime değil.
+     *
+     * Buraya "deposit" geçiyor mu diye bakılıyordu ve o kelime listede yalnızca
+     * GÖREVİN metninde bulunabiliyor — görev ise havuzdan RASTGELE seçiliyor.
+     * Yani test yıllardır kura tutturduğu için geçiyordu; havuz büyüyünce
+     * kaldı. Ölçmek istediği şey "yazdığım kayıt listede mi", o da kimliğiyle
+     * ölçülüyor.
+     */
+    const listeDe = await page.$$eval("a.entry-row", (els) =>
+      els.map((el) => el.getAttribute("href"))
+    );
+    check(
+      "kayıt listede",
+      listeDe.includes(`/entries/${entryId}`),
+      listeDe.join(", ")
+    );
     const rows = await page.$$eval(".entry-row", (els) => els.length);
     check("bir satır var", rows === 1, `${rows} satır`);
 
@@ -424,6 +449,61 @@ async function main() {
     check("düzeltme önerisi veriliyor", suggestions.includes("I agree"), suggestions.join(", "));
 
     // ══════════ ERİŞİLEBİLİRLİK ══════════
+    // ══════════ YENİ DAVRANIŞLAR ══════════
+    console.log("\n22b · hiç yazmadan seviye gösterilmiyor");
+    /*
+     * Hiç kaydı olmayan bir hesapta seviye cetvelinde hiçbir bant YANMAMALI.
+     * Önceki hâli `currentLevel()` okuyordu ve o, ölçüm bulamayınca varsayılana
+     * (B1) düşüyor: yeni kullanıcı kendi seviyesi olarak uydurulmuş bir bant
+     * görüyordu. Ürünün tek cümlelik kimliği tam olarak bunu yapmamak.
+     */
+    const yeniCtx = await browser.createBrowserContext();
+    const yeniPage = await yeniCtx.newPage();
+    const yeniMail = `taze-${stamp}@rung.test`;
+    await yeniPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
+    await submitAuthForm(yeniPage, yeniMail, PASSWORD);
+    extraAccounts.push(yeniMail);
+    const yanan = await yeniPage.$$eval(".rule-step.is-on", (els) => els.length);
+    check("kayıtsız hesapta hiçbir bant yanmıyor", yanan === 0, `${yanan} yanan bant`);
+    const cetvelNot = await readText(yeniPage, ".rule-none", 4);
+    check("neden ölçülmediği yazıyor", Boolean(cetvelNot), String(cetvelNot));
+
+    console.log("\n22c · kendi konusunda yazma");
+    /*
+     * Görevsiz kayıt: `?context=own` görev vermiyor, kaydetme eylemi boş
+     * `taskId` ile "Serbest" bağlamına yazıyor ve ölçüm zinciri aynı çalışıyor.
+     */
+    await yeniPage.goto(`${BASE}/write?context=own`, { waitUntil: "networkidle0" });
+    await yeniPage.waitForSelector(".composer button[type=submit]", { timeout: 15000 });
+    check(
+      "kendi konusunda görev verilmiyor",
+      (await yeniPage.$$(".task-swap")).length === 0
+    );
+    await yeniPage.type(
+      ".editor",
+      "Yesterday i have wrote a email to my landlord about the deposit. " +
+        "He didnt answered me and i am agree with my friend that this is not normal."
+    );
+    await yeniPage.click(".composer button[type=submit]");
+    const serbestOk = await waitForUrl(
+      yeniPage,
+      (u) => /\/entries\/\d+$/.test(u),
+      20000
+    );
+    check("görevsiz metin kaydedildi", serbestOk, yeniPage.url());
+    await new Promise((r) => setTimeout(r, 800));
+    const serbestBaslik = await readText(yeniPage, ".read-task", 6);
+    check(
+      "kayıt serbest yazı olarak açılıyor",
+      String(serbestBaslik).includes("Serbest"),
+      String(serbestBaslik)
+    );
+    const serbestBulgu = await yeniPage.$$eval(".fix", (els) => els.length);
+    check("görevsiz metinde de bulgu üretiliyor", serbestBulgu > 0, `${serbestBulgu} bulgu`);
+    const yananSonra = await yeniPage.$$eval(".rule-step.is-on", (els) => els.length);
+    check("ilk kayıttan sonra seviye ölçülüyor", yananSonra === 1, `${yananSonra} yanan bant`);
+    await yeniCtx.close();
+
     console.log("\n23 · erişilebilirlik");
     await page.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
 
