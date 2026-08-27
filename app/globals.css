@@ -1,53 +1,58 @@
 /* ═══════════════════════════════════════════════════════════════════
-   RUNG — ÖLÇÜM ALETİNİN STİL SAYFASI
+   RUNG — IŞIKLI KAYISI YÜZEYLER
 
-   Bu dosya sıfırdan yazıldı. Öncesi silindi, taşınmadı.
+   Bu, stil sayfasının üçüncü sıfırdan yazılışı. Önceki ikisi de reddedildi
+   ve ikisinin de kusuru kaydedildi, çünkü bu sefer tahmin edilmedi: dört
+   ayrı görsel dil çalışan sayfa olarak çizildi, ürün sahibi bakıp seçti.
 
-   Silinen dilin ne olduğu önemli, çünkü buradaki her karar onun karşısında
-   alındı: krem kâğıt zemin, zümrüt yeşili marka rengi, kitap serifi
-   başlıklar, yuvarlak köşeli "kart" kutuları, mono küçük-büyük etiketler.
-   Yedi tur boyunca o dilin RENGİ değişti; dilin kendisi hiç değişmedi.
+     REDDEDİLEN 1 — "kâğıt ve zümrüt": krem zemin, zümrüt yeşili, kitap
+     serifi, yuvarlak beyaz kartlar. Yedi tur rengi değişti, "hep aynı".
 
-   ───────────────────────────────────────────────────────────────────
-   BEŞ KARAR, HEPSİ BUNUN ÜSTÜNE KURULU
-
-   1 · ZEMİN KÂĞIT DEĞİL, İŞLENMİŞ METAL.
-       Krem (#f3f1ec, sarımsı) gitti; yerine 220° tonunda soğuk gri geldi.
-       Ürün bir belge değil bir tezgâh.
-
-   2 · RENK MARKA DEĞİL, SİNYAL.
-       Sayfada iki renk var ve ikisi de ÖLÇÜM: `--trace` ölçülen değer,
-       `--fault` bulunan hata. Gövdede renk YOK. Bir kumpasın üstünde marka
-       rengi olmaz; skalasında bir işaret olur.
-
-   3 · KUTU DİYE BİR NESNE YOK.
-       `--r: 0`. Ayırma işini boşluk, kılçizgi ve kertik yapıyor. "İç içe
-       geçmiş" şikâyetinin ölçülebilir sebebi kutuların içindeki kutulardı.
-
-   4 · YÜZ SEÇİMİ ANLAMDIR.
-       Türkçe olan her şey sans; ölçülen İngilizce, her sayı ve her künye
-       mono. "Türkçe yazılır; İngilizce ve sayı OKUNUR." Eski serif ayrımı
-       dekoratifti, bu işlevsel: numune aletin ekran yüzüyle gösteriliyor.
-
-   5 · BOŞLUĞUN SONU HER ZAMAN BİR ÇİZGİ.
-       "Şuranın üstü aşırı boş kalmış" itirazı boşluğa değil, ARTIK gibi
-       duran boşluğa yapılmıştı. Burada her büyük aralık 1px kılçizgiyle
-       bitiyor ve o çizginin üstünde bir folio rakamı oturuyor — boşluk
-       artık değil, ölçülmüş aralık.
+     REDDEDİLEN 2 — "gri tezgâh": soğuk gri, ultramarin, SIFIR yarıçap, hiç
+     kutu yok, her şey 1px çizgiyle ayrılmış, mono etiketler. Kusuru:
+     ÇIPLAKTI — biçimlendirilmemiş HTML gibi duruyordu, ve soğuktu. Oysa
+     sahibi açıkça "sayfa daha iç açıcı olsun" demişti.
 
    ───────────────────────────────────────────────────────────────────
-   PAZARLIĞA KAPALI OLANLAR (bunlar tasarım değil, doğruluk)
+   SEÇİLEN DİL — BEŞ KARAR
 
-   · TABAN CSS DAİMA BİTMİŞ KARE. Animasyonlu her özelliğin SON değeri
-     taban kuralda yazılı; `[data-play="1"]` onu baştan oynatıyor.
-     Korumasız `opacity: 0` yok. JavaScript inmezse sayfa tam görünüyor.
+   1 · SAYFA YÜZEYLERDEN OLUŞUYOR, ÇİZGİLERDEN DEĞİL.
+       Her bölüm kendi büyük, yuvarlak (40px), yumuşak gradyanlı yüzeyinde
+       oturuyor. Ayrımı kılçizgi değil ZEMİN yapıyor. Bu, "çıplak" kusurunun
+       doğrudan cevabı: ekranda tutulacak bir şey var.
+
+   2 · ZEMİN SICAK, RENK ÇOK AMA DOYGUNLUK AZ.
+       Kırık beyaz sayfa, üstünde kayısı · leylak · gül yüzeyler. Hiçbiri
+       parlak değil; hepsi aynı sıcaklıkta ve aynı açıklıkta.
+
+   3 · RENK BURADA SINIFLANDIRMA.
+       Taksonominin beş ailesi beş ayrı renk taşıyor — ve bu doğru bir
+       görsel gramer: aileler NOMİNAL kategoriler (aralarında büyüklük
+       ilişkisi yok) ve renk de nominal bir kodlama. Buna karşılık seviye
+       bantları A1→C1 SIRALI, o yüzden onlar tek bir rampanın beş durağı.
+       İki veri türü, iki ayrı gramer.
+
+   4 · KÖŞE YUVARLAK, DÜĞME HAP.
+       Panel 40px, jeton 10px, düğme tam yuvarlak. Yumuşaklık bu üründe
+       "kolay" demek değil; ölçüm sert, ekran değil.
+
+   5 · MONO YOK.
+       Önceki iki denemede ölçülen İngilizce ve bütün sayılar daktilo
+       yüzüyle yazılıyordu. Ölçülen cümle artık gövde yüzünde ve BÜYÜK:
+       okunacak bir metin gibi duruyor, terminal çıktısı gibi değil.
+
+   ───────────────────────────────────────────────────────────────────
+   PAZARLIĞA KAPALI OLANLAR (tasarım değil, doğruluk)
+
+   · TABAN CSS DAİMA BİTMİŞ KARE. Animasyonlu her özelliğin son değeri taban
+     kuralda yazılı; `[data-play="1"]` onu baştan oynatıyor. Korumasız
+     `opacity: 0` yok. JavaScript inmezse sayfa tam görünüyor.
    · `prefers-reduced-motion: reduce` hareketi GECİKMELERİYLE öldürüyor.
-   · Mobilde hiçbir şey `display: none` ile gizlenmiyor; görsel sıra DOM
-     sırasından ayrılmıyor (`order` yasak).
-   · Metin kontrastı WCAG AA. Her çift hesaplandı, `npm run contrast`
-     sürekli ölçüyor.
-   · `forced-colors: active` altında anlam kaybolmuyor — gradyan ve gölge
-     düştüğünde ayrım kılçizgi, kertik ve metinle sürüyor.
+   · Mobilde hiçbir şey `display: none` ile gizlenmiyor; `order` yasak.
+   · Metin kontrastı WCAG AA. Her çift hesaplandı; `npm run contrast` ve
+     `npm run styles` sürekli ölçüyor.
+   · `forced-colors: active` altında anlam kaybolmuyor: gradyanlar ve
+     gölgeler düştüğünde ayrım kenarlık ve metinle sürüyor.
    · Dış varlık yok: CDN, indirilen görsel, kütüphane yok.
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -56,257 +61,248 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── yüzler ───────────────────────────────────────────────────────
-     `--font-sans` ve `--font-mono` değişkenlerini `next/font` <html>
-     üzerine koyuyor; buradaki yedek yığın o inmezse devreye giriyor. */
-  --sans: var(--font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Consolas,
-    "Liberation Mono", monospace;
+  --display: var(--font-display), "Trebuchet MS", system-ui, sans-serif;
+  --body: var(--font-body), system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* ── gövde · üç kademe, dördüncüsü yok ─────────────────────────────
-     `--well` OKUMA PENCERESİ ve ekran başına BİR tane. Kural: bir ekranda
-     ikinci bir kuyu varsa yanlış olan yerleşimdir, jeton değil. */
-  --ground: #e9ebef;
-  --ground-2: #f3f4f7;
-  --well: #fcfcfd;
+  /* ── sayfa ve mürekkep ────────────────────────────────────────────
+     ÖLÇÜLDÜ (sayfa zemininde): ink 14,05 · ink-2 8,00 · ink-3 6,47.
+     Üçüncü mürekkep ayrıca EN KOYU yüzeyde de sınandı: 4,80. */
+  --page: #fcf7f3;
+  --ink: #33222b;
+  --ink-2: #5e4650;
+  --ink-3: #6b545d;
 
-  /* ── mürekkep ─────────────────────────────────────────────────────
-     ÖLÇÜLDÜ (açık tema, --ground üstünde): ink 15,33 · ink-2 7,71 ·
-     ink-3 5,00. Üçü de AA'nın 4,5 tabanının üstünde. */
-  --ink: #11151c;
-  --ink-2: #414855;
-  --ink-3: #5c6472;
+  /* ── vurgu · terracotta ───────────────────────────────────────────
+     Sayfada 6,33 · en koyu yüzeyde 4,70 · beyaz etiket üstünde 6,73. */
+  --accent: #a03a1e;
+  --accent-deep: #8c3119;
+  --on-accent: #ffffff;
 
-  /* ── çizgi · kutunun yerine geçen tek yapı malzemesi ───────────────
-     Üç ağırlık ve üçünün işi farklı:
-       soft   → kalibrasyon kertiği, liste satır ayracı
-       rule   → blok ayracı, ızgara ana çizgisi
-       strong → bölge sınırı, girdi alt çizgisi (3,15:1 — denetim tabanı) */
-  --rule-soft: #d3d8e0;
-  --rule: #b4bac6;
-  --rule-strong: #7c8493;
+  /* ── yüzeyler · her bölümün kendi zemini ──────────────────────────
+     Üç aile: kayısı (yazılan), leylak (bulunan), gül (ölçülen). Hepsi
+     aynı açıklıkta; hiyerarşi renk TONUYLA değil YERLE kuruluyor. */
+  --warm-1: #fceadc;
+  --warm-2: #f8d9c4;
+  --warm-3: #f6d0ba;
+  --cool-1: #f2ecf9;
+  --cool-2: #e9e1f5;
+  --rose-1: #fbe9ea;
+  --rose-2: #f6dde0;
+  /* Yüzeyin üstünde duran ikinci kademe: girdi, sessiz düğme, satır. */
+  --soft: #fdf4ee;
+  --soft-2: #ffffff;
+  --hair: rgba(51, 34, 43, 0.1);
+  --hair-2: rgba(51, 34, 43, 0.18);
 
-  /* ── sinyal 1 · İZ (ölçülen değer) ────────────────────────────────
-     7,54:1. Metin ve odak halkası bu; dolgu bir kademe parlak. */
-  --trace: #1a34c4;
-  --trace-fill: #2440dc;
-  --trace-wash: #dfe4fb;
-  /* Dolgunun üstündeki etiket. TEMAYLA TERS DÖNÜYOR: açık temada beyaz
-     7,39:1 veriyor, koyu temadaki parlak dolguda 3,27:1'e düşüp KALIYOR.
-     Bu yüzden sabit değil, jeton. */
-  --on-trace: #ffffff;
+  /* ── taksonominin beş ailesi · NOMİNAL, beş ayrı hue ─────────────
+     Her ailenin bir yıkaması ve bir mürekkebi var; mürekkep kendi
+     yıkamasında 5,81–7,05, sayfada 7,30–8,74. */
+  --fam-grammar: #f7d9c9;
+  --fam-grammar-ink: #8a3a1e;
+  --fam-lexis: #e6dcf4;
+  --fam-lexis-ink: #503a80;
+  --fam-mechanics: #dce5f3;
+  --fam-mechanics-ink: #2f4f80;
+  --fam-discourse: #dcefe4;
+  --fam-discourse-ink: #245c42;
+  --fam-turkish: #fbe0e6;
+  --fam-turkish-ink: #8c2f4c;
 
-  /* ── sinyal 2 · ARIZA (bulgu) ─────────────────────────────────────
-     6,21:1. Yalnız hatalı parçada ve bulgu satırında; başka hiçbir yerde. */
-  --fault: #a81c09;
-  --fault-fill: #c42b18;
-  --fault-wash: #f7dfdb;
-  --on-fault: #ffffff;
+  /* ── beş bant · SIRALI, tek rampanın beş durağı ───────────────────
+     Aileler gibi ayrı hue DEĞİL: A1'den C1'e ısınan tek bir rampa.
+     Sıralı veri sıralı gramer ister. */
+  --band-A1: #f0d9c8;
+  --band-A2: #ecc3a6;
+  --band-B1: #f2b441;
+  --band-B2: #dc9078;
+  --band-C1: #c77e81;
 
-  /* ── yön · ilerleme iyiye mi kötüye mi ────────────────────────────
-     Bunlar da sinyal: "azaldı" ve "arttı". Yeşil YOK — iyileşme izin
-     kendisiyle, kötüleşme arızayla anlatılıyor, üçüncü bir renk açılmıyor. */
-  --tone-good: #1a34c4;
-  --tone-bad: #a81c09;
-
-  /* ── beş bant · TEK rampanın beş durağı, beş hue DEĞİL ─────────────
-     Komşu duraklar arasında 3:1 vermek matematiksel olarak imkânsız
-     (tek hue, beş kademe). O yüzden ayrımı renk TEK BAŞINA taşımıyor:
-     her dilimin yanında sayısı yazılı ve şeritte 1px ayraç var. */
-  --band-A1: #7b8595;
-  --band-A2: #5d6eb8;
-  --band-B1: #3f52c0;
-  --band-B2: #2637b8;
-  --band-C1: #131e86;
-
-  /* ── model katmanı künyesi ────────────────────────────────────────
-     "Bu bulguyu model üretti" bilgisi. İzden ayrı bir mor: ölçüm değil,
-     KAYNAK bildiriyor. */
-  --model: #6b3fb0;
+  /* ── yön · ilerleme iyiye mi kötüye mi ──────────────────────────── */
+  --good: #245c42;
+  --bad: #8c2f4c;
+  /* Model katmanı künyesi — kaynak bildiriyor, ölçüm değil. */
+  --model: #503a80;
 
   /* ── üç boyutlu merdivenin yüzleri ────────────────────────────────
-     Tek ışık kaynağı: üst en aydınlık, ön orta, yan koyu, arka en koyu.
-     Sıra iki temada da korunuyor — ışığın bir yönü var. */
-  --face-top: #e6eaf0;
-  --face-front: #bcc5d2;
-  --face-side: #939fb0;
-  --face-back: #778395;
-  --lit-top: #5c74ee;
-  --lit-front: #2440dc;
-  --lit-side: #1a2fa8;
-  --face-edge: rgba(255, 255, 255, 0.5);
-  --face-shadow: rgba(17, 21, 28, 0.3);
+     Tek ışık: üst en aydınlık, ön orta, yan koyu. Sıra iki temada aynı.
+     Yanan basamak bandın kendi rengini alıyor. */
+  --face-lift: rgba(255, 255, 255, 0.55);
+  --face-shade: rgba(122, 65, 48, 0.2);
+  --plinth: #efd6c4;
+  --plinth-2: #e5c9b4;
+  --plinth-3: #fbeadd;
 
   /* ── ölçü ─────────────────────────────────────────────────────────
-     `--r: 0` sistemin kuralı. `--r-c` yalnız denetimlerde (düğme, girdi,
-     jeton) ve estetik değil ERGONOMİ: 44px'lik bir dokunma hedefi tam
-     kare olduğunda bozuk bir hücre gibi okunuyor. */
-  --r: 0;
-  --r-c: 2px;
+     Yuvarlaklık bu dilin taşıyıcısı: panel büyük, jeton orta, düğme hap. */
+  --r-panel: 40px;
+  --r-card: 22px;
+  --r-chip: 10px;
+  --r-pill: 999px;
 
-  /* ── boşluk · 24px'lik modüle oturan alet ritmi ───────────────────
-     Aritmetik bir dizi DEĞİL: her kademenin tek bir işi var, o yüzden
-     "hangi kademeyi kullansam" sorusu hiç çıkmıyor. */
+  /* ── gölge · yumuşak ve renkli, siyah değil ───────────────────────
+     Sıcak bir sayfada nötr siyah gölge kirli duruyor; gölge zeminin
+     kendi tonundan türüyor. */
+  --lift-1: 0 1px 2px rgba(122, 65, 48, 0.06), 0 4px 14px rgba(122, 65, 48, 0.05);
+  --lift-2: 0 2px 6px rgba(122, 65, 48, 0.08), 0 14px 40px rgba(122, 65, 48, 0.08);
+
+  /* ── boşluk ───────────────────────────────────────────────────────
+     Panel dili büyük boşluk ister: yüzeyin içi nefes alsın diye. */
   --s-1: 4px;
   --s-2: 8px;
   --s-3: 12px;
-  --s-4: 16px;
-  --s-5: 24px; /* ★ MODÜL: yatay iç dolgu, kertik aralığı, satır tabanı */
-  --s-6: 32px;
-  --s-7: 48px;
+  --s-4: 18px;
+  --s-5: 26px;
+  --s-6: 38px;
+  --s-7: 54px;
   --s-8: 72px;
-  --s-9: 112px; /* ★ BÖLÜM RİTMİ: iki ölçüm arasındaki nefes */
-  --s-10: 168px;
+  --s-9: 96px;
 
-  /* ── ızgara ───────────────────────────────────────────────────────
-     `--rail` kalibrasyon cetveli. Daralıyor ama ASLA kaybolmuyor:
-     cetveli olmayan alet, alet değil. */
-  --rail: 64px;
-  --gauge: 96px;
-  --measure: 68ch;
-  --measure-spec: 62ch;
-  --page: 1440px;
+  --pad: clamp(24px, 4vw, 54px); /* panel iç dolgusu */
+  --rail: clamp(20px, 3.2vw, 40px); /* sayfa kenar payı */
+  --page-max: 1240px;
 
   /* ── zaman ────────────────────────────────────────────────────────
-     Tek hareket fikri: BİR DEĞER YERİNİ BULUYOR. Süs hareketi yok. */
-  --d-1: 180ms; /* dokunuş: hover, odak */
-  --d-2: 420ms; /* bir bloğun gelişi */
-  --d-3: 700ms; /* bir ölçümün değerine yürümesi */
-  --d-4: 1100ms; /* çizginin çizilmesi */
+     Hareket fikri: bir yüzey yerine oturuyor, bir ölçüm değerine yürüyor. */
+  --d-1: 180ms;
+  --d-2: 460ms;
+  --d-3: 760ms;
   --ease: cubic-bezier(0.22, 0.68, 0.24, 1);
-  --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
 
   color-scheme: light;
 }
 
 /* ── KOYU TEMA ───────────────────────────────────────────────────────
-   Koyu tema "ışığı kısılmış açık tema" değil; ALETİN KENDİSİ: grafit
-   pano, üstünde parlayan iz.
+   Işığı kısılmış açık tema DEĞİL: aynı sıcaklığın gece hâli. Zemin
+   siyah değil derin erik-kahve; yüzeyler aynı üç aileden ama koyu.
 
    AŞAĞIDAKİ İKİ BLOK JETON JETON BİREBİR AYNI OLMAK ZORUNDA. Biri sistem
    tercihini, diğeri açık seçimi karşılıyor; ayrışırlarsa aynı sayfa iki
-   farklı renkte çiziliyor ve kimse fark etmiyor. Eşitlik `npm run styles`
-   yanında ayrıca sınanıyor. */
+   farklı renkte çiziliyor ve kimse fark etmiyor. `npm run styles` bu
+   eşitliği ölçüyor. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ground: #0e1116;
-    --ground-2: #151a21;
-    --well: #1b212a;
+    --page: #1c1417;
+    --ink: #f8efe9;
+    --ink-2: #c6b1b6;
+    --ink-3: #b09aa0;
 
-    --ink: #eef1f6;
-    --ink-2: #b4bcc9;
-    --ink-3: #8b95a5;
+    --accent: #ff9166;
+    --accent-deep: #ffa87f;
+    --on-accent: #1c1417;
 
-    --rule-soft: #232a34;
-    --rule: #333b47;
-    --rule-strong: #5a6474;
+    --warm-1: #33232a;
+    --warm-2: #3d2830;
+    --warm-3: #452c33;
+    --cool-1: #262234;
+    --cool-2: #2e283e;
+    --rose-1: #33212a;
+    --rose-2: #3b2632;
+    --soft: #2a1e22;
+    --soft-2: #34252a;
+    --hair: rgba(248, 239, 233, 0.09);
+    --hair-2: rgba(248, 239, 233, 0.16);
 
-    --trace: #93a6ff;
-    --trace-fill: #6e86f8;
-    --trace-wash: #1b2447;
-    --on-trace: #0b0e14;
+    --fam-grammar: #4a2a1e;
+    --fam-grammar-ink: #ffb08c;
+    --fam-lexis: #332a4a;
+    --fam-lexis-ink: #c3aeff;
+    --fam-mechanics: #22334a;
+    --fam-mechanics-ink: #9cc2f5;
+    --fam-discourse: #1f3d2e;
+    --fam-discourse-ink: #8fd8ae;
+    --fam-turkish: #48222f;
+    --fam-turkish-ink: #ffa3ba;
 
-    --fault: #ff9e8c;
-    --fault-fill: #f2705a;
-    --fault-wash: #3a1a15;
-    --on-fault: #0b0e14;
+    --band-A1: #5c4237;
+    --band-A2: #86583f;
+    --band-B1: #f2b441;
+    --band-B2: #c47a5f;
+    --band-C1: #b06a6d;
 
-    --tone-good: #93a6ff;
-    --tone-bad: #ff9e8c;
+    --good: #8fd8ae;
+    --bad: #ffa3ba;
+    --model: #c3aeff;
 
-    --band-A1: #6b7488;
-    --band-A2: #7c8ad6;
-    --band-B1: #93a6ff;
-    --band-B2: #aeb9ff;
-    --band-C1: #cdd4ff;
+    --face-lift: rgba(255, 255, 255, 0.16);
+    --face-shade: rgba(0, 0, 0, 0.45);
+    --plinth: #3a2a2f;
+    --plinth-2: #2e2126;
+    --plinth-3: #46333a;
 
-    --model: #c0a3ff;
-
-    --face-top: #515d6d;
-    --face-front: #38424f;
-    --face-side: #262f3a;
-    --face-back: #1a212a;
-    --lit-top: #93a6ff;
-    --lit-front: #6e86f8;
-    --lit-side: #4257c9;
-    --face-edge: rgba(255, 255, 255, 0.14);
-    --face-shadow: rgba(0, 0, 0, 0.55);
+    --lift-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.26);
+    --lift-2: 0 2px 6px rgba(0, 0, 0, 0.34), 0 14px 40px rgba(0, 0, 0, 0.36);
 
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --ground: #0e1116;
-  --ground-2: #151a21;
-  --well: #1b212a;
+  --page: #1c1417;
+  --ink: #f8efe9;
+  --ink-2: #c6b1b6;
+  --ink-3: #b09aa0;
 
-  --ink: #eef1f6;
-  --ink-2: #b4bcc9;
-  --ink-3: #8b95a5;
+  --accent: #ff9166;
+  --accent-deep: #ffa87f;
+  --on-accent: #1c1417;
 
-  --rule-soft: #232a34;
-  --rule: #333b47;
-  --rule-strong: #5a6474;
+  --warm-1: #33232a;
+  --warm-2: #3d2830;
+  --warm-3: #452c33;
+  --cool-1: #262234;
+  --cool-2: #2e283e;
+  --rose-1: #33212a;
+  --rose-2: #3b2632;
+  --soft: #2a1e22;
+  --soft-2: #34252a;
+  --hair: rgba(248, 239, 233, 0.09);
+  --hair-2: rgba(248, 239, 233, 0.16);
 
-  --trace: #93a6ff;
-  --trace-fill: #6e86f8;
-  --trace-wash: #1b2447;
-  --on-trace: #0b0e14;
+  --fam-grammar: #4a2a1e;
+  --fam-grammar-ink: #ffb08c;
+  --fam-lexis: #332a4a;
+  --fam-lexis-ink: #c3aeff;
+  --fam-mechanics: #22334a;
+  --fam-mechanics-ink: #9cc2f5;
+  --fam-discourse: #1f3d2e;
+  --fam-discourse-ink: #8fd8ae;
+  --fam-turkish: #48222f;
+  --fam-turkish-ink: #ffa3ba;
 
-  --fault: #ff9e8c;
-  --fault-fill: #f2705a;
-  --fault-wash: #3a1a15;
-  --on-fault: #0b0e14;
+  --band-A1: #5c4237;
+  --band-A2: #86583f;
+  --band-B1: #f2b441;
+  --band-B2: #c47a5f;
+  --band-C1: #b06a6d;
 
-  --tone-good: #93a6ff;
-  --tone-bad: #ff9e8c;
+  --good: #8fd8ae;
+  --bad: #ffa3ba;
+  --model: #c3aeff;
 
-  --band-A1: #6b7488;
-  --band-A2: #7c8ad6;
-  --band-B1: #93a6ff;
-  --band-B2: #aeb9ff;
-  --band-C1: #cdd4ff;
+  --face-lift: rgba(255, 255, 255, 0.16);
+  --face-shade: rgba(0, 0, 0, 0.45);
+  --plinth: #3a2a2f;
+  --plinth-2: #2e2126;
+  --plinth-3: #46333a;
 
-  --model: #c0a3ff;
-
-  --face-top: #515d6d;
-  --face-front: #38424f;
-  --face-side: #262f3a;
-  --face-back: #1a212a;
-  --lit-top: #93a6ff;
-  --lit-front: #6e86f8;
-  --lit-side: #4257c9;
-  --face-edge: rgba(255, 255, 255, 0.14);
-  --face-shadow: rgba(0, 0, 0, 0.55);
+  --lift-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.26);
+  --lift-2: 0 2px 6px rgba(0, 0, 0, 0.34), 0 14px 40px rgba(0, 0, 0, 0.36);
 
   color-scheme: dark;
 }
 
-/* ── dar ekranda ölçek küçülüyor, ADLAR değişmiyor ──────────────────
-   Kademe adları sabit kaldığı için hiçbir bileşende medya sorgusu yok:
-   bütün mobil indirgeme tek yerde, burada. */
-@media (max-width: 1023px) {
+/* Dar ekranda ölçek küçülüyor, ADLAR değişmiyor: bütün mobil indirgeme
+   tek yerde, o yüzden hiçbir bileşende medya sorgusu yok. */
+@media (max-width: 640px) {
   :root {
-    --rail: 32px;
-    --gauge: 0px;
-    --s-10: 96px;
-    --s-9: 72px;
-    --s-8: 56px;
+    --r-panel: 28px;
+    --r-card: 18px;
+    --s-9: 64px;
+    --s-8: 48px;
+    --s-7: 36px;
+    --s-6: 26px;
   }
 }
-@media (max-width: 639px) {
-  :root {
-    --rail: 20px;
-    --s-10: 64px;
-    --s-9: 56px;
-    --s-8: 40px;
-    --s-7: 32px;
-    --s-6: 20px;
-    --s-5: 16px;
-  }
-}
-
 
 /* ═══════════════════════════════════════════════════════════════════
    02 · SIFIRLAMA VE TABAN ÖĞELER
@@ -319,26 +315,18 @@
 }
 
 html {
-  /* Çapa bağlantısı (bulgu numarası → bulgu satırı) hedefi çubuğun altında
-     kalmasın. `scroll-padding` yerine bu: yapışkan çubuğun yüksekliği. */
   scroll-padding-block-start: var(--s-8);
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  background: var(--ground);
+  background: var(--page);
   color: var(--ink);
-  font-family: var(--sans);
+  font-family: var(--body);
   font-size: 16px;
-  line-height: 1.62;
-  /* Tabular rakam HER YERDE. Doğruluk tablosunda ve ölçüm listelerinde
-     sütunların oynamaması bir tercih değil, aletin şartı. */
-  font-variant-numeric: tabular-nums;
-  /*
-   * `-webkit-font-smoothing: antialiased` KULLANILMIYOR: koyu temada Plex'i
-   * inceltip ölçülen kontrastı düşürüyor. Tarayıcının kendi çizimi kalıyor.
-   */
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
@@ -355,20 +343,17 @@ ol,
 ul {
   margin: 0;
 }
-
 ol,
 ul {
   padding: 0;
   list-style: none;
 }
-
 img,
 svg,
 video {
   display: block;
   max-width: 100%;
 }
-
 button,
 input,
 select,
@@ -376,57 +361,45 @@ textarea {
   font: inherit;
   color: inherit;
 }
-
 a {
   color: inherit;
 }
-
 b,
 strong {
-  font-weight: 600;
+  font-weight: 700;
 }
-
-code,
-kbd,
-samp {
-  font-family: var(--mono);
-  font-size: 0.94em;
-}
-
 table {
   border-collapse: collapse;
 }
-
 ::selection {
-  background: var(--trace-wash);
+  background: var(--fam-grammar);
   color: var(--ink);
 }
 
-/* ── odak · tek görünüm, her yerde ──────────────────────────────────
-   Halka İZ renginde ve opak. Yarı saydam bir halka zeminine göre farklı
-   kontrast veriyordu; ÖLÇÜLDÜ, bir yerde 1,94:1'e düşüyordu. */
+/* Odak halkası vurgu renginde ve OPAK: yarı saydam bir halka zeminine
+   göre farklı kontrast veriyordu. */
 :focus-visible {
-  outline: 2px solid var(--trace);
-  outline-offset: 2px;
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 :focus:not(:focus-visible) {
   outline: none;
 }
 
-/* ── içeriğe atla ───────────────────────────────────────────────────
-   Odaklanana kadar görünmüyor ama `display: none` DEĞİL: gizlenen bir
-   bağlantıya klavye de ulaşamaz. Ekran dışına alınıyor. */
+/* Ekran dışına alınıyor, `display: none` DEĞİL: gizlenen bir bağlantıya
+   klavye de ulaşamaz. */
 .skip {
   position: absolute;
   z-index: 50;
   inset-inline-start: var(--s-4);
   inset-block-start: -100%;
   padding: var(--s-3) var(--s-5);
-  background: var(--trace-fill);
-  color: var(--on-trace);
-  font-weight: 600;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
   text-decoration: none;
-  border-radius: var(--r-c);
 }
 .skip:focus {
   inset-block-start: var(--s-4);
@@ -434,64 +407,23 @@ table {
 
 /* ═══════════════════════════════════════════════════════════════════
    03 · TİPOGRAFİ ÖLÇEĞİ
-
-   Yüz seçimi ANLAM: sans Türkçe, mono ölçülen İngilizce + her sayı +
-   her künye. Aşağıdaki sınıflar doğrudan kullanılmıyor; bileşen kuralları
-   bu ölçekten okuyor. Ölçek burada tek yerde durduğu için "bu başlık kaç
-   punto" sorusunun tek bir cevabı var.
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Ekranın TEK büyük okuması. Sayfa başına bir tane: %4,9 · B2 · 41. */
-  --t-readout: clamp(52px, 11vw, 124px);
-  --t-h1: clamp(34px, 5.2vw, 58px);
-  --t-h2: clamp(25px, 3.2vw, 36px);
-  --t-h3: 20px;
-  --t-lede: clamp(17px, 1.4vw, 20px);
-  --t-body: 16px;
-  --t-small: 14px;
-  /* Künye plakası — reddedilen mono küçük-büyük etiketin yerine geçen şey. */
-  --t-plate: 11.5px;
-  /* Kalibrasyon rakamı: folio (01–04), eksen değeri, kertik. */
-  --t-tick: 10.5px;
-  /* ÖLÇÜLEN İNGİLİZCE NUMUNE. Yazma alanı ve kayıt ekranı bunu kullanıyor. */
-  --t-spec: 16.5px;
-  --t-code: 13px;
-  --t-mid: 28px;
-}
-
-/* ── künye plakası ──────────────────────────────────────────────────
-   Sistemin etiket dili. VERSAL Türkçe `lang="tr"` ile birlikte şart,
-   yoksa "İlerleme" → "ILERLEME" oluyor; kök <html lang="tr"> bunu
-   sağlıyor. */
-
-/* ── büyük okuma ────────────────────────────────────────────────────
-   `min-width: 5ch` yerleşimi sabitliyor: mono yüzü yedeğe düşse bile
-   sayının kapladığı yer değişmiyor. */
-
-/* ═══════════════════════════════════════════════════════════════════
-   04 · TEZGÂH — TEK IZGARA, YEDİ EKRAN
-
-   Her sayfa aynı üç izli ızgaranın üstünde duruyor:
-
-     [rail]  kalibrasyon cetveli — folio rakamı, ay etiketi, kertik
-     [main]  okuma sütunu — bütün metin burada
-     [gauge] gösterge sütunu — ölçülen sayı, kenar endeksi
-
-   1280px altında `--gauge: 0` oluyor ve gösterge içeriği ana sütunun
-   ALTINA akıyor. `grid-column` değişiyor, DOM sırası DEĞİŞMİYOR ve
-   `order` kullanılmıyor.
-   ═══════════════════════════════════════════════════════════════════ */
-
-
-@media (min-width: 1280px) {
+  --t-mega: clamp(2.6rem, 5.6vw, 4.6rem); /* ekranın tek büyük okuması */
+  --t-h1: clamp(2.3rem, 4.6vw, 4.1rem);
+  --t-h2: clamp(1.55rem, 2.6vw, 2.1rem);
+  --t-h3: 1.22rem;
+  --t-lede: clamp(1.05rem, 1.25vw, 1.22rem);
+  --t-body: 1rem;
+  --t-small: 0.875rem;
+  --t-micro: 0.8rem;
+  --t-tag: 0.78rem; /* versal künye */
+  --t-read: clamp(1.05rem, 1.35vw, 1.28rem); /* ölçülen İngilizce cümle */
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   05 · DENETİMLER — düğme, bağlantı, girdi, jeton
-
-   Hiçbirinin kutusu yok. Düğme bir plakadır; ikincil düğme yalnız bir
-   çizgidir; girdi altı çizili bir alandır.
+   05 · DENETİMLER — hap düğme, yumuşak girdi, renkli jeton
    ═══════════════════════════════════════════════════════════════════ */
 
 .btn {
@@ -499,273 +431,260 @@ table {
   align-items: center;
   justify-content: center;
   gap: var(--s-2);
-  min-height: 44px;
-  padding: 0 var(--s-5);
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--r-c);
-  background: none;
+  min-height: 48px;
+  padding: 0 var(--s-6);
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--soft-2);
   color: var(--ink);
-  font-size: var(--t-small);
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-size: var(--t-body);
+  font-weight: 700;
+  letter-spacing: -0.01em;
   text-decoration: none;
   cursor: pointer;
+  box-shadow: var(--lift-1);
   transition:
-    border-color var(--d-1) var(--ease),
     background-color var(--d-1) var(--ease),
-    color var(--d-1) var(--ease);
+    transform var(--d-1) var(--ease),
+    box-shadow var(--d-1) var(--ease);
 }
 .btn:hover {
-  border-color: var(--ink);
-  background: var(--ground-2);
+  transform: translateY(-1px);
+  box-shadow: var(--lift-2);
+}
+.btn:active {
+  transform: translateY(0);
 }
 .btn:disabled {
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  background: var(--hair);
   color: var(--ink-3);
-  border-color: var(--rule);
 }
 
-/* Birincil düğme İZ dolgusu. Etiketi `--on-trace` — tema ile ters dönen
-   tek jeton, çünkü koyu temanın parlak dolgusunda beyaz 3,27:1 veriyor. */
 .btn-primary {
-  border-color: var(--trace-fill);
-  background: var(--trace-fill);
-  color: var(--on-trace);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 .btn-primary:hover {
-  border-color: var(--trace);
-  background: var(--trace);
-  color: var(--on-trace);
+  background: var(--accent-deep);
 }
-/*
- * Devre dışı düğme DOLU DEĞİL, BOŞ. Dolu griyi zemin griyle boyamak etiketi
- * neredeyse okunmaz yapıyordu; devre dışı denetimler AA'dan muaf olsa da
- * "kaç kelime kaldı" bilgisini taşıyan bir düğmenin okunması gerekiyor.
- */
 .btn-primary:disabled {
-  border-color: var(--rule);
-  background: none;
+  background: var(--hair);
   color: var(--ink-3);
 }
 
-/* Sessiz düğme: kenarlık yok, yalnız altı çizili bir eylem. */
+/* Sessiz düğme: yüzeyin üstünde durur, kabuğu yoktur. */
 .btn-quiet {
   min-height: 0;
   padding: var(--s-2) 0;
-  border: 0;
   background: none;
+  box-shadow: none;
   color: var(--ink-2);
+  font-weight: 600;
   text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--hair-2);
 }
 .btn-quiet:hover {
   background: none;
+  box-shadow: none;
+  transform: none;
   color: var(--ink);
-  text-decoration-color: var(--ink);
+  text-decoration-color: currentColor;
 }
 
 .btn-lg {
-  min-height: 52px;
-  padding: 0 var(--s-6);
-  font-size: var(--t-body);
+  min-height: 56px;
+  padding: 0 var(--s-7);
+  font-size: 1.05rem;
 }
 
-/* ── bağlantı · gövde metni içinde ──────────────────────────────────
-   Alt çizgi kalıyor; renk İZ. Bağlantıyı yalnız renkle işaretlemek
-   `forced-colors` altında ve renk körlüğünde ayrımı yok ediyor. */
+/* Gövde metni içindeki bağlantı: alt çizgi kalıyor. Yalnız renkle
+   işaretlemek zorlanmış renklerde ve renk körlüğünde ayrımı yok ediyor. */
 .detail-body a,
 .empty a,
 .read-back a,
 .auth-alt a,
-.shell-foot a {
-  color: var(--trace);
+.shell-foot a,
+.gate-scroll a {
+  color: var(--accent);
+  font-weight: 600;
   text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-}
-.detail-body a:hover,
-.empty a:hover,
-.read-back a:hover,
-.auth-alt a:hover,
-.shell-foot a:hover {
-  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }
 
-/* ── girdi · kutu değil, altı çizili alan ───────────────────────────── */
 .input {
   width: 100%;
-  min-height: 44px;
-  padding: var(--s-2) var(--s-3);
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--r-c);
-  background: var(--well);
+  min-height: 48px;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid transparent;
+  border-radius: var(--r-card);
+  background: var(--soft-2);
   color: var(--ink);
   font-size: var(--t-body);
+  box-shadow: inset 0 1px 2px rgba(122, 65, 48, 0.06);
 }
 .input::placeholder {
   color: var(--ink-3);
 }
 .input:hover {
-  border-color: var(--ink-3);
+  border-color: var(--hair-2);
 }
 .input:focus-visible {
-  border-color: var(--trace);
+  border-color: var(--accent);
+  outline-offset: 1px;
 }
-
 .pick {
-  /* Yerel `<select>` okunu tarayıcı çiziyor; sağdaki dolguyu ona bırakıyoruz. */
-  padding-inline-end: var(--s-2);
   cursor: pointer;
 }
 
-/* ── alan · etiket + girdi + ipucu ──────────────────────────────────── */
 .field {
   display: grid;
   gap: var(--s-2);
 }
 .field-label {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
 .field-hint {
   font-size: var(--t-small);
   color: var(--ink-3);
 }
-
 .form {
   display: grid;
   gap: var(--s-5);
 }
 
-/* Hata metni kırmızıya EK OLARAK bir dikme taşıyor: zorlanmış renklerde
-   renk düşüyor, dikme kalıyor. */
+/* Hata bloğu renge EK OLARAK bir dikme taşıyor: zorlanmış renklerde renk
+   düşüyor, dikme kalıyor. */
 .form-error {
-  padding: var(--s-3) var(--s-4);
-  border-inline-start: 3px solid var(--fault-fill);
-  background: var(--fault-wash);
-  color: var(--ink);
+  padding: var(--s-4) var(--s-5);
+  border-radius: var(--r-card);
+  border-inline-start: 4px solid var(--bad);
+  background: var(--fam-turkish);
+  color: var(--fam-turkish-ink);
   font-size: var(--t-small);
+  font-weight: 600;
 }
 
-/* ── jeton · seçilebilir plaka ──────────────────────────────────────── */
+/* Jeton: yumuşak köşeli, seçiliyken vurgu dolgusu. */
 .chip {
   display: inline-flex;
   align-items: center;
-  min-height: 32px;
-  padding: 0 var(--s-3);
-  border: 1px solid var(--rule);
-  border-radius: var(--r-c);
-  background: none;
+  min-height: 36px;
+  padding: 0 var(--s-4);
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: var(--soft-2);
   color: var(--ink-2);
-  font-size: var(--t-plate);
+  font-size: var(--t-small);
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
 }
 a.chip:hover {
-  border-color: var(--ink-3);
   color: var(--ink);
+  box-shadow: var(--lift-1);
 }
-/* Seçili jeton İKİ İŞARETLE ayrılıyor: renk ve kalın alt kenar. Tek
-   başına renk `forced-colors` altında düşüyor. */
+/* Seçili jeton İKİ İŞARETLE ayrılıyor: dolgu ve kenarlık. Tek başına
+   renk zorlanmış renklerde düşüyor. */
 .chip.is-on {
-  border-color: var(--trace);
-  box-shadow: inset 0 -2px 0 0 var(--trace-fill);
-  color: var(--trace);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
 }
-
 .chips {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s-2);
 }
 
-/* ── küçük eylem düğmesi (katılıyorum / deftere al) ─────────────────── */
+/* Küçük eylem düğmesi: katılıyorum / katılmıyorum / deftere al. */
 .act {
-  min-height: 32px;
-  padding: 0 var(--s-3);
-  border: 1px solid var(--rule);
-  border-radius: var(--r-c);
-  background: none;
+  min-height: 36px;
+  padding: 0 var(--s-4);
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: var(--soft-2);
   color: var(--ink-2);
   font-size: var(--t-small);
+  font-weight: 600;
   cursor: pointer;
-  transition: border-color var(--d-1) var(--ease), color var(--d-1) var(--ease);
+  transition: color var(--d-1) var(--ease), background-color var(--d-1) var(--ease);
 }
 .act:hover {
-  border-color: var(--ink-3);
   color: var(--ink);
 }
 .act.is-on {
-  border-color: var(--trace);
-  color: var(--trace);
-  box-shadow: inset 0 -2px 0 0 var(--trace-fill);
+  background: var(--fam-discourse);
+  border-color: var(--fam-discourse-ink);
+  color: var(--fam-discourse-ink);
 }
 .act.is-off {
-  border-color: var(--fault);
-  color: var(--fault);
-  box-shadow: inset 0 -2px 0 0 var(--fault-fill);
+  background: var(--fam-turkish);
+  border-color: var(--fam-turkish-ink);
+  color: var(--fam-turkish-ink);
 }
 
-/* ── boş durum ──────────────────────────────────────────────────────── */
 .empty {
   padding: var(--s-7) 0;
-  color: var(--ink-2);
   font-size: var(--t-lede);
+  color: var(--ink-2);
 }
 
 
 /* ═══════════════════════════════════════════════════════════════════
    06 · MARKA İŞARETİ
 
-   Beş basamak + bir sonraki basamağın boş konturu. İşaretin kendisi
-   ürünün cümlesi: ölçek beşte bitmiyor, bir sonraki adım orada duruyor.
+   Beş basamak, her biri kendi bandının rengini taşıyor: işaretin kendisi
+   ölçeğin ta kendisi. Altıncı çizgi bir sonraki adım — ölçek beşte
+   bitmiyor.
    ═══════════════════════════════════════════════════════════════════ */
 
 .mark {
   display: inline-flex;
   align-items: center;
-  gap: 0.55em;
+  gap: 0.45em;
   color: var(--ink);
   white-space: nowrap;
 }
 .mark-sm {
-  font-size: 15px;
+  font-size: 17px;
 }
 .mark-md {
-  font-size: 19px;
+  font-size: 21px;
 }
 .mark-lg {
-  font-size: 26px;
+  font-size: 27px;
 }
-
 .mark-glyph {
-  /* Ölçüsü metne bağlı: tek yerde punto değişince işaret de büyüyor. */
-  inline-size: 1.35em;
+  inline-size: 1.4em;
   block-size: auto;
   overflow: visible;
 }
 .mark-steps {
-  fill: currentColor;
+  fill: var(--accent);
 }
-/* Boş kontur: henüz çıkılmamış basamak. İz renginde, çünkü o da ölçek. */
+/* Henüz çıkılmamış basamak: boş kontur. */
 .mark-next {
   fill: none;
-  stroke: var(--trace);
+  stroke: var(--accent);
   stroke-width: 1.6;
-  stroke-linecap: square;
+  stroke-linecap: round;
+  opacity: 0.45;
 }
 .mark-word {
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 0.95em;
+  letter-spacing: -0.03em;
 }
-
 .mark-link {
   display: inline-flex;
   text-decoration: none;
@@ -780,41 +699,39 @@ a.chip:hover {
 
    HACİM SAHİCİ: her basamak `transform-style: preserve-3d` ile kurulmuş
    beş yüzlü bir kutu, sahnenin `perspective`i var, derinlik sırasını
-   tarayıcı hesaplıyor. WebGL yok, kütüphane yok — yirmi beş `div`.
+   tarayıcı hesaplıyor. WebGL yok, kütüphane yok.
 
    İKİ TUZAK, İKİSİ DE ÖLÇÜLDÜ:
      · `filter` ve 1'den küçük `opacity` `preserve-3d` zincirini
-       DÜZLEŞTİRİYOR. Zemin gölgesi bu yüzden `filter: blur()` ile değil,
-       radyal gradyanla çiziliyor.
-     · Yüz sırası (üst en aydınlık → arka en koyu) iki temada da aynı
-       kalmak zorunda: ışığın bir yönü var, tema onu çevirmiyor.
+       DÜZLEŞTİRİYOR. Zemin gölgesi bu yüzden bulanıklıkla değil radyal
+       gradyanla çiziliyor.
+     · Yüz sırası (üst aydınlık → arka koyu) iki temada da aynı kalmak
+       zorunda: ışığın bir yönü var, tema onu çevirmiyor.
 
-   Bütün ölçek üç jetonda: `--w` basamak genişliği, `--u` bir basamağın
-   yükselişi, `--d` derinlik. Kabı bunları ezerek modeli büyütüp
-   küçültüyor; başka hiçbir sayı elle değişmiyor.
+   BU DİLDE HER BASAMAK KENDİ BANDININ RENGİNİ TAŞIYOR. Bantlar sıralı
+   bir ölçek, o yüzden renkler de tek bir rampanın beş durağı — beş ayrı
+   hue değil. Ölçülen basamak rampanın parlak durağında (B1 sarısı).
    ═══════════════════════════════════════════════════════════════════ */
 
 .model {
-  --w: clamp(42px, 5.9vw, 86px);
-  --u: clamp(20px, 2.6vw, 38px);
-  --d: clamp(42px, 5.9vw, 86px);
+  --w: clamp(44px, 6.2vw, 92px);
+  --u: clamp(20px, 2.7vw, 40px);
+  --d: clamp(44px, 6.2vw, 92px);
 
   display: grid;
   gap: var(--s-4);
   perspective: 2000px;
   perspective-origin: 50% 46%;
 }
-
 .model-stage {
   position: relative;
   width: 100%;
   height: calc(var(--u) * 5 + var(--d) * 1.5);
   transform-style: preserve-3d;
-  /* Taban BİTMİŞ KARE: hareket kapalıyken de tam üç boyutlu duruyor. */
+  /* Taban BİTMİŞ KARE: hareket kapalıyken de tam üç boyutlu. */
   transform: rotateX(-17deg) rotateY(-24deg);
 }
-
-/* Zemin teması — model havada durmasın. `filter` YOK. */
+/* Kaide gölgesi — model havada durmasın. `filter` YOK. */
 .model-ground {
   position: absolute;
   left: 50%;
@@ -823,10 +740,11 @@ a.chip:hover {
   height: calc(var(--d) * 2.6);
   margin-left: calc((var(--w) * 5 + var(--d) * 2.6) / -2);
   transform: translateY(50%) rotateX(90deg);
+  border-radius: 40%;
   background: radial-gradient(
     50% 50% at 50% 50%,
-    var(--face-shadow) 0%,
-    transparent 72%
+    var(--face-shade) 0%,
+    transparent 70%
   );
 }
 
@@ -840,7 +758,6 @@ a.chip:hover {
   margin-left: calc(var(--w) * (var(--n) - 2.5));
   transform-style: preserve-3d;
 }
-
 .mbox {
   position: absolute;
   inset: 0;
@@ -850,11 +767,27 @@ a.chip:hover {
   position: absolute;
   display: block;
   /* Kenar ışığı: her yüzün üst kenarında ince bir parlaklık. */
-  background-image: linear-gradient(
-    to bottom,
-    var(--face-edge) 0,
-    transparent 2px
-  );
+  background-image: linear-gradient(to bottom, var(--face-lift) 0, transparent 3px);
+}
+
+/*
+ * Basamağın rengi `--n` üzerinden bandına bağlanıyor. Beş ayrı kural
+ * yerine tek bir zincir: sıra veriden geliyor, elle yazılmıyor.
+ */
+.mstep {
+  --face: var(--band-A1);
+}
+.mstep:nth-of-type(2) {
+  --face: var(--band-A2);
+}
+.mstep:nth-of-type(3) {
+  --face: var(--band-B1);
+}
+.mstep:nth-of-type(4) {
+  --face: var(--band-B2);
+}
+.mstep:nth-of-type(5) {
+  --face: var(--band-C1);
 }
 
 .f-front,
@@ -863,13 +796,12 @@ a.chip:hover {
 }
 .f-front {
   transform: translateZ(calc(var(--d) / 2));
-  background-color: var(--face-front);
+  background-color: color-mix(in srgb, var(--face) 82%, #000 18%);
 }
 .f-back {
   transform: translateZ(calc(var(--d) / -2)) rotateY(180deg);
-  background-color: var(--face-back);
+  background-color: color-mix(in srgb, var(--face) 58%, #000 42%);
 }
-
 .f-right,
 .f-left {
   top: 0;
@@ -877,7 +809,7 @@ a.chip:hover {
   width: var(--d);
   left: 50%;
   margin-left: calc(var(--d) / -2);
-  background-color: var(--face-side);
+  background-color: color-mix(in srgb, var(--face) 66%, #000 34%);
 }
 .f-right {
   transform: translateX(calc(var(--w) / 2)) rotateY(90deg);
@@ -885,7 +817,6 @@ a.chip:hover {
 .f-left {
   transform: translateX(calc(var(--w) / -2)) rotateY(-90deg);
 }
-
 .f-top {
   left: 0;
   width: 100%;
@@ -893,83 +824,54 @@ a.chip:hover {
   top: 50%;
   margin-top: calc(var(--d) / -2);
   transform: translateY(calc(var(--h) / -2)) rotateX(90deg);
-  background-color: var(--face-top);
+  background-color: var(--face);
 }
 
 /*
- * BİTMİŞ KAREDE DE BİR BASAMAK YANIYOR.
- *
- * Anasayfada ışık A1'den C1'e TIRMANIYOR ve hiçbirinde durmuyor — ama o
- * tırmanış `[data-play]` altında. Hareket kapalıyken (JavaScript inmemiş ya
- * da `prefers-reduced-motion`) hiçbir basamak yanmıyordu: nesne ölçek olmaktan
- * çıkıp beş gri kutuya dönüyordu. Taban kare ortadaki basamağı yakıyor.
- *
- * `nth-of-type(3)`: sahnenin çocukları bir `<i class="model-ground">` ve beş
- * `<div class="mstep">`. Üçüncü `div` B1 — ölçeğin ortası.
+ * Yanan basamak: kendi rengini korur ama ETRAFINDA IŞIK olur. Rengi
+ * değiştirmek bandın kimliğini bozardı — B1 hep B1 sarısı.
  */
-.model:not(.is-fixed) .mstep:nth-of-type(3) .f-top {
-  background-color: var(--lit-top);
-}
-.model:not(.is-fixed) .mstep:nth-of-type(3) .f-front {
-  background-color: var(--lit-front);
-}
-.model:not(.is-fixed) .mstep:nth-of-type(3) .f-left,
-.model:not(.is-fixed) .mstep:nth-of-type(3) .f-right,
-.model:not(.is-fixed) .mstep:nth-of-type(3) .f-back {
-  background-color: var(--lit-side);
-}
-.model:not(.is-fixed) .model-scale span:nth-child(3) {
-  color: var(--trace);
-  border-block-start-color: var(--trace-fill);
-  border-block-start-width: 2px;
-  font-weight: 600;
+.mstep.is-lit .f-top,
+.mstep.is-lit .f-front {
+  box-shadow: 0 0 34px 6px color-mix(in srgb, var(--face) 55%, transparent);
 }
 
-/* Yanan basamak — ölçülen bant. Üç yüz birlikte aydınlanıyor: tek ışık
-   kaynağı olduğu için yüzlerin BİRBİRİNE göre sırası korunuyor. */
-.mstep.is-lit .f-top {
-  background-color: var(--lit-top);
-}
-.mstep.is-lit .f-front {
-  background-color: var(--lit-front);
-}
-.mstep.is-lit .f-left,
-.mstep.is-lit .f-right,
-.mstep.is-lit .f-back {
-  background-color: var(--lit-side);
+/*
+ * KAPI EKRANI: ışık tırmanmıyor, ÖLÇÜLEN basamakta duruyor. Anasayfada
+ * merdiven bir VAAT (ışık A1'den C1'e yürüyor), kapıda bir OKUMA — aşağıdaki
+ * cümlenin ölçüldüğü yeri gösteriyor. Tek nesne, iki davranış.
+ */
+.model.is-fixed .mstep.is-lit .f-top,
+.model.is-fixed .mstep.is-lit .f-front {
+  box-shadow: 0 0 40px 8px color-mix(in srgb, var(--face) 62%, transparent);
 }
 
 /* ── ölçek satırı · modelin DIŞINDA ─────────────────────────────────
    Etiketler basamakların yüzüne basılıyken 10px'e sıkışıyor ve eğik
-   yüzeyde okunmuyordu. Burada düz bir cetvel satırı. */
+   yüzeyde okunmuyordu. */
 .model-scale {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--ink-3);
+  gap: var(--s-2);
   text-align: center;
 }
 .model-scale span {
-  padding-block-start: var(--s-2);
-  /* Kertik: her etiketin üstünde cetvel çizgisi. */
-  border-block-start: 1px solid var(--rule);
+  padding-block: var(--s-2);
+  border-radius: var(--r-pill);
+  font-size: var(--t-small);
+  font-weight: 700;
+  color: var(--ink-2);
 }
 .model-scale .is-lit {
-  color: var(--trace);
-  border-block-start-color: var(--trace-fill);
-  border-block-start-width: 2px;
-  font-weight: 600;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    08 · SEVİYE CETVELİ — markanın merdiveni, mobilya olmuş hâli
 
    Kabuğun çubuğunda her sayfada duruyor. Ölçülen bant İKİ İŞARETLE
-   ayrılıyor (renk + kalın kertik): zorlanmış renklerde renk düşünce
-   kertik kalıyor.
+   ayrılıyor (dolgu + ağırlık): zorlanmış renklerde dolgu düşse de kalır.
    ═══════════════════════════════════════════════════════════════════ */
 
 .rule {
@@ -979,53 +881,65 @@ a.chip:hover {
   min-inline-size: 0;
 }
 .rule-label {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 .rule-steps {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 2px;
-  min-inline-size: 0;
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border-radius: var(--r-pill);
+  background: var(--soft-2);
 }
 .rule-step {
-  padding: var(--s-1) var(--s-2) 0;
-  border-block-start: 2px solid var(--rule);
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
+  padding: 3px var(--s-3);
+  border-radius: var(--r-pill);
+  font-size: var(--t-micro);
+  font-weight: 600;
   color: var(--ink-3);
 }
 .rule-step.is-on {
-  border-block-start-color: var(--trace-fill);
-  color: var(--trace);
-  font-weight: 600;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
 }
 
 
 /* ═══════════════════════════════════════════════════════════════════
-   09 · NESNE BÜTÇESİ — ekran başına TEK büyük okuma
+   09 · AİLE RENKLERİ
 
-   Bir ekranda yalnız BİR sayı `--t-readout` ya da onun bir kademe altı
-   boyunda çizilebiliyor. Ölçülen sayının hak ettiği ağırlığı alması,
-   yanında ikinci bir devin olmamasına bağlı.
+   Beş aile, beş hue. Her aile bir yıkama ve bir mürekkep taşıyor; satır,
+   metindeki işaret ve numara jetonu aynı çifti paylaşıyor, göz üçünü
+   eşliyor.
 
-   Kural burada YAZILI ama CSS ile ZORLANMIYOR, ve bu bilerek: denemesi
-   yapıldı. Paylaşılan bir `.well` sınıfı ve "ikinci kuyu kendini iptal
-   etsin" seçicisi kurulmuştu; anasayfada 01 ve 02 numaralı bölümler AYNI
-   motorun iki cümlesi ve tam olarak AYNI görünmeleri gerekiyor —
-   ikincisini sessizce düzleştiren bir kural, bölümün argümanını bozuyordu.
-   Yanlış yere uygulanan bir mekanizma, mekanizmasızlıktan kötü.
-
-   Sayı boyları bu yüzden tek yerde toplu duruyor; büyük okuma yalnız şu
-   üçünde geçiyor ve üçü ayrı ekranda:
-     .tile-value.accent            → İlerleme, Doğruluk
-     .proof-cell.is-lead .proof-value → anasayfa 04
-     .accuracy-band                → kapı
+   Sınıf bileşenden geliyor (`fam-${familyOf(sub)}`) — yani taksonomiye
+   yeni bir alt kategori eklendiğinde rengi kendiliğinden doğru oluyor,
+   burada elle eşleştirilecek bir liste yok.
    ═══════════════════════════════════════════════════════════════════ */
+
+.fam-grammar {
+  --wash: var(--fam-grammar);
+  --tone: var(--fam-grammar-ink);
+}
+.fam-lexis {
+  --wash: var(--fam-lexis);
+  --tone: var(--fam-lexis-ink);
+}
+.fam-mechanics {
+  --wash: var(--fam-mechanics);
+  --tone: var(--fam-mechanics-ink);
+}
+.fam-discourse {
+  --wash: var(--fam-discourse);
+  --tone: var(--fam-discourse-ink);
+}
+.fam-turkish {
+  --wash: var(--fam-turkish);
+  --tone: var(--fam-turkish-ink);
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    10 · NUMUNE — ölçülen cümle ve bulgu rafı
@@ -1037,11 +951,7 @@ a.chip:hover {
 .sample-read {
   display: grid;
   gap: var(--s-4);
-  background: var(--well);
-  border-block: 1px solid var(--rule-strong);
-  padding: var(--s-5);
 }
-
 .sample-head {
   display: flex;
   align-items: baseline;
@@ -1050,10 +960,9 @@ a.chip:hover {
   flex-wrap: wrap;
 }
 .sample-tag {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
@@ -1061,55 +970,54 @@ a.chip:hover {
   display: flex;
   align-items: baseline;
   gap: var(--s-2);
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
-/* Sayının kendisi: ekranın okuması. Mono, tabular, iri. */
 .sample-count b {
-  font-family: var(--mono);
-  font-size: var(--t-mid);
-  font-weight: 600;
+  font-family: var(--display);
+  font-size: 2.1rem;
+  font-weight: 700;
   line-height: 0.9;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: var(--ink);
 }
-/* Sıfır bulgu da bir ÖLÇÜM: iz renginde. Yeşil yok — temiz olmak
-   ölçülmüş olmaktır, ayrı bir duygu değil. */
+/* Sıfır bulgu da bir ÖLÇÜM: vurgu renginde. Temiz olmak ölçülmüş
+   olmaktır, ayrı bir duygu değil. */
 .is-quiet .sample-count b {
-  color: var(--trace);
+  color: var(--accent);
 }
 
-/* ── ölçülen İngilizce cümle · mono ─────────────────────────────────
-   Yüz seçimi anlam: numune, aletin ekran yüzüyle gösteriliyor. */
+/* Ölçülen cümle: BÜYÜK ve okunur. Daktilo yüzü yok — bu bir terminal
+   çıktısı değil, okunacak bir metin. */
 .sample-text {
-  font-family: var(--mono);
-  font-size: var(--t-spec);
-  line-height: 1.86;
+  font-size: var(--t-read);
+  line-height: 1.95;
+  letter-spacing: -0.005em;
   color: var(--ink);
-  max-width: var(--measure-spec);
+  max-width: 34em;
 }
 
-/* Hatalı parça KUTULANMIYOR, altı çiziliyor. `<mark>`ın tarayıcı
-   varsayılanı sarı zemin — mutlaka eziliyor. */
+/* Hatalı parça: ailesinin yumuşak yıkamasında bir hap, altında ince bir
+   dikme. `<mark>`ın tarayıcı varsayılanı sarı zemin — mutlaka eziliyor. */
 .sample-mark {
-  background: none;
+  background: var(--wash);
   color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: var(--fault-fill);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
-  /* Harflerin alt çıkıntıları çizgiyi kesmesin: çizgi ölçüm, süs değil. */
-  text-decoration-skip-ink: none;
+  padding: 3px 7px;
+  border-radius: var(--r-chip);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--tone) 45%, transparent);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 .sample-mark sup {
-  font-size: 0.62em;
+  font-size: 0.58em;
+  font-weight: 800;
   line-height: 0;
+  margin-inline-start: 3px;
   vertical-align: super;
-  color: var(--fault);
-  padding-inline-start: 2px;
+  color: var(--tone);
 }
 
 /* ── taksonomi şeridi · 21 yuva, 5 aile ────────────────────────────── */
@@ -1118,11 +1026,8 @@ a.chip:hover {
   align-items: center;
   flex-wrap: wrap;
   gap: var(--s-3);
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: var(--t-micro);
+  font-weight: 600;
   color: var(--ink-3);
 }
 .slot-family {
@@ -1130,37 +1035,36 @@ a.chip:hover {
   gap: 3px;
 }
 .slot {
-  inline-size: 7px;
-  block-size: 12px;
-  background: var(--rule);
+  inline-size: 8px;
+  block-size: 14px;
+  border-radius: 3px;
+  background: var(--hair-2);
 }
-/* Dolu yuva: bu cümlede yazılan taksonomi hücresi. */
 .slot.is-hit {
-  background: var(--fault-fill);
+  background: var(--accent);
 }
 .slots b {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ink-2);
 }
 
 /* ── bulgu rafı ─────────────────────────────────────────────────────
-   Kart yok. Satırlar 1px kılçizgiyle ayrılıyor; ilk satırın üstünde
-   çizgi yok çünkü kuyunun kendi kenarı zaten orada. */
+   Kart yok — satırlar yüzeyin üstünde duruyor, ayracı ince bir çizgi. */
 .sample-findings {
   display: grid;
+  margin-block-start: var(--s-3);
 }
 .sample-finding {
-  border-block-start: 1px solid var(--rule-soft);
+  border-block-start: 1px solid var(--hair);
 }
 .sample-finding:first-child {
   border-block-start: 0;
 }
-
 .sample-line {
   display: grid;
-  grid-template-columns: 2ch minmax(0, 1fr) auto;
-  align-items: baseline;
-  column-gap: var(--s-3);
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--s-4);
   padding-block: var(--s-3);
   cursor: pointer;
   list-style: none;
@@ -1171,25 +1075,27 @@ a.chip:hover {
 .sample-line::marker {
   content: "";
 }
-.sample-line:hover .sample-kind {
-  color: var(--ink);
-}
 
+/* Numara jetonu ailesinin renginde. */
 .sample-no {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  color: var(--ink-3);
+  inline-size: 32px;
+  block-size: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-chip);
+  background: var(--wash);
+  color: var(--tone);
+  font-size: var(--t-small);
+  font-weight: 800;
 }
 
-/* Düzeltmenin kendisi — kapalı satırda okuyanın aradığı şey. */
 .sample-fix {
-  font-family: var(--mono);
-  font-size: var(--t-code);
-  display: inline;
+  font-size: var(--t-body);
+  letter-spacing: -0.012em;
+  min-inline-size: 0;
 }
 .was {
-  color: var(--fault);
+  color: var(--ink-3);
   text-decoration: line-through;
   text-decoration-thickness: 1px;
 }
@@ -1197,52 +1103,31 @@ a.chip:hover {
   color: var(--ink-3);
   padding-inline: var(--s-2);
 }
-/* Doğru taraf: iz renginde DEĞİL, mürekkep — altında iz çizgisi.
-   Düzeltme bir ölçüm değil, bir cevap; renk onu bağırmamalı. */
 .now {
   color: var(--ink);
-  font-weight: 500;
-  box-shadow: inset 0 -2px 0 0 var(--trace-fill);
+  font-weight: 700;
 }
 
 .sample-kind {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-3);
+  font-size: var(--t-micro);
+  font-weight: 700;
+  color: var(--tone);
   text-align: end;
+  white-space: nowrap;
 }
-
-/* Açılma göstergesi: gradyan değil KARAKTER. Zorlanmış renklerde
-   gradyanlar düşüyor ve satırın açılabildiğini söyleyen tek ipucu
-   kayboluyordu. */
+/* Açılma göstergesi gradyan değil KARAKTER: zorlanmış renklerde
+   gradyanlar düşüyor ve satırın açılabildiğini söyleyen ipucu kayboluyordu. */
 .sample-line .sample-kind::after {
   content: " +";
-  font-weight: 600;
-  color: var(--ink-2);
+  color: var(--ink-3);
 }
 .sample-finding[open] .sample-line .sample-kind::after {
   content: " \2212";
 }
 
-/* Aynı çakışma vitrinde de var; orada kap sorgusu, çünkü bölüm gövdesi
-   görüntüden dar olabiliyor. */
-@container (max-width: 430px) {
-  .sample-line {
-    grid-template-columns: 2ch minmax(0, 1fr);
-    row-gap: var(--s-1);
-  }
-  .sample-kind {
-    grid-column: 2;
-    text-align: start;
-  }
-}
-
 .sample-why {
   padding-block-end: var(--s-4);
-  padding-inline-start: calc(2ch + var(--s-3));
+  padding-inline-start: calc(32px + var(--s-4));
   font-size: var(--t-small);
   color: var(--ink-2);
   max-width: 62ch;
@@ -1251,28 +1136,41 @@ a.chip:hover {
 /* Sıfır bulgu hâli — boş raf "yüklenmedi" gibi okunduğu için ayrı öğe. */
 .sample-silent {
   padding-block: var(--s-4);
-  font-size: var(--t-small);
+  font-size: var(--t-body);
   color: var(--ink-2);
 }
 .sample-silent b {
   color: var(--ink);
 }
 
+/* Dar kapta taksonomi etiketi alt satıra: üçüncü sütun `auto` ve Türkçe
+   etiket uzun, orta sütunu sıfıra sıkıştırıp düzeltmenin üstüne biniyordu. */
+@container (max-width: 460px) {
+  .sample-line {
+    grid-template-columns: 32px minmax(0, 1fr);
+    row-gap: var(--s-1);
+    align-items: start;
+  }
+  .sample-kind {
+    grid-column: 2;
+    text-align: start;
+    white-space: normal;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    11 · HAT — beş katman
 
-   Ray DİKEY. Yatay bir ray dikey bir listenin üstünde durunca ikisi
-   aynı beş şeyi iki ayrı eksende anlatıyordu. Hizayı `1fr` garanti
-   ediyor: hem rayın hem hattın beş satırı eşit yükseklikte.
+   Ray DİKEY: yatay bir ray dikey bir listenin üstünde durunca ikisi aynı
+   beş şeyi iki ayrı eksende anlatıyordu. Hizayı `1fr` garanti ediyor.
    ═══════════════════════════════════════════════════════════════════ */
 
 .pipe-wrap {
   display: grid;
-  grid-template-columns: 13px minmax(0, 1fr);
+  grid-template-columns: 14px minmax(0, 1fr);
   column-gap: var(--s-5);
   align-items: stretch;
 }
-
 .pipe-flow {
   position: relative;
   display: grid;
@@ -1284,32 +1182,34 @@ a.chip:hover {
   position: absolute;
   inset-block: 0;
   inset-inline-start: 50%;
-  inline-size: 1px;
-  margin-inline-start: -0.5px;
-  background: var(--rule);
+  inline-size: 2px;
+  margin-inline-start: -1px;
+  border-radius: 2px;
+  background: var(--hair-2);
 }
 .flow-node {
   position: relative;
   z-index: 1;
-  inline-size: 11px;
-  block-size: 11px;
-  border: 1.5px solid var(--ink-3);
-  background: var(--ground);
+  inline-size: 12px;
+  block-size: 12px;
+  border-radius: 50%;
+  background: var(--soft-2);
+  box-shadow: 0 0 0 2px var(--ink-3);
 }
 .flow-node.is-ai {
-  border-color: var(--model);
+  box-shadow: 0 0 0 2px var(--model);
 }
-/* Jeton BİTMİŞ KAREDE de duruyor — rayın girişinde, "metin buradan
-   giriyor" diyor. Hareket kapalıyken kaybolan bir şey olmasın. */
+/* Jeton BİTMİŞ KAREDE de duruyor — rayın girişinde. */
 .flow-pulse {
   position: absolute;
   z-index: 2;
   inset-block-start: 0;
   inset-inline-start: 50%;
-  inline-size: 7px;
-  block-size: 7px;
-  margin: -3.5px 0 0 -3.5px;
-  background: var(--trace-fill);
+  inline-size: 8px;
+  block-size: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 .pipe {
@@ -1318,12 +1218,12 @@ a.chip:hover {
 }
 .pipe-cell {
   display: grid;
-  grid-template-columns: 3.2rem minmax(0, 1fr) auto;
+  grid-template-columns: 3rem minmax(0, 1fr) auto;
   align-items: baseline;
   column-gap: var(--s-4);
   row-gap: 2px;
   padding-block: var(--s-3);
-  border-block-start: 1px solid var(--rule-soft);
+  border-block-start: 1px solid var(--hair);
 }
 .pipe-cell:first-child {
   border-block-start: 0;
@@ -1331,10 +1231,9 @@ a.chip:hover {
 .pipe-code {
   grid-column: 1;
   grid-row: 1 / span 2;
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: var(--t-micro);
+  font-weight: 800;
+  letter-spacing: 0.04em;
   color: var(--ink-3);
 }
 .pipe-cell.is-ai .pipe-code {
@@ -1344,7 +1243,7 @@ a.chip:hover {
   grid-column: 2;
   grid-row: 1;
   font-size: var(--t-body);
-  font-weight: 600;
+  font-weight: 700;
 }
 .pipe-what {
   grid-column: 2;
@@ -1355,11 +1254,8 @@ a.chip:hover {
 .pipe-tag {
   grid-column: 3;
   grid-row: 1;
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: var(--t-micro);
+  font-weight: 700;
   color: var(--ink-3);
   white-space: nowrap;
 }
@@ -1367,12 +1263,12 @@ a.chip:hover {
   color: var(--model);
 }
 
-/* Dar kapta ray düşüyor: tek sütunda hizalanacak eksen kalmıyor ve
-   kaybolan şey `aria-hidden` bir çizim. */
-@container (max-width: 380px) {
+@container (max-width: 400px) {
   .pipe-wrap {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* Ray düşüyor: tek sütunda hizalanacak eksen kalmıyor ve kaybolan şey
+     `aria-hidden` bir çizim. */
   .pipe-flow {
     display: none;
   }
@@ -1394,8 +1290,8 @@ a.chip:hover {
 /* ═══════════════════════════════════════════════════════════════════
    12 · KANIT — dört ölçüm
 
-   Kutu yok. Dört hücre, aralarında kılçizgi; ana ölçüt İZ renginde ve
-   diğerlerinden büyük.
+   Ana ölçüt vurgu renginde ve diğerlerinden çok büyük: ekranın tek
+   büyük okuması o.
    ═══════════════════════════════════════════════════════════════════ */
 
 .proof {
@@ -1404,35 +1300,37 @@ a.chip:hover {
 }
 .proof-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  border-block-start: 1px solid var(--rule-strong);
+  /* İKİŞERLİ. `auto-fit` üç sütun üretiyordu ve dördüncü hücre tek başına
+     alt satıra düşüyordu — ÖLÇÜLDÜ, kurşun hücrenin devasa sayısı yüzünden
+     ilk satır iki kat yüksek kalıyordu. */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--s-5) var(--s-6);
 }
 .proof-cell {
   position: relative;
   display: grid;
   align-content: start;
   gap: var(--s-2);
-  padding: var(--s-4) var(--s-4) var(--s-5) 0;
-  border-block-end: 1px solid var(--rule-soft);
+  padding-block-end: var(--s-4);
 }
 .proof-label {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 .proof-value {
-  font-family: var(--mono);
-  font-size: var(--t-mid);
-  font-weight: 600;
+  font-family: var(--display);
+  font-size: 2.1rem;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: var(--ink);
 }
 .proof-cell.is-lead .proof-value {
-  font-size: clamp(38px, 4.4vw, 56px);
-  color: var(--trace);
+  font-size: var(--t-mega);
+  color: var(--accent);
 }
 .proof-note {
   font-size: var(--t-small);
@@ -1443,43 +1341,47 @@ a.chip:hover {
   position: absolute;
   inset-block-end: 0;
   inset-inline-start: 0;
-  block-size: 2px;
+  block-size: 3px;
   inline-size: calc(var(--v) * 100%);
+  border-radius: 3px;
   background: var(--ink-3);
   transform-origin: left;
 }
 .proof-cell.is-lead .proof-fill {
-  block-size: 3px;
-  background: var(--trace-fill);
+  block-size: 4px;
+  background: var(--accent);
 }
 .proof-source {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: var(--t-micro);
   color: var(--ink-3);
 }
 
 
 /* ═══════════════════════════════════════════════════════════════════
-   13 · ANASAYFA — ALET DURUR, ÖLÇÜMLER GEÇER
+   13 · ANASAYFA
 
-   Yerleşim korunuyor, dili değişiyor. Sol sütun kaydırma boyunca
-   yerinde: alet elinde kalır, ölçtüğü şeyler gelip geçer. Bu bir
-   yerleşim tercihi değil ürünün kendisi.
+   Sayfa büyük yüzeylerden oluşuyor ve her yüzeyin bir KONUSU var:
 
-   Sol sütun artık koyu bir "sahne" değil — sistemde iki zemin var ve
-   ikisi de gri. Ayrımı ZEMİN DEĞİL SINIR yapıyor: 1px `--rule-strong`.
+     kayısı → yazılan şey (kahraman, örnek cümleler)
+     leylak → bulunan şey (bulgular, hattın kendisi)
+     gül    → ölçülen şey (doğruluk)
+
+   Sol sütun kaydırma boyunca yerinde: alet elinde kalır, ölçtüğü şeyler
+   gelip geçer. Bu bir yerleşim tercihi değil, ürünün kendisi.
    ═══════════════════════════════════════════════════════════════════ */
 
 .rig {
   display: grid;
-  background: var(--ground);
+  gap: var(--s-5);
+  max-inline-size: var(--page-max);
+  margin-inline: auto;
+  padding: var(--s-6) var(--rail) var(--s-8);
 }
 
 .rig-body {
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 8fr);
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--s-5);
   align-items: start;
 }
 
@@ -1490,57 +1392,56 @@ a.chip:hover {
    modelin birim ölçüsü bu yüzden `svh`ye bağlı. */
 .tool {
   position: sticky;
-  inset-block-start: 0;
+  inset-block-start: var(--s-4);
   align-self: start;
-  min-block-size: 100svh;
   display: grid;
   align-content: center;
-  padding: clamp(28px, 5svh, 56px) var(--s-7) clamp(28px, 5svh, 56px)
-    var(--rail);
-  background: var(--ground-2);
-  border-inline-end: 1px solid var(--rule-strong);
+  min-block-size: min(760px, calc(100svh - var(--s-6)));
+  border-radius: var(--r-panel);
+  padding: clamp(28px, 4.4svh, 54px) var(--pad);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(
+    152deg,
+    var(--warm-1) 0%,
+    var(--warm-2) 54%,
+    var(--warm-3) 100%
+  );
   /* Üç boyutlu modelin çizim alanı yerleşim kutusundan ~90px geniş:
-     yüzler z ekseninde döndüğü için taşıyor. ÖLÇÜLDÜ — panelin sağında,
-     komşu sütunun üstünde gri bir kama görünüyordu. */
+     yüzler z ekseninde döndüğü için taşıyor. Panelin yuvarlak köşesi de
+     bu kırpmayla korunuyor. */
   overflow: hidden;
 }
 .tool-in {
   display: grid;
   justify-items: start;
-  gap: clamp(16px, 2.4svh, 24px);
-  max-inline-size: 30rem;
+  gap: clamp(16px, 2.4svh, 26px);
+  max-inline-size: 32rem;
 }
-
 .tool-kicker {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--accent);
 }
 
-/*
- * Sessiz öncül, yüksek sesli fiil. Farkı ÖLÇÜ ve AĞIRLIK taşıyor.
- * "Ölç." kelimesinin altında 3px iz çizgisi var — kalem kâğıda değiyor.
- */
+/* Sessiz öncül, yüksek sesli fiil: fark ÖLÇÜ ve RENK ile. */
 .tool-title {
+  font-family: var(--display);
   display: grid;
-  gap: var(--s-2);
-  line-height: 1.02;
-  letter-spacing: -0.03em;
+  line-height: 1;
+  letter-spacing: -0.035em;
 }
 .tool-title span {
-  font-size: clamp(19px, 1.8vw, 24px);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  color: var(--ink-2);
+  font-size: clamp(1.35rem, 1.9vw, 1.85rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }
 .tool-title b {
-  justify-self: start;
   font-size: var(--t-h1);
-  font-weight: 600;
-  color: var(--ink);
-  box-shadow: inset 0 -4px 0 0 var(--trace-fill);
+  font-weight: 700;
+  color: var(--accent);
 }
 
 .tool-art {
@@ -1548,21 +1449,22 @@ a.chip:hover {
 }
 .tool .model {
   /* İki eksen birden: dar pencerede genişlik, alçak pencerede yükseklik
-     kısıtlıyor. Model tamamen bu üç jetonla ölçekleniyor. */
-  --w: clamp(34px, min(4.4vw, 7.2svh), 68px);
-  --u: clamp(16px, min(2vw, 3.2svh), 30px);
-  --d: clamp(34px, min(4.4vw, 7.2svh), 68px);
+     kısıtlıyor. */
+  --w: clamp(34px, min(4.6vw, 7svh), 74px);
+  --u: clamp(16px, min(2vw, 3.1svh), 32px);
+  --d: clamp(34px, min(4.6vw, 7svh), 74px);
 }
 
 .tool-lede {
   font-size: var(--t-lede);
+  line-height: 1.68;
   color: var(--ink-2);
-  max-inline-size: 42ch;
+  max-inline-size: 26em;
 }
 .tool-lede b {
   color: var(--ink);
+  font-weight: 700;
 }
-
 .tool-go {
   display: flex;
   flex-wrap: wrap;
@@ -1573,80 +1475,83 @@ a.chip:hover {
   color: var(--ink-3);
 }
 
-/* ── SAĞ: GEÇEN ÖLÇÜMLER ────────────────────────────────────────────
-   Bölümler arasındaki boşluğun sonu her zaman bir ÇİZGİ, ve o çizginin
-   üstünde folio rakamı oturuyor. Boşluk artık değil, ölçülmüş aralık. */
+/* ── SAĞ: GEÇEN ÖLÇÜMLER ──────────────────────────────────────────── */
 .reel {
   display: grid;
-  padding: var(--s-9) var(--rail) var(--s-9) var(--s-7);
-  row-gap: var(--s-9);
+  gap: var(--s-5);
 }
 
+/*
+ * Her bölüm kendi yüzeyinde. Bölümler arasındaki ayrım bir çizgi değil
+ * bir ARALIK: iki yüzey arasında sayfanın kendi zemini görünüyor.
+ */
 .scene {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  column-gap: var(--s-5);
-  row-gap: var(--s-5);
-  align-items: start;
+  gap: var(--s-4);
+  border-radius: var(--r-panel);
+  padding: var(--pad);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(158deg, var(--cool-1) 0%, var(--cool-2) 100%);
 }
-.scene + .scene {
-  padding-block-start: var(--s-9);
-  border-block-start: 1px solid var(--rule);
+/* 01 ve 04 kendi konularının rengini alıyor: yazılan kayısı, ölçülen gül. */
+.scene:first-child {
+  background: linear-gradient(
+    152deg,
+    var(--warm-1) 0%,
+    var(--warm-2) 60%,
+    var(--warm-3) 100%
+  );
+}
+.scene:last-child {
+  background: linear-gradient(158deg, var(--rose-1) 0%, var(--rose-2) 100%);
 }
 
-/* Folio rakamı kenar payında asılı: bölümler arası sınır bir çizgi
-   DEĞİL bir sayı. Sıra bildiriyor, ölçüm değil — o yüzden mono ama
-   küçük, ve ölçülen sayıların ağırlığını taşımıyor. */
 .scene-no {
-  grid-column: 1;
-  grid-row: 1 / span 3;
-  padding-block-start: 6px;
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--ink-3);
+  font-size: var(--t-tag);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--accent);
 }
 .scene-h {
-  grid-column: 2;
+  font-family: var(--display);
   font-size: var(--t-h2);
   font-weight: 600;
   line-height: 1.1;
-  letter-spacing: -0.02em;
-  max-inline-size: 22ch;
+  letter-spacing: -0.028em;
+  max-inline-size: 20ch;
   text-wrap: balance;
 }
 .scene-sub {
-  grid-column: 2;
   font-size: var(--t-body);
   color: var(--ink-2);
-  max-inline-size: 58ch;
+  max-inline-size: 54ch;
   text-wrap: pretty;
 }
 .scene-sub b {
   color: var(--ink);
+  font-weight: 700;
 }
 .scene-body {
-  grid-column: 2;
   display: grid;
-  row-gap: var(--s-5);
+  gap: var(--s-4);
   min-inline-size: 0;
+  margin-block-start: var(--s-2);
   /* Hat sütunları GÖRÜNTÜ genişliğine değil KENDİ genişliğine bakıyor:
-     sağ sütun görüntünün yarısından dar, görüntü sorgusu burada yanlış
-     sayıyı okur. */
+     sağ sütun görüntünün yarısından dar. */
   container-type: inline-size;
 }
 
-/* ── kapanış — iki sütunun ALTINDAN geçiyor ─────────────────────────── */
+/* ── kapanış — tam genişlik fotoğraf ────────────────────────────────── */
 .coda {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-block-size: clamp(360px, 44vw, 640px);
+  border-radius: var(--r-panel);
+  min-block-size: clamp(340px, 40vw, 560px);
   display: grid;
   align-content: center;
-  padding: var(--s-9) var(--rail);
-  border-block-start: 1px solid var(--rule-strong);
+  padding: var(--pad);
+  box-shadow: var(--lift-1);
 }
 .coda-photo {
   position: absolute;
@@ -1657,38 +1562,26 @@ a.chip:hover {
   object-fit: cover;
   object-position: 22% 58%;
   /*
-   * FOTOĞRAF DA SİSTEME GİRİYOR.
-   *
-   * Kadrajdaki ölçülen basamak zümrüt yeşiliydi — silinen dilin marka
-   * rengi. Sayfanın tamamında hiç yeşil yokken kapanışın en doygun nesnesi
-   * yeşil olunca, kaldırdığımız fikir ("renk marka demektir") tam orada geri
-   * geliyordu.
-   *
-   * Ton döndürme yeşili izin mavisine taşıyor; doygunluk kısma da duvarın
-   * yeşile kaymasını engelliyor (yalnız `hue-rotate` ile duvar açıkça yeşil
-   * kalıyor, ÖLÇÜLDÜ). Fotoğraf değişmiyor — gösterimi sisteme giriyor.
-   *
-   * `filter` burada güvenli: `preserve-3d` zinciri içinde değil.
+   * Fotoğraf da sisteme giriyor. Kadrajdaki ölçülen basamak kaynakta
+   * zümrüt yeşili — silinen iki dilin de dışında bir renk. Ton döndürme
+   * onu bu dilin sıcak kayısısına taşıyor, doygunluk kısma da duvarın
+   * kaymasını engelliyor. `filter` burada güvenli: `preserve-3d`
+   * zincirinin içinde değil.
    */
-  filter: hue-rotate(78deg) saturate(0.55);
+  filter: hue-rotate(230deg) saturate(0.65) sepia(0.45);
 }
 @media (min-width: 861px) {
-  /* Kendi zemini fotoğraf. Jetonlar kendi alt ağacında ve iki temada da
+  /* Kendi zemini fotoğraf: jetonlar kendi alt ağacında ve iki temada da
      aynı, çünkü altındaki fotoğraf iki temada da aynı. */
   .coda {
-    /*
-     * Kendi zemini FOTOĞRAF, ve fotoğrafın altındaki bej piksel piksel
-     * değişiyor. Üçüncü mürekkep #4d535e ile ÖLÇÜLDÜ: en koyu bej üstünde
-     * 4,13:1 — AA'nın 4,5 tabanının altında. Bir kademe koyulaştı, aynı
-     * ölçümde 5,14:1 veriyor.
-     */
-    --ink: #1a1d24;
-    --ink-2: #333842;
-    --ink-3: #40454e;
-    --trace: #16249b;
+    --ink: #2c1c16;
+    --ink-2: #4a3227;
+    --ink-3: #5c4033;
+    --accent: #93341a;
+    --on-accent: #fff8f2;
   }
   .coda-say {
-    margin-inline-start: 52%;
+    margin-inline-start: 50%;
   }
 }
 .coda-say {
@@ -1697,11 +1590,12 @@ a.chip:hover {
   gap: var(--s-5);
 }
 .coda-h {
+  font-family: var(--display);
   font-size: var(--t-h2);
   font-weight: 600;
   line-height: 1.12;
-  letter-spacing: -0.025em;
-  max-inline-size: 20ch;
+  letter-spacing: -0.03em;
+  max-inline-size: 18ch;
   color: var(--ink);
   text-wrap: balance;
 }
@@ -1710,26 +1604,21 @@ a.chip:hover {
   align-items: baseline;
   flex-wrap: wrap;
   gap: var(--s-2);
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-3);
+  font-size: var(--t-small);
+  color: var(--ink-2);
 }
 /* Oran ile dayanağı arasındaki ayraç metnin kendisinde: CSS boşluğu iki
-   sayıyı ayırmaya yetmiyordu, "%4,941 bulgunun 2'si" tek sayı gibi
-   okunuyordu. */
+   sayıyı ayırmaya yetmiyordu. */
 .claim-figure {
   display: inline-flex;
   align-items: baseline;
   gap: 6px;
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 800;
 }
 .claim-figure i {
   font-style: normal;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink-3);
 }
 
@@ -1738,13 +1627,8 @@ a.chip:hover {
   align-items: center;
   justify-content: space-between;
   gap: var(--s-4);
-  padding: var(--s-5) var(--rail);
-  border-block-start: 1px solid var(--rule);
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  padding: var(--s-5) var(--s-4) 0;
+  font-size: var(--t-small);
   color: var(--ink-3);
 }
 
@@ -1759,38 +1643,16 @@ a.chip:hover {
   .tool {
     position: static;
     min-block-size: 0;
-    padding: var(--s-8) var(--rail);
-    border-inline-end: 0;
-    border-block-end: 1px solid var(--rule-strong);
+    padding: var(--s-7) var(--pad);
     overflow: visible;
   }
   .tool-in {
     gap: var(--s-5);
     max-inline-size: none;
   }
-  .reel {
-    padding: var(--s-8) var(--rail);
-    row-gap: var(--s-8);
-  }
-  .scene {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .scene + .scene {
-    padding-block-start: var(--s-8);
-  }
-  .scene-no {
-    grid-column: 1;
-    grid-row: auto;
-    padding-block-start: 0;
-  }
-  .scene-h,
-  .scene-sub,
-  .scene-body {
-    grid-column: 1;
-  }
   .coda {
     min-block-size: 0;
-    padding: 0 0 var(--s-8);
+    padding: 0 0 var(--s-7);
   }
   .coda-photo {
     position: static;
@@ -1799,100 +1661,108 @@ a.chip:hover {
     margin-block-end: var(--s-6);
   }
   .coda-say {
-    padding-inline: var(--rail);
+    padding-inline: var(--pad);
   }
 }
 
-
 /* ═══════════════════════════════════════════════════════════════════
    14 · KAPI — giriş / kayıt
-
-   İki sütun: solda alet (merdiven, SABİT yanan basamakla — burada
-   merdiven bir OKUMA, vaat değil), sağda form. Ayrımı yine sınır
-   yapıyor, zemin değil.
    ═══════════════════════════════════════════════════════════════════ */
 
 .gate {
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  min-block-size: 100svh;
-  background: var(--ground);
+  gap: var(--s-5);
+  max-inline-size: var(--page-max);
+  margin-inline: auto;
+  padding: var(--s-6) var(--rail) var(--s-8);
 }
-
 .gate-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--s-4);
-  padding: var(--s-5) var(--rail);
-  border-block-end: 1px solid var(--rule-strong);
+  padding-inline: var(--s-4);
 }
 .gate-tag {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 
 .gate-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(340px, 460px);
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 440px);
   align-items: center;
-  gap: var(--s-8) var(--s-9);
-  padding: var(--s-9) var(--rail);
+  gap: var(--s-6) var(--s-7);
+  border-radius: var(--r-panel);
+  padding: var(--pad);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(
+    152deg,
+    var(--warm-1) 0%,
+    var(--warm-2) 54%,
+    var(--warm-3) 100%
+  );
 }
-
 .gate-enter {
   grid-column: 2;
   grid-row: 1;
   display: grid;
-  gap: var(--s-5);
+  gap: var(--s-4);
   align-content: center;
+  padding: var(--s-6);
+  border-radius: var(--r-card);
+  background: var(--soft);
+  box-shadow: var(--lift-1);
 }
 .gate-kicker {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--trace);
+  color: var(--accent);
 }
 .gate-title {
-  font-size: var(--t-h1);
+  font-family: var(--display);
+  font-size: clamp(1.8rem, 2.8vw, 2.5rem);
   font-weight: 600;
-  line-height: 1.04;
+  line-height: 1.06;
   letter-spacing: -0.03em;
 }
 .gate-title i {
   font-style: normal;
-  color: var(--trace);
+  color: var(--accent);
 }
 .gate-lede {
-  font-size: var(--t-lede);
+  font-size: var(--t-body);
   color: var(--ink-2);
-  max-inline-size: 40ch;
+  max-inline-size: 36ch;
 }
-
 .gate-doors {
   display: flex;
-  gap: var(--s-5);
-  padding-block-start: var(--s-4);
-  border-block-start: 1px solid var(--rule);
+  gap: var(--s-4);
+  padding-block-start: var(--s-3);
+  border-block-start: 1px solid var(--hair);
   font-size: var(--t-small);
 }
 .gate-doors a {
   color: var(--ink-2);
+  font-weight: 600;
   text-decoration: none;
-  padding-block-end: var(--s-2);
+  padding-block: var(--s-1);
 }
 .gate-doors a:hover {
   color: var(--ink);
 }
-/* Bulunduğun kapı İKİ İŞARETLE: renk ve kalın kertik. */
+/* Bulunduğun kapı İKİ İŞARETLE: renk ve ağırlık. */
 .gate-doors a[aria-current="page"] {
-  color: var(--trace);
-  font-weight: 600;
-  box-shadow: inset 0 -2px 0 0 var(--trace-fill);
+  color: var(--accent);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+  text-decoration-thickness: 2px;
 }
 .gate-foot {
   font-size: var(--t-small);
@@ -1903,13 +1773,13 @@ a.chip:hover {
   grid-column: 1;
   grid-row: 1;
   display: grid;
-  gap: var(--s-5);
+  gap: var(--s-4);
   align-content: center;
 }
 .gate-caption {
   font-size: var(--t-small);
   color: var(--ink-2);
-  max-inline-size: 56ch;
+  max-inline-size: 52ch;
 }
 
 /* Numune şeridi İKİ SÜTUNU DA kesiyor: kompozisyonda dikiş kalmıyor. */
@@ -1917,115 +1787,125 @@ a.chip:hover {
   grid-column: 1 / -1;
   display: grid;
   gap: var(--s-4);
+  padding: var(--s-5);
+  border-radius: var(--r-card);
+  background: var(--soft);
 }
 
 .gate-scroll {
-  padding: 0 var(--rail) var(--s-7);
+  padding-inline: var(--s-4);
   font-size: var(--t-small);
 }
-.gate-scroll a {
-  color: var(--trace);
-  text-decoration: none;
-  border-block-end: 1px solid var(--trace-fill);
-  padding-block-end: 2px;
-}
 
-/* ── kapının altı: adım adım anlatım ────────────────────────────────── */
 .gate-chapter {
-  padding: var(--s-9) var(--rail);
-  border-block-start: 1px solid var(--rule-strong);
+  display: grid;
+  gap: var(--s-5);
+  border-radius: var(--r-panel);
+  padding: var(--pad);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(158deg, var(--cool-1) 0%, var(--cool-2) 100%);
 }
 .chapter-head {
   display: grid;
   gap: var(--s-3);
-  padding-block-end: var(--s-8);
 }
 .chapter-title {
+  font-family: var(--display);
   font-size: var(--t-h2);
   font-weight: 600;
-  letter-spacing: -0.02em;
-  max-inline-size: 24ch;
+  letter-spacing: -0.028em;
+  max-inline-size: 22ch;
   text-wrap: balance;
 }
 .chapter-sub {
   font-size: var(--t-lede);
   color: var(--ink-2);
-  max-inline-size: 58ch;
+  max-inline-size: 54ch;
 }
 
 .step {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   column-gap: var(--s-5);
-  row-gap: var(--s-4);
-  padding-block: var(--s-8);
-  border-block-start: 1px solid var(--rule);
+  row-gap: var(--s-3);
+  padding-block: var(--s-5);
+  border-block-start: 1px solid var(--hair);
 }
 .step-folio {
   grid-column: 1;
-  grid-row: 1 / span 3;
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--ink-3);
-  padding-block-start: 6px;
+  grid-row: 1 / span 4;
+  inline-size: 34px;
+  block-size: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-chip);
+  background: var(--soft-2);
+  font-size: var(--t-small);
+  font-weight: 800;
+  color: var(--accent);
+}
+.step-body {
+  grid-column: 2;
+  display: grid;
+  gap: var(--s-3);
+  min-inline-size: 0;
+  container-type: inline-size;
 }
 .step-title {
+  font-family: var(--display);
   font-size: var(--t-h3);
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 .step-text {
   font-size: var(--t-body);
   color: var(--ink-2);
-  max-inline-size: 60ch;
+  max-inline-size: 56ch;
 }
 .step-text b {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 700;
+}
+/* Omuz notu — ana metnin akışını kesmeyen kenar yazısı. */
+.step-note {
+  grid-column: 2;
+  padding-inline-start: var(--s-4);
+  border-inline-start: 3px solid var(--hair-2);
+  font-size: var(--t-small);
+  color: var(--ink-3);
+  max-inline-size: 48ch;
 }
 .step-figure {
   grid-column: 2;
   min-inline-size: 0;
   container-type: inline-size;
 }
-/* Omuz notu — ana metnin akışını kesmeyen kenar yazısı. */
-.step-note {
-  grid-column: 2;
-  padding-inline-start: var(--s-4);
-  border-inline-start: 2px solid var(--rule);
-  font-size: var(--t-small);
-  color: var(--ink-3);
-  max-inline-size: 52ch;
-}
 .step-rail {
   grid-column: 2;
+  min-inline-size: 0;
+  container-type: inline-size;
 }
 
-/* ── kapının doğruluk bandı ─────────────────────────────────────────── */
 .gate-accuracy {
   display: grid;
   gap: var(--s-5);
-  padding: var(--s-9) var(--rail);
-  border-block-start: 1px solid var(--rule-strong);
+  border-radius: var(--r-panel);
+  padding: var(--pad);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(158deg, var(--rose-1) 0%, var(--rose-2) 100%);
 }
-/* Metin bloğu — başlık, açıklama, tez cümlesi. */
 .accuracy-head {
   display: grid;
   gap: var(--s-3);
 }
-/* Ana ölçütü söyleyen cümle: alt cümleden bir kademe ağır. */
 .accuracy-thesis {
   font-size: var(--t-body);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink);
-  max-inline-size: 60ch;
+  max-inline-size: 52ch;
   padding-block-start: var(--s-3);
-  border-block-start: 1px solid var(--rule);
+  border-block-start: 1px solid var(--hair);
 }
-/* Proof ızgarasını saran şerit. Sayının kendisi `.proof-cell.is-lead
-   .proof-value` — burada ölçü yok, yalnız yer var. */
 .accuracy-band {
   display: grid;
   gap: var(--s-4);
@@ -2033,34 +1913,25 @@ a.chip:hover {
 
 .gate-close {
   display: grid;
-  gap: var(--s-5);
+  gap: var(--s-4);
   justify-items: start;
-  padding: var(--s-9) var(--rail);
-  border-block-start: 1px solid var(--rule-strong);
+  border-radius: var(--r-panel);
+  padding: var(--pad);
+  background: var(--soft);
 }
-/* Altbilgi: küçük işaret ve iki sınıfsız span. Çocuklar sınıfsız
-   olduğu için seçici buradan yazılıyor. */
 .gate-end {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--s-2) var(--s-5);
-  padding: var(--s-5) var(--rail);
-  border-block-start: 1px solid var(--rule);
-}
-.gate-end span {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  padding: var(--s-4);
+  font-size: var(--t-small);
   color: var(--ink-3);
 }
 
 @media (max-width: 900px) {
   .gate-hero {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--s-8);
   }
   /* Sıra DOM sırası: alet önce, form sonra. `order` yok. */
   .gate-instrument,
@@ -2070,9 +1941,9 @@ a.chip:hover {
     grid-row: auto;
   }
   .gate-instrument .model {
-    --w: clamp(30px, 8vw, 52px);
-    --u: clamp(14px, 3.6vw, 24px);
-    --d: clamp(30px, 8vw, 52px);
+    --w: clamp(30px, 8vw, 54px);
+    --u: clamp(14px, 3.6vw, 25px);
+    --d: clamp(30px, 8vw, 54px);
   }
   .step {
     grid-template-columns: minmax(0, 1fr);
@@ -2080,12 +1951,10 @@ a.chip:hover {
   .step-folio {
     grid-column: 1;
     grid-row: auto;
-    padding-block-start: 0;
   }
-  .step-title,
-  .step-text,
-  .step-figure,
+  .step-body,
   .step-note,
+  .step-figure,
   .step-rail {
     grid-column: 1;
   }
@@ -2099,21 +1968,28 @@ a.chip:hover {
   display: grid;
   place-items: center;
   min-block-size: 100svh;
-  padding: var(--s-8) var(--rail);
-  background: var(--ground);
+  padding: var(--s-7) var(--rail);
 }
 .auth-card {
   inline-size: 100%;
-  max-inline-size: 460px;
+  max-inline-size: 470px;
   display: grid;
   gap: var(--s-5);
-  padding: var(--s-8) 0;
-  border-block: 1px solid var(--rule-strong);
+  border-radius: var(--r-panel);
+  padding: var(--pad);
+  box-shadow: var(--lift-2);
+  background: linear-gradient(
+    152deg,
+    var(--warm-1) 0%,
+    var(--warm-2) 60%,
+    var(--warm-3) 100%
+  );
 }
 .auth-title {
+  font-family: var(--display);
   font-size: var(--t-h2);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.028em;
 }
 .auth-lede {
   font-size: var(--t-body);
@@ -2124,59 +2000,63 @@ a.chip:hover {
   color: var(--ink-2);
 }
 
+
 /* ═══════════════════════════════════════════════════════════════════
    16 · KABUK — giriş yapmış kullanıcının çerçevesi
 
-   Beş hedeften üçe indi. Çubuk yapışkan: hangi ekranda olursan ol
-   ölçülen seviyen ve üç hedef ekranda kalıyor.
+   Beş hedeften üçe indi. Çubuk yapışkan ve kendi yüzeyinde: hangi
+   ekranda olursan ol ölçülen seviyen ve üç hedef görünür kalıyor.
    ═══════════════════════════════════════════════════════════════════ */
 
 .shell {
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-block-size: 100svh;
-  background: var(--ground);
+  max-inline-size: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--rail);
 }
 
 .shell-bar {
   position: sticky;
-  inset-block-start: 0;
+  inset-block-start: var(--s-3);
   z-index: 20;
   display: flex;
   align-items: center;
-  gap: var(--s-6);
-  padding: var(--s-3) var(--rail);
-  background: var(--ground-2);
-  border-block-end: 1px solid var(--rule-strong);
+  gap: var(--s-5);
+  margin-block: var(--s-4) var(--s-5);
+  padding: var(--s-3) var(--s-5);
+  border-radius: var(--r-pill);
+  background: var(--soft);
+  box-shadow: var(--lift-1);
 }
-
 .shell-nav {
   display: flex;
-  gap: var(--s-5);
+  gap: var(--s-2);
 }
 .nav-link {
-  padding-block: var(--s-2);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-pill);
   font-size: var(--t-small);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink-2);
   text-decoration: none;
   white-space: nowrap;
 }
 .nav-link:hover {
   color: var(--ink);
+  background: var(--soft-2);
 }
-/* Bulunduğun ekran İKİ İŞARETLE: renk ve kertik. */
+/* Bulunduğun ekran İKİ İŞARETLE: dolgu ve ağırlık. */
 .nav-link.is-on {
-  color: var(--trace);
-  font-weight: 600;
-  box-shadow: inset 0 -2px 0 0 var(--trace-fill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
 }
 
-/* Seviye cetveli ortada, ikisi arasında: aletin kadranı. */
 .shell-bar .rule {
   margin-inline: auto;
 }
-
 .shell-who {
   display: flex;
   align-items: center;
@@ -2184,9 +2064,7 @@ a.chip:hover {
   margin-inline-start: auto;
 }
 .shell-user {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
+  font-size: var(--t-micro);
   color: var(--ink-3);
 }
 .shell-out {
@@ -2194,11 +2072,12 @@ a.chip:hover {
   background: none;
   padding: var(--s-2) 0;
   font-size: var(--t-small);
+  font-weight: 600;
   color: var(--ink-2);
   cursor: pointer;
   text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 4px;
+  text-decoration-color: var(--hair-2);
 }
 .shell-out:hover {
   color: var(--ink);
@@ -2206,14 +2085,10 @@ a.chip:hover {
 
 .shell-main {
   display: grid;
-  /* SÜTUN KABA BAĞLI. `auto` olsaydı içerideki SVG kendi doğal
-     genişliğini dayatır ve sayfa 390px'te taşardı — ÖLÇÜLDÜ. */
   grid-template-columns: minmax(0, 1fr);
   align-content: start;
-  padding: var(--s-8) var(--rail);
-  max-inline-size: var(--page);
-  inline-size: 100%;
-  margin-inline: auto;
+  gap: var(--s-5);
+  padding-block-end: var(--s-7);
 }
 
 .shell-foot {
@@ -2221,27 +2096,19 @@ a.chip:hover {
   align-items: center;
   justify-content: space-between;
   gap: var(--s-4);
-  padding: var(--s-5) var(--rail);
-  border-block-start: 1px solid var(--rule);
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  padding: var(--s-5) var(--s-5) var(--s-7);
+  font-size: var(--t-small);
   color: var(--ink-3);
 }
 
 @media (max-width: 860px) {
   .shell-bar {
     flex-wrap: wrap;
-    gap: var(--s-3) var(--s-5);
+    gap: var(--s-3) var(--s-4);
+    border-radius: var(--r-card);
   }
-  /* Cetvel kaybolmuyor, satır başına geçiyor: cetveli olmayan alet,
-     alet değil. `display: none` yok. */
+  /* Cetvel kaybolmuyor, satır başına geçiyor: `order` yok, `flex-basis`. */
   .shell-bar .rule {
-    /* `order` YOK: sıra DOM sırası. Kendi satırına `flex-basis` ile
-       geçiyor, yerini değiştirerek değil. `inline-size: 100%` yerine
-       `flex: 1 1 100%`: kutu modeli taşmayı değil sarmayı seçiyor. */
     flex: 1 1 100%;
     margin-inline: 0;
   }
@@ -2250,37 +2117,41 @@ a.chip:hover {
   }
 }
 
-
 /* ═══════════════════════════════════════════════════════════════════
    17 · YAZ — ölçüm kâğıdı
 
-   Yazma alanı sayfanın en büyük nesnesi. Arkasında GERÇEK satır
-   çizgileri var ve `background-attachment: local` sayesinde metinle
-   birlikte kayıyorlar: ölçüm kâğıdı.
+   Yazma alanı sayfanın en büyük nesnesi ve kendi yüzeyinde. Arkasında
+   gerçek satır çizgileri var; `background-attachment: local` sayesinde
+   metinle birlikte kayıyorlar.
    ═══════════════════════════════════════════════════════════════════ */
 
 .write {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--s-6);
-  max-inline-size: 78ch;
+  gap: var(--s-5);
+  border-radius: var(--r-panel);
+  padding: var(--pad);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(
+    152deg,
+    var(--warm-1) 0%,
+    var(--warm-2) 60%,
+    var(--warm-3) 100%
+  );
 }
-
 .task {
   display: grid;
   gap: var(--s-3);
-  padding-block-end: var(--s-5);
-  border-block-end: 1px solid var(--rule);
 }
-/* Görev İngilizce bir numune: mono. */
 .task-title {
-  font-family: var(--mono);
-  font-size: clamp(19px, 2.1vw, 24px);
-  font-weight: 500;
-  line-height: 1.34;
-  letter-spacing: -0.01em;
+  font-family: var(--display);
+  font-size: clamp(1.35rem, 2.3vw, 1.95rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.028em;
   color: var(--ink);
-  max-inline-size: var(--measure-spec);
+  max-inline-size: 24ch;
+  text-wrap: balance;
 }
 .task-meta {
   display: flex;
@@ -2288,15 +2159,16 @@ a.chip:hover {
   flex-wrap: wrap;
   gap: var(--s-2);
   font-size: var(--t-small);
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
 .task-sep {
-  color: var(--rule-strong);
+  color: var(--ink-3);
 }
 .task-swap {
-  color: var(--trace);
+  color: var(--accent);
+  font-weight: 700;
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
   margin-inline-start: auto;
 }
 
@@ -2305,21 +2177,20 @@ a.chip:hover {
   grid-template-columns: minmax(0, 1fr);
   gap: var(--s-4);
 }
-
 .editor {
-  --line: 1.72em;
+  --line: 1.9em;
   inline-size: 100%;
-  min-block-size: 46svh;
+  min-block-size: 44svh;
   padding: var(--s-5);
-  border: 0;
-  border-block: 1px solid var(--rule-strong);
-  border-radius: 0;
-  background-color: var(--well);
+  border: 1px solid transparent;
+  border-radius: var(--r-card);
+  background-color: var(--soft-2);
   color: var(--ink);
-  font-family: var(--mono);
-  font-size: var(--t-spec);
+  font-family: var(--body);
+  font-size: var(--t-read);
   line-height: var(--line);
   resize: vertical;
+  box-shadow: inset 0 1px 3px rgba(122, 65, 48, 0.07);
   /*
    * Kâğıdın satırları. `local` tutturma metinle birlikte kaydırıyor —
    * `scroll` olsaydı çizgiler sabit kalır, metin üstünde kayar ve hiza
@@ -2328,7 +2199,7 @@ a.chip:hover {
   background-image: repeating-linear-gradient(
     to bottom,
     transparent 0 calc(var(--line) - 1px),
-    var(--rule-soft) calc(var(--line) - 1px) var(--line)
+    var(--hair) calc(var(--line) - 1px) var(--line)
   );
   background-attachment: local;
   background-position: 0 var(--s-5);
@@ -2337,7 +2208,8 @@ a.chip:hover {
   color: var(--ink-3);
 }
 .editor:focus-visible {
-  outline-offset: -2px;
+  border-color: var(--accent);
+  outline-offset: 1px;
 }
 
 .composer-foot {
@@ -2351,49 +2223,44 @@ a.chip:hover {
   display: flex;
   align-items: baseline;
   gap: var(--s-2);
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
-/* Kelime sayacı bir ÖLÇÜM: ikincil okuma boyunda. */
 .composer-count b {
-  font-size: var(--t-mid);
-  font-weight: 600;
+  font-family: var(--display);
+  font-size: 1.9rem;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: var(--ink);
 }
 .composer-target {
   color: var(--ink-3);
 }
 .composer-flag {
-  padding: 2px var(--s-2);
-  border: 1px solid var(--fault);
-  color: var(--fault);
-  border-radius: var(--r-c);
+  padding: 2px var(--s-3);
+  border-radius: var(--r-pill);
+  background: var(--fam-turkish);
+  color: var(--fam-turkish-ink);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   18 · KELİME DEFTERİ
-
-   Yazma ekranının ALTINDA. Görevle yazı alanının arasında duruyordu ve
-   buraya yazmaya gelen kişinin gözü tam o noktada üç nesnelik bir
-   kutuya çarpıyordu.
+   18 · KELİME DEFTERİ — yazma ekranının ALTINDA
    ═══════════════════════════════════════════════════════════════════ */
 
 .offband {
   display: grid;
   gap: var(--s-3);
   padding-block-start: var(--s-5);
-  border-block-start: 1px solid var(--rule);
+  border-block-start: 1px solid var(--hair);
 }
 .offband-head {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
@@ -2409,13 +2276,13 @@ a.chip:hover {
 .offband-add {
   display: flex;
   align-items: center;
-  gap: var(--s-2);
+  gap: var(--s-3);
   flex-wrap: wrap;
 }
 .offband-label {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
@@ -2427,32 +2294,30 @@ a.chip:hover {
   display: inline-flex;
   align-items: center;
   gap: var(--s-1);
-  min-block-size: 30px;
-  padding: 0 var(--s-3);
-  border: 1px solid var(--rule);
-  border-radius: var(--r-c);
-  background: none;
+  min-block-size: 34px;
+  padding: 0 var(--s-4);
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: var(--soft-2);
   color: var(--ink-2);
-  font-family: var(--mono);
-  font-size: var(--t-code);
+  font-size: var(--t-small);
+  font-weight: 600;
   cursor: pointer;
 }
 .note-btn:hover {
-  border-color: var(--ink-3);
   color: var(--ink);
+  box-shadow: var(--lift-1);
 }
 .note-btn.is-on {
-  border-color: var(--trace);
-  color: var(--trace);
-  box-shadow: inset 0 -2px 0 0 var(--trace-fill);
+  background: var(--fam-lexis);
+  border-color: var(--fam-lexis-ink);
+  color: var(--fam-lexis-ink);
 }
 .note-form {
   display: contents;
 }
-/* Deftere alınacak kelimenin kendisi — İngilizce, yani mono. */
 .note-word {
-  font-family: var(--mono);
-  font-weight: 500;
+  font-weight: 700;
   color: var(--ink);
 }
 
@@ -2460,9 +2325,9 @@ a.chip:hover {
    19 · KAYIT — ölçümün okunduğu ekran
 
    Sıra tek bir soruya göre: NE YANLIŞ?
-     1 metnin kendisi, hataları işaretli
+     1 metnin kendisi, hataları işaretli   (kayısı yüzey)
      2 tek satır hüküm
-     3 bulgular — tek liste
+     3 bulgular — tek liste                (leylak yüzey)
      4 ölçüm ayrıntısı, tek katlanır kutuda
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -2470,65 +2335,71 @@ a.chip:hover {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--s-5);
-  max-inline-size: 84ch;
+  container-type: inline-size;
 }
-
 .read-meta {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s-4);
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  padding-inline: var(--s-4);
+  font-size: var(--t-micro);
+  font-weight: 600;
   color: var(--ink-3);
 }
 .read-task {
-  font-family: var(--mono);
-  font-size: clamp(19px, 2.1vw, 24px);
-  font-weight: 500;
-  line-height: 1.34;
-  letter-spacing: -0.01em;
-  max-inline-size: var(--measure-spec);
+  font-family: var(--display);
+  font-size: clamp(1.35rem, 2.3vw, 1.95rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.028em;
+  padding-inline: var(--s-4);
+  max-inline-size: 26ch;
+  text-wrap: balance;
 }
 .read-hint {
+  padding-inline: var(--s-4);
   font-size: var(--t-small);
   color: var(--ink-2);
 }
 
-/* ── 1 · metnin kendisi — ekranın TEK okuma penceresi ───────────────── */
+/* ── 1 · metnin kendisi ─────────────────────────────────────────────── */
 .read-text {
-  padding: var(--s-6) var(--s-5);
-  background: var(--well);
-  border-block: 1px solid var(--rule-strong);
-  font-family: var(--mono);
-  font-size: var(--t-spec);
-  line-height: 1.86;
+  border-radius: var(--r-panel);
+  padding: var(--pad);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(
+    152deg,
+    var(--warm-1) 0%,
+    var(--warm-2) 60%,
+    var(--warm-3) 100%
+  );
+  font-size: var(--t-read);
+  line-height: 1.95;
   color: var(--ink);
-  max-inline-size: none;
   white-space: pre-wrap;
 }
-/* Hatalı parça kutulanmıyor, altı çiziliyor — ve tıklanabilir: numara
+/* Hatalı parça ailesinin yıkamasında bir hap — ve tıklanabilir: numara
    listedeki satırına atlıyor. */
 .read-mark {
-  background: none;
-  color: inherit;
+  background: var(--wash);
+  color: var(--ink);
+  padding: 3px 7px;
+  border-radius: var(--r-chip);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--tone) 45%, transparent);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 .read-mark a {
   color: inherit;
-  text-decoration: underline;
-  text-decoration-color: var(--fault-fill);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
-  text-decoration-skip-ink: none;
+  text-decoration: none;
 }
 .read-mark sup {
-  font-size: 0.62em;
+  font-size: 0.58em;
+  font-weight: 800;
   line-height: 0;
+  margin-inline-start: 3px;
   vertical-align: super;
-  color: var(--fault);
-  padding-inline-start: 2px;
+  color: var(--tone);
 }
 
 /* ── 2 · tek satır hüküm ────────────────────────────────────────────── */
@@ -2536,36 +2407,37 @@ a.chip:hover {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: var(--s-2);
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  gap: var(--s-3);
+  padding-inline: var(--s-4);
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 .read-verdict b {
-  font-family: var(--mono);
-  font-size: var(--t-mid);
-  font-weight: 600;
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: var(--ink);
 }
 .read-level {
-  color: var(--trace);
+  color: var(--accent);
 }
 .read-soft {
-  font-weight: 400;
-  letter-spacing: 0.04em;
+  font-weight: 500;
+  letter-spacing: 0;
   text-transform: none;
   color: var(--ink-3);
 }
 
-/* ── model katmanı koşuyor ──────────────────────────────────────────── */
 .run {
   display: grid;
   gap: var(--s-2);
   justify-items: start;
+  padding-inline: var(--s-4);
 }
 .run-busy {
   display: flex;
@@ -2577,41 +2449,50 @@ a.chip:hover {
 }
 /* Jeton hareket kapalıyken de görünür: dolu bir nokta. */
 .run-dot {
-  inline-size: 8px;
-  block-size: 8px;
+  inline-size: 10px;
+  block-size: 10px;
   flex: none;
-  background: var(--trace-fill);
+  border-radius: 50%;
+  background: var(--accent);
 }
 .run-error {
+  padding-inline: var(--s-4);
   font-size: var(--t-small);
-  color: var(--fault);
+  color: var(--bad);
 }
-
 .read-clean {
-  padding-block: var(--s-4);
-  font-size: var(--t-body);
+  padding: var(--s-6) var(--pad);
+  border-radius: var(--r-panel);
+  background: linear-gradient(158deg, var(--cool-1) 0%, var(--cool-2) 100%);
+  font-size: var(--t-lede);
   color: var(--ink-2);
-  border-block-start: 1px solid var(--rule);
 }
 
-/* ── 3 · bulgular · tek liste ───────────────────────────────────────── */
+/* ── 3 · bulgular · tek liste, kendi yüzeyinde ─────────────────────── */
 .fixes {
   display: grid;
-  border-block-start: 1px solid var(--rule-strong);
+  border-radius: var(--r-panel);
+  padding: var(--s-4) var(--pad);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(158deg, var(--cool-1) 0%, var(--cool-2) 100%);
 }
 .fix {
-  border-block-end: 1px solid var(--rule-soft);
+  border-block-start: 1px solid var(--hair);
+}
+.fix:first-child {
+  border-block-start: 0;
 }
 /* Metindeki numaradan buraya atlanınca satır kendini belli etsin. */
 .fix:target {
-  background: var(--trace-wash);
+  background: var(--soft-2);
+  border-radius: var(--r-card);
 }
 
 .fix-line {
   display: grid;
-  grid-template-columns: 2.5ch minmax(0, 1fr) auto;
-  align-items: baseline;
-  column-gap: var(--s-3);
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--s-4);
   padding-block: var(--s-3);
   cursor: pointer;
   list-style: none;
@@ -2623,18 +2504,23 @@ a.chip:hover {
   content: "";
 }
 .fix-no {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  color: var(--ink-3);
+  inline-size: 32px;
+  block-size: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-chip);
+  background: var(--wash);
+  color: var(--tone);
+  font-size: var(--t-small);
+  font-weight: 800;
 }
 .fix-swap {
-  font-family: var(--mono);
-  font-size: var(--t-code);
+  font-size: var(--t-body);
+  letter-spacing: -0.012em;
   min-inline-size: 0;
 }
 .fix-was {
-  color: var(--fault);
+  color: var(--ink-3);
   text-decoration: line-through;
   text-decoration-thickness: 1px;
 }
@@ -2644,52 +2530,48 @@ a.chip:hover {
 }
 .fix-now {
   color: var(--ink);
-  font-weight: 500;
-  box-shadow: inset 0 -2px 0 0 var(--trace-fill);
+  font-weight: 700;
 }
 .fix-kind {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-3);
+  font-size: var(--t-micro);
+  font-weight: 700;
+  color: var(--tone);
   text-align: end;
+  white-space: nowrap;
 }
-/* Açılma göstergesi karakter — gradyan zorlanmış renklerde düşüyor. */
 .fix-line .fix-kind::after {
   content: " +";
-  font-weight: 600;
-  color: var(--ink-2);
+  color: var(--ink-3);
 }
 .fix-in[open] .fix-line .fix-kind::after {
   content: " \2212";
 }
 .fix-badge {
   margin-inline-start: var(--s-2);
-  padding: 1px var(--s-2);
-  border: 1px solid var(--fault);
-  color: var(--fault);
-  font-weight: 500;
+  padding: 2px var(--s-3);
+  border-radius: var(--r-pill);
+  background: var(--soft-2);
+  color: var(--ink-2);
+  font-weight: 700;
 }
 
 .fix-body {
   display: grid;
   gap: var(--s-3);
   padding-block-end: var(--s-4);
-  padding-inline-start: calc(2.5ch + var(--s-3));
+  padding-inline-start: calc(32px + var(--s-4));
 }
 .fix-why {
   font-size: var(--t-small);
   color: var(--ink-2);
-  max-inline-size: 64ch;
+  max-inline-size: 62ch;
 }
 .fix-note {
   font-size: var(--t-small);
   color: var(--ink-3);
-  border-inline-start: 2px solid var(--rule);
   padding-inline-start: var(--s-3);
-  max-inline-size: 64ch;
+  border-inline-start: 3px solid var(--hair-2);
+  max-inline-size: 62ch;
 }
 .fix-foot {
   display: flex;
@@ -2698,53 +2580,48 @@ a.chip:hover {
   gap: var(--s-2);
 }
 .fix-src {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: var(--t-micro);
+  font-weight: 600;
   color: var(--ink-3);
   margin-inline-end: var(--s-2);
 }
 .fix-thanks {
   font-size: var(--t-small);
-  color: var(--trace);
+  color: var(--good);
+  font-weight: 600;
 }
-
 .read-filtered {
+  padding-inline: var(--s-4);
   font-size: var(--t-small);
   color: var(--ink-3);
-  max-inline-size: 64ch;
+  max-inline-size: 62ch;
 }
 
-/*
- * DAR EKRANDA KATEGORİ ALT SATIRA.
- *
- * Üçüncü sütun `auto` ve içindeki Türkçe taksonomi etiketi uzun ("GRAMER ·
- * ZAMAN"); 390px'te orta sütunu sıfıra sıkıştırıp düzeltmenin ÜSTÜNE biniyordu
- * — ÖLÇÜLDÜ, ekran görüntüsünde iki metin iç içe çiziliyordu. İki sütuna
- * inince ikisi de tam okunuyor.
- */
-@media (max-width: 639px) {
+/* Dar kapta taksonomi etiketi alt satıra. */
+@container (max-width: 560px) {
   .fix-line {
-    grid-template-columns: 2.5ch minmax(0, 1fr);
+    grid-template-columns: 32px minmax(0, 1fr);
     row-gap: var(--s-1);
+    align-items: start;
   }
   .fix-kind {
     grid-column: 2;
     text-align: start;
+    white-space: normal;
   }
 }
 
 /* ── 4 · ölçüm ayrıntısı · TEK katlanır kutu ───────────────────────── */
 .read-detail {
-  border-block-start: 1px solid var(--rule);
+  border-radius: var(--r-panel);
+  padding: 0 var(--pad);
+  background: var(--soft);
 }
 .read-detail > summary {
-  padding-block: var(--s-4);
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  padding-block: var(--s-5);
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-2);
   cursor: pointer;
@@ -2775,35 +2652,29 @@ a.chip:hover {
   gap: var(--s-3);
 }
 .detail-h {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
   padding-block-end: var(--s-2);
-  border-block-end: 1px solid var(--rule-soft);
+  border-block-end: 1px solid var(--hair);
 }
 .detail-note {
   font-size: var(--t-small);
   color: var(--ink-2);
-  max-inline-size: 64ch;
+  max-inline-size: 62ch;
 }
 .detail-none {
   font-size: var(--t-small);
   color: var(--ink-2);
 }
 .detail-stamp {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: var(--t-micro);
   color: var(--ink-3);
 }
 
-/* Seviye sinyalleri — dört satır, çubuk yok: sayı ve bant yeter.
-   Kendi adları var: `Figures.tsx` aynı kavramı `.signal*` ile ama başka bir
-   YAPIYLA çiziyor (orada bir de ölçer var) ve tek kural iki şekle hizmet
-   edemiyor. */
+/* seviye sinyalleri — kayıt ekranı sürümü */
 .lvl {
   display: grid;
 }
@@ -2812,7 +2683,7 @@ a.chip:hover {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--s-1) var(--s-4);
   padding-block: var(--s-3);
-  border-block-start: 1px solid var(--rule-soft);
+  border-block-start: 1px solid var(--hair);
 }
 .lvl-row:first-child {
   border-block-start: 0;
@@ -2820,16 +2691,14 @@ a.chip:hover {
 .lvl-name {
   grid-column: 1;
   font-size: var(--t-body);
-  font-weight: 500;
+  font-weight: 600;
 }
 .lvl-band {
   grid-column: 2;
   grid-row: 1;
   margin: 0;
-  font-family: var(--mono);
-  font-size: var(--t-code);
-  font-weight: 600;
-  color: var(--trace);
+  font-weight: 800;
+  color: var(--accent);
 }
 .lvl-detail {
   grid-column: 1 / -1;
@@ -2838,11 +2707,10 @@ a.chip:hover {
   color: var(--ink-2);
 }
 
-/* ham ölçüler — anahtar/değer çiftleri */
 .pairs {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: var(--s-3) var(--s-5);
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--s-4);
 }
 .pair {
   display: grid;
@@ -2850,27 +2718,26 @@ a.chip:hover {
 }
 .pair dt,
 .pair-key {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 .pair dd,
 .pair-val {
   margin: 0;
-  font-family: var(--mono);
   font-size: var(--t-body);
-  font-weight: 500;
+  font-weight: 700;
   color: var(--ink);
 }
 
-/* kelime bandı şeridi */
 .bands-bar {
   display: flex;
-  block-size: 10px;
-  gap: 1px;
-  background: var(--rule);
+  block-size: 12px;
+  gap: 2px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
 }
 .bands-slice {
   block-size: 100%;
@@ -2894,10 +2761,7 @@ a.chip:hover {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s-2) var(--s-4);
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: var(--t-micro);
   color: var(--ink-3);
 }
 .bands-item {
@@ -2906,35 +2770,36 @@ a.chip:hover {
   gap: var(--s-1);
 }
 /* Rampanın komşu durakları arasında 3:1 vermek tek hue ile matematiksel
-   olarak imkânsız. O yüzden ayrımı renk TEK BAŞINA taşımıyor: her
-   dilimin sayısı yanında yazılı. */
+   olarak imkânsız; ayrımı renk TEK BAŞINA taşımıyor, her dilimin sayısı
+   yanında yazılı. */
 .bands-dot {
-  inline-size: 8px;
-  block-size: 8px;
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 3px;
 }
 .bands-item b {
   color: var(--ink);
+  font-weight: 700;
 }
 .bands-above {
   margin-inline-start: auto;
 }
 
 .read-back {
-  padding-block-start: var(--s-4);
-  border-block-start: 1px solid var(--rule);
+  padding-inline: var(--s-4);
   font-size: var(--t-small);
 }
-
 .earlier {
   display: grid;
   gap: var(--s-3);
-  padding-block-start: var(--s-6);
-  border-block-start: 1px solid var(--rule);
+  border-radius: var(--r-panel);
+  padding: var(--s-5) var(--pad);
+  background: var(--soft);
 }
 .earlier-title {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
@@ -2942,9 +2807,6 @@ a.chip:hover {
 
 /* ═══════════════════════════════════════════════════════════════════
    20 · KAYITLAR — liste
-
-   Kart yok. Her kayıt bir satır; ayracı 1px kılçizgi. Yoğunluk çubuğu
-   süs değil, listede ilerlemeyi görünür kılan tek şey.
    ═══════════════════════════════════════════════════════════════════ */
 
 .log {
@@ -2958,31 +2820,27 @@ a.chip:hover {
   justify-content: space-between;
   gap: var(--s-4);
   flex-wrap: wrap;
-  padding-block-end: var(--s-4);
-  border-block-end: 1px solid var(--rule-strong);
+  padding-inline: var(--s-4);
 }
 .log-title {
+  font-family: var(--display);
   font-size: var(--t-h2);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.028em;
 }
 .log-count {
   display: flex;
   align-items: baseline;
   gap: var(--s-2);
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-3);
+  font-size: var(--t-small);
+  color: var(--ink-2);
 }
 .log-count b {
-  font-family: var(--mono);
-  font-size: var(--t-body);
+  font-weight: 800;
   color: var(--ink);
 }
 .log-sep {
-  color: var(--rule-strong);
+  color: var(--ink-3);
 }
 
 .filters {
@@ -2990,6 +2848,9 @@ a.chip:hover {
   gap: var(--s-3);
   flex-wrap: wrap;
   align-items: center;
+  padding: var(--s-4);
+  border-radius: var(--r-panel);
+  background: var(--soft);
 }
 .filters .input {
   inline-size: min(100%, 320px);
@@ -2997,46 +2858,45 @@ a.chip:hover {
 
 .log-month {
   display: grid;
+  border-radius: var(--r-panel);
+  padding: var(--s-4) var(--pad) var(--s-5);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(158deg, var(--cool-1) 0%, var(--cool-2) 100%);
 }
 .month {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: var(--s-4);
-  padding-block: var(--s-4) var(--s-2);
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  padding-block: var(--s-3);
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 .month-scale {
-  font-weight: 500;
-  color: var(--ink-3);
+  font-weight: 600;
 }
 
-/* ── kayıt satırı ───────────────────────────────────────────────────── */
 .entry-row {
   display: grid;
-  grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+  grid-template-columns: 4.4rem minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--s-2) var(--s-4);
-  padding-block: var(--s-3);
-  border-block-start: 1px solid var(--rule-soft);
+  padding: var(--s-3) var(--s-3);
+  border-radius: var(--r-card);
   color: inherit;
   text-decoration: none;
+  transition: background-color var(--d-1) var(--ease);
 }
 .entry-row:hover {
-  border-block-start-color: var(--rule-strong);
-}
-.entry-row:hover .entry-name {
-  color: var(--trace);
+  background: var(--soft-2);
 }
 .entry-day {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
@@ -3046,8 +2906,8 @@ a.chip:hover {
   min-inline-size: 0;
 }
 .entry-name {
-  font-family: var(--mono);
-  font-size: var(--t-code);
+  font-size: var(--t-body);
+  font-weight: 600;
   color: var(--ink);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3060,20 +2920,22 @@ a.chip:hover {
   font-size: var(--t-small);
   color: var(--ink-3);
 }
-/* Metnin ÖLÇÜLEN seviyesi. Ölçülmemişse rozet hiç çizilmiyor.
-   Güvenilmez tahminde çerçeve kesik — sayı gizlenmiyor, ne kadar
-   güvenileceği söyleniyor. */
+/* Metnin ÖLÇÜLEN seviyesi. Ölçülmemişse rozet hiç çizilmiyor; güvenilmez
+   tahminde çerçeve kesik — sayı gizlenmiyor, ne kadar güvenileceği
+   söyleniyor. */
 .row-level {
-  padding: 1px var(--s-2);
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--r-c);
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 600;
+  padding: 1px var(--s-3);
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: var(--soft-2);
+  font-size: var(--t-micro);
+  font-weight: 800;
   color: var(--ink-2);
 }
 .row-level.is-soft {
+  background: none;
   border-style: dashed;
+  border-color: var(--hair-2);
   color: var(--ink-3);
 }
 
@@ -3085,32 +2947,32 @@ a.chip:hover {
 }
 .entry-bar {
   display: block;
-  inline-size: 90px;
-  block-size: 3px;
-  background: var(--rule);
+  inline-size: 84px;
+  block-size: 6px;
+  border-radius: var(--r-pill);
+  background: var(--hair-2);
+  overflow: hidden;
 }
 .entry-bar i {
   display: block;
   block-size: 100%;
-  background: var(--trace-fill);
+  border-radius: var(--r-pill);
+  background: var(--accent);
 }
 .entry-num {
-  font-family: var(--mono);
-  font-size: var(--t-code);
-  font-weight: 600;
+  font-size: var(--t-body);
+  font-weight: 800;
   color: var(--ink);
   min-inline-size: 3ch;
   text-align: end;
 }
 .entry-pending {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: var(--t-micro);
+  font-weight: 600;
   color: var(--ink-3);
 }
 
-@media (max-width: 639px) {
+@media (max-width: 640px) {
   .entry-row {
     grid-template-columns: minmax(0, 1fr) auto;
   }
@@ -3128,55 +2990,54 @@ a.chip:hover {
 
 /* ═══════════════════════════════════════════════════════════════════
    21 · İLERLEME — aylar
-
-   Ürünün asıl vaadi. Grafikler sunucuda SVG olarak çiziliyor; sayfa
-   JavaScript olmadan da eksiksiz.
    ═══════════════════════════════════════════════════════════════════ */
 
 .section-title {
-  padding-block-start: var(--s-7);
+  font-family: var(--display);
   font-size: var(--t-h3);
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  padding-block-start: var(--s-5);
 }
 .section-note {
   font-size: var(--t-small);
   color: var(--ink-2);
-  max-inline-size: 64ch;
+  max-inline-size: 62ch;
 }
 
-/* ── ölçüm kutucukları · kutu değil, kertikli sütunlar ─────────────── */
 .tiles {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  border-block-start: 1px solid var(--rule-strong);
+  gap: var(--s-5);
+  border-radius: var(--r-panel);
+  padding: var(--pad);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(158deg, var(--rose-1) 0%, var(--rose-2) 100%);
 }
 .tile {
   display: grid;
   align-content: start;
   gap: var(--s-2);
-  padding: var(--s-4) var(--s-4) var(--s-5) 0;
-  border-block-end: 1px solid var(--rule-soft);
 }
 .tile-label {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 .tile-value {
-  font-family: var(--mono);
-  font-size: var(--t-mid);
-  font-weight: 600;
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: var(--ink);
 }
 /* Ekranın TEK büyük okuması: ana ölçüt. */
 .tile-value.accent {
-  font-size: clamp(38px, 4.4vw, 56px);
-  color: var(--trace);
+  font-size: var(--t-mega);
+  color: var(--accent);
 }
 .tile-note {
   font-size: var(--t-small);
@@ -3184,61 +3045,54 @@ a.chip:hover {
 }
 
 .tone-good {
-  color: var(--tone-good);
-  font-weight: 600;
+  color: var(--good);
+  font-weight: 700;
 }
 .tone-bad {
-  color: var(--tone-bad);
-  font-weight: 600;
+  color: var(--bad);
+  font-weight: 700;
 }
 .tone-flat {
   color: var(--ink-3);
 }
 
-/* ── seviye izi · SVG ───────────────────────────────────────────────── */
 .plot {
   inline-size: 100%;
   block-size: auto;
   margin-block-start: var(--s-4);
 }
 .plot-tick {
-  font-family: var(--mono);
-  font-size: 10.5px;
-  font-weight: 500;
+  font-family: var(--body);
+  font-size: 11px;
+  font-weight: 600;
   fill: var(--ink-3);
 }
 /*
- * SVG boyaları JETONLA DEĞİL SINIFLA veriliyor.
- *
- * Satır içinde `stroke="var(--hairline)"` yazıyordu; o jeton bu stil
- * sayfasında artık yok ve GEÇERSİZ bir sunum niteliği sessizce başlangıç
- * değerine düşüyor: çizgi `none` oluyor, nokta siyaha çöküyor. Sayfa 200
- * dönüyor, hiçbir test patlamıyor ve ölçülen ilerleme çizgisi EKRANDA
- * GÖRÜNMÜYOR. Sınıf üzerinden verilince jeton adı değiştiğinde stil sayfası
- * onu takip ediyor.
+ * SVG boyaları JETONLA DEĞİL SINIFLA veriliyor. Satır içinde
+ * `stroke="var(--hairline)"` yazıyordu; o jeton silinince GEÇERSİZ bir
+ * sunum niteliği sessizce başlangıç değerine düşüyor, çizgi `none` oluyor
+ * ve ölçülen ilerleme EKRANDA GÖRÜNMÜYOR — hiçbir test de patlamıyor.
  */
 .plot-grid {
-  stroke: var(--rule);
+  stroke: var(--hair-2);
 }
 .plot-line {
-  stroke: var(--trace-fill);
+  stroke: var(--accent);
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 .plot-dot {
-  fill: var(--trace-fill);
+  fill: var(--accent);
 }
 
-/* ── hata yoğunluğu · aylık sütunlar ────────────────────────────────── */
 .bars {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
-  gap: 1px;
+  gap: var(--s-2);
   align-items: end;
-  block-size: 180px;
+  block-size: 190px;
   margin-block-start: var(--s-4);
-  border-block-end: 1px solid var(--rule-strong);
 }
 .bar-col {
   display: grid;
@@ -3249,44 +3103,42 @@ a.chip:hover {
   justify-items: center;
 }
 .bar-val {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 600;
+  font-size: var(--t-micro);
+  font-weight: 800;
   color: var(--ink-2);
 }
 .bar-track {
-  display: block;
-  inline-size: 100%;
-  block-size: 100%;
   display: flex;
   align-items: end;
+  inline-size: 100%;
+  block-size: 100%;
 }
 .bar-fill {
   display: block;
   inline-size: 100%;
-  background: var(--trace-fill);
+  border-radius: var(--r-chip) var(--r-chip) 4px 4px;
+  background: var(--accent);
   transform-origin: bottom;
 }
 .bar-label {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: var(--t-micro);
+  font-weight: 600;
   color: var(--ink-3);
-  padding-block-start: var(--s-2);
 }
 
-/* ── ölçerler · ilk ay → bu ay ──────────────────────────────────────── */
 .meters {
   display: grid;
+  gap: var(--s-2);
   margin-block-start: var(--s-4);
-  border-block-start: 1px solid var(--rule-strong);
 }
 .meter-row {
   display: grid;
   gap: var(--s-2);
-  padding-block: var(--s-4);
-  border-block-end: 1px solid var(--rule-soft);
+  padding-block: var(--s-3);
+  border-block-start: 1px solid var(--hair);
+}
+.meter-row:first-child {
+  border-block-start: 0;
 }
 .meter-top {
   display: flex;
@@ -3298,36 +3150,32 @@ a.chip:hover {
   display: flex;
   align-items: baseline;
   gap: var(--s-2);
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-2);
+  font-size: var(--t-small);
+  font-weight: 700;
+  color: var(--ink);
 }
-/* Bayrak renkle DEĞİL, renk + üçgen + metinle: zorlanmış renklerde
-   uyarı kaybolmasın. */
+/* Bayrak renkle DEĞİL, renk + üçgen + metinle. */
 .meter-flag {
-  color: var(--fault);
-  letter-spacing: 0.08em;
+  color: var(--bad);
+  font-weight: 700;
 }
 .meter-val {
-  font-family: var(--mono);
-  font-size: var(--t-code);
-  font-weight: 600;
+  font-size: var(--t-small);
+  font-weight: 800;
   color: var(--ink);
 }
 .meter-sub {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  letter-spacing: 0.06em;
+  font-size: var(--t-micro);
   color: var(--ink-3);
 }
 .meter-track {
   position: relative;
   display: block;
   inline-size: 100%;
-  block-size: 6px;
-  background: var(--rule);
+  block-size: 8px;
+  border-radius: var(--r-pill);
+  background: var(--hair-2);
+  overflow: hidden;
 }
 .meter-was,
 .meter-fill {
@@ -3335,24 +3183,24 @@ a.chip:hover {
   inset-block: 0;
   inset-inline-start: 0;
   display: block;
+  border-radius: var(--r-pill);
   transform-origin: left;
 }
 /* Soluk çubuk nerede başladığın, dolu çubuk bugün. */
 .meter-was {
-  background: var(--rule-strong);
+  background: var(--ink-3);
+  opacity: 0.45;
 }
 .meter-fill {
-  background: var(--trace-fill);
-  block-size: 6px;
+  background: var(--accent);
 }
 .meter-fill.warn {
-  background: var(--fault-fill);
+  background: var(--bad);
 }
 
-/* Doğruluk ekranındaki iki çubuklu satır: etiket + çubuk + değer. */
 .pair {
   display: grid;
-  grid-template-columns: 6.5rem minmax(0, 1fr) 4.5rem;
+  grid-template-columns: 6rem minmax(0, 1fr) 4.2rem;
   align-items: center;
   gap: var(--s-3);
 }
@@ -3360,11 +3208,9 @@ a.chip:hover {
   text-align: end;
 }
 
-/* ── inatçı kategoriler ─────────────────────────────────────────────── */
 .stubborn {
   display: grid;
   margin-block-start: var(--s-4);
-  border-block-start: 1px solid var(--rule-strong);
 }
 .stubborn-row {
   display: flex;
@@ -3372,35 +3218,37 @@ a.chip:hover {
   justify-content: space-between;
   gap: var(--s-4);
   padding-block: var(--s-3);
-  border-block-end: 1px solid var(--rule-soft);
+  border-block-start: 1px solid var(--hair);
+}
+.stubborn-row:first-child {
+  border-block-start: 0;
 }
 .cat {
   display: grid;
   gap: 2px;
   font-size: var(--t-body);
+  font-weight: 600;
 }
 .cat span {
   font-size: var(--t-small);
+  font-weight: 400;
   color: var(--ink-3);
 }
 .n {
   display: flex;
   align-items: baseline;
   gap: var(--s-2);
-  font-size: var(--t-plate);
+  font-size: var(--t-micro);
   font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: var(--ink-3);
   white-space: nowrap;
 }
 .n b {
-  font-family: var(--mono);
   font-size: var(--t-body);
+  font-weight: 800;
   color: var(--ink);
 }
 
-/* ── aynı görevi tekrar yazdın ──────────────────────────────────────── */
 .repeat {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -3411,11 +3259,10 @@ a.chip:hover {
   align-items: center;
   gap: var(--s-3);
   padding-block-end: var(--s-3);
-  border-block-end: 1px solid var(--rule-strong);
 }
 .repeat-prompt {
-  font-family: var(--mono);
-  font-size: var(--t-code);
+  font-size: var(--t-body);
+  font-weight: 600;
   color: var(--ink);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3426,22 +3273,20 @@ a.chip:hover {
    dört satıra sarıyordu. `npm run styles` yakaladı. */
 .try {
   display: grid;
-  grid-template-columns: 6.5rem minmax(0, 1fr) 5rem 6rem;
+  grid-template-columns: 6.2rem minmax(0, 1fr) 4.6rem 5.6rem;
   align-items: baseline;
   gap: var(--s-2) var(--s-4);
-  padding-block: var(--s-3);
-  border-block-end: 1px solid var(--rule-soft);
+  padding: var(--s-3);
+  border-radius: var(--r-card);
   color: inherit;
   text-decoration: none;
 }
 .try:hover {
-  border-block-end-color: var(--rule-strong);
+  background: var(--soft-2);
 }
 .try-day {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: var(--t-micro);
+  font-weight: 600;
   color: var(--ink-3);
 }
 .try-what {
@@ -3449,9 +3294,8 @@ a.chip:hover {
   color: var(--ink-2);
 }
 .try-num {
-  font-family: var(--mono);
-  font-size: var(--t-code);
-  font-weight: 600;
+  font-size: var(--t-body);
+  font-weight: 800;
   color: var(--ink);
   text-align: end;
 }
@@ -3459,7 +3303,7 @@ a.chip:hover {
   font-size: var(--t-small);
   text-align: end;
 }
-@media (max-width: 639px) {
+@media (max-width: 640px) {
   .try {
     grid-template-columns: minmax(0, 1fr) auto;
   }
@@ -3468,12 +3312,8 @@ a.chip:hover {
   }
 }
 
-
 /* ═══════════════════════════════════════════════════════════════════
    22 · DOĞRULUK — aletin kendi ölçümü
-
-   Ürünün en büyük okuması burada. Kutu yok, zemin yok, gölge yok:
-   sayı yalnız duruyor.
    ═══════════════════════════════════════════════════════════════════ */
 
 .view-bar {
@@ -3485,10 +3325,7 @@ a.chip:hover {
 }
 .run-stamp {
   margin-inline-start: auto;
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: var(--t-micro);
   color: var(--ink-3);
 }
 
@@ -3496,60 +3333,60 @@ a.chip:hover {
 .table-scroll {
   overflow-x: auto;
   margin-block-start: var(--s-4);
-  border-block-start: 1px solid var(--rule-strong);
+  border-radius: var(--r-card);
+  background: var(--soft);
 }
 .runs {
   inline-size: 100%;
   min-inline-size: 620px;
-  font-family: var(--mono);
-  font-size: var(--t-code);
+  font-size: var(--t-small);
 }
 .runs th {
-  padding: var(--s-3) var(--s-4) var(--s-3) 0;
+  padding: var(--s-3) var(--s-4);
   text-align: start;
-  font-size: var(--t-tick);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--ink-3);
-  border-block-end: 1px solid var(--rule);
+  border-block-end: 1px solid var(--hair);
   white-space: nowrap;
 }
 .runs td {
-  padding: var(--s-3) var(--s-4) var(--s-3) 0;
-  border-block-end: 1px solid var(--rule-soft);
+  padding: var(--s-3) var(--s-4);
+  border-block-end: 1px solid var(--hair);
   color: var(--ink-2);
   white-space: nowrap;
 }
 .runs tbody tr:first-child td {
   color: var(--ink);
+  font-weight: 600;
 }
 
-/* ── beş savunma ────────────────────────────────────────────────────── */
 .defences {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--s-6);
+  gap: var(--s-4);
   margin-block-start: var(--s-4);
 }
 .defence {
   display: grid;
   align-content: start;
   gap: var(--s-2);
-  padding-block-start: var(--s-3);
-  border-block-start: 2px solid var(--rule-strong);
+  padding: var(--s-4);
+  border-radius: var(--r-card);
+  background: var(--soft);
 }
 .defence-n {
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  font-weight: 500;
+  font-size: var(--t-micro);
+  font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--accent);
 }
 .defence-t {
   font-size: var(--t-body);
-  font-weight: 600;
+  font-weight: 700;
 }
 .defence-w {
   font-size: var(--t-small);
@@ -3560,37 +3397,166 @@ a.chip:hover {
    23 · KALAN ORTAK PARÇALAR
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Sayı çiftleri: uzunluk / bağlam / gün gibi künye üçlüleri. */
-
-.accent {
-  color: var(--trace);
-}
-.warn {
-  color: var(--fault);
-}
-
-/* Ekranların taban kabı — yeni ekranlar kendi kökünü taşıyor, bunlar
-   hâlâ eski kabı kullanan yerler için. */
 .panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--s-5);
+  border-radius: var(--r-panel);
+  padding: var(--pad);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(158deg, var(--cool-1) 0%, var(--cool-2) 100%);
 }
 .panel-title {
+  font-family: var(--display);
   font-size: var(--t-h2);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.028em;
 }
 .panel-lede {
   font-size: var(--t-lede);
   color: var(--ink-2);
-  max-inline-size: 62ch;
+  max-inline-size: 58ch;
 }
+.accent {
+  color: var(--accent);
+}
+.warn {
+  color: var(--bad);
+}
+
+/* ── kapının şekilleri: taksonomi, damga, sinyaller ─────────────────── */
+.taxo {
+  display: grid;
+  gap: var(--s-4);
+}
+.taxo-family {
+  display: grid;
+  gap: var(--s-2);
+}
+.taxo-name {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.taxo-name b {
+  color: var(--ink-2);
+}
+.taxo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.taxo-chip {
+  padding: 3px var(--s-3);
+  border-radius: var(--r-pill);
+  background: var(--soft-2);
+  font-size: var(--t-micro);
+  font-weight: 600;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.stamp {
+  display: grid;
+  gap: var(--s-3);
+}
+.stamp-head {
+  font-size: var(--t-tag);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.stamp-head b {
+  color: var(--ink);
+}
+.stamp-rows {
+  display: grid;
+}
+.stamp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  gap: var(--s-2) var(--s-4);
+  padding-block: var(--s-3);
+  border-block-start: 1px solid var(--hair);
+}
+.stamp-row:first-child {
+  border-block-start: 0;
+}
+.stamp-row dt {
+  font-weight: 700;
+  color: var(--ink);
+}
+.stamp-row dd {
+  margin: 0;
+  font-size: var(--t-small);
+  color: var(--ink-2);
+}
+.stamp-foot {
+  font-size: var(--t-small);
+  color: var(--ink-3);
+}
+
+.signals {
+  display: grid;
+  gap: var(--s-4);
+}
+.signal {
+  display: grid;
+  gap: var(--s-2);
+}
+.signal-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+}
+.signal-name {
+  font-size: var(--t-body);
+  font-weight: 600;
+}
+.signal-band {
+  font-weight: 800;
+  color: var(--accent);
+}
+.signal-detail {
+  font-size: var(--t-small);
+  color: var(--ink-2);
+}
+.signal-sum {
+  padding-block-start: var(--s-3);
+  border-block-start: 1px solid var(--hair);
+  font-size: var(--t-small);
+  color: var(--ink-2);
+}
+.signal-sum b {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+/* ── sahne gövdesi değiştiricileri ─────────────────────────────────── */
+.is-noisy,
+.is-quiet {
+  padding: var(--s-5);
+  border-radius: var(--r-card);
+  background: var(--soft);
+}
+.is-rail,
+.is-proof {
+  gap: var(--s-4);
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════
    24 · HAREKET
 
-   TEK FİKİR: BİR DEĞER YERİNİ BULUYOR. Süs hareketi yok, "fade-in" yok.
+   TEK FİKİR: BİR YÜZEY YERİNE OTURUYOR, BİR ÖLÇÜM DEĞERİNE YÜRÜYOR.
+   Süs hareketi yok.
 
    Taban CSS BİTMİŞ KARE: animasyonlu her özelliğin son değeri yukarıdaki
    kurallarda yazılı ve buradaki `@keyframes` yalnızca `from` durumundan
@@ -3598,8 +3564,7 @@ a.chip:hover {
    animasyon başlamıyor ve sayfa TAM görünüyor.
    ═══════════════════════════════════════════════════════════════════ */
 
-/* 1 · MODELİN SALINIMI — imza hareketi.
-   DÖNMÜYOR, salınıyor: bir alet dönmez. Genlik 14°, süre 18s. */
+/* 1 · MODELİN SALINIMI — imza hareketi. Dönmüyor, salınıyor. */
 @keyframes rig-sway {
   from {
     transform: rotateX(-19deg) rotateY(-33deg);
@@ -3612,48 +3577,38 @@ a.chip:hover {
   animation: rig-sway 18s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
 
-/* 2 · IŞIK TIRMANIYOR — A1'den C1'e, hiçbirinde durmuyor.
-   Kapı ekranında `is-fixed` bunu kapatıyor: orada merdiven bir OKUMA. */
+/*
+ * 2 · IŞIK TIRMANIYOR — A1'den C1'e, hiçbirinde durmuyor.
+ *
+ * Yanan basamağın RENGİ değişmiyor; etrafında ışık oluyor. Rengi değiştirmek
+ * bandın kimliğini bozardı: B1 hep B1 sarısı. Kapı ekranında `is-fixed`
+ * tırmanışı kapatıyor ve ölçülen basamak sabit yanıyor.
+ */
 @keyframes rung-climb {
   0%,
-  9% {
-    background-color: var(--lit);
+  10% {
+    box-shadow: 0 0 34px 6px color-mix(in srgb, var(--face) 55%, transparent);
   }
-  20%,
+  22%,
   100% {
-    background-color: var(--base);
+    box-shadow: 0 0 0 0 transparent;
   }
 }
-[data-play="1"] .model:not(.is-fixed) .mstep .f-top {
-  --lit: var(--lit-top);
-  --base: var(--face-top);
-  animation: rung-climb 6s linear infinite;
-  animation-delay: calc(var(--n) * 1.2s);
-}
+[data-play="1"] .model:not(.is-fixed) .mstep .f-top,
 [data-play="1"] .model:not(.is-fixed) .mstep .f-front {
-  --lit: var(--lit-front);
-  --base: var(--face-front);
   animation: rung-climb 6s linear infinite;
   animation-delay: calc(var(--n) * 1.2s);
 }
-[data-play="1"] .model:not(.is-fixed) .mstep .f-left,
-[data-play="1"] .model:not(.is-fixed) .mstep .f-right {
-  --lit: var(--lit-side);
-  --base: var(--face-side);
-  animation: rung-climb 6s linear infinite;
-  animation-delay: calc(var(--n) * 1.2s);
-}
-/* Ölçek satırındaki etiket de aynı tempoda yanıyor. */
 @keyframes tick-climb {
   0%,
-  9% {
-    color: var(--trace);
-    border-block-start-color: var(--trace-fill);
+  10% {
+    background: var(--accent);
+    color: var(--on-accent);
   }
-  20%,
+  22%,
   100% {
-    color: var(--ink-3);
-    border-block-start-color: var(--rule);
+    background: transparent;
+    color: var(--ink-2);
   }
 }
 [data-play="1"] .model:not(.is-fixed) .model-scale span {
@@ -3661,20 +3616,27 @@ a.chip:hover {
   animation-delay: calc(var(--n) * 1.2s);
 }
 
-/* 3 · ÇİZGİ ÇİZİLİYOR — kalem kâğıda değiyor.
-   Alete en çok yakışan hareket bu. */
-@keyframes rule-draw {
+/*
+ * 3 · YÜZEY YERİNE OTURUYOR.
+ * 12px'ten fazla değil: daha fazlası zıplama gibi duruyor.
+ */
+@keyframes settle {
   from {
-    transform: scaleX(0);
+    opacity: 0.001;
+    transform: translateY(12px);
   }
 }
-[data-play="1"] .scene + .scene,
-[data-play="1"] .step {
-  animation: none;
+[data-play="1"] .scene-body,
+[data-play="1"] .step-figure,
+[data-play="1"] .step-rail,
+[data-play="1"] .accuracy-band {
+  animation: settle var(--d-2) var(--ease) both;
 }
 
-/* 4 · ÖLÇÜM ÇUBUĞU SIFIRDAN DEĞERİNE.
-   Opaklıkla değil KONUMLA: ölçüm bir yerdir, bir görünürlük değil. */
+/*
+ * 4 · ÖLÇÜM ÇUBUĞU SIFIRDAN DEĞERİNE.
+ * Opaklıkla değil KONUMLA: ölçüm bir yerdir, bir görünürlük değil.
+ */
 @keyframes seek-x {
   from {
     transform: scaleX(0);
@@ -3715,7 +3677,7 @@ a.chip:hover {
   }
   10%,
   15% {
-    transform: scale(1.45);
+    transform: scale(1.4);
   }
   22%,
   100% {
@@ -3727,33 +3689,35 @@ a.chip:hover {
   animation-delay: calc(700ms + 500ms + var(--i) * 1000ms);
 }
 
-/* 6 · BULGU SATIRI SOLDAN AÇILIYOR.
-   `clip-path` KULLANILMIYOR: odak o satıra düştüğünde sıfır genişlikte
-   kalıyordu ve klavyeyle gezen kişi görünmeyen bir satıra odaklanıyordu
-   (WCAG 2.4.7). Yerine küçük bir kayma. */
+/*
+ * 6 · BULGU SATIRI GELİYOR.
+ * `clip-path` KULLANILMIYOR: odak o satıra düştüğünde sıfır genişlikte
+ * kalıyordu ve klavyeyle gezen kişi görünmeyen bir satıra odaklanıyordu
+ * (WCAG 2.4.7).
+ */
 @keyframes finding-in {
   from {
     opacity: 0.001;
-    transform: translateX(-6px);
+    transform: translateX(-8px);
   }
 }
 [data-play="1"] .sample-finding {
   animation: finding-in var(--d-2) var(--ease) both;
   animation-delay: calc(var(--i) * 70ms);
 }
-/* Odak gelirse animasyon iptal: görünmeyen bir şeye odaklanılmasın. */
 [data-play="1"] .sample-finding:focus-within {
   animation: none;
 }
 
-/* 7 · İŞARETLİ PARÇANIN ALT ÇİZGİSİ ÇEKİLİYOR. */
-@keyframes mark-draw {
+/* 7 · İŞARETİN YIKAMASI DOLUYOR. */
+@keyframes wash-in {
   from {
-    text-decoration-color: transparent;
+    background-color: transparent;
+    box-shadow: inset 0 -2px 0 transparent;
   }
 }
 [data-play="1"] .sample-mark {
-  animation: mark-draw var(--d-2) var(--ease) both;
+  animation: wash-in var(--d-2) var(--ease) both;
   animation-delay: calc(var(--i) * 90ms);
 }
 
@@ -3776,34 +3740,72 @@ a.chip:hover {
 /* ═══════════════════════════════════════════════════════════════════
    25 · ZORLANMIŞ RENKLER
 
-   Gradyanlar ve gölgeler DÜŞÜYOR. Ayrımı renge yüklemiş her yer burada
-   kılçizgi, kertik ya da karaktere çevriliyor.
+   Bu dil zeminlere ve gradyanlara dayanıyor; `forced-colors` altında
+   ikisi de düşüyor. Ayrımı taşıyan her şey burada kenarlığa, kertiğe ya
+   da karaktere çevriliyor.
    ═══════════════════════════════════════════════════════════════════ */
 
 @media (forced-colors: active) {
-  /* Kenarlıklar sistem rengine geçiyor; `box-shadow` ile çizilen
-     kertikler kayboluyor, yerine gerçek kenarlık. */
+  /* Yüzeyler tek renge çöküyor: sınırı kenarlık veriyor. */
+  .scene,
+  .tool,
+  .write,
+  .read-text,
+  .fixes,
+  .read-detail,
+  .read-clean,
+  .tiles,
+  .log-month,
+  .panel,
+  .gate-hero,
+  .gate-chapter,
+  .gate-accuracy,
+  .gate-close,
+  .gate-enter,
+  .gate-read,
+  .auth-card,
+  .earlier,
+  .filters,
+  .shell-bar,
+  .defence,
+  .table-scroll,
+  .is-noisy,
+  .is-quiet {
+    border: 1px solid CanvasText;
+  }
+
+  /* Dolgu ile ayrılan durumlar: dolgu düşünce kenarlık kalıyor. */
   .chip.is-on,
   .act.is-on,
   .act.is-off,
   .note-btn.is-on,
   .nav-link.is-on,
-  .gate-doors a[aria-current="page"] {
-    box-shadow: none;
-    border-block-end: 3px solid currentColor;
-  }
-  .now,
-  .fix-now {
-    box-shadow: none;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-  }
-  .tool-title b {
-    box-shadow: none;
-    text-decoration: underline;
+  .rule-step.is-on,
+  .model-scale .is-lit {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    border: 1px solid CanvasText;
   }
 
-  /* Yuvalar: dolu ile boş aynı renge çökmesin. */
+  /* Aile renkleri düşüyor: numara jetonu ve işaret kenarlıkla ayrılıyor. */
+  .fix-no,
+  .sample-no,
+  .read-mark,
+  .sample-mark,
+  .taxo-chip,
+  .row-level,
+  .composer-flag,
+  .fix-badge,
+  .step-folio {
+    forced-color-adjust: none;
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+    box-shadow: none;
+  }
+
+  /* Yuvalar ve noktalar: dolu ile boş aynı renge çökmesin. */
   .slot,
   .bands-dot,
   .bands-slice,
@@ -3814,6 +3816,7 @@ a.chip:hover {
     background: Canvas;
     outline: 1px solid CanvasText;
     outline-offset: -1px;
+    box-shadow: none;
   }
   .slot.is-hit,
   .flow-pulse,
@@ -3821,7 +3824,7 @@ a.chip:hover {
     background: Highlight;
   }
 
-  /* Ölçüm çubukları: dolu kısım sistem vurgusu. */
+  /* Ölçüm çubukları: dolu kısım sistem vurgusu, eski değer gri. */
   .meter-track,
   .entry-bar,
   .bars {
@@ -3830,16 +3833,16 @@ a.chip:hover {
     outline: 1px solid CanvasText;
   }
   .meter-fill,
-  .meter-was,
   .bar-fill,
   .entry-bar i,
   .proof-fill {
     forced-color-adjust: none;
     background: Highlight;
   }
-  /* İki çubuk üst üste binerken ayrım kalsın: eski değer taralı. */
   .meter-was {
+    forced-color-adjust: none;
     background: GrayText;
+    opacity: 1;
   }
 
   /* Üç boyutlu model: yüzler tek renge çöküyor, ayrımı kenar veriyor. */
@@ -3851,16 +3854,9 @@ a.chip:hover {
     outline-offset: -1px;
   }
   .mstep.is-lit .f-top,
-  .mstep.is-lit .f-front,
-  .mstep.is-lit .f-left,
-  .mstep.is-lit .f-right,
-  .mstep.is-lit .f-back,
-  .model:not(.is-fixed) .mstep:nth-of-type(3) .f-top,
-  .model:not(.is-fixed) .mstep:nth-of-type(3) .f-front,
-  .model:not(.is-fixed) .mstep:nth-of-type(3) .f-left,
-  .model:not(.is-fixed) .mstep:nth-of-type(3) .f-right,
-  .model:not(.is-fixed) .mstep:nth-of-type(3) .f-back {
+  .mstep.is-lit .f-front {
     background-color: Highlight;
+    box-shadow: none;
   }
   .model-ground {
     background: none;
@@ -3869,184 +3865,18 @@ a.chip:hover {
   /* Kâğıdın satır çizgileri düşüyor; alan yine de kutu olarak duruyor. */
   .editor {
     background-image: none;
+    border: 1px solid CanvasText;
   }
 
-  /* Hata bloğunun dikmesi renge bağlı değil, kenarlığa. */
+  /* Hata bloğunun dikmesi renge değil kenarlığa bağlı. */
   .form-error {
     background: none;
     border: 1px solid CanvasText;
-    border-inline-start-width: 3px;
+    border-inline-start-width: 4px;
   }
-}
 
-
-/* ═══════════════════════════════════════════════════════════════════
-   26 · KAPININ ŞEKİLLERİ — taksonomi, damga, sinyaller
-
-   Kapı ekranı ürünü adım adım anlatıyor ve her adımın bir şekli var.
-   Üçü de aynı dille: zemin yok, kutu yok, ayrım kılçizgide.
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* ── taksonomi · beş aile, yirmi bir alt kategori ──────────────────── */
-.taxo {
-  display: grid;
-  gap: var(--s-4);
-}
-.taxo-family {
-  display: grid;
-  gap: var(--s-2);
-  padding-block-start: var(--s-3);
-  border-block-start: 1px solid var(--rule-soft);
-}
-.taxo-name {
-  display: flex;
-  align-items: baseline;
-  gap: var(--s-2);
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-.taxo-name b {
-  font-family: var(--mono);
-  color: var(--ink-2);
-}
-.taxo-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-2);
-}
-/* Alt kategori künyesi — makine adı, o yüzden mono ve küçük harf. */
-.taxo-chip {
-  padding: 2px var(--s-2);
-  border: 1px solid var(--rule);
-  border-radius: var(--r-c);
-  font-family: var(--mono);
-  font-size: var(--t-tick);
-  color: var(--ink-2);
-  white-space: nowrap;
-}
-
-/* ── kayıt damgası · beş alan birlikte yazılıyor ───────────────────── */
-.stamp {
-  display: grid;
-  gap: var(--s-3);
-}
-.stamp-head {
-  font-size: var(--t-plate);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-.stamp-head b {
-  color: var(--ink);
-}
-.stamp-rows {
-  display: grid;
-  border-block-start: 1px solid var(--rule-strong);
-}
-.stamp-row {
-  display: grid;
-  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
-  gap: var(--s-2) var(--s-4);
-  padding-block: var(--s-3);
-  border-block-end: 1px solid var(--rule-soft);
-}
-.stamp-row dt {
-  font-family: var(--mono);
-  font-size: var(--t-code);
-  font-weight: 500;
-  color: var(--ink);
-}
-.stamp-row dd {
-  margin: 0;
-  font-size: var(--t-small);
-  color: var(--ink-2);
-}
-.stamp-foot {
-  font-size: var(--t-small);
-  color: var(--ink-3);
-}
-
-/* ── seviye sinyalleri · kapı sürümü, ölçerli ──────────────────────── */
-.signals {
-  display: grid;
-  gap: var(--s-4);
-}
-.signal {
-  display: grid;
-  gap: var(--s-2);
-  padding-block-start: var(--s-3);
-  border-block-start: 1px solid var(--rule-soft);
-}
-.signal-top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--s-4);
-}
-.signal-name {
-  font-size: var(--t-body);
-  font-weight: 500;
-}
-.signal-band {
-  font-family: var(--mono);
-  font-size: var(--t-code);
-  font-weight: 600;
-  color: var(--trace);
-}
-.signal-detail {
-  font-size: var(--t-small);
-  color: var(--ink-2);
-}
-.signal-sum {
-  padding-block-start: var(--s-3);
-  border-block-start: 1px solid var(--rule);
-  font-size: var(--t-small);
-  color: var(--ink-2);
-}
-.signal-sum b {
-  font-family: var(--mono);
-  color: var(--ink);
-}
-
-/* Adımın şekil gövdesi — çizim ile metin arasındaki nefes. */
-.step-body {
-  grid-column: 2;
-  display: grid;
-  gap: var(--s-4);
-  min-inline-size: 0;
-  container-type: inline-size;
-}
-@media (max-width: 900px) {
-  .step-body {
-    grid-column: 1;
+  /* Gölgeler zaten düşüyor; düğmenin sınırı kalsın. */
+  .btn {
+    border: 1px solid CanvasText;
   }
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   27 · SAHNE GÖVDESİ DEĞİŞTİRİCİLERİ
-
-   Anasayfanın dört bölümü aynı `.scene-body` kabını kullanıyor ama
-   içeriklerinin ihtiyacı farklı. Değiştiriciler yalnız YERLEŞİM
-   ayarlıyor; renk ve yüzey dili ortak.
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* 01 · gürültülü cümle: okuma şeridi + bulgu rafı, ikisi kardeş. */
-.is-noisy {
-  row-gap: 0;
-}
-/* 02 · temiz cümle: rafın yerinde tek cümle var. */
-.is-quiet {
-  row-gap: 0;
-}
-/* 03 · hat: kendi dikey rayını taşıyor. */
-.is-rail {
-  row-gap: var(--s-4);
-}
-/* 04 · ölçüm: dört hücre + koşum künyesi. */
-.is-proof {
-  row-gap: var(--s-4);
 }

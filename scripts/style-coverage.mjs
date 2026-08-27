@@ -37,6 +37,10 @@ const HESAPLANAN = [
   "band-A1", "band-A2", "band-B1", "band-B2", "band-C1",
   "tone-good", "tone-bad", "tone-flat",
   "mark-sm", "mark-md", "mark-lg",
+  /* `fam-${familyOf(sub)}` — taksonominin beş ailesi, bileşende şablonla
+     üretiliyor. Liste `app/lib/taxonomy.ts`teki FAMILIES ile aynı olmak
+     zorunda; oradaki bir aile buraya eklenmezse rengi sessizce düşer. */
+  "fam-grammar", "fam-lexis", "fam-mechanics", "fam-discourse", "fam-turkish",
 ];
 
 function siniflariTopla() {

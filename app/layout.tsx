@@ -1,53 +1,45 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Bricolage_Grotesque, Manrope } from "next/font/google";
 
 import "./globals.css";
 
 /*
- * İKİ YÜZ, VE ARALARINDAKİ SINIR BİR ANLAM SINIRI.
+ * İKİ YÜZ, VE ARALARINDAKİ SINIR SES SINIRI.
  *
- *   Türkçe olan her şey  → sans
- *   Ölçülen İngilizce metin, HER SAYI, ve künyeler (K0, tense, prompt v1) → mono
+ *   Bricolage Grotesque → başlıklar, panel başlıkları, büyük okumalar
+ *   Manrope             → gövde, etiket, düğme, veri
  *
- * "Türkçe YAZILIR; İngilizce ve sayı OKUNUR." Önceki sürümde bu ayrımı bir
- * kitap serifi yapıyordu (Source Serif 4) ve ayrım DEKORATİFTİ — başlıklar
- * serif, gövde sans. Şimdi ayrım işlevsel: numune, aletin ekran yüzüyle
- * gösteriliyor. Ürün bir ölçüm aleti; ölçtüğü şey ekranında mono görünür.
+ * Bricolage karakterli bir display grotesk: harfler hafifçe eğik omuzlu,
+ * `wdth` ekseni sayesinde büyük puntoda sıkılaşabiliyor. Ürünün "sıcak ama
+ * kesin" tonunu başlık taşıyor; Manrope onun altında sakin ve okunur duruyor.
  *
- * Aynı süperailenin iki üyesi: ölçüleri, tonu ve rakam çizimi birlikte
- * tasarlanmış. Plex bir MÜHENDİSLİK yüzü — düz yanlı `a`, açılı sonlanmalar,
- * kusursuz tabular rakam.
+ * MONO YOK. Önceki iki denemede ölçülen İngilizce ve bütün sayılar daktilo
+ * yüzüyle yazılıyordu; sonuç fazla teknik ve soğuk okundu. Ölçülen cümle artık
+ * gövde yüzünde ve BÜYÜK — okunacak bir metin gibi duruyor, terminal çıktısı
+ * gibi değil.
  *
- * TÜRKÇE KAPSAMI DİSKTEN DOĞRULANDI: `next/font`un kendi `font-data.json`
- * dosyasında iki yüz için de `latin-ext` var (ş ğ İ ı Ş Ğ); ç ö ü zaten
- * `latin` içinde.
+ * TÜRKÇE KAPSAMI DİSKTEN DOĞRULANDI: `next/font`un `font-data.json` dosyasında
+ * iki yüz için de `latin-ext` var (ş ğ İ ı Ş Ğ); ç ö ü zaten `latin` içinde.
  *
  * Font DERLEME ANINDA kendi sunucumuza iniyor — çalışma zamanında Google'a
  * hiçbir istek gitmiyor.
  */
-const sans = IBM_Plex_Sans({
+const display = Bricolage_Grotesque({
   subsets: ["latin", "latin-ext"],
   display: "swap",
-  variable: "--font-sans",
+  variable: "--font-display",
   /*
    * `axes` var, `weight` YOK: ikisi birlikte verilseydi Next tek bir STATİK
-   * kesit indirirdi ve 400 ile 700 arasındaki her ağırlık taklit edilirdi.
-   * Böyle tek dosyada bütün ağırlık ve genişlikler geliyor.
+   * kesit indirir ve 64px başlıkla 20px başlık aynı çizimi kullanırdı.
    */
-  axes: ["wdth"],
+  axes: ["opsz", "wdth"],
 });
 
-/*
- * Mono'nun değişken ekseni yok — ağırlıklar tek tek isteniyor. Üçü de
- * kullanılıyor: 400 numune metni, 500 künye ve kalibrasyon rakamı, 600 büyük
- * okuma.
- */
-const mono = IBM_Plex_Mono({
+const body = Manrope({
   subsets: ["latin", "latin-ext"],
   display: "swap",
-  variable: "--font-mono",
-  weight: ["400", "500", "600"],
+  variable: "--font-body",
 });
 
 export const metadata: Metadata = {
@@ -76,7 +68,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="tr" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="tr" className={`${display.variable} ${body.variable}`}>
       <body>
         {/*
           Klavyeyle gezen ve ekran okuyucu kullananlar için: her sayfada

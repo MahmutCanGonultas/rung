@@ -6,6 +6,7 @@ import { showcaseAnalysis } from "../../lib/showcase-run";
 import {
   FAMILIES,
   SUBCATEGORIES,
+  familyOf,
   labelOf,
   type Family,
   type Subcategory,
@@ -145,9 +146,15 @@ export function SampleAnalysis({
           part.kind === "plain" ? (
             <span key={i}>{part.text}</span>
           ) : (
+            /*
+              İşaret KENDİ AİLESİNİN rengini taşıyor. Taksonominin beş ailesi
+              NOMİNAL kategoriler — aralarında büyüklük ilişkisi yok — ve renk
+              de nominal bir kodlama; ikisi birbirine uyuyor. (Seviye bantları
+              tersine SIRALI, o yüzden onlar tek rampanın beş durağı.)
+            */
             <mark
               key={i}
-              className="sample-mark"
+              className={`sample-mark fam-${familyOf(part.finding.subcategory)}`}
               style={{ "--i": String(part.index) } as CSSProperties}
             >
               {part.text}
@@ -203,7 +210,7 @@ export function SampleAnalysis({
          */
         <details
           key={`${finding.start}-${i}`}
-          className="sample-finding"
+          className={`sample-finding fam-${familyOf(finding.subcategory)}`}
           open={open === "all" || i === 0}
           style={{ "--i": String(i) } as CSSProperties}
         >

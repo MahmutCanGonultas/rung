@@ -15,6 +15,7 @@ import { BAND_ORDER, bandOf } from "../../../lib/k0/bands";
 import { segment } from "../../../lib/k0/segments";
 import { words } from "../../../lib/k0/tokenize";
 import { partitionFindings } from "../../../lib/k2/display";
+import { familyOf } from "../../../lib/taxonomy";
 import { filterForLevel, limitFor } from "../../../lib/k3/filter";
 import { currentLevel, estimateForEntry } from "../../../lib/k3/store";
 import { mergeFindings } from "../../../lib/findings-merge";
@@ -132,7 +133,10 @@ export default async function EntryPage({
           part.kind === "plain" ? (
             <span key={i}>{part.text}</span>
           ) : (
-            <mark key={i} className="read-mark">
+            <mark
+              key={i}
+              className={`read-mark fam-${familyOf(part.finding.subcategory)}`}
+            >
               <a href={`#b${part.index + 1}`}>
                 {part.text}
                 <sup>{part.index + 1}</sup>

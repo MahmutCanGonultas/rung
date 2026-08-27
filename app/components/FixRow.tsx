@@ -1,6 +1,6 @@
 import type { MergedFinding } from "../lib/findings-merge";
 import { recordFeedbackAction } from "../lib/feedback-actions";
-import { labelOf } from "../lib/taxonomy";
+import { familyOf, labelOf } from "../lib/taxonomy";
 import { NoteWordButton } from "./NoteWordButton";
 
 /*
@@ -78,7 +78,11 @@ export function FixRow({
       : null;
 
   return (
-    <li className="fix" id={`b${index + 1}`}>
+    /*
+      Satır KENDİ AİLESİNİN rengini taşıyor: numara jetonu, taksonomi etiketi
+      ve metindeki işaret aynı rengi paylaşıyor — göz üçünü eşliyor.
+    */
+    <li className={`fix fam-${familyOf(finding.subcategory)}`} id={`b${index + 1}`}>
       <details className="fix-in" open={open}>
         <summary className="fix-line">
           <span className="fix-no">{index + 1}</span>
