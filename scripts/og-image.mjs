@@ -15,12 +15,20 @@
  * Kaynak değişince tek yapılacak: dosyayı aynı yola koyup bunu koşturmak.
  *
  * `sips` macOS'ta yerleşik — yeni bağımlılık yok.
+ *
+ * TON DÜZELTMESİ: kadrajdaki ölçülen basamak kaynakta zümrüt yeşili ve stil
+ * sayfası onu `hue-rotate(78deg) saturate(0.55)` ile izin mavisine taşıyor.
+ * Paylaşım kartı düzeltmesiz üretilirse WhatsApp'ta çıkan görsel sitede olmayan
+ * bir renkte oluyor. Aynı süzgeç burada da uygulanıyor — DEĞERLER TEK YERDEN
+ * DEĞİL diye tekrarlanıyor ve o yüzden ikisi birlikte değişmek zorunda; bu
+ * yorum o bağı taşıyan şey.
  */
 
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import puppeteer from "puppeteer-core";
 
 const KAYNAK = "docs/shots/rung-foto.png";
 const CIKTI = "app/opengraph-image.jpg";
@@ -49,8 +57,35 @@ const sonBoy = kirpBoy <= h ? kirpBoy : h;
 
 const gecici = mkdtempSync(join(tmpdir(), "rung-og-"));
 const ara = join(gecici, "kirpik.png");
+const boyali = join(gecici, "boyali.png");
 
-execFileSync("sips", ["-c", String(sonBoy), String(kirpEn), KAYNAK, "--out", ara], {
+/*
+ * Süzgeci tarayıcı uyguluyor: aynı CSS motoru, aynı sonuç. Elle yazılmış bir
+ * piksel dönüşümü sitedekiyle birebir aynı çıkmazdı.
+ */
+const CHROME =
+  process.env.CHROME_PATH ??
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const SUZGEC = "hue-rotate(78deg) saturate(0.55)";
+
+const browser = await puppeteer.launch({
+  executablePath: CHROME,
+  headless: true,
+  args: ["--no-sandbox", "--disable-gpu", "--hide-scrollbars"],
+});
+const page = await browser.newPage();
+await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+const veri = readFileSync(KAYNAK).toString("base64");
+await page.setContent(
+  `<style>html,body{margin:0;background:#000}
+   img{display:block;width:${w}px;height:${h}px;filter:${SUZGEC}}</style>
+   <img src="data:image/png;base64,${veri}">`,
+  { waitUntil: "load" }
+);
+await page.screenshot({ path: boyali, type: "png" });
+await browser.close();
+
+execFileSync("sips", ["-c", String(sonBoy), String(kirpEn), boyali, "--out", ara], {
   stdio: "ignore",
 });
 execFileSync(

@@ -105,5 +105,61 @@ if (olu.length > 0) {
   console.log("  " + olu.map((c) => "." + c).join("  "));
 }
 
-if (eksik.length === 0 && olu.length === 0) console.log("\nsorun: YOK");
-process.exit(eksik.length > 0 ? 1 : 0);
+/*
+ * ── İKİ KOYU TEMA BLOĞU BİREBİR AYNI MI ──────────────────────────────
+ *
+ * Koyu tema iki yerde tanımlı: biri sistem tercihini karşılıyor
+ * (`@media (prefers-color-scheme: dark)` içindeki `:root:not([data-theme="light"])`),
+ * diğeri kullanıcının açık seçimini (`:root[data-theme="dark"]`).
+ *
+ * Ayrışırlarsa aynı sayfa iki farklı renkte çiziliyor ve kimse fark
+ * etmiyor — geçmişte tam olarak bu oldu: bir düzeltme yalnız bir bloğa
+ * uygulandı ve iki basamak rengi aylarca farklı kaldı. Eşitlik artık
+ * ölçülüyor.
+ */
+function blok(satirlar, bas) {
+  let d = 0;
+  const out = [];
+  for (let k = bas; k < satirlar.length; k++) {
+    d += (satirlar[k].match(/{/g) ?? []).length;
+    d -= (satirlar[k].match(/}/g) ?? []).length;
+    out.push(satirlar[k]);
+    if (d === 0 && k > bas) break;
+  }
+  return out.join("\n");
+}
+function jetonlar(s) {
+  const m = new Map();
+  for (const [, ad, deger] of s.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
+    m.set(ad, deger.trim().replace(/\s+/g, " "));
+  }
+  return m;
+}
+
+const satirlar = css.split("\n");
+const i1 = satirlar.findIndex((l) => l.trim().startsWith(':root:not([data-theme="light"])'));
+const i2 = satirlar.findIndex((l) => l.startsWith(':root[data-theme="dark"]'));
+
+let temaFarki = [];
+if (i1 < 0 || i2 < 0) {
+  temaFarki = ["koyu tema bloklarından biri bulunamadı"];
+} else {
+  const a = jetonlar(blok(satirlar, i1));
+  const b = jetonlar(blok(satirlar, i2));
+  for (const ad of new Set([...a.keys(), ...b.keys()])) {
+    if (a.get(ad) !== b.get(ad)) {
+      temaFarki.push(`${ad}: ${a.get(ad) ?? "(yok)"} ≠ ${b.get(ad) ?? "(yok)"}`);
+    }
+  }
+  console.log(`koyu tema · iki blok, ${a.size} ve ${b.size} jeton`);
+}
+
+if (temaFarki.length > 0) {
+  console.log(`\nKOYU TEMA BLOKLARI AYRIŞMIŞ · ${temaFarki.length}`);
+  for (const f of temaFarki) console.log("  " + f);
+}
+
+if (eksik.length === 0 && olu.length === 0 && temaFarki.length === 0) {
+  console.log("\nsorun: YOK");
+}
+process.exit(eksik.length > 0 || temaFarki.length > 0 ? 1 : 0);

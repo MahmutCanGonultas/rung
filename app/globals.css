@@ -537,10 +537,15 @@ table {
   background: var(--trace);
   color: var(--on-trace);
 }
+/*
+ * Devre dışı düğme DOLU DEĞİL, BOŞ. Dolu griyi zemin griyle boyamak etiketi
+ * neredeyse okunmaz yapıyordu; devre dışı denetimler AA'dan muaf olsa da
+ * "kaç kelime kaldı" bilgisini taşıyan bir düğmenin okunması gerekiyor.
+ */
 .btn-primary:disabled {
   border-color: var(--rule);
-  background: var(--rule);
-  color: var(--ground);
+  background: none;
+  color: var(--ink-3);
 }
 
 /* Sessiz düğme: kenarlık yok, yalnız altı çizili bir eylem. */
@@ -1222,6 +1227,19 @@ a.chip:hover {
   content: " \2212";
 }
 
+/* Aynı çakışma vitrinde de var; orada kap sorgusu, çünkü bölüm gövdesi
+   görüntüden dar olabiliyor. */
+@container (max-width: 430px) {
+  .sample-line {
+    grid-template-columns: 2ch minmax(0, 1fr);
+    row-gap: var(--s-1);
+  }
+  .sample-kind {
+    grid-column: 2;
+    text-align: start;
+  }
+}
+
 .sample-why {
   padding-block-end: var(--s-4);
   padding-inline-start: calc(2ch + var(--s-3));
@@ -1638,6 +1656,21 @@ a.chip:hover {
   block-size: 100%;
   object-fit: cover;
   object-position: 22% 58%;
+  /*
+   * FOTOĞRAF DA SİSTEME GİRİYOR.
+   *
+   * Kadrajdaki ölçülen basamak zümrüt yeşiliydi — silinen dilin marka
+   * rengi. Sayfanın tamamında hiç yeşil yokken kapanışın en doygun nesnesi
+   * yeşil olunca, kaldırdığımız fikir ("renk marka demektir") tam orada geri
+   * geliyordu.
+   *
+   * Ton döndürme yeşili izin mavisine taşıyor; doygunluk kısma da duvarın
+   * yeşile kaymasını engelliyor (yalnız `hue-rotate` ile duvar açıkça yeşil
+   * kalıyor, ÖLÇÜLDÜ). Fotoğraf değişmiyor — gösterimi sisteme giriyor.
+   *
+   * `filter` burada güvenli: `preserve-3d` zinciri içinde değil.
+   */
+  filter: hue-rotate(78deg) saturate(0.55);
 }
 @media (min-width: 861px) {
   /* Kendi zemini fotoğraf. Jetonlar kendi alt ağacında ve iki temada da
@@ -2682,6 +2715,25 @@ a.chip:hover {
   font-size: var(--t-small);
   color: var(--ink-3);
   max-inline-size: 64ch;
+}
+
+/*
+ * DAR EKRANDA KATEGORİ ALT SATIRA.
+ *
+ * Üçüncü sütun `auto` ve içindeki Türkçe taksonomi etiketi uzun ("GRAMER ·
+ * ZAMAN"); 390px'te orta sütunu sıfıra sıkıştırıp düzeltmenin ÜSTÜNE biniyordu
+ * — ÖLÇÜLDÜ, ekran görüntüsünde iki metin iç içe çiziliyordu. İki sütuna
+ * inince ikisi de tam okunuyor.
+ */
+@media (max-width: 639px) {
+  .fix-line {
+    grid-template-columns: 2.5ch minmax(0, 1fr);
+    row-gap: var(--s-1);
+  }
+  .fix-kind {
+    grid-column: 2;
+    text-align: start;
+  }
 }
 
 /* ── 4 · ölçüm ayrıntısı · TEK katlanır kutu ───────────────────────── */
