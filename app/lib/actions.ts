@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { log } from "./log";
 
 import { createUser, verifyCredentials } from "./auth";
+import { checkMailbox } from "./email-check";
 import type { FormState } from "./form-state";
 import { resendVerificationAction } from "./recover-actions";
 import { createSession, destroySession } from "./session";
@@ -37,6 +38,34 @@ export async function registerAction(
 
   const passwordError = validatePassword(password);
   if (passwordError) return { error: passwordError, email };
+
+  /*
+   * ADRES POSTA ALABİLİYOR MU — mail atmadan yapılabilen tek kontrol.
+   *
+   * Yazım hatasını (@gmial.com) ve uydurma alan adını burada yakalıyoruz.
+   * KUTUNUN kendisinin var olup olmadığını buradan öğrenmek MÜMKÜN DEĞİL:
+   * Gmail ve Outlook "böyle kullanıcı yok" demiyor, her adresi kabul ediyormuş
+   * gibi cevap veriyorlar. `asdajda@outlook.com` ancak doğrulama bağlantısı
+   * tıklanmadığında belli oluyor.
+   *
+   * Şifreden SONRA duruyor: DNS sorgusu ağ işi ve zayıf şifre yazan birine
+   * bunu bekletmenin anlamı yok.
+   */
+  const mailbox = await checkMailbox(email);
+  if (mailbox.ok && mailbox.degraded) {
+    /* Sorgu patladı ve elek geçirdi — arkasında doğrulama bağlantısı var,
+       ama bunun sessizce olmaması gerekiyor. */
+    log.error("mx_check_degraded", new Error("DNS sorgusu yanıt vermedi"), { email });
+  }
+  if (!mailbox.ok) {
+    return {
+      error:
+        mailbox.reason === "disposable"
+          ? "Geçici e-posta adresleri kullanılamıyor — bu ürün aylar boyunca ölçüyor ve şifreni unutursan o adrese geri dönmen gerekiyor."
+          : "Bu adresin alan adı posta almıyor. Yazımını kontrol eder misin?",
+      email,
+    };
+  }
 
   let userId: string;
   try {

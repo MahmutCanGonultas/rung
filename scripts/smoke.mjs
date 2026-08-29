@@ -221,6 +221,45 @@ async function main() {
     );
     extraAccounts.push(trBase);
 
+    console.log("\n9b · adresin gerçekten posta alıp almadığı");
+    /*
+     * Kayıtta bir ELEK var: alan adı posta almıyorsa hesap açılmıyor.
+     * `hotmial.com` ve `outlok.com` GERÇEKTEN kayıtlı alan adları ve A
+     * kayıtları var — ama MX kayıtları YOK. Elek RFC 5321'i izleyip A kaydına
+     * düşseydi ikisini de geçirirdi; ÖLÇÜLDÜ ve öyle oluyordu.
+     *
+     * Bu kontrol AĞA ÇIKIYOR. Ağ yoksa atlanıyor: duman testi bir DNS
+     * arızası yüzünden kırmızı yanmasın.
+     */
+    const agVar = await page
+      .evaluate(() => fetch("https://dns.google/resolve?name=gmail.com&type=MX").then((r) => r.ok))
+      .catch(() => false);
+
+    if (agVar) {
+      const elekCtx = await browser.createBrowserContext();
+      const elekPage = await elekCtx.newPage();
+      await elekPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
+      await submitAuthForm(elekPage, `kisi-${stamp}@hotmial.com`, PASSWORD);
+      const elekHata = await readText(elekPage, '[role="alert"]', 6);
+      check(
+        "posta almayan alan adı reddedildi",
+        Boolean(elekHata) && elekPage.url().includes("/register"),
+        String(elekHata).slice(0, 60)
+      );
+
+      await elekPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
+      await submitAuthForm(elekPage, `kisi-${stamp}@mailinator.com`, PASSWORD);
+      const gecici = await readText(elekPage, '[role="alert"]', 6);
+      check(
+        "tek kullanımlık adres reddedildi",
+        Boolean(gecici) && /geçici/i.test(String(gecici)),
+        String(gecici).slice(0, 60)
+      );
+      await elekCtx.close();
+    } else {
+      console.log("  · ağ yok, elek kontrolü atlandı");
+    }
+
     console.log("\n10 · bozuk e-posta reddi");
     await page2.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
     await submitAuthForm(page2, "bu-bir-eposta-degil", PASSWORD);
