@@ -5,6 +5,7 @@ import { log } from "./log";
 
 import { createUser, verifyCredentials } from "./auth";
 import type { FormState } from "./form-state";
+import { resendVerificationAction } from "./recover-actions";
 import { createSession, destroySession } from "./session";
 import {
   normalizeEmail,
@@ -45,6 +46,18 @@ export async function registerAction(
     }
     userId = created.userId;
     await createSession(userId);
+
+    /*
+     * DOĞRULAMA MAİLİ, KAYDIN ARDINDAN — ama hesap KİLİTLENMİYOR.
+     *
+     * Kilitlenseydi mail gitmeyen ya da spam'e düşen herkes daha ilk adımda
+     * dışarıda kalırdı. Doğrulama, hesabın kapısı değil şifreyi unuttuğunda
+     * geri dönebilmenin şartı; kabukta sessiz bir şerit onu hatırlatıyor.
+     *
+     * Gönderim kaydı BLOKLAMIYOR: `sendMail` kendi hatasını yutup rapor
+     * ediyor, hesap her hâlükârda açılmış oluyor.
+     */
+    await resendVerificationAction(userId, email);
   } catch (error) {
     return { error: reportUnexpected("kayıt", error), email };
   }

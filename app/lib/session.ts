@@ -24,6 +24,12 @@ export type SessionUser = {
   id: string;
   email: string;
   createdAt: Date;
+  /*
+   * Adresin sahipliğinin kanıtlandığı an; NULL ise kanıtlanmadı. Kabuktaki
+   * hatırlatma şeridi buna bakıyor, o yüzden oturum okumasının parçası —
+   * her sayfada ayrı bir sorgu atmak yerine zaten yapılan JOIN'e ekleniyor.
+   */
+  emailVerifiedAt: Date | null;
 };
 
 function hashToken(token: string): string {
@@ -60,19 +66,29 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   if (!token) return null;
 
   const rows = (await db()`
-    SELECT u.id::text AS id, u.email, u.created_at
+    SELECT u.id::text AS id, u.email, u.created_at, u.email_verified_at
     FROM sessions s
     JOIN users u ON u.id = s.user_id
     WHERE s.token_hash = ${hashToken(token)}
       AND s.expires_at > now()
     LIMIT 1
-  `) as Array<{ id: string; email: string; created_at: Date }>;
+  `) as Array<{
+    id: string;
+    email: string;
+    created_at: Date;
+    email_verified_at: Date | null;
+  }>;
 
   const row = rows[0];
   if (!row) return null;
 
   // Sürücü timestamptz'yi Date olarak veriyor — denenerek doğrulandı, metin değil.
-  return { id: row.id, email: row.email, createdAt: row.created_at };
+  return {
+    id: row.id,
+    email: row.email,
+    createdAt: row.created_at,
+    emailVerifiedAt: row.email_verified_at,
+  };
 });
 
 export async function destroySession(): Promise<void> {

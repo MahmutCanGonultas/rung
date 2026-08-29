@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AuthForm } from "../components/AuthForm";
@@ -10,8 +11,30 @@ export const metadata: Metadata = {
   title: "Giriş · Rung",
 };
 
-export default async function LoginPage() {
+/*
+ * Kapıya dönen kişiye NE OLDUĞUNU söyleyen mesajlar.
+ *
+ * Doğrulama ve sıfırlama akışları buraya bir bayrakla dönüyor; jeton adres
+ * çubuğunda taşınmıyor. Her durum ayrı cümle: "zaten doğrulanmış" ile
+ * "geçersiz bağlantı" ayrı şeyler ve ikincisini birinciye söylemek, işi
+ * bitmiş birine hata göstermek olurdu.
+ */
+const HABER: Record<string, string> = {
+  tamam: "E-posta adresin doğrulandı. Artık şifreni unutsan da geri dönebilirsin.",
+  zaten: "Bu adres zaten doğrulanmış. Giriş yapabilirsin.",
+  gecersiz: "Doğrulama bağlantısı geçersiz ya da süresi dolmuş. Giriş yapıp yeniden isteyebilirsin.",
+  hata: "Doğrulama sırasında bir şey ters gitti. Biraz sonra tekrar dener misin?",
+};
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ dogrulama?: string; reset?: string }>;
+}) {
   if (await getSessionUser()) redirect("/write");
+  const params = await searchParams;
+  const haber = params.dogrulama ? HABER[params.dogrulama] : null;
+  const sifirlandi = params.reset === "1";
 
   return (
     <GateShell
@@ -20,12 +43,27 @@ export default async function LoginPage() {
       title="Tekrar hoş geldin"
       lede="Bıraktığın yerden devam ediyorsun. Bir kayıt, yazıldığı gün neyse o kalıyor."
     >
+      {haber ? (
+        <p className="gate-news" role="status">
+          {haber}
+        </p>
+      ) : null}
+      {sifirlandi ? (
+        <p className="gate-news" role="status">
+          Şifren değiştirildi. Yeni şifrenle giriş yapabilirsin.
+        </p>
+      ) : null}
+
       <AuthForm
         action={loginAction}
         submitLabel="Giriş yap"
         pendingLabel="Kontrol ediliyor…"
         autoComplete="current-password"
       />
+
+      <p className="gate-forgot">
+        <Link href="/forgot">Şifreni mi unuttun?</Link>
+      </p>
     </GateShell>
   );
 }

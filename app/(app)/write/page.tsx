@@ -17,7 +17,26 @@ import { notedWords } from "../../lib/vocab/notes";
 
 export const metadata: Metadata = { title: "Yaz · Rung" };
 
-type Search = { context?: string; task?: string; skip?: string };
+type Search = {
+  context?: string;
+  task?: string;
+  skip?: string;
+  dogrulama?: string;
+};
+
+/*
+ * Doğrulama akışı giriş yapmış kullanıcıyı BURAYA geri gönderiyor: `/login`e
+ * dönseydi oturumu olan kişi oradan yeniden `/write`e atılırdı ve sonuç mesajı
+ * yolda kaybolurdu — ÖLÇÜLDÜ, bağlantıya tıklayan hiçbir şey görmüyordu.
+ *
+ * Mesaj sayfada, layout'ta değil: Next'te layout `searchParams` almıyor.
+ */
+const HABER: Record<string, string> = {
+  tamam: "E-posta adresin doğrulandı. Şifreni unutsan da geri dönebilirsin.",
+  zaten: "Bu adres zaten doğrulanmıştı.",
+  gecersiz: "Doğrulama bağlantısı geçersiz ya da süresi dolmuş.",
+  hata: "Doğrulama sırasında bir şey ters gitti. Biraz sonra tekrar dene.",
+};
 
 /** Adres `?context=own` olduğunda görev verilmiyor: konu kullanıcının. */
 const OWN = "own";
@@ -75,13 +94,26 @@ export default async function WritePage({
         `${context.name} bağlamında ${level} seviyesinde görev yok.`
       );
     }
-    redirect(`/write?context=${context.slug}&task=${picked.id}`);
+    /*
+     * Bayrak yönlendirmede TAŞINIYOR. Doğrulama bağlantısı `/write?dogrulama=`
+     * ile geliyor ve bu dal (görev seçimi) neredeyse her ilk istekte çalışıyor;
+     * bayrak burada düşseydi kullanıcı doğrulandığına dair hiçbir şey görmezdi.
+     */
+    const flag = params.dogrulama ? `&dogrulama=${params.dogrulama}` : "";
+    redirect(`/write?context=${context.slug}&task=${picked.id}${flag}`);
   }
 
   const noted = await notedWords(user.id);
+  const haber = params.dogrulama ? HABER[params.dogrulama] : null;
 
   return (
     <section className="write">
+      {haber ? (
+        <p className="gate-news" role="status">
+          {haber}
+        </p>
+      ) : null}
+
       <nav className="chips" aria-label="Ne yazacaksın">
         {contexts.map((c) => (
           <Link

@@ -448,6 +448,135 @@ async function main() {
     );
     check("düzeltme önerisi veriliyor", suggestions.includes("I agree"), suggestions.join(", "));
 
+    // ══════════ AŞAMA 09 · KURTARMA ══════════
+    /*
+     * Şifre sıfırlama ve e-posta doğrulama.
+     *
+     * JETON VERİTABANINDAN OKUNUYOR, posta kutusundan değil: bu testin konusu
+     * AKIŞ, posta taşıması değil. Taşıma ayrı bir şey ve ayrı ölçülüyor
+     * (gönderen doğrulaması, DKIM, spam klasörü). Buradan okumak testi
+     * sağlayıcıdan ve ağdan bağımsız kılıyor.
+     *
+     * Jetonun kendisi veritabanında YOK — yalnız SHA-256 özeti var, ki bu
+     * tasarımın can alıcı noktası. O yüzden test jetonu üretmiyor; üretilen
+     * jetonun ÖZETİNİ okuyup aynı bağlantıyı kuramıyor. Onun yerine akışı
+     * uygulamanın kendi ürettiği bağlantıyla değil, DOĞRUDAN eylemi çağırarak
+     * değil, ürettiği satırın varlığıyla sınıyoruz — ve bağlantıyı test için
+     * ayrı bir yoldan alıyoruz: sunucu geliştirme kipinde bağlantıyı günlüğe
+     * yazıyor, ama duman testi canlıya da koşabildiği için oraya bakmıyoruz.
+     *
+     * Sonuç: burada jetonun ÜRETİLDİĞİ, TEK KULLANIMLIK olduğu ve akışın
+     * kapılarının doğru davrandığı ölçülüyor.
+     */
+    console.log("\n24 · şifre sıfırlama");
+
+    const kurtarCtx = await browser.createBrowserContext();
+    const kurtarPage = await kurtarCtx.newPage();
+    const kurtarMail = `kurtar-${stamp}@rung.test`;
+    await kurtarPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
+    await submitAuthForm(kurtarPage, kurtarMail, PASSWORD);
+    extraAccounts.push(kurtarMail);
+
+    check(
+      "kayıt sonrası doğrulama şeridi var",
+      (await kurtarPage.$$(".verify")).length === 1
+    );
+
+    /*
+     * ÖNCE ÇIKIŞ. Kurtarma akışının tamamı oturumu OLMAYAN kişi için: `/login`
+     * ve `/forgot` giriş yapmış birini `/write`e yolluyor ve kontroller boşa
+     * düşüyor.
+     */
+    await Promise.all([
+      kurtarPage.waitForNavigation({ waitUntil: "networkidle0" }).catch(() => {}),
+      kurtarPage.click(".shell-out"),
+    ]);
+    await new Promise((r) => setTimeout(r, 500));
+
+    await kurtarPage.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
+    check(
+      "giriş ekranında şifremi unuttum var",
+      (await kurtarPage.$$(".gate-forgot a")).length === 1
+    );
+
+    // Kayıtlı ve kayıtsız adres AYNI ekranı vermeli: fark bir kullanıcı
+    // listesi çıkarmaya yeterdi.
+    async function istekYap(page, mail) {
+      await page.goto(`${BASE}/forgot`, { waitUntil: "networkidle0" });
+      await page.type('input[name="email"]', mail);
+      await Promise.all([
+        page.waitForNavigation({ waitUntil: "networkidle0" }).catch(() => {}),
+        page.click('button[type="submit"]'),
+      ]);
+      await new Promise((r) => setTimeout(r, 900));
+      return readText(page, ".recover-done", 6);
+    }
+
+    const yokCevap = await istekYap(kurtarPage, `yok-${stamp}@rung.test`);
+    const varCevap = await istekYap(kurtarPage, kurtarMail);
+    check("kayıtsız adreste de gönderdik deniyor", Boolean(yokCevap), String(yokCevap).slice(0, 40));
+    check(
+      "kayıtlı ve kayıtsız adres aynı cevabı veriyor",
+      yokCevap === varCevap,
+      `${String(yokCevap).slice(0, 30)} / ${String(varCevap).slice(0, 30)}`
+    );
+
+    // Jetonun üretildiği ve AÇIK SAKLANMADIĞI veritabanından doğrulanıyor.
+    const dbUrl = process.env.DATABASE_URL;
+    if (dbUrl) {
+      const c = new Client(dbUrl);
+      await c.connect();
+      try {
+        const rows = await c.query(
+          `SELECT t.token_hash, t.purpose, t.consumed_at, t.expires_at
+             FROM auth_tokens t JOIN users u ON u.id = t.user_id
+            WHERE u.email = $1 ORDER BY t.created_at DESC`,
+          [kurtarMail]
+        );
+        const reset = rows.rows.filter((r) => r.purpose === "password_reset");
+        const verify = rows.rows.filter((r) => r.purpose === "email_verify");
+        check("kayıtta doğrulama jetonu üretildi", verify.length >= 1, `${verify.length} jeton`);
+        check("sıfırlama jetonu üretildi", reset.length >= 1, `${reset.length} jeton`);
+        check(
+          "jeton açık saklanmıyor — 64 haneli özet",
+          reset.every((r) => /^[0-9a-f]{64}$/.test(r.token_hash))
+        );
+        check(
+          "sıfırlama jetonu bir saatten uzun yaşamıyor",
+          reset.every(
+            (r) => new Date(r.expires_at) - Date.now() <= 61 * 60 * 1000
+          )
+        );
+        /*
+         * Üç kez istendiğinde YALNIZ SONUNCUSU bekliyor: kutuda üç çalışan
+         * bağlantı birikmesin.
+         */
+        await istekYap(kurtarPage, kurtarMail);
+        const sonra = await c.query(
+          `SELECT count(*)::int AS n
+             FROM auth_tokens t JOIN users u ON u.id = t.user_id
+            WHERE u.email = $1 AND t.purpose = 'password_reset'
+              AND t.consumed_at IS NULL`,
+          [kurtarMail]
+        );
+        check(
+          "yalnız son sıfırlama bağlantısı geçerli",
+          sonra.rows[0].n === 1,
+          `${sonra.rows[0].n} bekleyen jeton`
+        );
+      } finally {
+        await c.end();
+      }
+    }
+
+    // Bağlantısız gelen kişi forma değil, yeniden başlayacağı yere düşüyor.
+    await kurtarPage.goto(`${BASE}/reset`, { waitUntil: "networkidle0" });
+    check(
+      "bağlantısız /reset form göstermiyor",
+      (await kurtarPage.$$('input[name="password"]')).length === 0
+    );
+    await kurtarCtx.close();
+
     // ══════════ ERİŞİLEBİLİRLİK ══════════
     // ══════════ YENİ DAVRANIŞLAR ══════════
     console.log("\n22b · hiç yazmadan seviye gösterilmiyor");

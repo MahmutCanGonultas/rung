@@ -4,6 +4,7 @@ import Link from "next/link";
 import { LevelRule } from "../components/LevelRule";
 import { Mark } from "../components/Mark";
 import { NavLink } from "../components/NavLink";
+import { VerifyBanner } from "../components/VerifyBanner";
 import { logoutAction } from "../lib/actions";
 import { requireUser } from "../lib/guard";
 import { latestEstimate } from "../lib/k3/store";
@@ -68,6 +69,14 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       </header>
 
       <main className="shell-main" id="main">
+        {/*
+          Doğrulanmamış adres uyarısı içeriğin ÜSTÜNDE ama akışın içinde:
+          yapışkan bir katman ya da kapatılabilir bir kutu değil. Kaybolmayan
+          ama engellemeyen bir cümle.
+        */}
+        {user.emailVerifiedAt ? null : (
+          <VerifyBanner userId={user.id} email={user.email} />
+        )}
         {children}
       </main>
 
