@@ -1,21 +1,20 @@
 import { log } from "./log";
 
 /*
- * E-POSTA GÖNDERİMİ — Brevo, tek `fetch`, npm paketi yok.
+ * E-POSTA GÖNDERİMİ — tek `fetch`, npm paketi yok.
  *
- * NEDEN BREVO (29 Ağustos 2026'da sağlayıcıların kendi sayfalarından
- * doğrulandı):
- *   Brevo   300/gün, süresiz ücretsiz, kredi kartı istemiyor
- *   Resend  3.000/ay ama ALAN ADI ZORUNLU
- *   AWS SES 21 Temmuz 2026'dan beri yeni hesaplarda ücretsiz katman YOK,
- *           üstelik SigV4 imzalama "tek fetch" kuralını bozuyor
+ * SAĞLAYICI GERÇEKLERİ, 29 Ağustos 2026'da kendi sayfalarından doğrulandı:
+ *   Resend  3.000/ay · 100/gün · ALAN ADI ZORUNLU · Vercel Marketplace'te
+ *   Brevo   300/gün · süresiz · kredi kartı istemiyor · alan adı şart değil
+ *   AWS SES 21 Temmuz 2026'dan beri yeni hesaplarda ücretsiz katman YOK, ve
+ *           SigV4 imzalama "tek fetch, paket yok" kuralını bozuyor
  *
- * ALAN ADI ŞART — ve bunu söyleyen üçüncü taraf değil, Brevo'nun kendisi:
- * "Sending from a free email address (@gmail.com, @yahoo.com, @outlook.com,
- * etc.) will cause your emails to be rejected or filtered to spam." Ayrıca
- * DMARC kurulmamışsa Microsoft adreslerine giden her şey spam sayılıyor. Şifre
- * sıfırlama maili tam da en çok gerektiği anda (dışarıda kaldığın an) spam'e
- * düşerse özellik yok demektir.
+ * ALAN ADI HER HÂLÜKÂRDA ŞART — ve bunu söyleyen üçüncü taraf değil, Brevo'nun
+ * kendisi: "Sending from a free email address (@gmail.com, @yahoo.com,
+ * @outlook.com, etc.) will cause your emails to be rejected or filtered to
+ * spam." DMARC kurulmamışsa Microsoft adreslerine giden her şey spam sayılıyor.
+ * Şifre sıfırlama maili tam da en çok gerektiği anda (dışarıda kaldığın an)
+ * spam'e düşerse özellik yok demektir.
  *
  * ANAHTAR YOKSA PATLAMIYOR, YAZIYOR. Geliştirmede ve duman testinde bağlantı
  * sunucu günlüğüne düşüyor: akışın tamamı gerçek posta kutusu olmadan
@@ -23,9 +22,8 @@ import { log } from "./log";
  * `sent: false` dönüyor — çağıran taraf kullanıcıya yalan söylemesin diye.
  */
 
-const ENDPOINT = "https://api.brevo.com/v3/smtp/email";
 
-export type MailResult = { sent: boolean; reason?: string };
+export type MailResult = { sent: boolean; reason?: string; detail?: string };
 
 export type Mail = {
   to: string;
@@ -80,35 +78,58 @@ function toHtml(text: string): string {
   );
 }
 
-export async function sendMail(mail: Mail): Promise<MailResult> {
-  const key = process.env.BREVO_API_KEY;
-  const from = process.env.MAIL_FROM;
-  const fromName = process.env.MAIL_FROM_NAME ?? "Rung";
+/*
+ * İKİ SAĞLAYICI, TEK ARAYÜZ — hangisinin anahtarı varsa o kullanılıyor.
+ *
+ * Resend, Vercel Marketplace'ten kurulabiliyor ve anahtarı projeye
+ * kendiliğinden ortam değişkeni olarak giriyor: alan adı, DNS ve e-posta tek
+ * panelden yürüyor. Brevo alan adı olmadan da gönderebiliyor ve günlük kotası
+ * daha yüksek.
+ *
+ * Seçim burada bir `if`: ikisi de aynı üç şeyi istiyor (kime, konu, gövde) ve
+ * ikisi de tek `fetch`. Sağlayıcı değiştirmek bir ortam değişkeni silmek.
+ */
+type Sender = {
+  name: string;
+  send(mail: Mail, from: string, fromName: string): Promise<MailResult>;
+};
 
-  if (!key || !from) {
-    /*
-     * Yapılandırma yok. Geliştirmede bu normal — bağlantıyı günlüğe yazıp
-     * akışı sürdürüyoruz. Üretimde bu bir arıza ve öyle raporlanıyor.
-     */
-    if (process.env.NODE_ENV === "production") {
-      log.error("mail_not_configured", new Error("BREVO_API_KEY veya MAIL_FROM yok"), {
-        to: mail.to,
-      });
-      return { sent: false, reason: "not_configured" };
-    }
-    console.log(
-      `\n── E-POSTA (geliştirme, gönderilmedi) ──\nkime: ${mail.to}\nkonu: ${mail.subject}\n\n${mail.text}\n────────────────────────\n`
-    );
-    return { sent: true, reason: "logged" };
-  }
+const RESEND: Sender = {
+  name: "resend",
+  async send(mail, from, fromName) {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        from: `${fromName} <${from}>`,
+        to: [mail.to],
+        subject: mail.subject,
+        text: mail.text,
+        html: toHtml(mail.text),
+      }),
+    });
+    return response.ok
+      ? { sent: true }
+      : {
+          sent: false,
+          reason: `http_${response.status}`,
+          detail: await response.text().catch(() => ""),
+        };
+  },
+};
 
-  try {
-    const response = await fetch(ENDPOINT, {
+const BREVO: Sender = {
+  name: "brevo",
+  async send(mail, from, fromName) {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
         // Brevo'nun başlığı `api-key`. `Authorization: Bearer` DEĞİL — en sık
         // yapılan hata bu ve 401 ile döner.
-        "api-key": key,
+        "api-key": process.env.BREVO_API_KEY ?? "",
         "content-type": "application/json",
         accept: "application/json",
       },
@@ -120,19 +141,58 @@ export async function sendMail(mail: Mail): Promise<MailResult> {
         htmlContent: toHtml(mail.text),
       }),
     });
+    return response.ok
+      ? { sent: true }
+      : {
+          sent: false,
+          reason: `http_${response.status}`,
+          detail: await response.text().catch(() => ""),
+        };
+  },
+};
 
-    if (!response.ok) {
-      const detail = await response.text().catch(() => "");
-      log.error("mail_send_failed", new Error(`HTTP ${response.status}`), {
-        to: mail.to,
-        detail: detail.slice(0, 300),
-      });
-      return { sent: false, reason: `http_${response.status}` };
+function pickSender(): Sender | null {
+  if (process.env.RESEND_API_KEY) return RESEND;
+  if (process.env.BREVO_API_KEY) return BREVO;
+  return null;
+}
+
+export async function sendMail(mail: Mail): Promise<MailResult> {
+  const sender = pickSender();
+  const from = process.env.MAIL_FROM;
+  const fromName = process.env.MAIL_FROM_NAME ?? "Rung";
+
+  if (!sender || !from) {
+    /*
+     * Yapılandırma yok. Geliştirmede bu normal — bağlantıyı günlüğe yazıp
+     * akışı sürdürüyoruz. Üretimde bu bir arıza ve öyle raporlanıyor.
+     */
+    if (process.env.NODE_ENV === "production") {
+      log.error(
+        "mail_not_configured",
+        new Error("RESEND_API_KEY / BREVO_API_KEY ya da MAIL_FROM yok"),
+        { to: mail.to }
+      );
+      return { sent: false, reason: "not_configured" };
     }
+    console.log(
+      `\n── E-POSTA (geliştirme, gönderilmedi) ──\nkime: ${mail.to}\nkonu: ${mail.subject}\n\n${mail.text}\n────────────────────────\n`
+    );
+    return { sent: true, reason: "logged" };
+  }
 
-    return { sent: true };
+  try {
+    const result = await sender.send(mail, from, fromName);
+    if (!result.sent) {
+      log.error("mail_send_failed", new Error(result.reason ?? "?"), {
+        provider: sender.name,
+        to: mail.to,
+        detail: (result.detail ?? "").slice(0, 300),
+      });
+    }
+    return { sent: result.sent, reason: result.reason };
   } catch (error) {
-    log.error("mail_send_threw", error, { to: mail.to });
+    log.error("mail_send_threw", error, { provider: sender.name, to: mail.to });
     return { sent: false, reason: "network" };
   }
 }
