@@ -21,6 +21,18 @@ export type EntrySummary = {
   contextName: string;
   contextSlug: string;
   taskPrompt: string | null;
+  /*
+   * KAYDIN İLK SATIRI — kullanıcının kendi yazdığı metnin başı.
+   *
+   * Liste bugüne kadar yalnızca GÖREVİN metnini gösteriyordu ve aynı görevi
+   * beş kez yazan biri beş özdeş satır görüyordu: "hangi kayıt hangisi"
+   * sorusunun cevabı listede yoktu. Ayırt edici olan tek şey kişinin kendi
+   * cümlesi.
+   *
+   * Tam gövde DEĞİL, ilk 140 karakter: liste sorgusu on sekiz kaydın tam
+   * metnini taşımak zorunda kalmasın.
+   */
+  snippet: string;
   /** Doğrulanmış bulgu sayısı. Analiz yapılmamışsa null. */
   findings: number | null;
   /** 100 kelimede bulgu — listede tek karşılaştırılabilir sayı. */
@@ -56,6 +68,7 @@ type SummaryRow = {
   context_name: string;
   context_slug: string;
   task_prompt: string | null;
+  snippet: string;
   analyses: number;
   findings: number;
   level: string | null;
@@ -78,6 +91,7 @@ function toSummary(row: SummaryRow): EntrySummary {
     level: row.level,
     levelReliable: row.level_reliable === true,
     taskPrompt: row.task_prompt,
+    snippet: row.snippet,
     findings: analysed ? row.findings : null,
     per100:
       analysed && row.word_count > 0
@@ -137,6 +151,9 @@ export async function listEntries(
            c.name         AS context_name,
            c.slug         AS context_slug,
            t.prompt       AS task_prompt,
+           -- Kaydın kendi ilk satırı. Postgres left() karakter tabanlı, yani
+           -- Türkçe ya da İngilizce fark etmiyor; kırpma işareti arayüzde.
+           left(e.body, 140) AS snippet,
            (SELECT count(*)::int FROM analyses a
              WHERE a.entry_id = e.id AND a.status = 'ok') AS analyses,
            (SELECT count(*)::int FROM findings f

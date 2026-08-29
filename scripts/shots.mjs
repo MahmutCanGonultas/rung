@@ -96,20 +96,51 @@ async function seed(client) {
     "SELECT id FROM tasks WHERE context_id=$1 AND level='B1' LIMIT 2", [ctx]
   )).rows;
 
-  const BODY =
-    "Dear Sarah, I am agree with your suggestion about the meeting of tomorrow. " +
-    "Thanks for the informations you sent me last week, i recieved them and they " +
-    "were very useful while i was preparing the report about our new pricing.";
+  /*
+   * ON SEKİZ KAYDIN ON SEKİZ AYRI METNİ.
+   *
+   * Önceden hepsine aynı gövde yazılıyordu ve liste ekranında on sekiz özdeş
+   * satır çıkıyordu — tam da tasarımın çözmesi gereken sorunun kendisi, ama
+   * gerçek veride değil ARACIN ürettiği veride. Kendi inceleme aracı yanlış
+   * bir dünya gösterince onunla alınan karar da yanlış oluyor.
+   *
+   * Metinler bilerek hatalı: liste satırındaki cümle gerçekte de böyle
+   * görünecek.
+   */
+  const BODIES = [
+    "Dear Sarah, I am agree with your suggestion about the meeting of tomorrow. Thanks for the informations you sent me last week.",
+    "Last weekend I have visited my friend in Ankara. The weather was very nice so we decided to walk in the park for two hours.",
+    "I am writing to ask about the deposit for the flat that I rented last year. The agreement said thirty days but nothing arrived.",
+    "My manager asked me to prepare a short report about the new pricing. I am not agree with some of the numbers in the document.",
+    "Yesterday i went to the doctor because my back was hurting since three days. He told me that i should not sit so much time.",
+    "I want to explain why i decided to change my morning habits. Before i was waking up very late and i couldnt finish my works.",
+    "The neighbour asked me to look after his plants while he is away. I said yes but i dont know nothing about the plants care.",
+    "We should discuss about the details of the contract when you are free. There is some points that are not clear for me still.",
+    "I have bought a new laptop last month but the battery is not working good. Can you tell me how i can send it for the repair?",
+    "When i was child my grandmother teached me how to make bread. I still remember the smell of the kitchen in the early morning.",
+    "The train was late for one hour and i missed my connection to Izmir. Nobody in the station could gave me a clear information.",
+    "I would like to apply for the position that you have announced last week. I am working in this sector since almost five years.",
+    "My friend recommended me this book but i couldnt finished it. The story was interesting but there was too many characters.",
+    "I am agree that we need to change the process, however i think the timing is not good because the team is very busy now.",
+    "Could you please to tell me when the transfer will be made and to which account? I have send three emails without answer.",
+    "The weather in Istanbul was raining all the week so we stayed at home. We watched some films and cooked a lot of foods.",
+    "I decided to stop drinking coffee after lunch because i couldnt sleep. It was difficult in the first days but now is better.",
+    "Thank you for your quick answer. I will send you the documents that you asked until the end of this week without fail.",
+  ];
+  let bodyIndex = 0;
 
   let firstEntry = null;
   for (let month = 5; month >= 0; month--) {
     for (let k = 0; k < 3; k++) {
       const words = 70 + k * 10;
+      /* Bulgu aralıkları bu kaydın KENDİ metninden kesiliyor: ekranda
+         işaretlenen parça gerçekten cümlenin içinde olsun. */
+      const body = BODIES[bodyIndex++ % BODIES.length];
       const nf = Math.max(1, Math.round(8 - (5 - month)));
       const entry = (await client.query(
         `INSERT INTO entries (user_id,context_id,task_id,body,word_count,created_at)
          VALUES ($1,$2,$3,$4,$5, now() - ($6||' days')::interval) RETURNING id::text AS id`,
-        [id, ctx, tasks[(month + k) % tasks.length].id, BODY, words, month * 30 + k * 3]
+        [id, ctx, tasks[(month + k) % tasks.length].id, body, words, month * 30 + k * 3]
       )).rows[0].id;
       if (month === 0 && k === 2) firstEntry = entry;
 
@@ -125,7 +156,7 @@ async function seed(client) {
              original,suggestion,explanation,confidence,layer,verdict)
            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'K1',$10)`,
           [analysis, entry, SUBS[i % SUBS.length], 6 + i * 4, 6 + i * 4 + 5,
-           BODY.slice(6 + i * 4, 6 + i * 4 + 5),
+           body.slice(6 + i * 4, 6 + i * 4 + 5),
            "düzeltilmiş hâli",
            "Bu bir örnek açıklama: hatanın neden hata olduğunu tek cümlede anlatıyor.",
            0.75 + (i % 4) * 0.06,

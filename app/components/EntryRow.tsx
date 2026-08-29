@@ -3,15 +3,22 @@ import Link from "next/link";
 import type { EntrySummary } from "../lib/entries";
 
 /*
- * Geçmiş listesinin tek satırı.
+ * Kayıt listesinin tek satırı.
+ *
+ * SATIRIN BAŞ ROLÜ KİŞİNİN KENDİ CÜMLESİ.
+ *
+ * Önceki hâli GÖREVİN metnini büyük yazıyordu. Aynı görevi beş kez yazan
+ * biri listede beş özdeş satır görüyordu — ürünün en okunabilir ilerleme
+ * kanıtı ("aynı görev, farklı zaman") listeyi okunmaz hâle getiriyordu.
+ * Ayırt edici olan tek şey kişinin o gün yazdığı cümle; artık o üstte.
+ *
+ * Görev kayboldu değil: altta, bağlam ve seviyeyle birlikte küçük satırda.
  *
  * Yoğunluk çubuğu süs değil: listede ilerlemeyi görünür kılan tek şey.
  * Sadece kelime sayısı gösteren bir liste, altı ay sonra "iyileşiyor muyum"
- * sorusuna cevap vermiyor.
- *
- * Çubuk 100 kelimede bulgu sayısını gösteriyor; 12 ve üstü tam dolu sayılıyor
- * — A1 seviyesinde tipik üst sınır. Ölçek sabit, yoksa iki liste
- * karşılaştırılamaz.
+ * sorusuna cevap vermiyor. Çubuk 100 kelimede bulgu sayısını gösteriyor; 12
+ * ve üstü tam dolu sayılıyor — A1 seviyesinde tipik üst sınır. Ölçek sabit,
+ * yoksa iki liste karşılaştırılamaz.
  */
 
 const FULL_SCALE = 12;
@@ -21,6 +28,18 @@ const DAY = new Intl.DateTimeFormat("tr-TR", {
   month: "short",
   timeZone: "Europe/Istanbul",
 });
+
+/*
+ * Kırpma KELİME SINIRINDA. Karakterden kesmek "informati…" gibi yarım
+ * kelimeler üretiyor ve göz onları okumak için duruyor.
+ */
+function firstLine(text: string, max = 96): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  if (flat.length <= max) return flat;
+  const cut = flat.slice(0, max);
+  const space = cut.lastIndexOf(" ");
+  return (space > max * 0.6 ? cut.slice(0, space) : cut) + "…";
+}
 
 export function EntryRow({ entry }: { entry: EntrySummary }) {
   const width =
@@ -33,9 +52,11 @@ export function EntryRow({ entry }: { entry: EntrySummary }) {
       <span className="entry-day">{DAY.format(entry.createdAt)}</span>
 
       <span className="entry-main">
-        <span className="entry-name" lang={entry.taskPrompt ? "en" : "tr"}>
-          {entry.taskPrompt ?? "Serbest yazı"}
+        {/* Kişinin kendi cümlesi — satırı ayırt eden şey. */}
+        <span className="entry-snippet" lang="en">
+          {firstLine(entry.snippet)}
         </span>
+
         <span className="entry-meta">
           {/*
             Metnin ÖLÇÜLEN seviyesi. Ölçülmemişse rozet hiç çizilmiyor —
@@ -55,7 +76,21 @@ export function EntryRow({ entry }: { entry: EntrySummary }) {
               {entry.level}
             </span>
           ) : null}
-          {entry.contextName} · {entry.wordCount} kelime
+          <span className="entry-where">{entry.contextName}</span>
+          <span className="entry-dot" aria-hidden="true">
+            ·
+          </span>
+          <span>{entry.wordCount} kelime</span>
+          {entry.taskPrompt ? (
+            <>
+              <span className="entry-dot" aria-hidden="true">
+                ·
+              </span>
+              <span className="entry-task" lang="en">
+                {firstLine(entry.taskPrompt, 52)}
+              </span>
+            </>
+          ) : null}
         </span>
       </span>
 
