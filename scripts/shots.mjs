@@ -86,8 +86,14 @@ async function seed(client) {
   // Önceki koşumdan kalmış olabilir.
   await client.query("DELETE FROM users WHERE email = $1", [EMAIL]);
 
+  /*
+   * DOĞRULANMIŞ AÇILIYOR. Gerçek kayıtlar artık bir bağlantıya tıklanarak
+   * açıldığı için doğrulanmış doğuyor; doğrulanmamış hesap istisna. Burada
+   * `NULL` bırakmak her ekrana bir uyarı şeridi ekliyor ve görüntüler tasarımın
+   * olağan hâlini değil istisnayı gösteriyordu.
+   */
   const id = (await client.query(
-    "INSERT INTO users (email,password_hash) VALUES ($1,$2) RETURNING id::text AS id",
+    "INSERT INTO users (email,password_hash,email_verified_at) VALUES ($1,$2,now()) RETURNING id::text AS id",
     [EMAIL, await bcrypt.hash(PASS, 12)]
   )).rows[0].id;
 
@@ -207,6 +213,7 @@ const PAGES = [
   ["anasayfa", "/", false],
   ["giris", "/login", false],
   ["kayit", "/register", false],
+  ["sifre-unuttum", "/forgot", false],
   ["yaz", "/write", true],
   ["gecmis", "/history", true],
   ["ilerleme", "/progress", true],

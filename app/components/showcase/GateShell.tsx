@@ -80,24 +80,28 @@ export function GateShell({
           {children}
 
           {/*
-            İki kapı formdan SONRA: buraya gelen kişi kapıyı zaten seçmiş
-            geliyor, burası yanlış seçtiğini fark ettiği yer. Sekme sırası
-            e-posta → şifre → gönder → kapılar.
+            ÖBÜR KAPI, TEK CÜMLEDE.
+            
+            Burada iki bağlantı yan yana duruyordu ve BULUNDUĞUN kapı vurgulu
+            çiziliyordu: accent renk, kalın, altı çizili. Yani sayfadaki en
+            görünür bağlantı, zaten açık olan sayfaya gidiyordu — gidilecek
+            olan ise soluk griydi. Ekran görüntüsünde bakınca yanlış olan
+            bağlantı "asıl düğme" gibi duruyor.
+
+            Şimdi tek bir cümle ve tek bir bağlantı var: gidilebilecek yer.
+            Bulunduğun yeri söylemeye gerek yok, başlık zaten söylüyor.
           */}
-          <nav className="gate-doors" aria-label="Giriş veya kayıt">
-            <Link
-              href="/login"
-              aria-current={mode === "login" ? "page" : undefined}
-            >
-              Giriş yap
-            </Link>
-            <Link
-              href="/register"
-              aria-current={mode === "register" ? "page" : undefined}
-            >
-              Hesap oluştur
-            </Link>
-          </nav>
+          <p className="gate-doors">
+            {mode === "login" ? (
+              <>
+                Hesabın yok mu? <Link href="/register">Hesap oluştur</Link>
+              </>
+            ) : (
+              <>
+                Zaten hesabın var mı? <Link href="/login">Giriş yap</Link>
+              </>
+            )}
+          </p>
 
           {footnote ? <p className="gate-foot">{footnote}</p> : null}
         </div>

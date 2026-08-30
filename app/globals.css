@@ -110,12 +110,25 @@
 
   /* ── beş bant · SIRALI, tek rampanın beş durağı ───────────────────
      Aileler gibi ayrı hue DEĞİL: A1'den C1'e ısınan tek bir rampa.
-     Sıralı veri sıralı gramer ister. */
-  --band-A1: #f0d9c8;
-  --band-A2: #ecc3a6;
-  --band-B1: #f2b441;
-  --band-B2: #dc9078;
-  --band-C1: #c77e81;
+     Sıralı veri sıralı gramer ister.
+
+     KURAL: her basamak zeminden bir öncekinden DAHA UZAK. Sayı büyüdükçe
+     kontrast büyüyor — "daha ileri" gözle de daha ileri duruyor.
+
+     ÖLÇÜLDÜ VE DÜZELTİLDİ. Önceki rampada B1 (#f2b441) doygun bir sarıydı ve
+     sırayı bozuyordu; koyu temada A1'den C1'e L* değerleri
+     30 → 42 → 77 → 58 → 53 gidiyordu, yani üçüncü basamak beşincisinden çok
+     daha parlaktı. Merdiven, "sıralı veri sıralı gramer ister" diye yazılmış
+     bir yorumun hemen altında sırasızdı. Şimdi iki temada da adımlar eşit:
+     açıkta L* 89 → 80 → 70 → 59 → 48, koyuda 29 → 39 → 49 → 59 → 70.
+
+     Bu renklerin ÜSTÜNE metin yazılmıyor — yalnız `.bands-slice` dolgusu ve
+     üç boyutlu merdivenin yüzü — o yüzden ölçüt kontrast değil SIRA. */
+  --band-A1: #f2ddcb;
+  --band-A2: #e8bd9b;
+  --band-B1: #dc9d6b;
+  --band-B2: #c87c5e;
+  --band-C1: #a95d5e;
 
   /* ── yön · ilerleme iyiye mi kötüye mi ──────────────────────────── */
   --good: #245c42;
@@ -213,11 +226,11 @@
     --fam-turkish: #48222f;
     --fam-turkish-ink: #ffa3ba;
 
-    --band-A1: #5c4237;
-    --band-A2: #86583f;
-    --band-B1: #f2b441;
-    --band-B2: #c47a5f;
-    --band-C1: #b06a6d;
+    --band-A1: #573f36;
+    --band-A2: #775443;
+    --band-B1: #996a50;
+    --band-B2: #bb8163;
+    --band-C1: #dc9c7c;
 
     --good: #8fd8ae;
     --bad: #ffa3ba;
@@ -269,11 +282,11 @@
   --fam-turkish: #48222f;
   --fam-turkish-ink: #ffa3ba;
 
-  --band-A1: #5c4237;
-  --band-A2: #86583f;
-  --band-B1: #f2b441;
-  --band-B2: #c47a5f;
-  --band-C1: #b06a6d;
+  --band-A1: #573f36;
+  --band-A2: #775443;
+  --band-B1: #996a50;
+  --band-B2: #bb8163;
+  --band-C1: #dc9c7c;
 
   --good: #8fd8ae;
   --bad: #ffa3ba;
@@ -1771,29 +1784,26 @@ a.chip:hover {
   color: var(--ink-2);
   max-inline-size: 36ch;
 }
+/*
+ * ÖBÜR KAPI. Tek cümle, tek bağlantı — ve bağlantı GİDİLECEK yere gidiyor.
+ * Eskiden iki bağlantı yan yanaydı ve vurgu BULUNDUĞUN sayfadaydı: en
+ * görünür bağlantı hiçbir yere götürmüyordu.
+ */
 .gate-doors {
-  display: flex;
-  gap: var(--s-4);
   padding-block-start: var(--s-3);
   border-block-start: 1px solid var(--hair);
   font-size: var(--t-small);
+  color: var(--ink-2);
 }
 .gate-doors a {
-  color: var(--ink-2);
-  font-weight: 600;
-  text-decoration: none;
-  padding-block: var(--s-1);
-}
-.gate-doors a:hover {
-  color: var(--ink);
-}
-/* Bulunduğun kapı İKİ İŞARETLE: renk ve ağırlık. */
-.gate-doors a[aria-current="page"] {
   color: var(--accent);
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 5px;
   text-decoration-thickness: 2px;
+}
+.gate-doors a:hover {
+  color: var(--accent-deep);
 }
 .gate-foot {
   font-size: var(--t-small);
@@ -3035,7 +3045,17 @@ a.chip:hover {
   color: var(--ink-3);
   min-inline-size: 0;
 }
-.entry-dot {
+/*
+ * Ayraç noktası, kendinden SONRAKİ ögenin parçası.
+ *
+ * Nokta ayrı bir `<span>` iken satır sarımı onu önceki satırın sonunda
+ * bırakıyordu: mobilde her meta satırı boşlukta duran bir "·" ile bitiyordu.
+ * `::before` olarak öge ile aynı kutuda: öge alt satıra inince noktası da
+ * onunla iniyor.
+ */
+.entry-words::before,
+.entry-task::before {
+  content: "· ";
   color: var(--hair-2);
 }
 .entry-where {
@@ -3317,10 +3337,16 @@ a.chip:hover {
   border-radius: var(--r-pill);
   transform-origin: left;
 }
-/* Soluk çubuk nerede başladığın, dolu çubuk bugün. */
+/*
+ * Soluk çubuk nerede başladığın, dolu çubuk bugün.
+ *
+ * Eskiden `--ink-3` üzerine 0.45 saydamlıktı: gri üstüne gri, iki temada da
+ * zar zor görünüyordu ve saydamlık altındaki rengin ne olduğuna bağlı
+ * olduğu için sonucu kimse hesaplayamıyordu. Şimdi AYNI RENGİN soluk hâli —
+ * "aynı şey, daha önce" demenin doğru grameri — ve opak, yani ölçülebilir.
+ */
 .meter-was {
-  background: var(--ink-3);
-  opacity: 0.45;
+  background: color-mix(in srgb, var(--accent) 40%, var(--hair-2));
 }
 .meter-fill {
   background: var(--accent);
@@ -3404,7 +3430,10 @@ a.chip:hover {
    dört satıra sarıyordu. `npm run styles` yakaladı. */
 .try {
   display: grid;
-  grid-template-columns: 6.2rem minmax(0, 1fr) 4.6rem 5.6rem;
+  /* Tarih sütunu 6.2rem'di ve "24 Ağustos 2026" sığmayıp iki satıra
+     sarıyordu: tabloda bazı satırlar bir, bazıları iki satır yüksekliğinde
+     duruyordu. Sütun genişledi ve tarih artık hiç sarmıyor. */
+  grid-template-columns: 8.2rem minmax(0, 1fr) 4.6rem 5.6rem;
   align-items: baseline;
   gap: var(--s-2) var(--s-4);
   padding: var(--s-3);
@@ -3419,6 +3448,7 @@ a.chip:hover {
   font-size: var(--t-micro);
   font-weight: 600;
   color: var(--ink-3);
+  white-space: nowrap;
 }
 .try-what {
   font-size: var(--t-small);
@@ -3494,9 +3524,15 @@ a.chip:hover {
   font-weight: 600;
 }
 
+/*
+ * Beş savunma. Alt sınır 180px'ti ve geniş ekranda beşi de yan yana
+ * sığıyordu: her kart ~150px kalıyor, üç kelimelik satırlar sekiz satıra
+ * iniyor ve beş dar sütun okunacak metin değil duvar oluyordu. 235px, aynı
+ * ekranda üç sütuna düşürüyor — kart sayısı değil SATIR UZUNLUĞU belirliyor.
+ */
 .defences {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
   gap: var(--s-4);
   margin-block-start: var(--s-4);
 }

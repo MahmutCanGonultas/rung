@@ -8,8 +8,8 @@ izler — ve **kendi doğruluğunu ölçer.**
 
 **Canlı → https://rung-plum.vercel.app**
 
-Next.js 16 · TypeScript (katı) · PostgreSQL · Anthropic API · 163 birim testi ·
-61 uçtan uca kontrol
+Next.js 16 · TypeScript (katı) · PostgreSQL · Anthropic API · 183 birim testi ·
+90 uçtan uca kontrol
 
 ![Anasayfa](docs/shots/landing.png)
 
@@ -228,6 +228,14 @@ Her teknoloji seçimi `docs/plan.md` §15'te **gerekçesi ve elenen
 alternatifleriyle** yazılı. Kimlik doğrulama elle yazıldı (`bcryptjs`, opak
 oturum jetonu, sunucuda SHA-256 özeti) — hazır kütüphane işi bitirirdi ama
 oturumun nasıl çalıştığını öğretmezdi; bu projenin ikinci hedefi buydu.
+
+**Hesap kayıt formunda açılmıyor.** Form yalnızca bekleyen bir kayıt yazıyor
+(adres, bcrypt'li şifre, 24 saatlik jeton); `users` satırı, adrese giden
+bağlantıya tıklandığında oluşuyor. Bir posta kutusunun hem var olduğunun hem
+de kişinin ona eriştiğinin başka kanıtı yok: Gmail ve Outlook SMTP'de "böyle
+kullanıcı yok" demiyor, spam toplayıcılara liste çıkarttırmamak için her
+adresi kabul ediyormuş gibi cevap veriyor. Bunun bedeli açık — mail teslim
+edilemiyorsa kimse kaydolamaz — ve bedel bilerek ödeniyor.
 
 ## Neler yok
 

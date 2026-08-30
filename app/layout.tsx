@@ -47,8 +47,15 @@ export const metadata: Metadata = {
    * `metadataBase` ŞART. Paylaşım etiketleri MUTLAK adres istiyor; bu olmadan
    * Next göreli bir yol yazıyor ve WhatsApp, LinkedIn, X hiçbiri onu çözemiyor
    * — link önizlemesi görselsiz çıkıyor.
+   *
+   * ADRES ORTAM DEĞİŞKENİNDEN. `APP_URL` zaten doğrulama ve şifre sıfırlama
+   * bağlantılarının kaynağı; sitenin kendi adresini İKİNCİ bir yerde yazmak,
+   * alan adı değiştiğinde birinin eskimesi demekti. Tek yer, tek gerçek.
+   *
+   * `VERCEL_URL` KULLANILMIYOR: o adres her dağıtımda değişiyor ve önizleme
+   * dağıtımlarında paylaşım kartını yanlış adrese çiviliyor.
    */
-  metadataBase: new URL("https://rung-plum.vercel.app"),
+  metadataBase: new URL(process.env.APP_URL ?? "https://rung-plum.vercel.app"),
   title: {
     default: "Rung",
     template: "%s",
