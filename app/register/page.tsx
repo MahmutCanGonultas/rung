@@ -20,13 +20,13 @@ export default async function RegisterPage() {
       mode="register"
       kicker="İlk ölçüm bugün"
       title="Ölçmeye başla"
-      lede="E-posta ve şifre, başka bir şey yok. Yazdığın ilk paragraf aynı zamanda ilk ölçümün oluyor."
-      footnote="Doğrulama e-postası yok, kart yok."
+      lede="E-posta ve şifre, başka bir şey yok. Adresine bir bağlantı gönderiyoruz; hesabın ona tıklayınca açılıyor."
+      footnote="Kart yok. Adresini doğruluyoruz, çünkü şifreni unuttuğunda geri dönebilmen buna bağlı."
     >
       <AuthForm
         action={registerAction}
-        submitLabel="Kayıt ol"
-        pendingLabel="Oluşturuluyor…"
+        submitLabel="Kayıt bağlantısı gönder"
+        pendingLabel="Gönderiliyor…"
         autoComplete="new-password"
         passwordHint={`En az ${PASSWORD_MIN} karakter.`}
       />

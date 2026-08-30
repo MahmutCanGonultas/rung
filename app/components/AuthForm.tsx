@@ -51,6 +51,31 @@ export function AuthForm({
 }: Props) {
   const [state, formAction] = useActionState(action, EMPTY_FORM_STATE);
 
+  /*
+   * GÖNDERİLDİ EKRANI HER ZAMAN AYNI.
+   *
+   * Adres yeni de olsa, zaten kayıtlı da olsa, hız sınırına takılmış da olsa
+   * bu cümle çıkıyor. Fark, sırayla adres deneyerek kimin üye olduğunu
+   * öğrenmeye yeterdi — kurtarma yolunda kapattığımız kapı, kayıt yolunda
+   * açık kalmasın.
+   *
+   * Giriş yolunda hiç görünmüyor: orada başarı bir yönlendirme.
+   */
+  if (state.sent) {
+    return (
+      <div className="form">
+        <p className="recover-done">
+          <b>{state.email}</b> adresine bir bağlantı gönderdik. Gelen kutunu ve{" "}
+          <b>spam klasörünü</b> kontrol et.
+        </p>
+        <p className="auth-alt">
+          Bağlantı yirmi dört saat geçerli. Gelmediyse birkaç dakika bekle,
+          sonra adresini tekrar yaz.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <form className="form" action={formAction} noValidate>
       {state.error ? (

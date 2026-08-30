@@ -26,34 +26,6 @@ export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, BCRYPT_COST);
 }
 
-export type CreateUserResult =
-  | { ok: true; userId: string }
-  | { ok: false; reason: "email_taken" };
-
-export async function createUser(
-  email: string,
-  password: string
-): Promise<CreateUserResult> {
-  const passwordHash = await hashPassword(password);
-
-  /*
-   * Benzersizliği kodda değil veritabanında kontrol ediyoruz. "Önce SELECT ile
-   * bak, yoksa INSERT et" iki isteğin arasında yarışa açık: ikisi de boş görür,
-   * ikisi de yazar. Yazma anını yalnızca veritabanı görüyor.
-   */
-  const rows = (await db()`
-    INSERT INTO users (email, password_hash)
-    VALUES (${email}, ${passwordHash})
-    ON CONFLICT (email) DO NOTHING
-    RETURNING id::text AS id
-  `) as Array<{ id: string }>;
-
-  const row = rows[0];
-  if (!row) return { ok: false, reason: "email_taken" };
-
-  return { ok: true, userId: row.id };
-}
-
 export type VerifyResult =
   | { ok: true; userId: string }
   | { ok: false };

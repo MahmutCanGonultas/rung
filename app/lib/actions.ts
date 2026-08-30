@@ -1,13 +1,17 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { log } from "./log";
 
-import { createUser, verifyCredentials } from "./auth";
+import { hashPassword, verifyCredentials } from "./auth";
+import { db } from "./db";
+import { linkFor, sendMail } from "./email";
 import { checkMailbox } from "./email-check";
 import type { FormState } from "./form-state";
-import { resendVerificationAction } from "./recover-actions";
 import { createSession, destroySession } from "./session";
+import { stashSignup, sweepPending } from "./signup";
+import { allow, sweepAttempts } from "./throttle";
 import {
   normalizeEmail,
   readField,
@@ -26,6 +30,28 @@ import {
  * içinde çağrılmıyor, yoksa kendi catch'imiz yönlendirmeyi yutar.
  */
 
+/*
+ * KAYIT — hesap burada AÇILMIYOR.
+ *
+ * Bu form artık yalnızca bir NİYET kaydediyor: adres, şifre özeti ve yirmi
+ * dört saatlik bir jeton. Hesap, o adrese giden bağlantıya tıklandığında
+ * `/verify` içinde açılıyor.
+ *
+ * NEDEN DEĞİŞTİ: "hesabı aç, sonra doğrula" modelinde `asdasdas@outlook.com`
+ * yazan biri veritabanında gerçek bir hesap olarak duruyordu — doğrulanmamış,
+ * şifresi sıfırlanamaz, ama var. İstenen şey açıktı: gerçek olduğuna emin
+ * olduğumuz adresler kaydolsun. Bir kutunun hem VAR OLDUĞUNUN hem de kişinin
+ * ona ERİŞTİĞİNİN tek kanıtı, oraya giden bağlantıya tıklanması.
+ *
+ * BEDELİ, AÇIKÇA: mail teslim edilemiyorsa kimse kaydolamıyor. Bunu
+ * gizlemiyoruz — `sendMail` başarısız olursa ekranda dürüst bir cümle çıkıyor
+ * ve bekleyen kayıt yazılmıyor.
+ *
+ * REDDEDİLEN ALTERNATİF: mail gönderilemediğinde eski davranışa düşmek
+ * (hesabı yine de açmak). Sessizce açılan bir arka kapı, kapının kendisinden
+ * kötüdür: yapılandırma bozulduğu gün ürün ölçtüğünü sandığı şeyi ölçmemeye
+ * başlar ve kimse fark etmez.
+ */
 export async function registerAction(
   _prev: FormState,
   formData: FormData
@@ -42,11 +68,10 @@ export async function registerAction(
   /*
    * ADRES POSTA ALABİLİYOR MU — mail atmadan yapılabilen tek kontrol.
    *
-   * Yazım hatasını (@gmial.com) ve uydurma alan adını burada yakalıyoruz.
-   * KUTUNUN kendisinin var olup olmadığını buradan öğrenmek MÜMKÜN DEĞİL:
-   * Gmail ve Outlook "böyle kullanıcı yok" demiyor, her adresi kabul ediyormuş
-   * gibi cevap veriyorlar. `asdajda@outlook.com` ancak doğrulama bağlantısı
-   * tıklanmadığında belli oluyor.
+   * Yazım hatasını (@gmial.com) ve uydurma alan adını burada yakalıyoruz;
+   * bunları bağlantıya bırakmak, kullanıcıyı hiç gelmeyecek bir maili
+   * beklemeye göndermek olurdu. KUTUNUN kendisi buradan bilinemiyor — onu
+   * bağlantı ölçüyor.
    *
    * Şifreden SONRA duruyor: DNS sorgusu ağ işi ve zayıf şifre yazan birine
    * bunu bekletmenin anlamı yok.
@@ -67,31 +92,105 @@ export async function registerAction(
     };
   }
 
-  let userId: string;
   try {
-    const created = await createUser(email, password);
-    if (!created.ok) {
-      return { error: "Bu e-posta zaten kayıtlı. Giriş yapmayı dene.", email };
-    }
-    userId = created.userId;
-    await createSession(userId);
+    /*
+     * İKİ KOVA — `requestResetAction` ile aynı gerekçe, aynı sayılar.
+     *
+     * Adres kovası bir kişinin kutusunun bombalanmasını engelliyor; IP kovası
+     * tek kaynaktan yüzlerce adrese mail attırılmasını. IP sınırı bilerek
+     * gevşek: mobil operatörler CGNAT kullanıyor, dar bir sınır saldırganı
+     * değil aynı hattaki insanları keserdi.
+     *
+     * Sınıra takılan istek SESSİZCE düşüyor ve ekran yine "kutuna bak" diyor.
+     * "Çok denedin" demek, o adresin durumu hakkında bilgi vermenin dolaylı
+     * yolu olurdu.
+     */
+    const ip = (await headers()).get("x-forwarded-for")?.split(",")[0].trim() ?? "";
+    const okEmail = await allow({
+      key: `signup:${email}`,
+      limit: 3,
+      windowMs: 60 * 60 * 1000,
+    });
+    const okIp = await allow({
+      key: ip ? `signup-ip:${ip}` : "",
+      limit: 30,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!okEmail || !okIp) return { error: null, email, sent: true };
 
     /*
-     * DOĞRULAMA MAİLİ, KAYDIN ARDINDAN — ama hesap KİLİTLENMİYOR.
+     * ADRES ZATEN KAYITLIYSA EKRAN DEĞİŞMİYOR.
      *
-     * Kilitlenseydi mail gitmeyen ya da spam'e düşen herkes daha ilk adımda
-     * dışarıda kalırdı. Doğrulama, hesabın kapısı değil şifreyi unuttuğunda
-     * geri dönebilmenin şartı; kabukta sessiz bir şerit onu hatırlatıyor.
+     * Eskiden "Bu e-posta zaten kayıtlı" yazıyordu ve bu, sırayla adres
+     * deneyerek kimin üye olduğunu öğrenmeye yeten bir cevaptı. Kurtarma
+     * yolunda bu sızıntıyı kapatmıştık; kayıt yolunda açık bırakmak aynı
+     * listeyi başka kapıdan vermek olurdu.
      *
-     * Gönderim kaydı BLOKLAMIYOR: `sendMail` kendi hatasını yutup rapor
-     * ediyor, hesap her hâlükârda açılmış oluyor.
+     * Kutuya YİNE de bir mail gidiyor, ama farklı bir mail: "hesabın zaten
+     * var". Gerçekten unutmuş olan kişi böylece yardım alıyor, deneyen kişi
+     * hiçbir şey öğrenmiyor — ikisi de aynı ekranı görüyor.
      */
-    await resendVerificationAction(userId, email);
+    const existing = (await db()`
+      SELECT id::text AS id FROM users WHERE email = ${email} LIMIT 1
+    `) as Array<{ id: string }>;
+
+    const mail = existing[0]
+      ? {
+          to: email,
+          subject: "Rung — hesabın zaten var",
+          text:
+            `Bu adresle bir hesap açılmaya çalışıldı, ama zaten bir hesabın var.\n\n` +
+            `Giriş yapmak için:\n${linkFor("/login")}\n\n` +
+            `Şifreni hatırlamıyorsan:\n${linkFor("/forgot")}\n\n` +
+            `Bu isteği sen yapmadıysan yapman gereken bir şey yok — ` +
+            `hesabına hiçbir şey olmadı.`,
+        }
+      : await (async () => {
+          /*
+           * Şifre özeti bekleyen kayda da bcrypt'li giriyor. Geçici diye açık
+           * saklamak, sızıntıda insanların BAŞKA sitelerdeki şifrelerini
+           * vermek olurdu — insanlar şifre tekrar kullanıyor.
+           */
+          const token = await stashSignup({
+            email,
+            passwordHash: await hashPassword(password),
+          });
+          return {
+            to: email,
+            subject: "Rung — hesabını aç",
+            text:
+              `Hesabın bu bağlantıya tıklayınca açılıyor:\n\n` +
+              `${linkFor(`/verify?t=${token}`)}\n\n` +
+              `Bağlantı yirmi dört saat geçerli. Tıklayana kadar hiçbir şey ` +
+              `kaydedilmiş olmuyor — bu isteği sen yapmadıysan bu maili ` +
+              `silmen yeterli.`,
+          };
+        })();
+
+    const result = await sendMail(mail);
+    if (!result.sent) {
+      /*
+       * MAİL GİTMEDİ. Bekleyen kayıt yazılmış olabilir ama kimse ona
+       * ulaşamaz; süresi dolunca kendi kendine düşüyor. Kullanıcıya
+       * söylediğimiz şey doğru olan: şu an kaydolamazsın.
+       */
+      return {
+        error:
+          "Doğrulama e-postası gönderilemedi, o yüzden kaydını tamamlayamıyoruz. " +
+          "Biraz sonra tekrar dener misin?",
+        email,
+      };
+    }
+
+    /* Eski damgalar ve tıklanmadan kalmış bekleyen kayıtlar toplansın:
+       ikincisinin içinde bir şifre özeti duruyor. */
+    void sweepAttempts();
+    void sweepPending();
   } catch (error) {
     return { error: reportUnexpected("kayıt", error), email };
   }
 
-  redirect("/write");
+  return { error: null, email, sent: true };
 }
 
 export async function loginAction(

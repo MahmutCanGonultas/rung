@@ -12,6 +12,15 @@
 export type FormState = {
   error: string | null;
   email: string;
+  /*
+   * Kayıt yolunda bağlantı gönderildi ve ekran değişti.
+   *
+   * Kayıt artık hesap AÇMIYOR: bekleyen bir kayıt yazıp posta kutusuna
+   * bağlantı yolluyor. Yani başarı hâli bir yönlendirme değil, "kutuna bak"
+   * ekranı — ve bu bayrak onu açıyor. Giriş yolunda hiç kullanılmıyor, orada
+   * başarı hâlâ `redirect("/write")`.
+   */
+  sent?: boolean;
 };
 
 export const EMPTY_FORM_STATE: FormState = { error: null, email: "" };

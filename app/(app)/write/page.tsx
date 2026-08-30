@@ -32,8 +32,11 @@ type Search = {
  * Mesaj sayfada, layout'ta değil: Next'te layout `searchParams` almıyor.
  */
 const HABER: Record<string, string> = {
+  /* Bekleyen kayıt bağlantısı tıklandı: hesap BU AN açıldı. */
+  hesap: "Hesabın açıldı ve adresin doğrulandı. İlk paragrafını yazabilirsin.",
   tamam: "E-posta adresin doğrulandı. Şifreni unutsan da geri dönebilirsin.",
   zaten: "Bu adres zaten doğrulanmıştı.",
+  suresiz: "O bağlantının süresi dolmuştu — yirmi dört saat geçerliydi.",
   gecersiz: "Doğrulama bağlantısı geçersiz ya da süresi dolmuş.",
   hata: "Doğrulama sırasında bir şey ters gitti. Biraz sonra tekrar dene.",
 };

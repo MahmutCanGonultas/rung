@@ -22,7 +22,10 @@ export const metadata: Metadata = {
 const HABER: Record<string, string> = {
   tamam: "E-posta adresin doğrulandı. Artık şifreni unutsan da geri dönebilirsin.",
   zaten: "Bu adres zaten doğrulanmış. Giriş yapabilirsin.",
-  gecersiz: "Doğrulama bağlantısı geçersiz ya da süresi dolmuş. Giriş yapıp yeniden isteyebilirsin.",
+  suresiz:
+    "O bağlantının süresi dolmuştu — yirmi dört saat geçerliydi. Yeniden kaydolabilirsin.",
+  gecersiz:
+    "Bağlantı geçersiz ya da süresi dolmuş. Yeniden kaydolabilir, hesabın varsa giriş yapıp yeni bir doğrulama isteyebilirsin.",
   hata: "Doğrulama sırasında bir şey ters gitti. Biraz sonra tekrar dener misin?",
 };
 
