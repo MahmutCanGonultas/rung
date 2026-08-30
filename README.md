@@ -222,6 +222,7 @@ app/
 migrations/     numaralı, dondurulmuş SQL — ileri yönlü
 scripts/        migration, tohum veri, ölçüm, duman testi, ekran görüntüsü
 docs/plan.md    plan ve karar günlüğü — §15 elenen alternatifleriyle birlikte
+docs/yayin.md   alan adı, e-posta sağlayıcısı ve DNS — panelde yapılacaklar
 ```
 
 Her teknoloji seçimi `docs/plan.md` §15'te **gerekçesi ve elenen
