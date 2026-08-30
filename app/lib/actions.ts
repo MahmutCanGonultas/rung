@@ -10,7 +10,7 @@ import { linkFor, sendMail } from "./email";
 import { checkMailbox } from "./email-check";
 import type { FormState } from "./form-state";
 import { createSession, destroySession } from "./session";
-import { stashSignup, sweepPending } from "./signup";
+import { claimByCode, stashSignup, sweepPending } from "./signup";
 import { allow, sweepAttempts } from "./throttle";
 import {
   normalizeEmail,
@@ -151,19 +151,48 @@ export async function registerAction(
            * saklamak, sızıntıda insanların BAŞKA sitelerdeki şifrelerini
            * vermek olurdu — insanlar şifre tekrar kullanıyor.
            */
-          const token = await stashSignup({
+          const { token, code } = await stashSignup({
             email,
             passwordHash: await hashPassword(password),
           });
+          /*
+           * GÖVDE BİR MEKTUP, BİR BİLDİRİM DEĞİL.
+           *
+           * Önceki hâli kırk kelimeydi: bir cümle, bir bağlantı, iki cümle.
+           * Kim gönderiyor, mail neden geldi, hangi adres için, tıklanmazsa
+           * ne olur — hiçbiri yazmıyordu. Alan adı yeni olduğu için filtrenin
+           * elinde itibar sinyali yok ve karar şekle bakıyor; kırk kelimelik
+           * tek bağlantılı bir mail "normal insan maili" örüntüsüne az
+           * benziyor.
+           *
+           * İkinci ve daha önemli sebep: mail SPAM'E DÜŞTÜĞÜNDE de okunabilir
+           * olmalı. Oradan çıkarılacak tek şey "bu meşru bir mail" kararıysa,
+           * o kararı verecek kadar bilgi içermeli.
+           *
+           * KOD BAĞLANTININ YANINDA. Junk'a düşen bir mail, bağlantı tek yol
+           * olduğunda ölü uçtur; kodla birlikte otuz saniyelik bir sapmaya
+           * dönüyor — kişi zaten açık duran sekmeye yazıyor.
+           */
           return {
             to: email,
             subject: "Rung — hesabını aç",
             text:
-              `Hesabın bu bağlantıya tıklayınca açılıyor:\n\n` +
+              `Merhaba,\n\n` +
+              `rungscale.com adresinde ${email} ile bir hesap açılmak istendi. ` +
+              `Rung, Türkçe konuşanlar için bir İngilizce ölçüm aleti — yazdığın ` +
+              `İngilizceye bakıp hatayı sabit bir taksonomiye yazıyor ve aylar ` +
+              `boyunca izliyor.\n\n` +
+              `Hesabın şu bağlantıya tıklayınca açılıyor:\n\n` +
               `${linkFor(`/verify?t=${token}`)}\n\n` +
-              `Bağlantı yirmi dört saat geçerli. Tıklayana kadar hiçbir şey ` +
-              `kaydedilmiş olmuyor — bu isteği sen yapmadıysan bu maili ` +
-              `silmen yeterli.`,
+              `Bağlantı çalışmazsa ya da bu maile başka bir cihazdan bakıyorsan, ` +
+              `kayıt ekranında duran kutuya şu kodu yazabilirsin:\n\n` +
+              `${code}\n\n` +
+              `İkisi de aynı yere çıkıyor ve yirmi dört saat geçerli.\n\n` +
+              `Tıklamazsan hiçbir şey olmuyor: şu an ortada bir hesap YOK, ` +
+              `yalnızca bekleyen bir kayıt var ve yirmi dört saat sonra kendi ` +
+              `kendine siliniyor. Bu isteği sen yapmadıysan bu maili silmen ` +
+              `yeterli — kimse adresinle bir hesap açmış olmuyor.\n\n` +
+              `Bu maile cevap yazabilirsin, okuyoruz.`,
           };
         })();
 
@@ -191,6 +220,84 @@ export async function registerAction(
   }
 
   return { error: null, email, sent: true };
+}
+
+/*
+ * KODLA HESABI AÇ — mail spam'e düştüğünde kullanılan ikinci yol.
+ *
+ * Bağlantıyla tamamen aynı yere varıyor: aynı bekleyen kayıt, aynı hesap,
+ * aynı oturum. Fark yalnızca kanıtın nasıl gösterildiği.
+ *
+ * NEDEN VAR: gönderim alan adı yeni ve Outlook maili gereksiz klasörüne
+ * koydu — ölçüldü. İtibar zamanla oluşuyor ve satın alınamıyor; o süre
+ * boyunca bağlantı tek yol olsaydı ürün çalışmıyor olurdu.
+ */
+export async function verifySignupCodeAction(
+  _prev: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const email = normalizeEmail(readField(formData, "email"));
+  /* Boşluk ve tire yazan çok oluyor ("391 402", "391-402") — temizleyip alıyoruz. */
+  const code = readField(formData, "code").replace(/\D/g, "");
+
+  if (code.length !== 6) {
+    return { error: "Kod altı haneli. Maildeki sayıyı olduğu gibi yaz.", email, sent: true };
+  }
+
+  let userId: string;
+  try {
+    /*
+     * İKİ KOVA. Kod altı hane, yani bir milyon olasılık — sınırsız denemede
+     * hiçbir şey. Bekleyen kaydın kendi beş deneme hakkı var (`claimByCode`),
+     * bu kovalar da aynı adrese ve aynı kaynağa yeni kayıtlar açtırıp
+     * durmadan yeni kod üretmeyi engelliyor.
+     */
+    const ip = (await headers()).get("x-forwarded-for")?.split(",")[0].trim() ?? "";
+    const okEmail = await allow({ key: `code:${email}`, limit: 10, windowMs: 60 * 60 * 1000 });
+    const okIp = await allow({
+      key: ip ? `code-ip:${ip}` : "",
+      limit: 60,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!okEmail || !okIp) {
+      return {
+        error: "Çok fazla deneme oldu. Biraz sonra tekrar dener misin?",
+        email,
+        sent: true,
+      };
+    }
+
+    const result = await claimByCode(email, code);
+    if (!result.ok) {
+      /*
+       * "Bu adresin bekleyen kaydı yok" ile "kod yanlış" AYNI cevabı alıyor.
+       * Ayırmak, sırayla adres deneyerek kimin kaydolmaya çalıştığını
+       * öğrenmeye yeterdi.
+       */
+      const mesaj: Record<string, string> = {
+        wrong_code:
+          result.left !== undefined
+            ? `Kod tutmadı. ${result.left} hakkın kaldı.`
+            : "Kod tutmadı.",
+        unknown: "Kod tutmadı.",
+        burned:
+          "Çok fazla yanlış deneme oldu ve kayıt düştü. Baştan kaydolman gerekiyor.",
+        expired:
+          "Kodun süresi dolmuştu — yirmi dört saat geçerliydi. Baştan kaydolabilirsin.",
+        email_taken:
+          "Bu adresle zaten bir hesap var. Giriş yapmayı dene.",
+      };
+      return { error: mesaj[result.reason] ?? "Kod tutmadı.", email, sent: true };
+    }
+
+    userId = result.userId;
+    await createSession(userId);
+  } catch (error) {
+    return { error: reportUnexpected("kod doğrulama", error), email, sent: true };
+  }
+
+  /* `redirect()` özel bir hata fırlatıyor — asla try/catch içinde çağrılmıyor. */
+  redirect("/write?dogrulama=hesap");
 }
 
 export async function loginAction(

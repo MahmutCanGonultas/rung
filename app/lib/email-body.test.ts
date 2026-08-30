@@ -71,6 +71,33 @@ test("HTML: bağlantı tıklanabilir oluyor", () => {
   assert.ok(html.includes('<a href="https://rungscale.com/verify?t=ABC"'));
 });
 
+test("HTML: görünen bağlantı metni JETONU GÖSTERMİYOR", () => {
+  /*
+   * REGRESYON. Görünen metin ham URL'ydi, yani ekranda 43 karakterlik
+   * rastgele bir jeton duruyordu — oltalama mailinin birebir şekli. İlk
+   * gerçek doğrulama maili Outlook'ta gereksiz klasörüne düştü.
+   */
+  const token = "aB9-_xYzQq7LmN4pR2sT6vW8yZ0cD3fG5hJ1kL";
+  const html = toHtml(`Tıkla:\n\nhttps://www.rungscale.com/verify?t=${token}`);
+
+  assert.equal(html.includes(`>${"https://www.rungscale.com/verify?t=" + token}<`), false);
+  assert.ok(html.includes(">www.rungscale.com/verify<"), "host + yol görünmeli");
+  /* href TAM adres olmalı — kırpılan yalnız görünen metin. */
+  assert.ok(html.includes(`href="https://www.rungscale.com/verify?t=${token}"`));
+});
+
+test("HTML: görünen alan adı ile gidilen alan adı AYNI", () => {
+  /*
+   * Asıl oltalama sinyali bu ikisinin farklı olmasıdır. Kırpma yalnız sorgu
+   * dizesine dokunabilir; host'a asla.
+   */
+  const html = toHtml("https://www.rungscale.com/reset/start?t=X");
+  const href = /href="https?:\/\/([^/"]+)/.exec(html)?.[1];
+  const gorunen = />([^<]*rungscale[^<]*)</.exec(html)?.[1];
+  assert.equal(href, "www.rungscale.com");
+  assert.ok(gorunen?.startsWith("www.rungscale.com"), String(gorunen));
+});
+
 test("HTML: kullanıcı metni kaçırılıyor — enjeksiyon yok", () => {
   /*
    * Mail gövdesine kullanıcıdan gelen bir dize girmiyor BUGÜN. Yarın girerse

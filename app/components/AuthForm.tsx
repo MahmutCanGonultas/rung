@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { CodeForm } from "./CodeForm";
 import { EMPTY_FORM_STATE, type FormState } from "../lib/form-state";
 import { PASSWORD_MIN } from "../lib/validation";
 
@@ -66,10 +67,23 @@ export function AuthForm({
       <div className="form">
         <p className="recover-done">
           <b>{state.email}</b> adresine bir bağlantı gönderdik. Gelen kutunu ve{" "}
-          <b>spam klasörünü</b> kontrol et.
+          <b>Gereksiz E-Posta</b> klasörünü kontrol et.
         </p>
+
+        {/*
+          KOD, BAĞLANTININ YANINDA — ve bu bir kolaylık değil, bir zorunluluk.
+
+          Gönderim alan adımız yeni ve Outlook maili gereksiz klasörüne
+          koyuyor (ölçüldü). İtibar zamanla oluşuyor, satın alınamıyor. O süre
+          boyunca bağlantı tek yol olsaydı, junk'a düşen her mail ölü uç
+          demekti. Kodla birlikte otuz saniyelik bir sapmaya dönüyor: kişi
+          zaten AÇIK DURAN bu sekmeye yazıyor.
+        */}
+        <CodeForm email={state.email} />
+
         <p className="auth-alt">
-          Bağlantı yirmi dört saat geçerli. Gelmediyse birkaç dakika bekle,
+          Mail gereksize düştüyse <b>&ldquo;Gereksiz değil&rdquo;</b> dersen
+          bize de yardım etmiş olursun. Hiç gelmediyse birkaç dakika bekle,
           sonra adresini tekrar yaz.
         </p>
       </div>

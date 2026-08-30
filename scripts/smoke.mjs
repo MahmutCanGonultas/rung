@@ -278,6 +278,70 @@ async function main() {
     check("çerez httpOnly", session?.httpOnly === true);
     check("çerez sameSite=Lax", session?.sameSite === "Lax", String(session?.sameSite));
 
+    console.log("\n2b · KODLA hesap açma — mail spam'e düştüğünde kalan yol");
+    /*
+     * Gönderim alan adı yeni ve Outlook doğrulama mailini gereksiz klasörüne
+     * koydu (ölçüldü). İtibar zamanla oluşuyor; o süre boyunca bağlantı tek
+     * yol olsaydı ürün çalışmıyor olurdu. Kod aynı yere çıkıyor ve burada
+     * gerçekten çıktığı ölçülüyor.
+     */
+    const kodCtx = await browser.createBrowserContext();
+    const kodPage = await kodCtx.newPage();
+    const kodMail = `kod-${stamp}@rung.test`;
+    extraAccounts.push(kodMail);
+
+    await kodPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
+    await submitAuthForm(kodPage, kodMail, PASSWORD);
+    check("kod kutusu ekranda", (await kodPage.$$("#code")).length === 1);
+
+    /* Kodu veritabanından okuyoruz — posta kutusu okuyamıyoruz. */
+    const kodSatir = await ask(
+      "SELECT code FROM pending_signups WHERE email = $1",
+      [kodMail]
+    );
+    const kod = kodSatir.rows[0]?.code;
+    check("altı haneli kod üretildi", /^\d{6}$/.test(String(kod)), String(kod));
+
+    /* Önce YANLIŞ kod: reddedilmeli ve kalan hak söylenmeli. */
+    const yanlisKod = kod === "000000" ? "111111" : "000000";
+    await kodPage.type("#code", yanlisKod);
+    await Promise.all([
+      kodPage.waitForNavigation({ waitUntil: "networkidle0", timeout: 8000 }).catch(() => {}),
+      kodPage.click(".codebox button[type=submit]"),
+    ]);
+    await new Promise((r) => setTimeout(r, 900));
+    const kodHata = await readText(kodPage, ".codebox .form-error", 8);
+    check(
+      "yanlış kod reddedildi ve kalan hak yazıyor",
+      Boolean(kodHata) && /hakkın kaldı/i.test(String(kodHata)),
+      String(kodHata).slice(0, 50)
+    );
+    const halaYok = await ask("SELECT 1 FROM users WHERE email = $1", [kodMail]);
+    check("yanlış koddan sonra hâlâ hesap YOK", halaYok.rowCount === 0);
+
+    /* Sonra DOĞRU kod. */
+    await kodPage.$eval("#code", (el) => { el.value = ""; });
+    await kodPage.type("#code", String(kod));
+    await Promise.all([
+      kodPage.waitForNavigation({ waitUntil: "networkidle0", timeout: 12000 }).catch(() => {}),
+      kodPage.click(".codebox button[type=submit]"),
+    ]);
+    await waitForUrl(kodPage, (u) => u.includes("/write"), 15000);
+    check("doğru kodla hesap açıldı", kodPage.url().includes("/write"), kodPage.url());
+    const kodHesap = await ask(
+      "SELECT email_verified_at IS NOT NULL v FROM users WHERE email = $1",
+      [kodMail]
+    );
+    check("kodla açılan hesap DOĞRULANMIŞ", kodHesap.rows[0]?.v === true);
+
+    /* Kod TEK KULLANIMLIK: aynı kod ikinci kez hesap açmamalı. */
+    const kalanKayit = await ask(
+      "SELECT 1 FROM pending_signups WHERE email = $1",
+      [kodMail]
+    );
+    check("bekleyen kayıt tüketildi", kalanKayit.rowCount === 0);
+    await kodCtx.close();
+
     console.log("\n3 · aynı e-postayla tekrar kayıt");
     await page.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
     check(

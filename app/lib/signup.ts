@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomBytes, randomInt } from "node:crypto";
 
 import { db } from "./db";
 
@@ -31,34 +31,62 @@ function hash(token: string): string {
 }
 
 /*
+ * ALTI HANELİ KOD — bağlantının yanında duran ikinci yol.
+ *
+ * NEDEN VAR: gönderim alan adı yeni ve mail spam'e düşebiliyor (ölçüldü,
+ * Outlook junk'a koydu). Bağlantı tek yolsa junk'a düşen mail ölü uçtur;
+ * kodla birlikte otuz saniyelik bir sapmaya dönüyor.
+ *
+ * `randomInt` KULLANILIYOR, `Math.random()` DEĞİL: ikincisi kriptografik
+ * değil ve çıktısı tahmin edilebilir. Altı hane zaten dar bir uzay, bir de
+ * zayıf üreteçle daraltmanın anlamı yok.
+ *
+ * Sıfırla başlayabiliyor ("003914") — `padStart` onu koruyor, yoksa kod
+ * ekranda beş haneymiş gibi görünürdü.
+ */
+function makeCode(): string {
+  return String(randomInt(0, 1_000_000)).padStart(6, "0");
+}
+
+/** Beş yanlış denemede bekleyen kayıt tamamen düşüyor. */
+const MAX_TRIES = 5;
+
+/*
  * Bekleyen kaydı yazıyor ve AYNI ADRESİN eskilerini düşürüyor: kişi üç kez
  * kaydolmayı denerse kutusunda üç çalışan bağlantı birikmesin.
  */
 export async function stashSignup(input: {
   email: string;
   passwordHash: string;
-}): Promise<string> {
+}): Promise<{ token: string; code: string }> {
   const token = randomBytes(32).toString("base64url");
+  const code = makeCode();
   const expiresAt = new Date(Date.now() + TTL_MS);
 
   await db()`DELETE FROM pending_signups WHERE email = ${input.email}`;
 
   await db()`
-    INSERT INTO pending_signups (token_hash, email, password_hash, expires_at)
+    INSERT INTO pending_signups (token_hash, email, password_hash, expires_at, code)
     VALUES (
       ${hash(token)},
       ${input.email},
       ${input.passwordHash},
-      ${expiresAt.toISOString()}
+      ${expiresAt.toISOString()},
+      ${code}
     )
   `;
 
-  return token;
+  return { token, code };
 }
 
 export type ClaimResult =
   | { ok: true; userId: string; email: string }
-  | { ok: false; reason: "unknown" | "expired" | "email_taken" };
+  | {
+      ok: false;
+      reason: "unknown" | "expired" | "email_taken" | "wrong_code" | "burned";
+      /** `wrong_code` için: kaç deneme kaldı. */
+      left?: number;
+    };
 
 /*
  * Bağlantıya tıklandı: bekleyen kaydı HESABA çeviriyor.
@@ -79,7 +107,66 @@ export async function claimSignup(token: string): Promise<ClaimResult> {
     RETURNING email, password_hash, expires_at
   `) as Array<{ email: string; password_hash: string; expires_at: Date }>;
 
-  const row = rows[0];
+  return rowToAccount(rows[0]);
+}
+
+/*
+ * KODLA AÇMA — mail spam'e düştüğünde kullanılan ikinci yol.
+ *
+ * Bağlantıyla tamamen aynı yere varıyor: aynı satır, aynı hesap, aynı oturum.
+ * Fark yalnızca kanıtın nasıl gösterildiği — tıklamak yerine yazmak.
+ *
+ * ADRES DE SORULUYOR, çünkü kod tek başına altı hane: hangi kayda ait olduğu
+ * adresle belirleniyor ve saldırganın "herhangi bir hesap" değil BELİRLİ bir
+ * adres için doğru kodu bulması gerekiyor.
+ */
+export async function claimByCode(
+  email: string,
+  code: string
+): Promise<ClaimResult> {
+  /*
+   * EŞLEŞME TEK SORGUDA SİLİYOR. "Önce oku sonra sil" iki eşzamanlı denemede
+   * aynı kaydı iki hesaba çevirebilirdi.
+   */
+  const hit = (await db()`
+    DELETE FROM pending_signups
+     WHERE email = ${email} AND code = ${code}
+    RETURNING email, password_hash, expires_at
+  `) as Array<{ email: string; password_hash: string; expires_at: Date }>;
+
+  if (hit[0]) return rowToAccount(hit[0]);
+
+  /*
+   * Eşleşmedi: ya bu adresin bekleyen kaydı yok, ya kod yanlış. İkisini
+   * AYIRMIYORUZ — "bu adresin bekleyen kaydı var" demek, sırayla adres
+   * deneyerek kimin kaydolmaya çalıştığını öğrenmeye yeterdi.
+   */
+  const bumped = (await db()`
+    UPDATE pending_signups
+       SET code_tries = code_tries + 1
+     WHERE email = ${email}
+    RETURNING code_tries
+  `) as Array<{ code_tries: number }>;
+
+  const tries = bumped[0]?.code_tries;
+  if (tries === undefined) return { ok: false, reason: "unknown" };
+
+  if (tries >= MAX_TRIES) {
+    /*
+     * Hak bitti: kayıt tamamen düşüyor. Altı hane sınırsız denemeye karşı
+     * zayıf — koruma kodun uzunluğu değil, deneme sayısı.
+     */
+    await db()`DELETE FROM pending_signups WHERE email = ${email}`;
+    return { ok: false, reason: "burned" };
+  }
+
+  return { ok: false, reason: "wrong_code", left: MAX_TRIES - tries };
+}
+
+/* Bekleyen kayıt satırını hesaba çeviren ortak adım — iki yol da buraya varıyor. */
+async function rowToAccount(
+  row: { email: string; password_hash: string; expires_at: Date } | undefined
+): Promise<ClaimResult> {
   if (!row) return { ok: false, reason: "unknown" };
   if (new Date(row.expires_at).getTime() < Date.now()) {
     return { ok: false, reason: "expired" };

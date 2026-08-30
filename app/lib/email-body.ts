@@ -63,10 +63,28 @@ export function toHtml(text: string): string {
   const body = escape(text)
     .split(/\n{2,}/)
     .map((para) => {
-      const withLinks = para.replace(
-        /(https?:\/\/\S+)/g,
-        '<a href="$1" style="color:#a03a1e">$1</a>'
-      );
+      const withLinks = para.replace(/(https?:\/\/\S+)/g, (url) => {
+        /*
+         * GÖRÜNEN METİN JETONU GÖSTERMİYOR.
+         *
+         * Önceden bağlantının metni ham URL'nin kendisiydi, yani ekranda
+         * 43 karakterlik rastgele bir jeton duruyordu — saatler yaşındaki
+         * bir alan adına giden, uzun ve okunamaz bir adres. Bu birebir
+         * oltalama (phishing) mailinin şekli, ve filtrenin elinde başka
+         * sinyal yokken karar tam olarak şekle bakıyor. ÖLÇÜLDÜ: ilk gerçek
+         * doğrulama maili Outlook'ta gereksiz klasörüne düştü.
+         *
+         * Google'ın gönderen kılavuzu da bunu istiyor: "Web links in the
+         * message body should be visible and easy to understand."
+         *
+         * ALAN ADI ASLA DEĞİŞMİYOR. Görünen metin, gerçekten gidilen adresin
+         * host + yol kısmı — yalnızca sorgu dizesi kırpılıyor. Görünen alan
+         * adı ile gerçek alan adı farklı olsaydı, asıl oltalama sinyali o
+         * olurdu.
+         */
+        const label = url.replace(/^https?:\/\//, "").split("?")[0];
+        return `<a href="${url}" style="color:#a03a1e">${label}</a>`;
+      });
       return `<p style="margin:0 0 16px">${withLinks.replace(/\n/g, "<br>")}</p>`;
     })
     .join("");

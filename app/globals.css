@@ -2115,6 +2115,43 @@ a.chip:hover {
 }
 
 /*
+ * MAİLDEKİ KODU GİRME KUTUSU.
+ *
+ * Bağlantının ALTINDA ve daha sessiz: birincil yol bağlantı, bu ikinci kapı.
+ * Ama gizli değil — gönderim alan adı yeniyken mailin gereksiz klasörüne
+ * düşmesi olağan, ve o durumda bu kutu ürünün çalışan tek yolu oluyor.
+ */
+.codebox {
+  display: grid;
+  gap: var(--s-2);
+  padding-block-start: var(--s-4);
+  border-block-start: 1px solid var(--hair);
+}
+.codebox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  align-items: center;
+}
+/* Rakamlar geniş ve aralıklı: altı haneyi tek tek okunacak biçimde göster. */
+.code-input {
+  inline-size: auto;
+  flex: 1 1 9rem;
+  min-inline-size: 0;
+  font-size: var(--t-h4);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-align: center;
+  /* Rakamlar eşit genişlikte olsun — kod yazılırken alan zıplamasın. */
+  font-variant-numeric: tabular-nums;
+}
+.code-input::placeholder {
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: var(--hair-2);
+}
+
+/*
  * Doğrulama şeridi. Engelleyici değil, kapatılabilir değil: hesap
  * doğrulanmadan da çalışıyor ama şifre unutulduğunda geri dönüş yolu
  * olmuyor, ve bunun görünür kalması gerekiyor.
