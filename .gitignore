@@ -18,3 +18,7 @@ out/
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Dış servisler, hesaplar ve yenileme bilgileri. Depo public — bu dosya
+# kişisel adresler ve panel yolları içeriyor, dışarı çıkmıyor.
+rung-tools.txt
