@@ -2206,9 +2206,15 @@ a.chip:hover {
   gap: var(--s-4);
   margin-inline-start: auto;
 }
+/* Adres bir bağlantı: hesap ekranına giden tek kapı. Altı çizili DEĞİL —
+   çubuk zaten kalabalık; imleç ve renk değişimi yeterli işaret. */
 .shell-user {
   font-size: var(--t-micro);
   color: var(--ink-3);
+  text-decoration: none;
+}
+.shell-user:hover {
+  color: var(--accent);
 }
 .shell-out {
   border: 0;
@@ -4088,4 +4094,117 @@ a.chip:hover {
   .btn {
     border: 1px solid CanvasText;
   }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   26 · HESAP — kimlik, birikim, anahtarlar
+
+   Üç soru, üç kart. Ayar yok: ürünün ayarlanacak bir tercihi yok, ve
+   olmayan bir şey için boş bir bölüm açmak ekranı kalabalıklaştırırdı.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/*
+ * ORTALANMIŞ, dar bir sütun. Ötekiler (yaz, kayıtlar, ilerleme) tam genişlik
+ * kullanıyor çünkü orada VERİ var; burada okunacak birkaç satır ve iki form
+ * var. Sola yaslanmış dar bir sütun 1440px'te sağ yarıyı boş bırakıp sayfayı
+ * yarım bıraktırıyordu.
+ */
+.account {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-5);
+  max-inline-size: 46rem;
+  margin-inline: auto;
+}
+.account-title {
+  font-family: var(--display);
+  font-size: var(--t-h2);
+  font-weight: 600;
+  letter-spacing: -0.028em;
+}
+.account-card {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+  border-radius: var(--r-panel);
+  padding: var(--pad);
+  box-shadow: var(--lift-1);
+  background: linear-gradient(
+    152deg,
+    var(--warm-1) 0%,
+    var(--warm-2) 60%,
+    var(--warm-3) 100%
+  );
+}
+.account-h {
+  font-size: var(--t-tag);
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+/* Adresin kendisi bu kartın baş rolü: kişinin sistemdeki kimliği bu. */
+.account-mail {
+  font-family: var(--display);
+  font-size: var(--t-h3);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+.account-note {
+  font-size: var(--t-small);
+  color: var(--ink-2);
+  max-inline-size: 60ch;
+}
+/* Durum İKİ İŞARETLE: renk ve kelime. Yalnız renk zorlanmış renklerde düşer. */
+.account-ok {
+  font-weight: 700;
+  color: var(--good);
+}
+.account-warn {
+  font-weight: 700;
+  color: var(--bad);
+}
+.account-fine {
+  font-size: var(--t-small);
+  color: var(--ink-3);
+}
+.account-fine a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+/* Sayılar: dar ekranda ikiye, geniş ekranda dörde düşüyor — sabit sütun
+   sayısı yerine ölçü, çünkü "Ölçülen seviye" etiketi ötekilerden uzun. */
+/*
+ * Dört sayı, geniş ekranda TEK SATIRDA. Alt sınır 9rem'di ve dördüncü
+ * ("Ölçülen seviye") alt satıra düşüp 3+1 diye asimetrik bir blok
+ * bırakıyordu. 7rem ile dördü de sığıyor; dar ekranda ikişerli iniyor.
+ */
+.account-nums {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: var(--s-4);
+  margin: 0;
+}
+.account-nums div {
+  display: grid;
+  gap: var(--s-1);
+}
+.account-nums dt {
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.account-nums dd {
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--t-h4);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }

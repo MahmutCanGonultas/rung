@@ -59,7 +59,14 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <LevelRule level={estimate?.level ?? null} />
 
         <div className="shell-who">
-          <span className="shell-user">{user.email}</span>
+          {/*
+            Adres artık bir BAĞLANTI. Eskiden düz metindi ve hesapla ilgili
+            hiçbir şeye gidilemiyordu — şifre değiştirmenin tek yolu çıkış
+            yapıp "şifremi unuttum" demekti.
+          */}
+          <Link className="shell-user" href="/account">
+            {user.email}
+          </Link>
           <form action={logoutAction}>
             <button className="shell-out" type="submit">
               Çıkış

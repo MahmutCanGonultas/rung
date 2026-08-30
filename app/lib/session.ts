@@ -91,6 +91,44 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   };
 });
 
+/*
+ * KAÇ CİHAZDA AÇIK.
+ *
+ * Hesap ekranı "ortak bir bilgisayarda çıkış yapmayı unuttun mu" sorusunu
+ * sorabilsin diye. Süresi geçmiş satırlar sayılmıyor — onlar zaten oturum
+ * değil, henüz toplanmamış çöp.
+ *
+ * Cihazı TANIMLAMIYORUZ: tarayıcı, işletim sistemi, IP, konum hiçbiri
+ * saklanmıyor. Sayı yeterli bilgiyi veriyor ve fazlası, ürünün ihtiyacı
+ * olmayan bir izleme kaydı olurdu.
+ */
+export async function countOpenSessions(userId: string): Promise<number> {
+  const rows = (await db()`
+    SELECT count(*)::int AS n FROM sessions
+     WHERE user_id = ${userId} AND expires_at > now()
+  `) as Array<{ n: number }>;
+  return rows[0]?.n ?? 1;
+}
+
+/*
+ * ŞU ANKİ OTURUMUN VERİTABANINDAKİ ANAHTARI.
+ *
+ * "Bu oturum hariç hepsini kapat" diyebilmek için gerekiyor: kendi çerezimizin
+ * özetini bilmeden hangi satırın bizim olduğunu ayırt edemeyiz.
+ *
+ * Jetonun kendisi DEĞİL özeti dönüyor — çağıran taraf onu yalnız bir SQL
+ * karşılaştırmasında kullanıyor ve jetonun kendisinin çerezden çıkmasına hiç
+ * gerek yok.
+ *
+ * Oturumun GEÇERLİ olup olmadığına bakmıyor; bunu çağıran her yer zaten
+ * `requireUser()` çağırmış oluyor.
+ */
+export async function currentSessionHash(): Promise<string | null> {
+  const jar = await cookies();
+  const token = jar.get(COOKIE_NAME)?.value;
+  return token ? hashToken(token) : null;
+}
+
 export async function destroySession(): Promise<void> {
   const jar = await cookies();
   const token = jar.get(COOKIE_NAME)?.value;

@@ -877,6 +877,86 @@ async function main() {
     check("ilk kayıttan sonra seviye ölçülüyor", yananSonra === 1, `${yananSonra} yanan bant`);
     await yeniCtx.close();
 
+    console.log("\n25 · hesap ekranı ve şifre değiştirme");
+    /*
+     * Şifre değiştirme oturumu OLAN kişinin yolu ve güvenlik açısından
+     * hassas: açık bırakılmış bir ekranın başına oturan biri hesabı
+     * devralamamalı. O yüzden mevcut şifre soruluyor ve burada ölçülüyor.
+     */
+    const hesapCtx = await browser.createBrowserContext();
+    const hesapPage = await hesapCtx.newPage();
+    const hesapMail = `hesap-${stamp}@rung.test`;
+    const YENI_SIFRE = "yeni-duman-sifresi-7431";
+    await signupThrough(hesapPage, hesapMail, PASSWORD);
+    extraAccounts.push(hesapMail);
+
+    await hesapPage.goto(`${BASE}/account`, { waitUntil: "networkidle0" });
+    check(
+      "hesap ekranı adresi gösteriyor",
+      (await hesapPage.content()).includes(hesapMail)
+    );
+    check(
+      "yeni hesap doğrulanmış görünüyor",
+      (await hesapPage.$$(".account-ok")).length === 1
+    );
+
+    /* Yanlış mevcut şifreyle değiştirme REDDEDİLMELİ. */
+    await hesapPage.type("#current", "kesinlikle-yanlis-sifre");
+    await hesapPage.type("#next", YENI_SIFRE);
+    await Promise.all([
+      hesapPage
+        .waitForNavigation({ waitUntil: "networkidle0", timeout: 8000 })
+        .catch(() => {}),
+      hesapPage.click(".account-card .btn-primary"),
+    ]);
+    await new Promise((r) => setTimeout(r, 800));
+    const yanlisHata = await readText(hesapPage, ".form-error", 8);
+    check(
+      "yanlış mevcut şifre reddedildi",
+      Boolean(yanlisHata) && /Mevcut şifre/i.test(String(yanlisHata)),
+      String(yanlisHata).slice(0, 40)
+    );
+
+    /* Doğru mevcut şifreyle değiştirme GEÇMELİ. */
+    await hesapPage.goto(`${BASE}/account`, { waitUntil: "networkidle0" });
+    await hesapPage.type("#current", PASSWORD);
+    await hesapPage.type("#next", YENI_SIFRE);
+    await Promise.all([
+      hesapPage
+        .waitForNavigation({ waitUntil: "networkidle0", timeout: 8000 })
+        .catch(() => {}),
+      hesapPage.click(".account-card .btn-primary"),
+    ]);
+    await new Promise((r) => setTimeout(r, 1200));
+    check(
+      "şifre değişti ve onay gösteriliyor",
+      (await hesapPage.$$(".recover-done")).length === 1
+    );
+
+    /*
+     * ASIL KONTROL: eski şifre artık çalışmamalı, yenisi çalışmalı.
+     * Onay ekranı göstermek kolay; şifrenin gerçekten değiştiğini ancak
+     * giriş denemesi söyler.
+     */
+    const kanitCtx = await browser.createBrowserContext();
+    const kanitPage = await kanitCtx.newPage();
+    await kanitPage.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
+    await submitAuthForm(kanitPage, hesapMail, PASSWORD);
+    check(
+      "eski şifre artık çalışmıyor",
+      kanitPage.url().includes("/login"),
+      kanitPage.url()
+    );
+    await kanitPage.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
+    await submitAuthForm(kanitPage, hesapMail, YENI_SIFRE);
+    check(
+      "yeni şifreyle giriş yapılıyor",
+      kanitPage.url().includes("/write"),
+      kanitPage.url()
+    );
+    await kanitCtx.close();
+    await hesapCtx.close();
+
     console.log("\n23 · erişilebilirlik");
     await page.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
 
