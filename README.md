@@ -6,10 +6,10 @@ değil, yazım denetleyicisi değil.
 Yazdığın İngilizceye bakar, hatayı sabit bir taksonomiye yazar, aylar boyunca
 izler — ve **kendi doğruluğunu ölçer.**
 
-**Canlı → https://rung-plum.vercel.app**
+**Canlı → https://www.rungscale.com**
 
-Next.js 16 · TypeScript (katı) · PostgreSQL · Anthropic API · 183 birim testi ·
-90 uçtan uca kontrol
+Next.js 16 · TypeScript (katı) · PostgreSQL · Anthropic API · 204 birim testi ·
+98 uçtan uca kontrol
 
 ![Anasayfa](docs/shots/landing.png)
 

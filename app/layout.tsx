@@ -55,7 +55,7 @@ export const metadata: Metadata = {
    * `VERCEL_URL` KULLANILMIYOR: o adres her dağıtımda değişiyor ve önizleme
    * dağıtımlarında paylaşım kartını yanlış adrese çiviliyor.
    */
-  metadataBase: new URL(process.env.APP_URL ?? "https://rung-plum.vercel.app"),
+  metadataBase: new URL(process.env.APP_URL ?? "https://www.rungscale.com"),
   title: {
     default: "Rung",
     template: "%s",

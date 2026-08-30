@@ -5,7 +5,13 @@
  * yazar. Birim testi değil — "kritik akış hâlâ ayakta mı" sorusunun cevabı.
  *
  * Çalıştırma:  npm run smoke        (dev sunucusu ayrı bir terminalde açıkken)
- *              npm run smoke -- --base=https://rung-plum.vercel.app
+ *              npm run smoke -- --base=https://www.rungscale.com
+ *
+ * CANLIYA KARŞI KOŞMADAN ÖNCE OKU: kayıt artık gerçek mail gönderiyor.
+ * Bu takım her koşumda altı civarı hesap açıyor ve adresleri `@rung.test` —
+ * yani gönderilen her mail HARD BOUNCE üretiyor. Yeni bir gönderim alan
+ * adında bounce oranı itibarı doğrudan düşürüyor. Canlıya karşı koşmak,
+ * teslim edilebilirliği ölçmek isterken bozmak demek.
  *
  * Kendi açtığı test hesabını sonunda siler.
  */
