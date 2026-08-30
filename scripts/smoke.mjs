@@ -10,6 +10,8 @@
  * Kendi açtığı test hesabını sonunda siler.
  */
 
+import { createHash, randomBytes } from "node:crypto";
+
 import puppeteer from "puppeteer-core";
 import { Client } from "@neondatabase/serverless";
 
@@ -78,27 +80,113 @@ async function submitAuthForm(page, email, password) {
   await page.waitForSelector('input[name="email"]');
   await page.type('input[name="email"]', email);
   await page.type('input[name="password"]', password);
+  /*
+   * Yönlendirme BEKLENİYOR AMA ŞART DEĞİL. Hatalı girdi yönlendirme üretmiyor
+   * ve varsayılan yirmi saniyelik zaman aşımı her hata denemesine yirmi saniye
+   * ekliyordu — takım on dakikayı buluyordu. Sekiz saniye, sunucu eylemi +
+   * bcrypt + yönlendirme için fazlasıyla yeterli.
+   */
   await Promise.all([
-    page.waitForNavigation({ waitUntil: "networkidle0" }).catch(() => {}),
+    page
+      .waitForNavigation({ waitUntil: "networkidle0", timeout: 8000 })
+      .catch(() => {}),
     page.click('button[type="submit"]'),
   ]);
   // Server Action + redirect bazen navigation olayı üretmez; sayfanın oturmasını bekle.
   await new Promise((r) => setTimeout(r, 600));
 }
 
+/*
+ * KAYIT ARTIK İKİ ADIM — ve duman testi ikisini de yürüyor.
+ *
+ * Form hesap AÇMIYOR: bekleyen bir kayıt yazıp posta kutusuna bağlantı
+ * yolluyor. Test bir posta kutusu okuyamıyor, ama veritabanını okuyabiliyor.
+ *
+ * NEDEN JETONU YENİDEN YAZIYORUZ, OKUMUYORUZ: tabloda jetonun kendisi değil
+ * SHA-256 özeti duruyor — okunacak bir şey yok, özetten jeton çıkmıyor. Test
+ * kendi jetonunu üretip özetini satıra yazıyor; satırın geri kalanı
+ * (adres, bcrypt'li şifre, son kullanma) uygulamanın yazdığı gerçek satır.
+ *
+ * NEDEN SUNUCU GÜNLÜĞÜNÜ OKUMUYORUZ: `sendMail` anahtar yokken bağlantıyı
+ * konsola yazıyor, ama o konsol başka bir terminalde — ve bu test canlıya
+ * karşı da koşabiliyor. Veritabanı iki durumda da erişilebilir tek yer.
+ */
+/*
+ * `storedAs`: formda yazılan adres ile satıra düşen adres AYRI olabiliyor —
+ * `İsmail@Rung.test` küçültülüp `ismail@rung.test` olarak saklanıyor. Bekleyen
+ * kaydı saklanan hâliyle arıyoruz.
+ */
+async function signupThrough(page, email, password, storedAs = email) {
+  await page.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
+  await submitAuthForm(page, email, password);
+
+  const token = randomBytes(32).toString("base64url");
+  const hash = createHash("sha256").update(token, "utf8").digest("hex");
+  const r = await ask(
+    "UPDATE pending_signups SET token_hash = $1 WHERE email = $2",
+    [hash, storedAs]
+  );
+  if (r.rowCount !== 1) {
+    throw new Error(
+      `bekleyen kayıt yazılmadı (${storedAs}) — satır sayısı ${r.rowCount}`
+    );
+  }
+
+  await openVerifyLink(page, token);
+}
+
+/*
+ * Doğrulama bağlantısı ÜÇ hoplama yapıyor: `/verify` → `/write` → `/write`in
+ * kalıcı adresi. `networkidle0` bu zincirde geliştirme sunucusunun HMR
+ * soketiyle birlikte zaman aşımına düşüyordu — uygulamada değil, ölçüm
+ * aracında bir sorun. Belge yüklenmesini bekleyip adresin oturmasını ayrıca
+ * kolluyoruz.
+ */
+async function openVerifyLink(page, token) {
+  await page.goto(`${BASE}/verify?t=${token}`, { waitUntil: "domcontentloaded" });
+  await waitForUrl(page, (u) => !u.includes("/verify"));
+  await new Promise((rr) => setTimeout(rr, 400));
+}
+
+/*
+ * HER SORGU İÇİN YENİ BAĞLANTI — bilerek.
+ *
+ * Önce tek bir uzun ömürlü `Client` tutuluyordu. ÖLÇÜLDÜ ve süreci çökertti:
+ * Neon'un WebSocket'i dakikalarca boşta kalınca kapanıyor, sürücü `error`
+ * olayı yayıyor ve o olayın dinleyicisi olmadığı için Node bütün süreci
+ * düşürüyor — duman testi ürünle ilgisi olmayan bir sebeple ölüyordu.
+ *
+ * Bağlantı açmak birkaç yüz milisaniye; bu testte önemsiz.
+ */
+async function ask(sql, params) {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL yok — kayıt akışı sınanamıyor");
+  const client = new Client(url);
+  /* Kapanan sokete kimse bakmazsa süreç düşüyor. */
+  client.on("error", () => {});
+  await client.connect();
+  try {
+    return await client.query(sql, params);
+  } finally {
+    await client.end().catch(() => {});
+  }
+}
+
 async function cleanUp() {
   const url = process.env.DATABASE_URL;
   if (!url) return;
   const client = new Client(url);
+  client.on("error", () => {});
   await client.connect();
+  const all = [EMAIL, ...extraAccounts];
   try {
     // sessions.user_id ON DELETE CASCADE — oturumlar da gider.
-    const r = await client.query("DELETE FROM users WHERE email = ANY($1)", [
-      [EMAIL, ...extraAccounts],
-    ]);
+    const r = await client.query("DELETE FROM users WHERE email = ANY($1)", [all]);
+    /* Tıklanmadan kalmış bekleyen kayıtlar da gitsin: içlerinde şifre özeti var. */
+    await client.query("DELETE FROM pending_signups WHERE email = ANY($1)", [all]);
     console.log(`\ntemizlik · silinen test hesabı: ${r.rowCount}`);
   } finally {
-    await client.end();
+    await client.end().catch(() => {});
   }
 }
 
@@ -111,7 +199,13 @@ async function main() {
 
   try {
     const page = await browser.newPage();
-    page.setDefaultTimeout(20000);
+    /*
+     * Kırk beş saniye. Geliştirme sunucusu bir sayfayı İLK istekte derliyor ve
+     * `networkidle0` HMR soketiyle birlikte yirmi saniyeyi aşabiliyor — ölçüm
+     * aracının kendi zaman aşımı yüzünden kırmızı yanan bir takım, ölçtüğü şey
+     * hakkında hiçbir şey söylemiyor.
+     */
+    page.setDefaultTimeout(45000);
 
     console.log(`\ntemel adres: ${BASE}`);
     console.log(`test hesabı: ${EMAIL}\n`);
@@ -124,10 +218,49 @@ async function main() {
       page.url()
     );
 
-    console.log("\n2 · kayıt");
+    console.log("\n2 · kayıt — hesap bağlantıya tıklayınca açılıyor");
     await page.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
     await submitAuthForm(page, EMAIL, PASSWORD);
-    check("kayıt sonrası /write", page.url().includes("/write"), page.url());
+    check(
+      "form 'kutuna bak' ekranına döndü",
+      (await page.$$(".recover-done")).length === 1,
+      page.url()
+    );
+    check(
+      "form daha oturum açmadı",
+      !(await browser.cookies()).some((c) => c.name === "rung_session" && c.value)
+    );
+    /*
+     * ASIL KONTROL: form tek başına HESAP AÇMIYOR. Bu satır düşerse ürün
+     * sessizce eski davranışına dönmüş demektir — doğrulanmamış hesaplar
+     * yine birikiyor.
+     */
+    const beforeClick = await ask("SELECT 1 FROM users WHERE email = $1", [EMAIL]);
+    check("bağlantıdan önce hesap YOK", beforeClick.rowCount === 0);
+
+    const token0 = randomBytes(32).toString("base64url");
+    const reKey = await ask(
+      "UPDATE pending_signups SET token_hash = $1 WHERE email = $2",
+      [createHash("sha256").update(token0, "utf8").digest("hex"), EMAIL]
+    );
+    check("bekleyen kayıt yazıldı", reKey.rowCount === 1);
+
+    await openVerifyLink(page, token0);
+    check("bağlantı sonrası /write", page.url().includes("/write"), page.url());
+    check(
+      "adres doğrulanmış açıldı — uyarı şeridi yok",
+      (await page.$$(".verify")).length === 0
+    );
+    /* Jeton tek kullanımlık: aynı bağlantı ikinci kez hesap açmıyor. */
+    const ikinciCtx = await browser.createBrowserContext();
+    const ikinciPage = await ikinciCtx.newPage();
+    await openVerifyLink(ikinciPage, token0);
+    check(
+      "aynı bağlantı ikinci kez çalışmıyor",
+      ikinciPage.url().includes("/login"),
+      ikinciPage.url()
+    );
+    await ikinciCtx.close();
     check(
       "kabukta e-posta görünüyor",
       (await page.content()).includes(EMAIL)
@@ -200,8 +333,7 @@ async function main() {
     const trTyped = `İsmail-${stamp}@Rung.test`;
     const ctx = await browser.createBrowserContext();
     const page3 = await ctx.newPage();
-    await page3.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
-    await submitAuthForm(page3, trTyped, PASSWORD);
+    await signupThrough(page3, trTyped, PASSWORD, trBase);
     check("İ'li adresle kayıt oldu", page3.url().includes("/write"), page3.url());
 
     await page3.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
@@ -338,6 +470,7 @@ async function main() {
       `sayaç ${shownWords}, gerçek ${BODY.trim().split(/\s+/).length}`
     );
 
+    const yazmaAdresi = page.url();
     await page.click(".composer button[type=submit]");
     await waitForUrl(page, (u) => /\/entries\/\d+$/.test(u), 20000);
     await new Promise((r) => setTimeout(r, 500));
@@ -347,6 +480,40 @@ async function main() {
 
     const entryText = await page.content();
     check("metin olduğu gibi duruyor", entryText.includes("thirty days"));
+
+    console.log("\n14b · aynı görevi ikinci kez yazmak");
+    /*
+     * REGRESYON. Ayrıntı sayfası aynı görevin ÖNCEKİ denemelerini listeliyor
+     * ve o liste satırı kişinin kendi cümlesini gösteriyor. Satırı besleyen
+     * sorgu `snippet` sütununu seçmiyordu: sayfanın tamamı hata sınırına
+     * düşüyordu ve hiçbir test görmüyordu, çünkü buraya kadar her görev
+     * yalnızca BİR kez yazılıyordu. Koyu tema ekran görüntüsünde yakalandı.
+     */
+    const IKINCI =
+      "Last month I wrote to you about the same deposit and nobody answered me. " +
+      "I am writing again because the money has still not arrived in my account, " +
+      "and the office phone rings without an answer every single morning I try.";
+    await page.goto(yazmaAdresi, { waitUntil: "networkidle0" });
+    await page.waitForSelector(".composer button[type=submit]", { timeout: 20000 });
+    await page.$eval(".editor", (el) => { el.value = ""; });
+    await page.type(".editor", IKINCI);
+    await page.click(".composer button[type=submit]");
+    await waitForUrl(page, (u) => /\/entries\/\d+$/.test(u) && u !== entryUrl, 25000);
+
+    await page.goto(entryUrl, { waitUntil: "networkidle0" });
+    const oncekiler = await page.$$eval(".earlier .entry-row .entry-snippet", (els) =>
+      els.map((el) => el.textContent.trim())
+    );
+    check(
+      "önceki deneme listeleniyor",
+      oncekiler.length === 1,
+      `${oncekiler.length} satır`
+    );
+    check(
+      "önceki denemenin kendi cümlesi yazıyor",
+      Boolean(oncekiler[0]) && oncekiler[0].startsWith("Last month"),
+      String(oncekiler[0]).slice(0, 40)
+    );
 
     console.log("\n15 · geçmiş");
     await page.goto(`${BASE}/history`, { waitUntil: "networkidle0" });
@@ -368,16 +535,21 @@ async function main() {
       listeDe.join(", ")
     );
     const rows = await page.$$eval(".entry-row", (els) => els.length);
-    check("bir satır var", rows === 1, `${rows} satır`);
+    check("iki satır var", rows === 2, `${rows} satır`);
 
     console.log("\n16 · arama");
     await page.goto(`${BASE}/history?q=deposit`, { waitUntil: "networkidle0" });
-    check("eşleşen arama sonuç veriyor", (await page.$$(".entry-row")).length === 1);
+    check("eşleşen arama sonuç veriyor", (await page.$$(".entry-row")).length === 2);
     await page.goto(`${BASE}/history?q=elephants`, { waitUntil: "networkidle0" });
     check("eşleşmeyen arama boş", (await page.$$(".entry-row")).length === 0);
     await page.goto(`${BASE}/history?q=agreements`, { waitUntil: "networkidle0" });
     check(
       "arama kök buluyor (agreements → agreement)",
+      (await page.$$(".entry-row")).length === 1
+    );
+    await page.goto(`${BASE}/history?q=mornings`, { waitUntil: "networkidle0" });
+    check(
+      "ikinci kayıt da aranabiliyor (mornings → morning)",
       (await page.$$(".entry-row")).length === 1
     );
 
@@ -389,8 +561,7 @@ async function main() {
     const otherEmail = `other-${stamp}@rung.test`;
     const otherCtx = await browser.createBrowserContext();
     const otherPage = await otherCtx.newPage();
-    await otherPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
-    await submitAuthForm(otherPage, otherEmail, PASSWORD);
+    await signupThrough(otherPage, otherEmail, PASSWORD);
     check("ikinci hesap açıldı", otherPage.url().includes("/write"), otherPage.url());
     extraAccounts.push(otherEmail);
 
@@ -512,13 +683,18 @@ async function main() {
     const kurtarCtx = await browser.createBrowserContext();
     const kurtarPage = await kurtarCtx.newPage();
     const kurtarMail = `kurtar-${stamp}@rung.test`;
-    await kurtarPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
-    await submitAuthForm(kurtarPage, kurtarMail, PASSWORD);
+    await signupThrough(kurtarPage, kurtarMail, PASSWORD);
     extraAccounts.push(kurtarMail);
 
+    /*
+     * ŞERİT ARTIK ÇIKMIYOR — ve bu bir gerileme değil, değişikliğin kendisi.
+     * Hesap ancak bağlantıya tıklanınca açıldığı için her yeni hesap
+     * doğrulanmış doğuyor. Şerit yalnızca bu modelden ÖNCE açılmış hesaplar
+     * için duruyor.
+     */
     check(
-      "kayıt sonrası doğrulama şeridi var",
-      (await kurtarPage.$$(".verify")).length === 1
+      "yeni hesapta doğrulama şeridi yok",
+      (await kurtarPage.$$(".verify")).length === 0
     );
 
     /*
@@ -564,6 +740,7 @@ async function main() {
     const dbUrl = process.env.DATABASE_URL;
     if (dbUrl) {
       const c = new Client(dbUrl);
+      c.on("error", () => {});
       await c.connect();
       try {
         const rows = await c.query(
@@ -574,7 +751,14 @@ async function main() {
         );
         const reset = rows.rows.filter((r) => r.purpose === "password_reset");
         const verify = rows.rows.filter((r) => r.purpose === "email_verify");
-        check("kayıtta doğrulama jetonu üretildi", verify.length >= 1, `${verify.length} jeton`);
+        /*
+         * KAYITTA ARTIK DOĞRULAMA JETONU ÜRETİLMİYOR — ve üretilmemeli.
+         *
+         * Hesap zaten bir bağlantıya tıklanarak açıldı; adres o anda
+         * doğrulanmış sayılıyor. İkinci bir "adresini doğrula" maili, işi
+         * bitmiş birine aynı işi tekrar yaptırmak olurdu.
+         */
+        check("kayıtta ikinci bir doğrulama jetonu üretilmiyor", verify.length === 0, `${verify.length} jeton`);
         check("sıfırlama jetonu üretildi", reset.length >= 1, `${reset.length} jeton`);
         check(
           "jeton açık saklanmıyor — 64 haneli özet",
@@ -628,8 +812,7 @@ async function main() {
     const yeniCtx = await browser.createBrowserContext();
     const yeniPage = await yeniCtx.newPage();
     const yeniMail = `taze-${stamp}@rung.test`;
-    await yeniPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
-    await submitAuthForm(yeniPage, yeniMail, PASSWORD);
+    await signupThrough(yeniPage, yeniMail, PASSWORD);
     extraAccounts.push(yeniMail);
     const yanan = await yeniPage.$$eval(".rule-step.is-on", (els) => els.length);
     check("kayıtsız hesapta hiçbir bant yanmıyor", yanan === 0, `${yanan} yanan bant`);

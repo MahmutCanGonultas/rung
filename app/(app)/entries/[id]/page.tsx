@@ -231,7 +231,7 @@ export default async function EntryPage({
         <section className="earlier">
           <h2 className="earlier-title">Aynı görevi daha önce de yazmışsın</h2>
           {earlier.map((e) => (
-            <EntryRow key={e.id} entry={e} />
+            <EntryRow key={e.id} entry={e} hideTask />
           ))}
         </section>
       ) : null}

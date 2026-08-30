@@ -41,7 +41,21 @@ function firstLine(text: string, max = 96): string {
   return (space > max * 0.6 ? cut.slice(0, space) : cut) + "…";
 }
 
-export function EntryRow({ entry }: { entry: EntrySummary }) {
+/*
+ * `hideTask`: görev satırını gizler.
+ *
+ * Kayıt ayrıntı sayfasındaki "aynı görevi daha önce de yazmışsın" listesinde
+ * bütün satırlar TANIM GEREĞİ aynı görev. Orada her satırın altına aynı görev
+ * cümlesini kırpılmış hâlde yazmak, beş kez aynı şeyi söylemek ve satırı
+ * kalabalıklaştırmaktan başka bir şey yapmıyordu.
+ */
+export function EntryRow({
+  entry,
+  hideTask = false,
+}: {
+  entry: EntrySummary;
+  hideTask?: boolean;
+}) {
   const width =
     entry.per100 === null
       ? 0
@@ -77,19 +91,18 @@ export function EntryRow({ entry }: { entry: EntrySummary }) {
             </span>
           ) : null}
           <span className="entry-where">{entry.contextName}</span>
-          <span className="entry-dot" aria-hidden="true">
-            ·
-          </span>
-          <span>{entry.wordCount} kelime</span>
-          {entry.taskPrompt ? (
-            <>
-              <span className="entry-dot" aria-hidden="true">
-                ·
-              </span>
-              <span className="entry-task" lang="en">
-                {firstLine(entry.taskPrompt, 52)}
-              </span>
-            </>
+          {/*
+            Ayraç noktaları AYRI SPAN DEĞİL. Öyleyken satır sarınca nokta
+            önceki satırın sonunda kalıyordu — mobilde her satır bir "·" ile
+            bitiyor, yazım hatası gibi duruyordu. Şimdi nokta CSS'te
+            `::before` olarak kendinden sonraki ögeye bağlı: öge sararsa
+            noktası da onunla sarıyor.
+          */}
+          <span className="entry-words">{entry.wordCount} kelime</span>
+          {entry.taskPrompt && !hideTask ? (
+            <span className="entry-task" lang="en">
+              {firstLine(entry.taskPrompt, 52)}
+            </span>
           ) : null}
         </span>
       </span>

@@ -77,6 +77,26 @@ type SummaryRow = {
 
 function toSummary(row: SummaryRow): EntrySummary {
   /*
+   * SATIRIN SÖZLEŞMEYE UYDUĞU BURADA ANLAŞILIYOR.
+   *
+   * Sorgu sonuçları `as SummaryRow[]` ile işaretleniyor; bu bir SÖZ, kontrol
+   * değil — TypeScript veritabanının ne döndürdüğünü göremiyor. `snippet`i
+   * seçmeyi unutan bir sorgu derlemeden geçti ve ekranda "Cannot read
+   * properties of undefined" olarak patladı: kayıt ayrıntı sayfasının tamamı
+   * beyaz ekrana döndü ve hangi sorgunun eksik olduğunu söyleyen hiçbir şey
+   * yoktu. ÖLÇÜLDÜ — koyu tema ekran görüntüsünde yakalandı, hiçbir test
+   * yakalamadı.
+   *
+   * Bu satır o sınıfı kapatıyor: eksik sütun, sorgunun adıyla birlikte
+   * anında ve anlaşılır biçimde patlıyor.
+   */
+  if (typeof row.snippet !== "string") {
+    throw new Error(
+      "kayıt sorgusu `left(e.body, 140) AS snippet` sütununu seçmiyor"
+    );
+  }
+
+  /*
    * Hiç analiz koşumu yoksa bulgu sayısı 0 değil BİLİNMİYOR. İkisini
    * karıştırmak, analiz edilmemiş bir kaydı "hatasız" göstermek olurdu.
    */
@@ -215,6 +235,9 @@ export async function findEntryForUser(
            e.created_at,
            e.word_count,
            e.body,
+           -- Gövde zaten var ama snippet sözleşmenin parçası: EntryDetail,
+           -- EntrySummary'yi genişletiyor ve aynı satır tipiyle okunuyor.
+           left(e.body, 140) AS snippet,
            e.task_id::text AS task_id,
            c.name      AS context_name,
            c.slug      AS context_slug,
@@ -275,6 +298,7 @@ export async function previousAttempts(
            c.name     AS context_name,
            c.slug     AS context_slug,
            t.prompt   AS task_prompt,
+           left(e.body, 140) AS snippet,
            (SELECT count(*)::int FROM analyses a
              WHERE a.entry_id = e.id AND a.status = 'ok') AS analyses,
            (SELECT count(*)::int FROM findings f
