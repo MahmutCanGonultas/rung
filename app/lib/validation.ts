@@ -31,6 +31,32 @@ export function normalizeEmail(raw: string): string {
  */
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/;
 
+/*
+ * ADRESTE TÜRKÇE HARF OLAMAZ — ve bunu SÖYLEMEK zorundayız.
+ *
+ * Bu kalıp öncekinden geçiyordu: `ayşe@gmail.com`, `mehmet@şirket.com`,
+ * `çağla@outlook.com`. Bir Türk kullanıcının yapacağı en doğal hata bu.
+ *
+ * NE OLUYORDU: adres doğrulamadan geçiyor, MX eleğinden de geçiyor
+ * (gmail.com'un MX'i var), bekleyen kayıt yazılıyor — sonra gönderim
+ * patlıyor ve kişi "doğrulama e-postası gönderilemedi, biraz sonra tekrar
+ * dene" görüyordu. Sonsuza kadar deneyebilirdi; mesaj YANLIŞ ŞEYİ
+ * söylüyordu ve sebep hiçbir yerde yazmıyordu.
+ *
+ * NEDEN GERÇEKTEN GÖNDERİLEMİYOR: SMTP zarfı ASCII istiyor; uluslararası
+ * adresler (RFC 6531 · SMTPUTF8) hem gönderen hem alan tarafın desteğini
+ * gerektiriyor ve gönderim yolumuz (Amazon SES) bunu güvenilir biçimde
+ * taşımıyor. Üstelik Gmail, Outlook ve Yandex zaten Türkçe harfli bir
+ * kullanıcı adı AÇTIRMIYOR — yani `ayşe@gmail.com` diye bir kutu var
+ * olamaz, kişi adresini yanlış yazmıştır.
+ *
+ * KABUL EDİLEN BEDEL: dünyada gerçekten uluslararası adresler var
+ * (çoğunlukla Çin, Rusya, Hindistan) ve onları reddediyoruz. Onlara mail
+ * teslim edemediğimiz için hesap da açamayız; kapıda dürüstçe söylemek,
+ * içeri alıp sonra sessizce başarısız olmaktan iyi.
+ */
+const ASCII_ONLY = /^[\x20-\x7E]+$/;
+
 /** Adres alanının veritabanı sınırı; RFC 5321'in pratik üst sınırı. */
 const EMAIL_MAX = 254;
 
@@ -47,6 +73,9 @@ export function validateEmail(email: string): string | null {
   if (email.length === 0) return "E-posta boş olamaz.";
   if (email.length > EMAIL_MAX) return "E-posta adresi fazla uzun.";
   if (!EMAIL_SHAPE.test(email)) return "E-posta adresi geçerli görünmüyor.";
+  if (!ASCII_ONLY.test(email)) {
+    return "E-posta adresinde Türkçe harf olamaz (ı, ş, ğ, ü, ö, ç). Adresini İngilizce harflerle yaz.";
+  }
   return null;
 }
 
