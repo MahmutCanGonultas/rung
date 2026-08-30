@@ -819,6 +819,28 @@ async function main() {
     const cetvelNot = await readText(yeniPage, ".rule-none", 4);
     check("neden ölçülmediği yazıyor", Boolean(cetvelNot), String(cetvelNot));
 
+    /*
+     * DAR EKRANDA TAŞMA — ölçümü olmayan hesapta.
+     *
+     * Ekran görüntüsü turu bu durumu hiç görmüyor: tohum hesabının ölçümü var
+     * ve "ilk kaydından sonra ölçülüyor" cümlesi çizilmiyor bile. Cümle
+     * girdiğinde kabuk çubuğu 390px'te içeriğini kırpıyordu — ve kayıt akışı
+     * değiştiğinden beri HER yeni kullanıcı bu ekrana ölçümsüz giriyor.
+     */
+    await yeniPage.setViewport({ width: 390, height: 844 });
+    await yeniPage.reload({ waitUntil: "networkidle0" });
+    const dar = await yeniPage.evaluate(() => {
+      const doc = document.documentElement;
+      const bar = document.querySelector(".shell-bar");
+      return {
+        page: doc.scrollWidth - doc.clientWidth,
+        bar: bar ? bar.scrollWidth - bar.clientWidth : 0,
+      };
+    });
+    check("390px'te sayfa taşmıyor", dar.page <= 1, `${dar.page}px`);
+    check("390px'te kabuk çubuğu kırpmıyor", dar.bar <= 1, `${dar.bar}px`);
+    await yeniPage.setViewport({ width: 1280, height: 900 });
+
     console.log("\n22c · kendi konusunda yazma");
     /*
      * Görevsiz kayıt: `?context=own` görev vermiyor, kaydetme eylemi boş

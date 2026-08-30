@@ -152,10 +152,15 @@ export default async function WritePage({
           </h1>
           <p className="task-meta">
             {chosen!.hint}
-            <span className="task-sep">·</span>
-            {chosen!.minWords}–{chosen!.maxWords} kelime
-            <span className="task-sep">·</span>
-            Seviye {chosen!.level}
+            {/*
+              Ayraç noktası kendinden SONRAKİ parçanın içinde. Ayrı bir span
+              iken satır sarımı onu önceki satırın sonunda bırakıyordu ve
+              390px'te satır boşlukta duran bir "·" ile bitiyordu.
+            */}
+            <span className="task-part">
+              {chosen!.minWords}–{chosen!.maxWords} kelime
+            </span>
+            <span className="task-part">Seviye {chosen!.level}</span>
             <Link
               className="task-swap"
               href={`/write?context=${context.slug}&skip=${chosen!.id}`}

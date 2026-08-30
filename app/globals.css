@@ -91,6 +91,17 @@
   /* Yüzeyin üstünde duran ikinci kademe: girdi, sessiz düğme, satır. */
   --soft: #fdf4ee;
   --soft-2: #ffffff;
+  /*
+   * DENETİM YÜZEYİ — jetonlar ve küçük eylem düğmeleri.
+   *
+   * `--soft-2`den ayrıldı çünkü o jeton SAYFA zeminine (`--page`) göre
+   * seçilmişti; jetonlar ise renkli PANELLERİN üstünde duruyor. Koyu temada
+   * `--soft-2` (#34252a) yazma panelinin gradyanından (#33232a → #452c33)
+   * DAHA KOYUYDU: jetonun panele karşı oranı 1,10 — ekranda pill yok, düz
+   * yazı var. Açık temada beyaz jeton kayısı panelde kendini gösteriyordu,
+   * koyu temada aynı rol boştaydı; iki tema aynı şeyi söylemiyordu.
+   */
+  --pill: #ffffff;
   --hair: rgba(51, 34, 43, 0.1);
   --hair-2: rgba(51, 34, 43, 0.18);
 
@@ -212,6 +223,7 @@
     --rose-2: #3b2632;
     --soft: #2a1e22;
     --soft-2: #34252a;
+    --pill: #553f47;
     --hair: rgba(248, 239, 233, 0.09);
     --hair-2: rgba(248, 239, 233, 0.16);
 
@@ -268,6 +280,7 @@
   --rose-2: #3b2632;
   --soft: #2a1e22;
   --soft-2: #34252a;
+  --pill: #553f47;
   --hair: rgba(248, 239, 233, 0.09);
   --hair-2: rgba(248, 239, 233, 0.16);
 
@@ -592,9 +605,11 @@ table {
   align-items: center;
   min-height: 36px;
   padding: 0 var(--s-4);
-  border: 1px solid transparent;
+  /* Kenarlık saydam değil: jetonun panelden ayrıldığı yer iki temada da
+     çizili olsun, yalnız dolgunun parlaklığına bırakılmasın. */
+  border: 1px solid var(--hair);
   border-radius: var(--r-pill);
-  background: var(--soft-2);
+  background: var(--pill);
   color: var(--ink-2);
   font-size: var(--t-small);
   font-weight: 600;
@@ -622,9 +637,9 @@ a.chip:hover {
 .act {
   min-height: 36px;
   padding: 0 var(--s-4);
-  border: 1px solid transparent;
+  border: 1px solid var(--hair);
   border-radius: var(--r-pill);
-  background: var(--soft-2);
+  background: var(--pill);
   color: var(--ink-2);
   font-size: var(--t-small);
   font-weight: 600;
@@ -887,10 +902,21 @@ a.chip:hover {
    ayrılıyor (dolgu + ağırlık): zorlanmış renklerde dolgu düşse de kalır.
    ═══════════════════════════════════════════════════════════════════ */
 
+/*
+ * SARMALI. Ölçüm yokken cetvelin yanına "ilk kaydından sonra ölçülüyor"
+ * cümlesi giriyor ve 390px'te etiket + beş bant + o cümle tek satıra
+ * sığmıyordu: kabuk çubuğu içeriğini kırpıyordu. Kırpılan şey de tam olarak
+ * YENİ kullanıcının gördüğü tek açıklamaydı — ve kayıt akışı değiştiğinden
+ * beri her yeni kullanıcı bu ekrana ölçümsüz giriyor.
+ *
+ * Ekran görüntüsü turu bunu göremiyordu: tohum hesabının ölçümü var, o yüzden
+ * cümle hiç çizilmiyordu. Duman testi artık bu ekranı 390px'te ölçüyor.
+ */
 .rule {
   display: flex;
   align-items: center;
-  gap: var(--s-3);
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-3);
   min-inline-size: 0;
 }
 .rule-label {
@@ -946,6 +972,20 @@ a.chip:hover {
   inset-inline-start: calc(var(--s-4) / -2);
   inline-size: 1px;
   background: var(--hair-2);
+}
+/*
+ * Dar ekranda ayraç KALKIYOR. Jetonlar sarınca "Kendi konum" çoğu zaman
+ * satırın başına düşüyor ve ayraç çizgisi hiçbir şeyi ayırmayan, boşlukta
+ * duran bir çizgiye dönüşüyordu. Kipin farklı bir şey olduğunu kesik çerçeve
+ * zaten söylüyor.
+ */
+@media (max-width: 640px) {
+  .chip.is-own {
+    margin-inline-start: 0;
+  }
+  .chip.is-own::before {
+    content: none;
+  }
 }
 .chip.is-own.is-on {
   border-style: solid;
@@ -2264,7 +2304,9 @@ a.chip:hover {
   font-size: var(--t-small);
   color: var(--ink-2);
 }
-.task-sep {
+/* Ayraç noktası, kendinden sonraki parçanın parçası — bkz. `.entry-words`. */
+.task-part::before {
+  content: "· ";
   color: var(--ink-3);
 }
 .task-swap {
