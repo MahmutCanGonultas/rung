@@ -1,3 +1,10 @@
+import {
+  brevoBody,
+  buildLink,
+  resendBody,
+  type Envelope,
+  type Mail,
+} from "./email-body";
 import { log } from "./log";
 
 /*
@@ -25,12 +32,7 @@ import { log } from "./log";
 
 export type MailResult = { sent: boolean; reason?: string; detail?: string };
 
-export type Mail = {
-  to: string;
-  subject: string;
-  /** Düz metin gövde. HTML'i buradan türetiliyor — tek kaynak. */
-  text: string;
-};
+export type { Mail } from "./email-body";
 
 function appUrl(): string {
   /*
@@ -42,40 +44,7 @@ function appUrl(): string {
 }
 
 export function linkFor(path: string): string {
-  return new URL(path, appUrl()).toString();
-}
-
-/*
- * Düz metinden HTML. Ayrı bir şablon tutulmuyor: iki gövdeyi elde ayrı ayrı
- * güncellemek, birinin eskimesi demek. Bağlantılar tıklanabilir oluyor,
- * gerisi paragraf.
- */
-function toHtml(text: string): string {
-  const escape = (s: string) =>
-    s
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-
-  const body = escape(text)
-    .split(/\n{2,}/)
-    .map((para) => {
-      const withLinks = para.replace(
-        /(https?:\/\/\S+)/g,
-        '<a href="$1" style="color:#a03a1e">$1</a>'
-      );
-      return `<p style="margin:0 0 16px">${withLinks.replace(/\n/g, "<br>")}</p>`;
-    })
-    .join("");
-
-  return (
-    `<!doctype html><html lang="tr"><body style="margin:0;background:#fcf7f3">` +
-    `<div style="max-width:520px;margin:0 auto;padding:32px 24px;` +
-    `font:16px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#33222b">` +
-    `<p style="margin:0 0 24px;font-weight:700;font-size:20px;color:#a03a1e">rung.</p>` +
-    body +
-    `</div></body></html>`
-  );
+  return buildLink(path, appUrl());
 }
 
 /*
@@ -91,25 +60,19 @@ function toHtml(text: string): string {
  */
 type Sender = {
   name: string;
-  send(mail: Mail, from: string, fromName: string): Promise<MailResult>;
+  send(mail: Mail, env: Envelope): Promise<MailResult>;
 };
 
 const RESEND: Sender = {
   name: "resend",
-  async send(mail, from, fromName) {
+  async send(mail, env) {
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         authorization: `Bearer ${process.env.RESEND_API_KEY}`,
         "content-type": "application/json",
       },
-      body: JSON.stringify({
-        from: `${fromName} <${from}>`,
-        to: [mail.to],
-        subject: mail.subject,
-        text: mail.text,
-        html: toHtml(mail.text),
-      }),
+      body: JSON.stringify(resendBody(mail, env)),
     });
     return response.ok
       ? { sent: true }
@@ -123,7 +86,7 @@ const RESEND: Sender = {
 
 const BREVO: Sender = {
   name: "brevo",
-  async send(mail, from, fromName) {
+  async send(mail, env) {
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
@@ -133,13 +96,7 @@ const BREVO: Sender = {
         "content-type": "application/json",
         accept: "application/json",
       },
-      body: JSON.stringify({
-        sender: { name: fromName, email: from },
-        to: [{ email: mail.to }],
-        subject: mail.subject,
-        textContent: mail.text,
-        htmlContent: toHtml(mail.text),
-      }),
+      body: JSON.stringify(brevoBody(mail, env)),
     });
     return response.ok
       ? { sent: true }
@@ -161,6 +118,12 @@ export async function sendMail(mail: Mail): Promise<MailResult> {
   const sender = pickSender();
   const from = process.env.MAIL_FROM;
   const fromName = process.env.MAIL_FROM_NAME ?? "Rung";
+  /*
+   * CEVAP ADRESİ. Gönderdiğimiz alan adının MX kaydı yok — oraya yazılan
+   * cevap hiçbir yere gitmiyor. Bu değişken doluysa cevaplar gerçek bir
+   * kutuya düşüyor. Boşsa alan hiç yazılmıyor.
+   */
+  const replyTo = process.env.MAIL_REPLY_TO || undefined;
 
   if (!sender || !from) {
     /*
@@ -182,7 +145,7 @@ export async function sendMail(mail: Mail): Promise<MailResult> {
   }
 
   try {
-    const result = await sender.send(mail, from, fromName);
+    const result = await sender.send(mail, { from, fromName, replyTo });
     if (!result.sent) {
       log.error("mail_send_failed", new Error(result.reason ?? "?"), {
         provider: sender.name,
