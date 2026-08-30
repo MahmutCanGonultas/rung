@@ -5,7 +5,6 @@ import foto from "../docs/shots/rung-foto.png";
 
 import { Mark } from "./components/Mark";
 import { InView } from "./components/showcase/InView";
-import { FalseAlarm } from "./components/showcase/FalseAlarm";
 import { LAYERS, Pipeline } from "./components/showcase/Pipeline";
 import { Proof } from "./components/showcase/Proof";
 import { SampleAnalysis } from "./components/showcase/SampleAnalysis";
@@ -200,9 +199,14 @@ export default async function HomePage() {
           >
             {user ? "Yazmaya başla" : "Hesap oluştur"}
           </Link>
-          <p className="coda-note">
-            Kayıtlar değiştirilemez · ana ölçüt yanlış alarm <FalseAlarm />
-          </p>
+          {/*
+            Yanlış alarm oranı BURADAN SİLİNDİ: aynı sayı bu sayfanın 04.
+            bölümünde, kendi satırında ve iki kat büyük duruyor. Aynı ölçütü
+            aynı sayfada iki kez söylemek onu vurgulamıyor, sıradanlaştırıyor.
+            "Kayıtlar değiştirilemez" kalıyor — o burada ilk kez söyleniyor ve
+            üç kabuk da aynı satırla kapanıyor.
+          */}
+          <p className="coda-note">Kayıtlar değiştirilemez</p>
         </div>
       </section>
 

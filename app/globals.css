@@ -445,6 +445,18 @@ table {
   --t-small: 0.875rem;
   --t-micro: 0.8rem;
   --t-tag: 0.78rem; /* versal künye */
+  /*
+   * ÖLÇÜM SAYISI ile EKSEN KÜNYESİ aynı boyda olmamalı.
+   *
+   * 190px'lik çubukların tepesindeki ölçüm 12,8px'ti ve altındaki ay
+   * etiketiyle tıpatıp aynı boydaydı. Ürün "ölçüyorum" diyor ama sayfa bunu
+   * bir kez yüksek sesle, sonra otuz kez fısıltıyla söylüyordu.
+   *
+   * `clamp` ile: mobil için ayrı medya sorgusu gerekmiyor ve dosyanın
+   * "bütün mobil indirgeme tek yerde" kuralı korunuyor.
+   */
+  --t-num-l: clamp(1.1rem, 2.6vw, 1.35rem);
+  --t-num-m: 1.2rem;
   --t-read: clamp(1.05rem, 1.35vw, 1.28rem); /* ölçülen İngilizce cümle */
 }
 
@@ -1076,12 +1088,13 @@ a.chip:hover {
 
 /* Ölçülen cümle: BÜYÜK ve okunur. Daktilo yüzü yok — bu bir terminal
    çıktısı değil, okunacak bir metin. */
+/* Üç okuma yüzeyi tek ölçüde: numune, yazma kâğıdı ve kayıt metni. */
 .sample-text {
   font-size: var(--t-read);
-  line-height: 1.95;
+  line-height: 1.85;
   letter-spacing: -0.005em;
   color: var(--ink);
-  max-width: 34em;
+  max-inline-size: 68ch;
 }
 
 /* Hatalı parça: ailesinin yumuşak yıkamasında bir hap, altında ince bir
@@ -1387,7 +1400,12 @@ a.chip:hover {
   /* İKİŞERLİ. `auto-fit` üç sütun üretiyordu ve dördüncü hücre tek başına
      alt satıra düşüyordu — ÖLÇÜLDÜ, kurşun hücrenin devasa sayısı yüzünden
      ilk satır iki kat yüksek kalıyordu. */
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  /*
+   * ANA ÖLÇÜT KENDİ SATIRINDA. Üç eşit sütun, ana ölçütü diğer ikisiyle aynı
+   * ağırlığa indiriyordu — ürünün en gururlu sayısı dört eşit hücreden biri
+   * olarak duruyordu. Şimdi ilk satır tamamen ona ait, kalan ikisi altında.
+   */
+  grid-template-columns: repeat(auto-fit, minmax(max(220px, 45%), 1fr));
   gap: var(--s-5) var(--s-6);
 }
 .proof-cell {
@@ -1412,8 +1430,11 @@ a.chip:hover {
   letter-spacing: -0.04em;
   color: var(--ink);
 }
+.proof-cell.is-lead {
+  grid-column: 1 / -1;
+}
 .proof-cell.is-lead .proof-value {
-  font-size: var(--t-mega);
+  font-size: clamp(3.4rem, 6.6vw, 5.6rem);
   color: var(--accent);
 }
 .proof-note {
@@ -1691,21 +1712,6 @@ a.chip:hover {
   font-size: var(--t-small);
   color: var(--ink-2);
 }
-/* Oran ile dayanağı arasındaki ayraç metnin kendisinde: CSS boşluğu iki
-   sayıyı ayırmaya yetmiyordu. */
-.claim-figure {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  color: var(--ink);
-  font-weight: 800;
-}
-.claim-figure i {
-  font-style: normal;
-  font-weight: 600;
-  color: var(--ink-3);
-}
-
 .rig-foot {
   display: flex;
   align-items: center;
@@ -1798,8 +1804,9 @@ a.chip:hover {
   align-content: center;
   padding: var(--s-6);
   border-radius: var(--r-card);
+  /* Gölge YOK: bu kart kapının kendi büyük yüzeyinin İÇİNDE duruyor.
+     İçinde duran yüzey gölge atmaz, zemin rengi değiştirir. */
   background: var(--soft);
-  box-shadow: var(--lift-1);
 }
 .gate-kicker {
   font-size: var(--t-tag);
@@ -1972,7 +1979,9 @@ a.chip:hover {
   gap: var(--s-5);
   border-radius: var(--r-panel);
   padding: var(--pad);
-  box-shadow: var(--lift-1);
+  /* Gölge YOK: bu karo başka bir yüzeyin İÇİNDE duruyor ve içinde duran
+     yüzey gölge atmaz, zemin rengi değiştirir. Anasayfadaki numune kartı
+     bu kalıbı zaten uyguluyor. */
   background: linear-gradient(158deg, var(--rose-1) 0%, var(--rose-2) 100%);
 }
 .accuracy-head {
@@ -2058,7 +2067,9 @@ a.chip:hover {
   gap: var(--s-5);
   border-radius: var(--r-panel);
   padding: var(--pad);
-  box-shadow: var(--lift-2);
+  /* Boş bir sayfada DİNLENEN bir kart; sistemin en ağır gölgesi ona ait
+     değil, üstünden geçen kabuk çubuğuna ait. */
+  box-shadow: var(--lift-1);
   background: linear-gradient(
     152deg,
     var(--warm-1) 0%,
@@ -2197,6 +2208,11 @@ a.chip:hover {
   padding-inline: var(--rail);
 }
 
+/*
+ * GÖLGE GRAMERİ, tek kural: içinde = gölge yok · dinleniyor = lift-1 ·
+ * ÜSTÜNDEN GEÇİYOR = lift-2. Bu çubuk gerçekten sayfanın üstünden geçiyor,
+ * o yüzden sistemin ağır gölgesi burada doğru.
+ */
 .shell-bar {
   position: sticky;
   inset-block-start: var(--s-3);
@@ -2208,7 +2224,27 @@ a.chip:hover {
   padding: var(--s-3) var(--s-5);
   border-radius: var(--r-pill);
   background: var(--soft);
-  box-shadow: var(--lift-1);
+  box-shadow: var(--lift-2);
+}
+/*
+ * MOBİLDE YAPIŞKAN DEĞİL.
+ *
+ * 390px'te çubuk dört satıra sarıp 223px tutuyor — görüntü alanının %26'sı —
+ * ve kaydırırken de peşi bırakmıyor. Yazma ekranında kâğıt ancak y=615'te
+ * başlıyordu.
+ *
+ * BEDELİ AÇIK: kaydırınca üç hedef (Yaz · Kayıtlar · İlerleme) ve seviye
+ * cetveli de gidiyor. Bilinçli takas — kayıtlar ekranı 20.000px'e uzayabiliyor
+ * ve orada ekranın dörtte birini kalıcı olarak vermek daha pahalı.
+ *
+ * Hiçbir şey `display: none` olmuyor, `order` kullanılmıyor.
+ */
+@media (max-width: 860px) {
+  .shell-bar {
+    position: static;
+    gap: var(--s-2) var(--s-3);
+    padding: var(--s-3) var(--s-4);
+  }
 }
 .shell-nav {
   display: flex;
@@ -2352,6 +2388,10 @@ a.chip:hover {
   content: "· ";
   color: var(--ink-3);
 }
+/* Kâğıtla aynı kapak: yoksa "başka görev" bağlantısı tek başına sağda kalıyor. */
+.task-meta {
+  max-inline-size: 68ch;
+}
 .task-swap {
   color: var(--accent);
   font-weight: 700;
@@ -2360,10 +2400,25 @@ a.chip:hover {
   margin-inline-start: auto;
 }
 
+/*
+ * OKUNUR GENİŞLİK — 68ch.
+ *
+ * Ölçülen İngilizce bu ürünün öznesi ve 1440px'te sayfanın EN ZOR OKUNAN
+ * metniydi: satırlar ~105 karaktere uzuyor ve göz satır başına dönemiyor.
+ *
+ * Kapak `.composer`da, `.editor`da DEĞİL: böylece sayaç ve Kaydet düğmesi
+ * (`.composer-foot`) kâğıtla aynı iki kenarı paylaşıyor, boşlukta asılı
+ * kalmıyor.
+ *
+ * `margin-inline: auto` YOK. Panelin sol omurgası korunuyor — jetonlar,
+ * başlık, görev satırı, uyarı, hepsi aynı x'ten başlıyor. Ortalamak kâğıdı
+ * o hattan koparırdı.
+ */
 .composer {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--s-4);
+  max-inline-size: 68ch;
 }
 .editor {
   --line: 1.9em;
@@ -2553,7 +2608,15 @@ a.chip:hover {
 /* ── 1 · metnin kendisi ─────────────────────────────────────────────── */
 .read-text {
   border-radius: var(--r-panel);
+  /*
+   * YÜZEY DARALTILMIYOR, METİN DARALIYOR.
+   *
+   * `max-inline-size` verilseydi panel küçülür ve altındaki bulgu paneliyle
+   * hizası bozulurdu — "sayfa yüzeylerden oluşuyor" kararı kırılırdı. Onun
+   * yerine sağ dolgu, satırı 68ch'e indirecek kadar büyüyor.
+   */
   padding: var(--pad);
+  padding-inline-end: max(var(--pad), calc(100% - var(--pad) - 68ch));
   box-shadow: var(--lift-1);
   background: linear-gradient(
     152deg,
@@ -2562,7 +2625,10 @@ a.chip:hover {
     var(--warm-3) 100%
   );
   font-size: var(--t-read);
-  line-height: 1.95;
+  /* 1,95 fazla seyrekti. 1,72 ise fazla sert: `.read-mark` hapı 31px ve satır
+     kutusu 33px kalıyor, iki satıra sarmış bir işaretin parçaları birbirine
+     değiyor. 1,85 ikisinin arası. */
+  line-height: 1.85;
   color: var(--ink);
   white-space: pre-wrap;
 }
@@ -3247,7 +3313,9 @@ a.chip:hover {
   gap: var(--s-5);
   border-radius: var(--r-panel);
   padding: var(--pad);
-  box-shadow: var(--lift-1);
+  /* Gölge YOK: bu karo başka bir yüzeyin İÇİNDE duruyor ve içinde duran
+     yüzey gölge atmaz, zemin rengi değiştirir. Anasayfadaki numune kartı
+     bu kalıbı zaten uyguluyor. */
   background: linear-gradient(158deg, var(--rose-1) 0%, var(--rose-2) 100%);
 }
 .tile {
@@ -3338,10 +3406,18 @@ a.chip:hover {
   align-items: end;
   justify-items: center;
 }
+/*
+ * Ölçüm değerleri display yüzünde ve TABULAR rakamla: altı ölçüm ancak
+ * hizalıyken "ölçüm sırası" gibi okunuyor, yoksa rastgele sayı yığını.
+ * Etiketler `--t-micro`da kalıyor — böylece 1,7 katlık bir ayrım doğuyor.
+ */
 .bar-val {
-  font-size: var(--t-micro);
-  font-weight: 800;
-  color: var(--ink-2);
+  font-family: var(--display);
+  font-size: var(--t-num-l);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
 }
 .bar-track {
   display: flex;
@@ -3442,12 +3518,23 @@ a.chip:hover {
 
 .pair {
   display: grid;
-  grid-template-columns: 6rem minmax(0, 1fr) 4.2rem;
+  /* Üçüncü sütun 4,2rem'di ve "%100,0" taşıyordu. */
+  grid-template-columns: 6rem minmax(0, 1fr) 5.4rem;
   align-items: center;
   gap: var(--s-3);
 }
+/*
+ * YALNIZ BU BLOKTAKİ `.pair-val`. Kayıt ayrıntısındaki ORTAK `.pair-val`
+ * kuralına dokunulmuyor — orada altı ham ölçü var ve hepsini büyütmek o
+ * sayfayı sayı duvarına çevirirdi.
+ */
 .pair-val {
   text-align: end;
+  font-family: var(--display);
+  font-size: var(--t-num-m);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
 }
 
 .stubborn {
@@ -3540,8 +3627,11 @@ a.chip:hover {
   color: var(--ink-2);
 }
 .try-num {
-  font-size: var(--t-body);
-  font-weight: 800;
+  font-family: var(--display);
+  font-size: var(--t-num-m);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
   color: var(--ink);
   text-align: end;
 }
@@ -3825,8 +3915,31 @@ a.chip:hover {
     transform: rotateX(-15deg) rotateY(-15deg);
   }
 }
-[data-play="1"] .model-stage {
+/*
+ * SALINIM YALNIZ ANASAYFADA — kapıda değil.
+ *
+ * Kural `is-fixed`i kapsamıyordu ve kapı ekranında merdiven sonsuza kadar
+ * sallanıyordu. Oysa aynı dosyanın kendi yorumu şunu söylüyor: anasayfada
+ * merdiven bir VAAT (ışık tırmanıyor), kapıda bir OKUMA (ölçülen basamak
+ * sabit yanıyor). Işık tırmanışı `is-fixed` ile doğru biçimde durduruluyordu;
+ * salınım unutulmuştu — okuma yapan bir alet durmadan sallanmaz.
+ */
+[data-play="1"] .model:not(.is-fixed) .model-stage {
   animation: rig-sway 18s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+
+/*
+ * Kapıda TEK ATIŞLIK bir yerleşme: nesne son açısına bir kez oturuyor ve
+ * duruyor. `both` ile son kare korunuyor; taban CSS zaten o kareyi çiziyor,
+ * yani hareket kapalıyken hiçbir şey eksilmiyor.
+ */
+@keyframes rig-land {
+  from {
+    transform: rotateX(-24deg) rotateY(-38deg);
+  }
+}
+[data-play="1"] .model.is-fixed .model-stage {
+  animation: rig-land var(--d-3) var(--ease) both;
 }
 
 /*

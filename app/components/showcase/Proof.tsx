@@ -34,7 +34,20 @@ export async function Proof({
   }
   if (!run) return null;
 
-  const precision = run.found === 0 ? 1 : run.truePositive / run.found;
+  /*
+   * İSABET HÜCRESİ SİLİNDİ ve sayı kaybolmadı, çünkü zaten yeni bir şey
+   * söylemiyordu: `isabet = truePositive / found` ve `yanlış alarm =
+   * falsePositive / found`, toplamları tanım gereği 1. Yani İsabet, sayfanın
+   * en büyük sayısının çıkarma işlemiydi.
+   *
+   * Görünen sonuç daha da kötüydü: bu koşumda İsabet ile Yakalama tesadüfen
+   * ikisi de %95,1 çıkıp yan yana duruyor ve kopyala-yapıştır hatası gibi
+   * görünüyordu.
+   *
+   * Kayıp KAPATILDI: `run.found` (payda) yalnız o hücrenin notunda yazıyordu,
+   * artık ana ölçütün notunda. Ham "39 / 41" sayısı Doğruluk ekranında,
+   * kendi karosunda duruyor.
+   */
   const recall = run.expected === 0 ? 1 : (run.expected - run.falseNegative) / run.expected;
   const falseAlarm = run.found === 0 ? 0 : run.falsePositive / run.found;
 
@@ -50,7 +63,9 @@ export async function Proof({
         <div className="proof-cell is-lead" style={{ "--i": "0" } as CSSProperties}>
           <span className="proof-label">Yanlış alarm</span>
           <span className="proof-value">{pct(falseAlarm)}</span>
-          <span className="proof-note">ana ölçüt</span>
+          <span className="proof-note">
+            ana ölçüt · {run.found} bulgunun {run.falsePositive}&rsquo;si
+          </span>
           <i
             className="proof-fill"
             aria-hidden="true"
@@ -67,16 +82,6 @@ export async function Proof({
             style={{ "--v": String(recall) } as CSSProperties}
           />
         </div>
-        <div className="proof-cell" style={{ "--i": "2" } as CSSProperties}>
-          <span className="proof-label">İsabet</span>
-          <span className="proof-value">{pct(precision)}</span>
-          <span className="proof-note">{run.found} bulgu</span>
-          <i
-            className="proof-fill"
-            aria-hidden="true"
-            style={{ "--v": String(precision) } as CSSProperties}
-          />
-        </div>
         {/*
           Burada eskiden kayıt başı dolar maliyeti vardı. Ziyaretçinin ilgisini
           çeken şey o değil; sayının neye dayandığı: %95 neyin üstünde ölçülmüş?
@@ -90,7 +95,7 @@ export async function Proof({
 
           Oran değil SAYI — paydası olmayan şeye orantılı çubuk çizilmiyor.
         */}
-        <div className="proof-cell" style={{ "--i": "3" } as CSSProperties}>
+        <div className="proof-cell" style={{ "--i": "2" } as CSSProperties}>
           <span className="proof-label">Ölçülen örnek</span>
           <span className="proof-value">{run.items}</span>
           <span className="proof-note">altın kümeden</span>
