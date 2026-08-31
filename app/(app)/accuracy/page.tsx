@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { LAYERS, Pipeline } from "../../components/showcase/Pipeline";
 import { pct } from "../../lib/eval/format";
 import { requireUser } from "../../lib/guard";
 import {
@@ -282,6 +283,24 @@ export default async function AccuracyPage() {
           </div>
         </>
       ) : null}
+
+      {/*
+        BEŞ KATMAN BURAYA TAŞINDI — anasayfadan.
+        
+        Orada "beş katmanın üçü model kullanmıyor" diye duruyordu ve ürüne ilk
+        kez bakan biri için hiçbir sorusuna cevap vermiyordu: bu ne, nasıl
+        kullanılır, bana ne katar. Ürünün İÇ YAPISI, ve iç yapı merak edenin
+        geldiği yerde durmalı. Burası tam olarak orası.
+      */}
+      <h2 className="section-title">Metin hangi katmanlardan geçiyor</h2>
+      <p className="section-note">
+        Beş katmanın {LAYERS.filter((l) => !l.model).length}&rsquo;ü model
+        kullanmıyor. Neyin modele verilmeyeceğini bilmek, model çağırabilmekten
+        daha zor.
+      </p>
+      <div className="acc-pipeline">
+        <Pipeline />
+      </div>
 
       <h2 className="section-title">Beş savunma</h2>
       <div className="defences">

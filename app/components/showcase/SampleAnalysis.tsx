@@ -82,6 +82,7 @@ export function SampleAnalysis({
   part = "both",
   open = "first",
   tag = true,
+  slots = true,
 }: {
   /*
    * `read` okuma şeridi, `shelf` bulgu rafı, `both` ikisi.
@@ -113,6 +114,15 @@ export function SampleAnalysis({
    * öğe hiç üretilmiyor, yani telefonda da yok.
    */
   tag?: boolean;
+  /*
+   * Yirmi bir yuvalı taksonomi şeridi.
+   *
+   * Anasayfada KAPALI. O şerit ürünün iç yapısını anlatıyor — "yirmi bir alt
+   * kategori var, beşi doldu" — ve bu, ürünü YAPANIN bilmesi gereken bir şey.
+   * Siteye ilk gelen kişinin sorusu "bu ne, nasıl kullanılır, bana ne katar";
+   * taksonominin genişliği o sorulardan hiçbirine cevap vermiyor.
+   */
+  slots?: boolean;
 }) {
   const { text, findings } = showcaseAnalysis(variant);
   const parts = segment(text, findings);
@@ -169,7 +179,7 @@ export function SampleAnalysis({
         yerlere koyuyor ve orada taksonomi zaten kendi adımında, yirmi bir
         jetonuyla anlatılıyor — aynı şeyi iki kez göstermenin anlamı yok.
       */}
-      {part === "both" ? (
+      {part === "both" && slots ? (
         <Slots hit={new Set(findings.map((f) => f.subcategory))} />
       ) : null}
     </div>

@@ -1026,11 +1026,35 @@ a.chip:hover {
 /* ── ölçek satırı · modelin DIŞINDA ─────────────────────────────────
    Etiketler basamakların yüzüne basılıyken 10px'e sıkışıyor ve eğik
    yüzeyde okunmuyordu. */
+/*
+ * ÖLÇEK KÜNYESİ — EKSEN DEĞİL.
+ *
+ * Beş etiket tam genişliğe eşit yayılıyordu ve basamaklarla hizasızdı:
+ * ÖLÇÜLDÜ, 390px'te ilk etiket kendi çubuğundan 71px, sonuncusu 67px
+ * sapıyordu. Göz bunu bir eksen sanıp hizasızlığı bir kusur olarak okuyordu.
+ *
+ * BİREBİR HİZA CSS'TE MÜMKÜN DEĞİL ve denendi: sapma perspektiften geliyor,
+ * oranı pencere boyuna göre değişiyor (1440'ta basamak aralığı `--w`nin 1,43
+ * katı, 390'da 1,09 katı). Sabit bir ızgara bunu takip edemez; şeridi
+ * daraltmak 1440'ta sapmayı 116 piksele ÇIKARDI.
+ *
+ * Çözüm hizalamak değil, HİZALIYORMUŞ GİBİ YAPMAYI BIRAKMAK. Etiketler artık
+ * ortalanmış, ayraçlı, kompakt bir künye: "ölçek A1'den C1'e" diyor ve
+ * hiçbir çubuğa işaret etmiyor. Söylemediği bir şeyde yanlış olamıyor.
+ */
 .model-scale {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--s-2);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
   text-align: center;
+}
+/* Ayraç, kendinden sonraki etikete bağlı: satır sararsa onunla sarıyor. */
+.model-scale span + span::before {
+  content: "·";
+  margin-inline-end: var(--s-3);
+  color: var(--hair-2);
 }
 .model-scale span {
   padding-block: var(--s-2);
@@ -1636,6 +1660,16 @@ a.chip:hover {
 .belt {
   padding-block: clamp(56px, 8vw, 118px);
   padding-inline: var(--rail);
+  /*
+   * Üç boyutlu modelin ÇİZİM ALANI yerleşim kutusundan geniş: yüzler z
+   * ekseninde döndüğü ve zemin düzlemi ayak izinden taşacak kadar büyük
+   * olduğu için. ÖLÇÜLDÜ — 1440px'te sayfayı 47px taşırıyor.
+   *
+   * Kırpma BANDA, kutuya değil: `preserve-3d` zincirinin İÇİNDEKİ bir
+   * elemana kırpma koymak zinciri düzleştirip modeli düz bir resme çevirir.
+   * Bant zincirin çok dışında, orada güvenli.
+   */
+  overflow-x: clip;
 }
 .belt-in {
   max-inline-size: var(--page-max);
@@ -1689,12 +1723,6 @@ a.chip:hover {
   max-inline-size: 62ch;
   margin-block-end: var(--s-6);
 }
-.belt-no {
-  font-size: var(--t-tag);
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  color: var(--accent);
-}
 .belt-h {
   font-family: var(--display);
   font-size: var(--t-h2);
@@ -1722,143 +1750,150 @@ a.chip:hover {
   text-underline-offset: 5px;
 }
 
-/* ── 00 · KANIT ─────────────────────────────────────────────────────
-   Sayfanın ilk gördüğü şey ÜRÜNÜN VAADİ DEĞİL, ÖLÇTÜĞÜ SAYI. Vaat ("ölç")
-   her ürünün söyleyebileceği bir cümle; %4,9 söyleyemeyeceği bir sayı. */
-.belt-proof {
-  /*
-   * İlk bant EKRAN BOYUNDA — ama `100svh` DEĞİL: sabit yükseklik, içerik
-   * büyüyünce (uzun bir e-posta adresi, sarmış bir başlık) taşar. `min-` ile
-   * içerik daha uzunsa bant onunla birlikte büyüyor.
-   */
-  min-block-size: min(86svh, 780px);
+/* ── 00 · BU NE ─────────────────────────────────────────────────────
+   Sayfanın ilk sorusu ziyaretçinin kendi sorusu: "ben neredeyim". Cevabın
+   şekli — beş bantlı ölçek — hemen yanında duruyor.
+
+   Buraya ÖNCE `%4,9` konmuştu ve yanlıştı: kanıt, sorusu olan kişiye
+   verilir; henüz ürünün ne olduğunu bilmeyen kişiye değil. */
+.belt-open {
+  min-block-size: min(84svh, 760px);
   display: grid;
   align-content: center;
-  padding-block: clamp(48px, 7vw, 96px);
 }
-.proof-hero {
+.open-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--s-6);
   align-items: center;
 }
 @media (min-width: 900px) {
-  .proof-hero {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  .open-hero {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
     gap: var(--s-7);
   }
 }
-.proof-hero-say {
-  display: grid;
-  justify-items: start;
-  gap: var(--s-5);
-}
-.proof-hero-h {
-  font-family: var(--display);
-  font-size: var(--t-h3);
-  font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-  max-inline-size: 24ch;
-  color: var(--ink-2);
-}
-/*
- * SAYI BU BANDIN KAHRAMANI.
- *
- * `--t-stat` sayfanın geri kalanı için ölçülü bir boy; burada ölçülü olması
- * gereken bir şey yok. Sayfa vaatle değil bu sayıyla açılıyor ve açılış
- * cümlesi fısıltıyla söylenmez.
- *
- * "Ölç." ile YARIŞMIYOR: ikisi ayrı bantlarda, aynı anda hiç görünmüyorlar.
- * Her bandın tek bir kahramanı var.
- */
-/*
- * SEÇİCİ `.is-lead`i DE İÇERİYOR, ve bu zorunlu: `.proof-cell.is-lead
- * .proof-value` iki sınıf taşıyor, yani `.proof-hero-num .proof-value`den
- * daha özgül. Kısa yazılmış hâli sessizce kaybediyordu — ÖLÇÜLDÜ, sayı
- * ekranda hiç büyümedi.
- */
-.proof-hero-num .proof-cell.is-lead .proof-value {
-  font-size: clamp(4.2rem, 10.5vw, 9.5rem);
-  line-height: 0.84;
-  letter-spacing: -0.045em;
-}
-.proof-hero-num .proof-label {
-  font-size: var(--t-tag);
-}
-.proof-hero-num .proof-grid {
-  gap: 0;
-}
-.proof-hero-num {
-  inline-size: 100%;
-}
-.proof-hero-sub {
-  font-size: var(--t-lede);
-  color: var(--ink-2);
-  max-inline-size: 56ch;
-}
-/*
- * Üç boyutlu modelin ÇİZİM ALANI yerleşim kutusundan geniş: yüzler z
- * ekseninde döndüğü ve zemin düzlemi ayak izinden taşacak kadar büyük
- * olduğu için. ÖLÇÜLDÜ — 1440px'te `.model-ground` sayfayı 69px taşırıyordu.
- *
- * `overflow: clip` KUTUYA DEĞİL BANDA: `preserve-3d` zincirinin içindeki bir
- * elemana kırpma koymak zinciri düzleştirip modeli düz bir resme çevirir.
- * Bant zincirin çok dışında, orada güvenli.
- */
-.belt {
-  overflow-x: clip;
-}
-.proof-hero-art {
-  inline-size: 100%;
-}
-
-/* ── 01 · VAAT ──────────────────────────────────────────────────────
-   Marka cümlesi ikinci sırada, ve bu bilinçli: söyleyemeyecekleri şey
-   önce geliyor. */
-.vow {
+.open-say {
   display: grid;
   justify-items: start;
   gap: var(--s-4);
-  max-inline-size: 40rem;
 }
-.vow-kicker {
+.open-kicker {
   font-size: var(--t-tag);
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent);
 }
-.vow-h {
-  display: grid;
+/* Sayfanın en büyük yazısı bir SORU. Cevabı ürünün kendisi. */
+.open-h {
   font-family: var(--display);
-  font-weight: 600;
-  line-height: 1.02;
-  letter-spacing: -0.035em;
-}
-.vow-h span {
-  font-size: var(--t-h2);
-}
-/* Markanın tezi tek kelime, ve sayfanın en büyük yazısı o. */
-.vow-h b {
   font-size: var(--t-mega);
+  font-weight: 600;
+  line-height: 1.0;
+  letter-spacing: -0.038em;
+  max-inline-size: 14ch;
+}
+.open-h b {
   font-weight: 700;
   color: var(--accent);
 }
-.vow-lede {
+.open-lede {
   font-size: var(--t-lede);
   color: var(--ink-2);
-  max-inline-size: 46ch;
+  max-inline-size: 44ch;
 }
-.vow-go {
+.open-go {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s-3);
   margin-block-start: var(--s-2);
 }
-.vow-note {
+.open-note {
   font-size: var(--t-small);
   color: var(--ink-3);
+}
+.open-art {
+  inline-size: 100%;
+}
+
+/* ── 01 · ÜÇ ADIM ───────────────────────────────────────────────────
+   Ziyaretçinin ikinci sorusu: "nasıl kullanılıyor". Üç kart, üç cümle,
+   ürünün iç yapısına dair tek kelime yok. */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--s-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+.step-card {
+  display: grid;
+  align-content: start;
+  gap: var(--s-3);
+  padding: var(--pad);
+  border-radius: var(--r-panel);
+  background: var(--soft);
+}
+/* Rakam büyük ve vurgu renginde: sıra sayfanın kendi ritmi. */
+.step-n {
+  font-family: var(--display);
+  font-size: var(--t-h2);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+}
+.step-t {
+  font-family: var(--display);
+  font-size: var(--t-h3);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.step-w {
+  font-size: var(--t-body);
+  color: var(--ink-2);
+}
+
+/* ── 04 · DAYANAK ───────────────────────────────────────────────────
+   Kanıt SONDA ve küçük. Sorusu olan kişi buraya kadar inmiştir; inmeyene
+   zaten gerekmiyordu. */
+.belt-trust {
+  padding-block: clamp(48px, 6vw, 84px);
+}
+.trust {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-5);
+  align-items: center;
+}
+@media (min-width: 860px) {
+  .trust {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--s-7);
+  }
+}
+.trust-say {
+  display: grid;
+  gap: var(--s-3);
+}
+.trust-say .belt-head {
+  margin-block-end: 0;
+}
+.trust-num {
+  inline-size: 100%;
+}
+/*
+ * SEÇİCİ `.is-lead`i DE İÇERİYOR, ve bu zorunlu: `.proof-cell.is-lead
+ * .proof-value` iki sınıf taşıyor, yani tek sınıflı bir kuraldan daha özgül.
+ * Kısa yazılmış hâli sessizce kaybediyordu — ÖLÇÜLDÜ, sayı hiç büyümedi.
+ */
+.trust-num .proof-cell.is-lead .proof-value {
+  font-size: clamp(3.4rem, 7vw, 5.4rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
 }
 
 /* ── kapanış — tam genişlik fotoğraf ────────────────────────────────── */
@@ -4696,4 +4731,9 @@ a.chip:hover {
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--ink);
+}
+
+/* Hattın `/accuracy` içindeki yeri: bölüm başlığından sonra nefes. */
+.acc-pipeline {
+  margin-block: var(--s-5) var(--s-6);
 }
