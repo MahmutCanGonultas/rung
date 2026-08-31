@@ -30,10 +30,14 @@ import { getSessionUser } from "./lib/session";
  * ═══ YENİ SIRA ═══
  *
  *   00  BU NE       kayısı · "İngilizcen şu an nerede?" · ölçek ve davet
- *   01  NASIL       leylak · üç adım: seç, yaz, gör
- *   02  NE GÖRECEK  gül    · gerçek bir ölçüm, ÖNERİ olarak çerçevelenmiş
- *   03  UYDURMAZ    kayısı · doğru cümlede sessizlik — güven noktası
+ *   01  NASIL       soluk  · üç adım: seç, yaz, gör
+ *   02  NE GÖRECEK  kayısı · gerçek bir ölçüm, ÖNERİ olarak çerçevelenmiş
+ *   03  UYDURMAZ    soluk  · doğru cümlede sessizlik — güven noktası
  *   04  DAYANAK     koyu   · ölçülen doğruluk, KÜÇÜK ve SONDA
+ *
+ * İKİ TON VE BİR KOYU. Leylak ve gül bantlar kalktı: onlar taksonominin
+ * AİLE renkleri ve iç ekranlarda anlam taşıyorlar. Anasayfada hiçbir şeyi
+ * sınıflandırmadıkları için orada yalnızca süstüler.
  *   --  KAPANIŞ     fotoğraf · asıl vaat: altı ay sonra
  *
  * `%4,9` artık sayfanın SONUNDA. Dün başındaydı ve o yanlıştı: kanıt, sorusu
@@ -103,7 +107,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 01 · NASIL KULLANILIR ════════════════════════════════════ */}
-      <section className="belt is-cool" aria-labelledby="nasil-h">
+      <section className="belt is-pale" aria-labelledby="nasil-h">
         <div className="belt-in">
           <header className="belt-head">
             <h2 className="belt-h" id="nasil-h">
@@ -145,7 +149,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 02 · NE GÖRECEKSİN ═══════════════════════════════════════ */}
-      <section className="belt is-rose" aria-labelledby="gor-h">
+      <section className="belt is-warm" aria-labelledby="gor-h">
         <div className="belt-in">
           <header className="belt-head">
             <h2 className="belt-h" id="gor-h">
@@ -165,7 +169,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 03 · UYDURMAZ ════════════════════════════════════════════ */}
-      <section className="belt is-warm" aria-labelledby="sessiz-h">
+      <section className="belt is-pale" aria-labelledby="sessiz-h">
         <div className="belt-in">
           <header className="belt-head">
             <h2 className="belt-h" id="sessiz-h">

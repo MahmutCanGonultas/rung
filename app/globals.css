@@ -1056,16 +1056,21 @@ a.chip:hover {
   margin-inline-end: var(--s-3);
   color: var(--hair-2);
 }
+/* Dolgu kalktığı için hap yuvarlaklığı ve dolgusu da kalktı: artık düz bir
+   künye satırı. */
 .model-scale span {
-  padding-block: var(--s-2);
-  border-radius: var(--r-pill);
   font-size: var(--t-small);
   font-weight: 700;
   color: var(--ink-2);
 }
+/*
+ * Ölçülen bant KAPI ekranında işaretli kalıyor (`is-fixed`): orada okuma
+ * var, hareket yok, ve hangi bandın ölçüldüğünü söylemek şart. Dolgu yerine
+ * renk ve ağırlık — iki işaret, ama gezinen bir hap değil.
+ */
 .model-scale .is-lit {
-  background: var(--accent);
-  color: var(--on-accent);
+  color: var(--accent);
+  font-weight: 800;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1676,17 +1681,64 @@ a.chip:hover {
   margin-inline: auto;
 }
 
+/*
+ * BANT DİKİŞİ — markanın kendi motifi.
+ *
+ * Bantlar düz bir çizgiyle bitişiyordu. Ürün sahibi: "sayfa arası
+ * geçişlerde biraz motif, bizim projeyi yansıtacak şeyler olabilir."
+ * Projenin motifi zaten belli — beş basamaklı merdiven, marka işaretinin
+ * kendisi. Dikiş artık o: her bant bir öncekinin içine BEŞ BASAMAKLA
+ * giriyor, soldan sağa yükselerek.
+ *
+ * Yeni nesne EKLENMİYOR. Bandın kendi kutusu kırpılıyor, altındaki bant
+ * çentiklerden görünüyor — sayfaya bir şey eklemeden bir geçiş doğuyor.
+ *
+ * `clip-path` üç boyutlu zinciri BOZMUYOR: `.model` kendi `perspective`ini
+ * kuruyor, yani zincir onun içinde başlayıp bitiyor. Bant o zincirin
+ * dışında. (Aynı gerekçeyle `overflow-x: clip` de güvenliydi ve ölçüldü.)
+ *
+ * İlk banda uygulanmıyor (`+` bitişik kardeş): sayfanın tepesinde
+ * basamağın gireceği bir yüzey yok.
+ */
+.belt + .belt {
+  --seam: clamp(18px, 2.4vw, 40px);
+  margin-block-start: calc(var(--seam) * -1);
+  padding-block-start: calc(clamp(56px, 8vw, 118px) + var(--seam));
+  clip-path: polygon(
+    0 var(--seam),
+    20% var(--seam),
+    20% calc(var(--seam) * 0.75),
+    40% calc(var(--seam) * 0.75),
+    40% calc(var(--seam) * 0.5),
+    60% calc(var(--seam) * 0.5),
+    60% calc(var(--seam) * 0.25),
+    80% calc(var(--seam) * 0.25),
+    80% 0,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
+}
+
 /* ── bant zeminleri ─────────────────────────────────────────────────
-   Gradyanların açısı ve durakları panel dilinden geliyor; değişen tek
-   şey ölçek. */
+   İKİ TON VE BİR KOYU. Başka renk yok.
+
+   Sayfa kayısı → leylak → gül → kayısı → koyu gidiyordu ve ürün sahibi
+   "renk konusu çok karışık" dedi. Haklıydı, ve sebebi zevkten daha
+   sağlam: leylak ile gül TAKSONOMİ AİLE RENKLERİ. İç ekranlarda anlam
+   taşıyorlar — hangi ailenin hatası olduğunu söylüyorlar. Anasayfada
+   hiçbir şeyi sınıflandırmıyorlar, yani orada yalnızca süs.
+
+   Dilin üçüncü kararı "RENK BURADA SINIFLANDIRMA" diyor. Sınıflandırmayan
+   bir yerde sınıflandırma paletini kullanmak, o kararı hem burada hem
+   içeride zayıflatıyordu.
+
+   Kalan: sıcak zeminin iki tonu, ve sonda tek bir koyu. */
 .belt.is-warm {
   background: linear-gradient(152deg, var(--warm-1) 0%, var(--warm-2) 58%, var(--warm-3) 100%);
 }
-.belt.is-cool {
-  background: linear-gradient(158deg, var(--cool-1) 0%, var(--cool-2) 100%);
-}
-.belt.is-rose {
-  background: linear-gradient(158deg, var(--rose-1) 0%, var(--rose-2) 100%);
+.belt.is-pale {
+  background: linear-gradient(152deg, var(--page) 0%, var(--warm-1) 100%);
 }
 
 /*
@@ -4320,22 +4372,18 @@ a.chip:hover {
   animation: rung-climb 6s linear infinite;
   animation-delay: calc(var(--n) * 1.2s);
 }
-@keyframes tick-climb {
-  0%,
-  10% {
-    background: var(--accent);
-    color: var(--on-accent);
-  }
-  22%,
-  100% {
-    background: transparent;
-    color: var(--ink-2);
-  }
-}
-[data-play="1"] .model:not(.is-fixed) .model-scale span {
-  animation: tick-climb 6s linear infinite;
-  animation-delay: calc(var(--n) * 1.2s);
-}
+/*
+ * KÜNYE ARTIK YANMIYOR — hareket NESNENİN ÜSTÜNDE kalıyor.
+ *
+ * Etiket şeridinde dolu bir hap A1'den C1'e gezip duruyordu. Ürün sahibi:
+ * "aşağıda A1 A2 B1 B2 C1 diye gezinen yuvarlak kötü duruyor." Haklıydı ve
+ * sebebi düzeltilebilir: aynı bilgiyi İKİ YERDE birden hareket ettiriyorduk
+ * — hem basamağın etrafındaki ışık, hem altındaki hap. Basamağın ışığı
+ * hacimli bir nesnenin üstünde ve orada güzel; düz bir metin satırında
+ * gezinen dolu hap ise bir yükleme göstergesi gibi duruyor.
+ *
+ * Işık tırmanışı `.mstep`te DURUYOR. Silinen yalnızca onun düz kopyası.
+ */
 
 /*
  * 3 · YÜZEY YERİNE OTURUYOR.
