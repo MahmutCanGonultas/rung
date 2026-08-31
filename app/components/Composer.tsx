@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { saveDraftAction } from "../lib/draft-actions";
 import { EMPTY_SAVE_STATE, type SaveState } from "../lib/save-state";
 import { countWords } from "../lib/words";
 
@@ -12,6 +13,24 @@ import { countWords } from "../lib/words";
  * `countWords` sunucudaki kaydın da kullandığı fonksiyon — sayaçta 74 görüp
  * sunucudan farklı bir sayı almasın diye.
  */
+
+/*
+ * OTOMATİK TASLAK KAYDI — kaç milisaniye sessizlikten sonra.
+ *
+ * "Taslağı kaydet" düğmesi düşünüldü ve elendi: tarayıcı çöktüğünde, telefon
+ * çaldığında ya da sekme yanlışlıkla kapandığında kimse o düğmeye basmış
+ * olmuyor. Kaydı hatırlaması gereken şey kişi değil, alet.
+ *
+ * 1800 ms bir denge: daha kısası her kelimede bir sunucuya gidiyor, daha
+ * uzunu düşünmek için duran birinin yazdığını riske atıyor.
+ */
+const AUTOSAVE_MS = 1800;
+
+const SAAT = new Intl.DateTimeFormat("tr-TR", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Istanbul",
+});
 
 type Props = {
   action: (prev: SaveState, formData: FormData) => Promise<SaveState>;
@@ -23,6 +42,8 @@ type Props = {
   /** Bugün kaç ölçüm hakkı kaldı. Gerçek sınır sunucuda. */
   quotaLeft: number;
   quotaLimit: number;
+  /** Bu yazma durumunda yarım kalmış metin. ISO dizgisi: sunucudan geçiyor. */
+  draft?: { body: string; savedAt: string } | null;
 };
 
 function SaveButton({
@@ -48,6 +69,8 @@ function SaveButton({
   );
 }
 
+type DraftDurum = "yok" | "bekliyor" | "kayitli" | "hata";
+
 export function Composer({
   action,
   taskId,
@@ -56,9 +79,91 @@ export function Composer({
   placeholder,
   quotaLeft,
   quotaLimit,
+  draft = null,
 }: Props) {
   const [state, formAction] = useActionState(action, EMPTY_SAVE_STATE);
-  const [text, setText] = useState(state.body);
+  const [text, setText] = useState(draft?.body ?? state.body);
+
+  /*
+   * SON KAYDEDİLEN METİN bir ref'te, state'te değil: değeri değiştiğinde
+   * yeniden çizmeye gerek yok, ve otomatik kayıt etkisinin ona bakması onu
+   * bağımlılık listesine sokmamalı — sokarsa etki kendi kaydından sonra
+   * yeniden kurulur ve zincir kopmaz.
+   */
+  const sonKayit = useRef(draft?.body ?? "");
+  /* Ekrandaki güncel metin, çizimden bağımsız okunabilsin diye. Değeri
+     aşağıdaki etkinin başında yazılıyor — çizim sırasında ref'e yazmak,
+     iptal edilen bir çizimde yanlış değeri bırakabilir. */
+  const metin = useRef(text);
+
+  const [durum, setDurum] = useState<DraftDurum>(draft ? "kayitli" : "yok");
+  const [savedAt, setSavedAt] = useState<string | null>(draft?.savedAt ?? null);
+
+  /*
+   * DEBOUNCE: yazmayı bırakınca kaydediyor.
+   *
+   * Etki her tuşta yeniden kuruluyor ve bir öncekinin zamanlayıcısını
+   * temizliyor, yani ağa yalnızca DURAKLAMADA gidiliyor. Aralıksız yazan biri
+   * için tek bir istek bile çıkmıyor — duruşu bekliyor.
+   */
+  useEffect(() => {
+    metin.current = text;
+    if (text === sonKayit.current) return;
+    /*
+     * AYNI DEĞERE AYNI DEĞERİ YAZMAK YENİDEN ÇİZİM ÜRETMESİN.
+     *
+     * Düz `setDurum("bekliyor")` her tuşta ikinci bir durum güncellemesi
+     * demekti ve kontrollü bir `<textarea>` için bunun bedeli var: alan her
+     * çizimde React'in tuttuğu değere geri konuyor, ve çizim tuşa
+     * yetişemezse ARADAKİ KARAKTERLER DÜŞÜYOR. ÖLÇÜLDÜ — duman testinde
+     * kelime sayacı 57 yerine 55 gösterdi ve kaydedilen metinde "agreement
+     * said" yerine "agreements" vardı.
+     *
+     * Fonksiyonlu güncellemede React aynı değeri görünce çizimi atlıyor:
+     * tuş başına tek çizim kalıyor, yani taslaktan önceki davranış.
+     */
+    setDurum((d) => (d === "bekliyor" ? d : "bekliyor"));
+
+    const zaman = setTimeout(async () => {
+      const sonuc = await saveDraftAction(taskId, text);
+      /*
+       * KAYITTAN SONRA METİN DEĞİŞMİŞ OLABİLİR. Kişi istek uçarken yazmaya
+       * devam ettiyse "kaydedildi" demek yalan olur — o durumda bir sonraki
+       * duraklama zaten yeni bir kayıt açıyor.
+       */
+      if (metin.current !== text) return;
+      if (sonuc.ok) {
+        sonKayit.current = text;
+        setSavedAt(sonuc.savedAt);
+        setDurum(sonuc.empty ? "yok" : "kayitli");
+      } else {
+        setDurum("hata");
+      }
+    }, AUTOSAVE_MS);
+
+    return () => clearTimeout(zaman);
+  }, [text, taskId]);
+
+  /*
+   * SEKME ARKA PLANA DÜŞERKEN SON BİR KAYIT.
+   *
+   * Debounce 1800 ms bekliyor; sekmeyi o aralıkta kapatan biri son cümlesini
+   * kaybederdi. `visibilitychange` sekme gizlenirken ateşleniyor ve mobilde
+   * uygulamadan çıkışta da çalışıyor — `beforeunload` telefonlarda güvenilir
+   * değil, bu güvenilir.
+   */
+  useEffect(() => {
+    function bosalt() {
+      if (document.visibilityState !== "hidden") return;
+      if (metin.current === sonKayit.current) return;
+      const anlik = metin.current;
+      void saveDraftAction(taskId, anlik).then((sonuc) => {
+        if (sonuc.ok) sonKayit.current = anlik;
+      });
+    }
+    document.addEventListener("visibilitychange", bosalt);
+    return () => document.removeEventListener("visibilitychange", bosalt);
+  }, [taskId]);
 
   /*
    * KALAN HAK EKRANDA — ama sınır burada DEĞİL, sunucuda.
@@ -75,6 +180,14 @@ export function Composer({
    * — "yeter" diyor, "yanlış" demiyor. Uzun yazmak ölçümü bozmuyor.
    */
   const asti = words > maxWords;
+
+  async function taslagiAt() {
+    setText("");
+    sonKayit.current = "";
+    setDurum("yok");
+    setSavedAt(null);
+    await saveDraftAction(taskId, "");
+  }
 
   return (
     <form className="composer" action={formAction}>
@@ -141,22 +254,40 @@ export function Composer({
               {minWords}–{maxWords}
             </span>
           ) : null}
-          {/*
-            "kısa" / "uzun" rozetleri SİLİNDİ: rayın kertiği ve dolgusu ikisini
-            de gösteriyor, ve rozetler `--fam-turkish` kullanıyordu — yani bir
-            TAKSONOMİ AİLE rengini durum bildirmek için kullanıyor, dilin
-            "renk sınıflandırmadır" kuralını bozuyorlardı.
-          */}
+        </span>
+
+        {/*
+          TASLAK DURUMU — sessiz ama görünür.
+          
+          `role="status"`: ekran okuyucu yazarken bölünmesin diye kibar
+          bildirim. Metin her duruşta değişiyor, `aria-live="polite"` bunu
+          sıraya koyuyor.
+        */}
+        <span className="composer-draft" role="status">
+          {durum === "bekliyor" ? "taslağa yazılıyor…" : null}
+          {durum === "hata" ? "taslak kaydedilemedi" : null}
+          {durum === "kayitli" && savedAt
+            ? `taslak kaydedildi · ${SAAT.format(new Date(savedAt))}`
+            : null}
+          {durum === "kayitli" || durum === "bekliyor" ? (
+            <button className="composer-drop" type="button" onClick={taslagiAt}>
+              temizle
+            </button>
+          ) : null}
         </span>
 
         {/*
           Hak, sayacın YANINDA — ayrı bir uyarı kutusu değil. Sınır bir ceza
           değil, ürünün maliyetinin görünür hâli; kendi satırını hak edecek
           kadar da önemli değil.
+          
+          HAK DOLDUĞUNDA CÜMLE DEĞİŞTİ: artık yazdığının kaybolmayacağını da
+          söylüyor. Taslaktan önce doğru değildi — metin ekranda duruyordu ama
+          sayfadan çıkınca gidiyordu.
         */}
         <span className="composer-quota">
           {tukendi
-            ? `bugünlük hakkın doldu · ${quotaLimit}/${quotaLimit}`
+            ? `bugünlük hakkın doldu · yazdığın taslakta kalıyor`
             : `bugün ${quotaLeft} ölçüm hakkın kaldı`}
         </span>
 

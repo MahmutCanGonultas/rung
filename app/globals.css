@@ -3070,6 +3070,48 @@ a.chip:hover {
   color: var(--ink-3);
 }
 
+/* ── taslak durumu ──────────────────────────────────────────────────
+   Alt satırın en sessiz parçası, ve öyle kalmalı: otomatik kayıt işini
+   FARK EDİLMEDEN yapan bir şey. Yazarken göze giren bir gösterge,
+   kaydetmeyi kişinin işi gibi gösterirdi. */
+.composer-draft {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  font-size: var(--t-micro);
+  color: var(--ink-3);
+  /* Metin üç hâl arasında gidip geliyor ("taslağa yazılıyor…" → "taslak
+     kaydedildi · 14:32"); genişlik oynayınca yanındaki her şey zıplıyordu.
+     `min-inline-size` en uzun hâle göre yer ayırıyor. */
+  min-inline-size: 20ch;
+}
+.composer-drop {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: var(--ink-3);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.composer-drop:hover {
+  color: var(--ink);
+}
+
+/* Eski taslak uyarısı. Kutu değil, tek satır — bir hata değil, bir bilgi. */
+.draft-old {
+  margin-block-end: var(--s-4);
+  padding-inline-start: var(--s-4);
+  border-inline-start: 2px solid var(--accent);
+  font-size: var(--t-small);
+  color: var(--ink-2);
+  max-inline-size: 62ch;
+}
+.draft-old b {
+  color: var(--ink);
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    18 · KELİME DEFTERİ — yazma ekranının ALTINDA
    ═══════════════════════════════════════════════════════════════════ */
@@ -3648,6 +3690,111 @@ a.chip:hover {
   grid-template-columns: minmax(0, 1fr);
   gap: var(--s-5);
 }
+/* ── yarım kalanlar ─────────────────────────────────────────────────
+   Kayıtların üstünde ve onlardan AYRI kutuda: kayıt değiştirilemez ve
+   ölçülmüştür, taslak ikisi de değil. Aynı listede dizmek, ürünün en
+   sert kuralını görsel olarak bulandırırdı. */
+.drafts {
+  display: grid;
+  gap: var(--s-3);
+  margin-block-end: var(--s-6);
+  padding: var(--pad);
+  border-radius: var(--r-panel);
+  background: var(--soft);
+}
+.drafts-h {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--t-tag);
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.drafts-n {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.7em;
+  padding-inline: 0.4em;
+  border-radius: var(--r-chip);
+  background: var(--pill);
+  color: var(--ink-2);
+  font-size: var(--t-micro);
+}
+.draft-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.draft-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--s-3);
+  padding-block: var(--s-3);
+}
+.draft-row + .draft-row {
+  border-block-start: 1px solid var(--hair);
+}
+.draft-open {
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+  color: inherit;
+  text-decoration: none;
+}
+.draft-where {
+  font-size: var(--t-small);
+  font-weight: 700;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.draft-open:hover .draft-where {
+  color: var(--accent);
+}
+.draft-snip {
+  font-size: var(--t-small);
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.draft-meta {
+  font-size: var(--t-micro);
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.draft-drop {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--t-micro);
+  color: var(--ink-3);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.draft-drop:hover {
+  color: var(--accent);
+}
+/* Dar ekranda tarih alta: üç sütun 390px'te kısaltma noktasına kadar
+   sıkışıp ilk satırı okunmaz hâle getiriyordu. */
+@media (max-width: 560px) {
+  .draft-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .draft-meta {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
 .log-head {
   display: flex;
   align-items: baseline;

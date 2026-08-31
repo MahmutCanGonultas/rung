@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { log } from "./log";
 
 import { findContextBySlug, findTaskById } from "./content";
+import { deleteDraft } from "./drafts";
 import { createEntry, dailyQuota } from "./entries";
 import type { SaveState } from "./save-state";
 import { getSessionUser } from "./session";
@@ -132,6 +133,20 @@ export async function saveEntryAction(
       body,
       wordCount,
     });
+
+    /*
+     * TASLAK DÜŞÜYOR — kayıt onun yerini aldı.
+     *
+     * Kaydın KENDİSİNDEN sonra ve tahminden ÖNCE: bu noktada metin
+     * değiştirilemez bir satır olarak duruyor, yani taslağı tutmanın hiçbir
+     * karşılığı kalmadı. Bir hata olursa kayıt yine de var; silinemeyen bir
+     * taslak yalnızca kayıtlar ekranında hayalet bir satır bırakır.
+     */
+    try {
+      await deleteDraft(user.id, taskId || null);
+    } catch (error) {
+      log.error("draft_cleanup_failed", error, { userId: user.id, entryId });
+    }
 
     /*
      * Seviye tahmini her yeni kayıttan sonra güncelleniyor (plan §06:

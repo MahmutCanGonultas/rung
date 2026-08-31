@@ -196,6 +196,44 @@ async function cleanUp() {
   }
 }
 
+/*
+ * YAZMA ALANINI BOŞALT — React'in HABERİ OLARAK.
+ *
+ * Eskiden `el.value = ""` yazılıyordu ve bu, kontrollü bir `<textarea>` için
+ * yalnızca DOM'u değiştiriyor: React'in kendi durumu hâlâ eski metni tutuyor
+ * ve bir sonraki yeniden çizimde onu geri koyuyor. Otomatik taslak kaydı
+ * gelene kadar yazarken hiç yeniden çizim olmadığı için kusur görünmüyordu;
+ * durum satırı ("taslağa yazılıyor…") çizim üretmeye başlayınca test SESSİZCE
+ * eski metnin üstüne yazmaya başladı ve kaydedilen gövde iki metnin birleşimi
+ * oldu.
+ *
+ * Doğrusu React'in dinlediği yerden geçmek: yerel `value` yazıcısını çağırıp
+ * `input` olayını elle yollamak. Gerçek bir kullanıcı da tam olarak bunu
+ * yapıyor — tuşa basmak bu olayı üretiyor.
+ */
+/*
+ * UZUN GÖVDELER `delay: 4` İLE YAZILIYOR.
+ *
+ * Gecikmesiz `type` tuşları React'in çizebileceğinden hızlı yolluyor;
+ * kontrollü bir `<textarea>` her çizimde değerini React'in tuttuğu metne geri
+ * koyduğu için aradaki karakterler düşüyor. ÖLÇÜLDÜ: kelime sayacı 57 yerine
+ * 55, ve kaydedilen metinde "agreement said" yerine "agreements".
+ *
+ * Dört milisaniye insan hızının hâlâ çok üstünde (dakikada ~3000 kelime) ama
+ * çizime yetiyor. Ürün tarafında da bir çizim azaltıldı (bkz. `Composer`);
+ * ikisi birlikte ölçümü belirlenir kılıyor.
+ */
+async function clearEditor(page) {
+  await page.$eval(".editor", (el) => {
+    const yazici = Object.getOwnPropertyDescriptor(
+      window.HTMLTextAreaElement.prototype,
+      "value"
+    ).set;
+    yazici.call(el, "");
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+}
+
 async function main() {
   const browser = await puppeteer.launch({
     executablePath: CHROME,
@@ -554,8 +592,8 @@ async function main() {
       "The agreement said the money would be returned within thirty days, but nothing " +
       "has arrived yet and nobody answers the office phone. Could you please tell me " +
       "when the transfer will be made, and to which account it will be sent.";
-    await page.$eval(".editor", (el) => { el.value = ""; });
-    await page.type(".editor", BODY);
+    await clearEditor(page);
+    await page.type(".editor", BODY, { delay: 4 });
     const shownWords = await readText(page, ".composer-count b");
     check(
       "kelime sayacı doğru",
@@ -564,6 +602,24 @@ async function main() {
     );
 
     const yazmaAdresi = page.url();
+
+    /*
+     * TASLAK ÖNCE YAZILIYOR, SONRA KAYIT.
+     *
+     * Zamanlamaya güvenmiyoruz: durum satırı "kaydedildi" diyene kadar
+     * bekleniyor. Böylece bir sonraki kontrol ("kayıt taslağı düşürdü")
+     * gerçekten bir şeyin silindiğini ölçüyor, boş bir tabloyu değil.
+     */
+    await page.waitForFunction(
+      () => /kaydedildi/.test(document.querySelector(".composer-draft")?.textContent || ""),
+      { timeout: 20000 }
+    );
+    const taslakVar = await ask(
+      "SELECT count(*)::int n FROM drafts WHERE user_id = (SELECT id FROM users WHERE email = $1)",
+      [EMAIL]
+    );
+    check("yazarken taslak yazıldı", taslakVar.rows[0].n === 1, `${taslakVar.rows[0].n} taslak`);
+
     await page.click(".composer button[type=submit]");
     await waitForUrl(page, (u) => /\/entries\/\d+$/.test(u), 20000);
     await new Promise((r) => setTimeout(r, 500));
@@ -573,6 +629,16 @@ async function main() {
 
     const entryText = await page.content();
     check("metin olduğu gibi duruyor", entryText.includes("thirty days"));
+
+    /*
+     * Kayıt taslağın yerini aldı. Kalsaydı kayıtlar ekranında, ölçülmüş
+     * kaydın hemen üstünde, onun kopyası olan bir "yarım kalan" dururdu.
+     */
+    const taslakDustu = await ask(
+      "SELECT count(*)::int n FROM drafts WHERE user_id = (SELECT id FROM users WHERE email = $1)",
+      [EMAIL]
+    );
+    check("kayıt taslağı düşürdü", taslakDustu.rows[0].n === 0, `${taslakDustu.rows[0].n} taslak`);
 
     console.log("\n14b · aynı görevi ikinci kez yazmak");
     /*
@@ -588,8 +654,8 @@ async function main() {
       "and the office phone rings without an answer every single morning I try.";
     await page.goto(yazmaAdresi, { waitUntil: "networkidle0" });
     await page.waitForSelector(".composer button[type=submit]", { timeout: 20000 });
-    await page.$eval(".editor", (el) => { el.value = ""; });
-    await page.type(".editor", IKINCI);
+    await clearEditor(page);
+    await page.type(".editor", IKINCI, { delay: 4 });
     await page.click(".composer button[type=submit]");
     await waitForUrl(page, (u) => /\/entries\/\d+$/.test(u) && u !== entryUrl, 25000);
 
@@ -630,8 +696,8 @@ async function main() {
       "The shop told me the delivery would arrive on Tuesday but nothing came. " +
       "I called them twice and nobody could tell me where my parcel is now, " +
       "so I would like to know when it will be sent or when I get my money back.";
-    await page.$eval(".editor", (el) => { el.value = ""; });
-    await page.type(".editor", UCUNCU);
+    await clearEditor(page);
+    await page.type(".editor", UCUNCU, { delay: 4 });
     await page.click(".composer button[type=submit]");
     await waitForUrl(page, (u) => /\/entries\/\d+$/.test(u), 25000);
     check("üçüncü kayıt geçti", /\/entries\/\d+$/.test(page.url()), page.url());
@@ -651,8 +717,8 @@ async function main() {
      * ASIL KONTROL: düğmeyi elle açıp gönderiyoruz. Ekranın kapatması bir
      * sınır değil; sunucu reddetmezse sınır diye bir şey yok demektir.
      */
-    await page.$eval(".editor", (el) => { el.value = ""; });
-    await page.type(".editor", UCUNCU);
+    await clearEditor(page);
+    await page.type(".editor", UCUNCU, { delay: 4 });
     await page.$eval(".composer button[type=submit]", (el) => { el.disabled = false; });
     await Promise.all([
       page.waitForNavigation({ waitUntil: "networkidle0", timeout: 8000 }).catch(() => {}),
@@ -674,6 +740,81 @@ async function main() {
       kayitSayisi.rows[0].n === 3,
       `${kayitSayisi.rows[0].n} kayıt`
     );
+
+    console.log("\n14d · taslak — bitmemiş metin duruyor");
+    /*
+     * 14c'nin dördüncü kaydı SUNUCUDA reddedildi ve metin ekranda kaldı.
+     * Taslaktan önce o metin sayfadan çıkınca gidiyordu — hakkı dolan kişi
+     * yazdığını kaybediyordu. Asıl kontrol bu: hak dolmuşken bile yazılan
+     * şey duruyor.
+     */
+    await page.goto(yazmaAdresi, { waitUntil: "networkidle0" });
+    await page.waitForSelector(".editor", { timeout: 20000 });
+    const YARIM =
+      "I have started writing this letter about the parcel but I have not finished it";
+    await clearEditor(page);
+    await page.type(".editor", YARIM, { delay: 4 });
+    await page.waitForFunction(
+      () => /kaydedildi/.test(document.querySelector(".composer-draft")?.textContent || ""),
+      { timeout: 20000 }
+    );
+
+    const yarim = await ask(
+      "SELECT body FROM drafts WHERE user_id = (SELECT id FROM users WHERE email = $1)",
+      [EMAIL]
+    );
+    check(
+      "hak dolmuşken de taslak yazıldı",
+      yarim.rowCount === 1 && yarim.rows[0].body === YARIM,
+      String(yarim.rows[0]?.body).slice(0, 40)
+    );
+
+    /* Sayfadan çıkıp geri gelmek: metin yerinde mi. */
+    await page.goto(yazmaAdresi, { waitUntil: "networkidle0" });
+    await page.waitForSelector(".editor", { timeout: 20000 });
+    const geriGelen = await page.$eval(".editor", (el) => el.value);
+    check("sayfa yenilenince metin duruyor", geriGelen === YARIM, geriGelen.slice(0, 40));
+
+    /*
+     * ÇIPLAK /write TASLAĞA DÖNÜYOR. Bu dal olmasaydı "Yazmaya başla"
+     * diyen kişi yarım metninin yanına değil, rastgele bir görevin karşısına
+     * düşerdi.
+     */
+    await page.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
+    check(
+      "çıplak /write taslağın görevine dönüyor",
+      page.url() === yazmaAdresi,
+      `${page.url()} · beklenen ${yazmaAdresi}`
+    );
+
+    /* Kayıtlar ekranında ayrı bir bölümde listeleniyor. */
+    await page.goto(`${BASE}/history`, { waitUntil: "networkidle0" });
+    const taslakSatirlari = await page.$$eval(".draft-row .draft-snip", (els) =>
+      els.map((el) => el.textContent.trim())
+    );
+    check(
+      "kayıtlar ekranında yarım kalan listeleniyor",
+      taslakSatirlari.length === 1 && taslakSatirlari[0].startsWith("I have started"),
+      String(taslakSatirlari[0]).slice(0, 40)
+    );
+    check(
+      "taslak kayıt satırı olarak listelenmiyor",
+      (await page.$$("a.entry-row")).length === 3,
+      `${(await page.$$("a.entry-row")).length} kayıt satırı`
+    );
+
+    /* Temizle: alan boşalıyor ve satır düşüyor. Boşaltmak silmektir. */
+    await page.goto(yazmaAdresi, { waitUntil: "networkidle0" });
+    await page.waitForSelector(".composer-drop", { timeout: 20000 });
+    await page.click(".composer-drop");
+    await new Promise((r) => setTimeout(r, 1500));
+    const bosaldi = await page.$eval(".editor", (el) => el.value);
+    check("temizle yazma alanını boşalttı", bosaldi === "", `"${bosaldi.slice(0, 20)}"`);
+    const kalanTaslak = await ask(
+      "SELECT count(*)::int n FROM drafts WHERE user_id = (SELECT id FROM users WHERE email = $1)",
+      [EMAIL]
+    );
+    check("temizle taslağı sildi", kalanTaslak.rows[0].n === 0, `${kalanTaslak.rows[0].n} taslak`);
 
     console.log("\n15 · geçmiş");
     await page.goto(`${BASE}/history`, { waitUntil: "networkidle0" });
@@ -782,10 +923,16 @@ async function main() {
     const kuralBulgulari = await page.$$eval(".fix-src", (els) =>
       els.filter((el) => (el.textContent ?? "").startsWith("kural")).length
     );
+    /*
+     * Düşerse ÖLÇÜLEN METİN de yazılıyor. Bu satır bir kez düştü ve sebebi
+     * K0 değil, testin kendisiydi: yazma alanına giden metin bozulmuştu.
+     * Bulgu sayısı tek başına o ayrımı yapamıyor.
+     */
+    const olculenMetin = (await readText(page, ".read-text", 6)) ?? "";
     check(
       "temiz metinde kural katmanı susuyor",
       kuralBulgulari === 0,
-      `${kuralBulgulari} kural bulgusu`
+      `${kuralBulgulari} kural bulgusu · metin: ${olculenMetin.slice(0, 90)}`
     );
 
     console.log("\n22 · hatalı metin gerçekten bulgu üretiyor");
@@ -806,7 +953,7 @@ async function main() {
       "i am agree with your suggestion about the meeting of tomorrow. " +
       "Thanks for the informations you sent me , i recieved them yesterday. " +
       "We should discuss about the the details when you are free next week.";
-    await hataPage.type(".editor", BAD);
+    await hataPage.type(".editor", BAD, { delay: 4 });
     await hataPage.click(".composer button[type=submit]");
     await waitForUrl(hataPage, (u) => /\/entries\/\d+$/.test(u), 25000);
     await new Promise((r) => setTimeout(r, 600));

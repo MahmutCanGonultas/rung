@@ -13,6 +13,7 @@ import {
 import { currentLevel } from "../../lib/k3/store";
 import { saveEntryAction } from "../../lib/entry-actions";
 import { dailyQuota } from "../../lib/entries";
+import { draftAgeDays, findDraft, listDrafts, STALE_DAYS } from "../../lib/drafts";
 import { requireUser } from "../../lib/guard";
 import { notedWords } from "../../lib/vocab/notes";
 
@@ -85,6 +86,30 @@ export default async function WritePage({
 
   const own = params.context === OWN;
 
+  /*
+   * KALDIĞIN YERDEN.
+   *
+   * Çıplak `/write` bugüne kadar rastgele bir görev seçip oraya gidiyordu.
+   * Taslakla birlikte bu yanlış oldu: yarım bıraktığı metni olan biri
+   * "Yazmaya başla" deyince taslağının yanına değil, bambaşka bir görevin
+   * karşısına düşerdi.
+   *
+   * Yalnızca ADRESTE HİÇ PARAMETRE YOKKEN çalışıyor. Bir bağlam çipine
+   * tıklayan kişi bilerek başka bir yer istiyor; onu taslağına geri fırlatmak
+   * ekranı kilitlemek olurdu.
+   */
+  if (!params.context && !params.task) {
+    const [son] = await listDrafts(user.id);
+    if (son) {
+      const flag = params.dogrulama ? `&dogrulama=${params.dogrulama}` : "";
+      redirect(
+        son.taskId
+          ? `/write?context=${son.contextSlug}&task=${son.taskId}${flag}`
+          : `/write?context=${OWN}${flag ? `${flag}` : ""}`
+      );
+    }
+  }
+
   const context =
     (params.context && !own ? await findContextBySlug(params.context) : null) ??
     contexts[0];
@@ -116,6 +141,14 @@ export default async function WritePage({
 
   const noted = await notedWords(user.id);
   const haber = params.dogrulama ? HABER[params.dogrulama] : null;
+
+  /*
+   * TASLAK BU YAZMA DURUMUNA AİT. Her görevin (ve "kendi konum" kipinin) kendi
+   * taslağı var, o yüzden burada okunan şey "kullanıcının taslağı" değil, "bu
+   * ekranın taslağı".
+   */
+  const draft = await findDraft(user.id, own ? null : chosen!.id);
+  const eski = draft ? draftAgeDays(draft) : 0;
 
   return (
     <section className="write">
@@ -182,10 +215,29 @@ export default async function WritePage({
         </div>
       )}
 
+      {/*
+        ESKİ TASLAK UYARISI — silmiyor, SÖYLÜYOR.
+        
+        Süresi dolunca kendini silen bir taslak da düşünüldü (projede
+        `pending_signups` böyle) ve elendi: kimsenin yazdığı sessizce yok
+        olmaz. Ama bu ürün "şu anki hâlin" iddiasında, ve üç hafta önce
+        başlanmış bir metin bugünkü seni ölçmeyebilir. Söylemek yetiyor.
+      */}
+      {draft && eski >= STALE_DAYS ? (
+        <p className="draft-old" role="status">
+          Bu taslağa <b>{eski} gün</b> önce dokunmuşsun. Ölçüm şu anki hâlini
+          okuyor — araya bu kadar zaman girdiyse baştan yazmak daha doğru bir
+          sonuç verebilir.
+        </p>
+      ) : null}
+
       <Composer
         action={saveEntryAction}
         quotaLeft={quota.left}
         quotaLimit={quota.limit}
+        draft={
+          draft ? { body: draft.body, savedAt: draft.updatedAt.toISOString() } : null
+        }
         taskId={own ? "" : chosen!.id}
         minWords={own ? 10 : chosen!.minWords}
         maxWords={own ? 20000 : chosen!.maxWords}
