@@ -12,33 +12,38 @@ import { Stair } from "./components/showcase/Stair";
 import { getSessionUser } from "./lib/session";
 
 /*
- * Anasayfa — ALET DURUR, ÖLÇÜMLER GEÇER.
+ * Anasayfa — SAYFA VAATLE DEĞİL, ÖLÇÜMLE AÇILIYOR.
  *
- * ═══ NEDEN BAŞTAN YAZILDI ═══
+ * ═══ NEDEN YENİDEN KURULDU ═══
  *
- * Bu sayfa yedi tur boyunca yedi kez yeniden RENKLENDİ ama bir kez bile
- * yeniden KURULMADI. Yapı hep aynıydı: üst üste yığılmış altı-yedi tam
- * genişlikte bant, hep aynı sırada, her birinin içinde başlık + alt cümle +
- * bir nesne. Zeminleri değiştirmek, boşlukları ölçmek, jetonları düzeltmek —
- * hepsi o yığının üstüne sürülen boyaydı. Ürün sahibinin sözü: "bir inşaatı
- * yıkıp sıfırdan yapın deseler sadece boyasını mı değiştirirler?"
+ * Önceki mimari iki sütundu: solda yapışkan ALET, sağda akan ölçümler. Fikir
+ * doğruydu ve ürünü anlatıyordu ama iki ölçülmüş kusuru vardı. (1) Yapışkan
+ * sütun görüntüden uzundu — 1280×720'de 66px, 1440×900'de 14px taşıyordu ve
+ * yapışkan bir sütun ekrandan uzunsa alt ucuna hiçbir kaydırmayla
+ * ulaşılamıyor. (2) Sağ sütun 1440px'te sayfanın yarısına sıkışıyordu, yani
+ * ürünün asıl kanıtı olan ölçümler dar bir kolonda duruyordu.
  *
- * ═══ YENİ MİMARİ ═══
+ * Ürün sahibi dört maket arasından "kanıt duvarı" kompozisyonunu seçti ve
+ * şunu söyledi: renkler, tipografi ve üç boyutlu merdiven KALSIN, yerleşim
+ * ona benzesin.
  *
- * Sayfa artık iki şeyden oluşuyor:
+ * ═══ YENİ MİMARİ: TAM GENİŞLİKTE BANTLAR ═══
  *
- *   SOL — ALET. Ekran boyunda, `position: sticky` ile kaydırma boyunca yerinde
- *   duruyor: marka, iddia, üç boyutlu ölçek, ölçülen ana sayı ve davet. Hiç
- *   kaybolmuyor.
+ *   00  KANIT    koyu   · %4,9 ve üç boyutlu ölçek — sayfanın ilk gördüğü şey
+ *   01  VAAT     kayısı · "İngilizceni tahmin etme. Ölç." ve davet
+ *   02  GÜRÜLTÜ  leylak · bozuk cümle, beş bulgu
+ *   03  SESSİZLİK gül   · doğru cümle, sıfır bulgu
+ *   04  HAT      kayısı · beş katman
+ *   05  DAYANAK  koyu   · sayının nereden geldiği
+ *   --  KAPANIŞ  fotoğraf
  *
- *   SAĞ — GEÇEN ÖLÇÜMLER. Dört numaralı bölüm tek sütunda akıyor: bozuk cümle,
- *   temiz cümle, beş katman, ölçülen doğruluk.
+ * NEDEN SAYIYLA AÇILIYOR: bu ürünün diğerlerinden ayrıldığı tek yer kendi
+ * doğruluğunu ölçüp yayımlaması. Vaat ("ölç") her ürünün söyleyebileceği bir
+ * cümle; %4,9 söyleyemeyeceği bir sayı. Önce söyleyemeyecekleri şey geliyor.
  *
- * Bu bir düzen tercihi değil, ÜRÜNÜN KENDİSİ: alet elinde kalır, ölçtüğü
- * şeyler gelip geçer. Aylar boyunca aynı ölçek, değişen metinler.
- *
- * Yan kazanç ölçülebilir: davet düğmesi kaydırmanın her noktasında ekranda.
- * Eski yapıda ilk 660 pikselden sonra kayboluyordu.
+ * SAYI İKİ KEZ ÇİZİLMİYOR. 00'da ana ölçüt tek başına ve dev; 05'te onu
+ * çevreleyen sayılar (yakalama, ölçülen örnek, künye). `Proof` bileşeni
+ * `part` ile ikiye ayrılıyor.
  *
  * ═══ DEĞİŞMEYEN ═══
  *
@@ -48,9 +53,7 @@ import { getSessionUser } from "./lib/session";
  * olamaz.
  *
  * Ve dayanak noktası duruyor: aynı motor DOĞRU bir cümlede sıfır bulgu
- * veriyor. Eskiden bu iki cümle yan yanaydı; artık ARDIŞIK — 5'i okuyup
- * kaydırınca 0'a varıyorsun. Karşılaştırma mekândan zamana geçti ve
- * `showcase.test.ts` iki sayıyı da kilitlemeye devam ediyor.
+ * veriyor. İki cümle ARDIŞIK — 5'i okuyup kaydırınca 0'a varıyorsun.
  */
 export default async function HomePage() {
   const user = await getSessionUser();
@@ -59,128 +62,161 @@ export default async function HomePage() {
   const modelsiz = LAYERS.filter((l) => !l.model).length;
 
   return (
-    <main className="rig" id="main">
-      {/*
-        İKİ SÜTUN KENDİ KABINDA. `.rig`in doğrudan çocukları olsalardı yapışkan
-        panelin sınırı ızgara kabının kendisi olurdu ve panel ALTBİLGİNİN
-        ÜSTÜNE kadar inerdi — ÖLÇÜLDÜ: sayfanın sonunda sol yarı hâlâ koyuydu.
-        Kendi kabı sağ sütunla birlikte bittiği için panel de orada bırakıyor.
-      */}
-      <div className="rig-body">
-        {/* ══ SOL: ALET ══ */}
-        <aside className="tool">
-          <div className="tool-in">
+    <main className="wall" id="main">
+      {/* ══ 00 · KANIT — sayfa sayıyla açılıyor ══════════════════════ */}
+      <section className="belt is-deep belt-proof" aria-labelledby="kanit-h">
+        <div className="belt-in proof-hero">
+          <div className="proof-hero-say">
             <Link className="mark-link" href="/">
               <Mark size="lg" />
             </Link>
-
-            <p className="tool-kicker">Türkçe konuşanlar için</p>
-            <h1 className="tool-title">
-              <span>İngilizceni tahmin etme.</span>
-              <b>Ölç.</b>
+            <h1 className="proof-hero-h" id="kanit-h">
+              Kendi doğruluğunu ölçen bir alet.
             </h1>
-
-            <InView className="tool-art">
-              <Stair />
+            <InView className="proof-hero-num">
+              <Proof layout="flat" part="lead" />
             </InView>
-
-            <p className="tool-lede">
-              Yazdığın İngilizceye bakıp hatayı sabit bir taksonomiye yazan,
-              aylar boyunca izleyen ve <b>kendi doğruluğunu ölçen</b> bir alet.
-            </p>
-
-            <div className="tool-go">
-              {user ? (
-                <Link className="btn btn-primary btn-lg" href="/write">
-                  Panoya git
-                </Link>
-              ) : (
-                <>
-                  <Link className="btn btn-primary btn-lg" href="/register">
-                    Hesap oluştur
-                  </Link>
-                  <Link className="btn btn-lg" href="/login">
-                    Giriş yap
-                  </Link>
-                </>
-              )}
-            </div>
-            <p className="tool-note">
-              {user
-                ? `Giriş yapıldı — ${user.email}`
-                : "E-posta ve şifre. Yirmi saniye."}
+            <p className="proof-hero-sub">
+              Doğru bir cümleyi &ldquo;düzeltmek&rdquo; bu aletin yapabileceği
+              en kötü şey. Ne kadar sık yaptığı ölçülüyor ve burada yazıyor —
+              son ölçüm koşumundan okundu, sabit yazılmadı.
             </p>
           </div>
-        </aside>
 
-        {/* ══ SAĞ: GEÇEN ÖLÇÜMLER ══ */}
-        <div className="reel">
           {/*
-            Bölüm başlıkları NUMARALI ve numara ölçülen sayının kendisi değil
-            SIRA — ölçülen sayılar bölümlerin içinde, kendi yerlerinde duruyor.
+            Üç boyutlu merdiven — markanın motifi, sayının yanında.
+            Ölçek burada bir SÜS değil: sayının neyi ölçtüğünü söylüyor.
           */}
-          <section className="scene" aria-labelledby="act1">
-            <p className="scene-no">01</p>
-            <h2 className="scene-h" id="act1">
+          <InView className="proof-hero-art">
+            <Stair />
+          </InView>
+        </div>
+      </section>
+
+      {/* ══ 01 · VAAT ════════════════════════════════════════════════ */}
+      <section className="belt is-warm" aria-labelledby="vaat-h">
+        <div className="belt-in vow">
+          <p className="vow-kicker">Türkçe konuşanlar için</p>
+          <h2 className="vow-h" id="vaat-h">
+            <span>İngilizceni tahmin etme.</span>
+            <b>Ölç.</b>
+          </h2>
+          <p className="vow-lede">
+            Yazdığın İngilizceye bakıp hatayı sabit bir taksonomiye yazan,
+            aylar boyunca izleyen bir alet.
+          </p>
+          <div className="vow-go">
+            {user ? (
+              <Link className="btn btn-primary btn-lg" href="/write">
+                Panoya git
+              </Link>
+            ) : (
+              <>
+                <Link className="btn btn-primary btn-lg" href="/register">
+                  Hesap oluştur
+                </Link>
+                <Link className="btn btn-lg" href="/login">
+                  Giriş yap
+                </Link>
+              </>
+            )}
+          </div>
+          <p className="vow-note">
+            {user
+              ? `Giriş yapıldı — ${user.email}`
+              : "E-posta ve şifre. Yirmi saniye."}
+          </p>
+        </div>
+      </section>
+
+      {/* ══ 02 · GÜRÜLTÜ ═════════════════════════════════════════════ */}
+      <section className="belt is-cool" aria-labelledby="act1">
+        <div className="belt-in">
+          <header className="belt-head">
+            <p className="belt-no">01</p>
+            <h2 className="belt-h" id="act1">
               Yazarsın. Alet hemen konuşmaz.
             </h2>
-            <p className="scene-sub">
+            <p className="belt-sub">
               Bu cümle sayfa açılırken gerçek K0 katmanından geçti — maket
               değil. Model çağrısı yok: aynı metin her zaman aynı sonucu
               veriyor.
             </p>
-            <InView className="scene-body is-noisy">
-              <SampleAnalysis variant="broken" />
-            </InView>
-          </section>
+          </header>
+          <InView className="belt-body">
+            <SampleAnalysis variant="broken" />
+          </InView>
+        </div>
+      </section>
 
-          <section className="scene" aria-labelledby="act2">
-            <p className="scene-no">02</p>
-            <h2 className="scene-h" id="act2">
+      {/* ══ 03 · SESSİZLİK ═══════════════════════════════════════════ */}
+      <section className="belt is-rose" aria-labelledby="act2">
+        <div className="belt-in">
+          <header className="belt-head">
+            <p className="belt-no">02</p>
+            <h2 className="belt-h" id="act2">
               Aynı motor, doğru cümlede susar.
             </h2>
-            <p className="scene-sub">
+            <p className="belt-sub">
               Ürünün kanıtlanamaz iddiası burada cümle olmaktan çıkıyor: bir
               hatayı kaçırmak telafi edilir, doğru bir cümleyi{" "}
               <b>&ldquo;düzeltmek&rdquo; edilmez</b>.
             </p>
-            <InView className="scene-body is-quiet">
-              <SampleAnalysis variant="clean" tag={false} />
-            </InView>
-          </section>
+          </header>
+          {/*
+            `is-quiet`: sıfır bulgu sayacını vurgu renginde çizen kural buna
+            bağlı. Temiz olmak da bir ÖLÇÜM sonucu, ayrı bir duygu değil.
+          */}
+          <InView className="belt-body is-quiet">
+            <SampleAnalysis variant="clean" tag={false} />
+          </InView>
+        </div>
+      </section>
 
-          <section className="scene" aria-labelledby="act3">
-            <p className="scene-no">03</p>
-            <h2 className="scene-h" id="act3">
+      {/* ══ 04 · HAT ═════════════════════════════════════════════════ */}
+      <section className="belt is-warm" aria-labelledby="act3">
+        <div className="belt-in">
+          <header className="belt-head">
+            <p className="belt-no">03</p>
+            <h2 className="belt-h" id="act3">
               Beş katmanın {modelsiz}&rsquo;ü model kullanmıyor.
             </h2>
-            <p className="scene-sub">
+            <p className="belt-sub">
               Neyin modele verilmeyeceğini bilmek, model çağırabilmekten daha
               zor.
             </p>
-            <InView className="scene-body is-rail">
-              <Pipeline />
-            </InView>
-          </section>
-
-          <section className="scene" aria-labelledby="act4">
-            <p className="scene-no">04</p>
-            <h2 className="scene-h" id="act4">
-              Ve kendi doğruluğunu ölçüp yayımlıyor.
-            </h2>
-            <p className="scene-sub">
-              %100 doğruluk mümkün değil — dil modelleri olasılıksal çalışır.
-              Yapılabilecek tek şey ölçmek. Aşağıdaki sayılar sabit yazılmadı;
-              son ölçüm koşumundan okundu.
-            </p>
-            <InView className="scene-body is-proof">
-              <Proof layout="flat" />
-            </InView>
-          </section>
+          </header>
+          <InView className="belt-body">
+            <Pipeline />
+          </InView>
         </div>
-      </div>
+      </section>
 
-      {/* ══ KAPANIŞ — tam genişlik, iki sütunun altından geçiyor ══ */}
+      {/* ══ 05 · DAYANAK — sayının nereden geldiği ═══════════════════ */}
+      <section className="belt is-deep" aria-labelledby="act4">
+        <div className="belt-in">
+          <header className="belt-head">
+            <p className="belt-no">04</p>
+            <h2 className="belt-h" id="act4">
+              Yukarıdaki sayı nereden geliyor.
+            </h2>
+            <p className="belt-sub">
+              %100 doğruluk mümkün değil — dil modelleri olasılıksal çalışır.
+              Yapılabilecek tek şey ölçmek, ve ölçtüğünü yayımlamak. Hataları
+              önceden bilinen bir küme üstünde ölçülüyor; bir kısmı bilerek
+              hatasız, çünkü yanlış alarm ancak öyle sayılabiliyor.
+            </p>
+          </header>
+          <InView className="belt-body">
+            <Proof layout="flat" part="rest" />
+          </InView>
+          <p className="belt-more">
+            <Link href="/accuracy">Ölçümün tamamı — seviye kırılımı ve koşum geçmişi →</Link>
+          </p>
+        </div>
+      </section>
+
+      {/* ══ KAPANIŞ — tam genişlik fotoğraf ══════════════════════════ */}
       <section className="coda" aria-labelledby="coda-h">
         <Image
           className="coda-photo"
@@ -199,13 +235,6 @@ export default async function HomePage() {
           >
             {user ? "Yazmaya başla" : "Hesap oluştur"}
           </Link>
-          {/*
-            Yanlış alarm oranı BURADAN SİLİNDİ: aynı sayı bu sayfanın 04.
-            bölümünde, kendi satırında ve iki kat büyük duruyor. Aynı ölçütü
-            aynı sayfada iki kez söylemek onu vurgulamıyor, sıradanlaştırıyor.
-            "Kayıtlar değiştirilemez" kalıyor — o burada ilk kez söyleniyor ve
-            üç kabuk da aynı satırla kapanıyor.
-          */}
           <p className="coda-note">Kayıtlar değiştirilemez</p>
         </div>
       </section>

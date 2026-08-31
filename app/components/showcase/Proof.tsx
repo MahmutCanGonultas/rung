@@ -17,8 +17,20 @@ import { recentRuns } from "../../lib/eval/runs";
 export async function Proof({
   compact = false,
   layout = "card",
+  part = "all",
 }: {
   compact?: boolean;
+  /*
+   * `lead` / `rest`: ana ölçüt ile destekleyen sayılar AYRI BANTLARDA
+   * durabilsin diye. Anasayfa artık sayıyla açılıyor — %4,9 en üstte, tek
+   * başına, sayfanın ilk gördüğü şey; nereden geldiği (yakalama, ölçülen
+   * örnek, künye) aşağıda kendi bandında.
+   *
+   * Sayı İKİ KEZ ÇİZİLMİYOR: `lead` yalnız ana ölçütü, `rest` yalnız
+   * gerisini veriyor. Aynı ölçütü aynı sayfada iki kez söylemek onu
+   * vurgulamıyor, sıradanlaştırıyor.
+   */
+  part?: "all" | "lead" | "rest";
   /*
    * `flat`: parçalar ızgaranın DOĞRUDAN çocuğu oluyor. Anasayfada itiraf
    * şeridi kendi zeminine ve kendi genişliğine geçmek zorunda; kap içinde
@@ -51,6 +63,9 @@ export async function Proof({
   const recall = run.expected === 0 ? 1 : (run.expected - run.falseNegative) / run.expected;
   const falseAlarm = run.found === 0 ? 0 : run.falsePositive / run.found;
 
+  const lead = part !== "rest";
+  const rest = part !== "lead";
+
   const inner = (
     <>
       <div className="proof-grid">
@@ -60,6 +75,7 @@ export async function Proof({
           YOK — o, yarım saniye boyunca ekranda ölçülmemiş sayı göstermek olurdu
           ve bu ürünün tek cümlelik kimliği tam olarak onu yapmamak.
         */}
+        {lead ? (
         <div className="proof-cell is-lead" style={{ "--i": "0" } as CSSProperties}>
           <span className="proof-label">Yanlış alarm</span>
           <span className="proof-value">{pct(falseAlarm)}</span>
@@ -72,6 +88,9 @@ export async function Proof({
             style={{ "--v": String(falseAlarm) } as CSSProperties}
           />
         </div>
+        ) : null}
+        {rest ? (
+        <>
         <div className="proof-cell" style={{ "--i": "1" } as CSSProperties}>
           <span className="proof-label">Yakalama</span>
           <span className="proof-value">{pct(recall)}</span>
@@ -100,6 +119,8 @@ export async function Proof({
           <span className="proof-value">{run.items}</span>
           <span className="proof-note">altın kümeden</span>
         </div>
+        </>
+        ) : null}
       </div>
 
 
@@ -117,7 +138,7 @@ export async function Proof({
         gerekçesiyle kaydediyor.
       */}
 
-      {compact ? null : (
+      {compact || !rest ? null : (
         <p className="proof-source">
           bu koşumda {run.items} örnek ölçüldü · prompt {run.promptVersion} ·
           çaba {run.effort} · {run.layers}

@@ -1600,212 +1600,265 @@ a.chip:hover {
 
 
 /* ═══════════════════════════════════════════════════════════════════
-   13 · ANASAYFA
+   13 · ANASAYFA — KANIT DUVARI
 
-   Sayfa büyük yüzeylerden oluşuyor ve her yüzeyin bir KONUSU var:
+   Sayfa vaatle değil ÖLÇÜMLE açılıyor, ve tam genişlikte BANTLARDAN
+   oluşuyor.
 
-     kayısı → yazılan şey (kahraman, örnek cümleler)
-     leylak → bulunan şey (bulgular, hattın kendisi)
-     gül    → ölçülen şey (doğruluk)
+   NEDEN DEĞİŞTİ. Önceki mimari iki sütundu: solda yapışkan alet, sağda akan
+   ölçümler. Fikir ürünü anlatıyordu ama iki kusuru ÖLÇÜLDÜ — yapışkan sütun
+   1280×720'de 66px, 1440×900'de 14px görüntüden uzundu (yapışkan bir sütun
+   ekrandan uzunsa alt ucuna hiçbir kaydırmayla ulaşılamıyor), ve ürünün asıl
+   kanıtı olan ölçümler sayfanın yarısına sıkışıyordu.
 
-   Sol sütun kaydırma boyunca yerinde: alet elinde kalır, ölçtüğü şeyler
-   gelip geçer. Bu bir yerleşim tercihi değil, ürünün kendisi.
+   Ürün sahibi dört maket arasından bu kompozisyonu seçti ve şartını koydu:
+   RENKLER, TİPOGRAFİ VE ÜÇ BOYUTLU MERDİVEN KALSIN. Değişen yalnızca
+   yerleşim — jeton tablosuna, yazı yüzlerine ve `.model`e dokunulmadı.
+
+   BANT SIRASI
+     00  koyu    · %4,9 ve üç boyutlu ölçek
+     01  kayısı  · "İngilizceni tahmin etme. Ölç." ve davet
+     02  leylak  · bozuk cümle, beş bulgu
+     03  gül     · doğru cümle, sıfır bulgu
+     04  kayısı  · beş katman
+     05  koyu    · sayının nereden geldiği
+
+   Bant zeminleri kenardan kenara; içerik `.belt-in` ile ortalanıyor. Yüzey
+   dili korunuyor ama yüzeyler artık YÜZEN KARTLAR değil, sayfanın kendi
+   katmanları: "sayfa yüzeylerden oluşuyor" kararı bantlarda da geçerli,
+   yalnız yüzeyler büyüdü.
    ═══════════════════════════════════════════════════════════════════ */
 
-.rig {
+.wall {
   display: grid;
-  gap: var(--s-5);
+}
+
+.belt {
+  padding-block: clamp(56px, 8vw, 118px);
+  padding-inline: var(--rail);
+}
+.belt-in {
   max-inline-size: var(--page-max);
   margin-inline: auto;
-  padding: var(--s-6) var(--rail) var(--s-8);
 }
 
-.rig-body {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  gap: var(--s-5);
-  align-items: start;
+/* ── bant zeminleri ─────────────────────────────────────────────────
+   Gradyanların açısı ve durakları panel dilinden geliyor; değişen tek
+   şey ölçek. */
+.belt.is-warm {
+  background: linear-gradient(152deg, var(--warm-1) 0%, var(--warm-2) 58%, var(--warm-3) 100%);
+}
+.belt.is-cool {
+  background: linear-gradient(158deg, var(--cool-1) 0%, var(--cool-2) 100%);
+}
+.belt.is-rose {
+  background: linear-gradient(158deg, var(--rose-1) 0%, var(--rose-2) 100%);
 }
 
-/* ── SOL: ALET ──────────────────────────────────────────────────────
-   PANEL EKRANDAN UZUN OLAMAZ. Yapışkan bir sütun görüntüden uzunsa alt
-   ucuna hiçbir kaydırmayla ulaşılamıyor; ÖLÇÜLDÜ, 900px'lik ekranda
-   içerik 1015px'ti ve davetin altındaki not kayboluyordu. Boşluklar ve
-   modelin birim ölçüsü bu yüzden `svh`ye bağlı. */
 /*
- * YAPIŞKAN PANEL — ama YALNIZ SIĞDIĞINDA.
+ * KOYU BANT — iki temada da koyu.
  *
- * ÖLÇÜLDÜ, üç ekran boyunda: panel 1280×720'de 786px, 1440×900'de 890px
- * tutuyor. İkisinde de ekrandan uzun, ve yapışkan bir sütun ekrandan uzunsa
- * ALT UCUNA HİÇBİR KAYDIRMAYLA ULAŞILAMIYOR — davetin altındaki not
- * kayboluyor. Bu daha önce bir kez düzeltilmişti ve içerik büyüdükçe geri
- * gelmiş.
- *
- * Bu sefer kural şartlı: panel ancak sığdığı boyda yapışıyor, sığmadığında
- * sayfayla birlikte akıyor ve her şey ulaşılabilir kalıyor. Yapışkanlık bir
- * konfor; ulaşılamayan içerik bir kusur.
+ * `var(--ink)` ile boyanamaz: açık temada koyu, koyu temada AÇIK olurdu ve
+ * bant temaya göre ters dönerdi. Onun yerine bant kendi jeton çiftini
+ * taşıyor — dosyanın dokuzuncu kuralı: kendi zemini olan bölüm kendi
+ * jetonlarını da alır. Değerler koyu temanın kendi değerleri, yani yeni bir
+ * renk icat edilmiyor.
  */
-.tool {
-  position: sticky;
-  inset-block-start: var(--s-4);
-  align-self: start;
+.belt.is-deep {
+  --ink: #f8efe9;
+  --ink-2: #c6b1b6;
+  --ink-3: #b09aa0;
+  --accent: #ff9166;
+  --accent-deep: #ffa87f;
+  --on-accent: #1c1417;
+  --hair: rgba(248, 239, 233, 0.09);
+  --hair-2: rgba(248, 239, 233, 0.16);
+  --soft: #2a1e22;
+  --soft-2: #34252a;
+  --pill: #553f47;
+  color: var(--ink);
+  background: linear-gradient(152deg, #241a1e 0%, #2e2026 60%, #34242b 100%);
+}
+
+/* ── bant başlığı ───────────────────────────────────────────────────
+   Numara, başlık ve alt cümle tek blok. Ölçü metin ölçüsü: bant kenardan
+   kenara ama CÜMLE okunur genişlikte kalıyor. */
+.belt-head {
+  display: grid;
+  gap: var(--s-3);
+  max-inline-size: 62ch;
+  margin-block-end: var(--s-6);
+}
+.belt-no {
+  font-size: var(--t-tag);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+.belt-h {
+  font-family: var(--display);
+  font-size: var(--t-h2);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+.belt-sub {
+  font-size: var(--t-lede);
+  color: var(--ink-2);
+}
+.belt-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.belt-more {
+  margin-block-start: var(--s-5);
+  font-size: var(--t-small);
+}
+.belt-more a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+/* ── 00 · KANIT ─────────────────────────────────────────────────────
+   Sayfanın ilk gördüğü şey ÜRÜNÜN VAADİ DEĞİL, ÖLÇTÜĞÜ SAYI. Vaat ("ölç")
+   her ürünün söyleyebileceği bir cümle; %4,9 söyleyemeyeceği bir sayı. */
+.belt-proof {
+  /*
+   * İlk bant EKRAN BOYUNDA — ama `100svh` DEĞİL: sabit yükseklik, içerik
+   * büyüyünce (uzun bir e-posta adresi, sarmış bir başlık) taşar. `min-` ile
+   * içerik daha uzunsa bant onunla birlikte büyüyor.
+   */
+  min-block-size: min(86svh, 780px);
   display: grid;
   align-content: center;
-  min-block-size: min(760px, calc(100svh - var(--s-6)));
-  border-radius: var(--r-panel);
-  padding: clamp(26px, 4svh, 48px) var(--pad);
-  box-shadow: var(--lift-1);
-  background: linear-gradient(
-    152deg,
-    var(--warm-1) 0%,
-    var(--warm-2) 54%,
-    var(--warm-3) 100%
-  );
-  /* Üç boyutlu modelin çizim alanı yerleşim kutusundan ~90px geniş:
-     yüzler z ekseninde döndüğü için taşıyor. Panelin yuvarlak köşesi de
-     bu kırpmayla korunuyor. */
-  overflow: hidden;
+  padding-block: clamp(48px, 7vw, 96px);
 }
-/*
- * ALÇAK EKRANDA AKAR, YÜKSEK EKRANDA YAPIŞIR.
- *
- * 900px eşiği ölçümden geliyor: panel en sıkı hâlinde ~870px tutuyor ve
- * yapışkan konum `--s-4` kadar da aşağıdan başlıyor.
- */
-@media (max-height: 899px) {
-  .tool {
-    position: static;
-    min-block-size: 0;
+.proof-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-6);
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .proof-hero {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--s-7);
   }
 }
-.tool-in {
+.proof-hero-say {
   display: grid;
   justify-items: start;
-  gap: clamp(15px, 2.2svh, 26px);
-  max-inline-size: 32rem;
+  gap: var(--s-5);
 }
-.tool-kicker {
+.proof-hero-h {
+  font-family: var(--display);
+  font-size: var(--t-h3);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  max-inline-size: 24ch;
+  color: var(--ink-2);
+}
+/*
+ * SAYI BU BANDIN KAHRAMANI.
+ *
+ * `--t-stat` sayfanın geri kalanı için ölçülü bir boy; burada ölçülü olması
+ * gereken bir şey yok. Sayfa vaatle değil bu sayıyla açılıyor ve açılış
+ * cümlesi fısıltıyla söylenmez.
+ *
+ * "Ölç." ile YARIŞMIYOR: ikisi ayrı bantlarda, aynı anda hiç görünmüyorlar.
+ * Her bandın tek bir kahramanı var.
+ */
+/*
+ * SEÇİCİ `.is-lead`i DE İÇERİYOR, ve bu zorunlu: `.proof-cell.is-lead
+ * .proof-value` iki sınıf taşıyor, yani `.proof-hero-num .proof-value`den
+ * daha özgül. Kısa yazılmış hâli sessizce kaybediyordu — ÖLÇÜLDÜ, sayı
+ * ekranda hiç büyümedi.
+ */
+.proof-hero-num .proof-cell.is-lead .proof-value {
+  font-size: clamp(4.2rem, 10.5vw, 9.5rem);
+  line-height: 0.84;
+  letter-spacing: -0.045em;
+}
+.proof-hero-num .proof-label {
+  font-size: var(--t-tag);
+}
+.proof-hero-num .proof-grid {
+  gap: 0;
+}
+.proof-hero-num {
+  inline-size: 100%;
+}
+.proof-hero-sub {
+  font-size: var(--t-lede);
+  color: var(--ink-2);
+  max-inline-size: 56ch;
+}
+/*
+ * Üç boyutlu modelin ÇİZİM ALANI yerleşim kutusundan geniş: yüzler z
+ * ekseninde döndüğü ve zemin düzlemi ayak izinden taşacak kadar büyük
+ * olduğu için. ÖLÇÜLDÜ — 1440px'te `.model-ground` sayfayı 69px taşırıyordu.
+ *
+ * `overflow: clip` KUTUYA DEĞİL BANDA: `preserve-3d` zincirinin içindeki bir
+ * elemana kırpma koymak zinciri düzleştirip modeli düz bir resme çevirir.
+ * Bant zincirin çok dışında, orada güvenli.
+ */
+.belt {
+  overflow-x: clip;
+}
+.proof-hero-art {
+  inline-size: 100%;
+}
+
+/* ── 01 · VAAT ──────────────────────────────────────────────────────
+   Marka cümlesi ikinci sırada, ve bu bilinçli: söyleyemeyecekleri şey
+   önce geliyor. */
+.vow {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-4);
+  max-inline-size: 40rem;
+}
+.vow-kicker {
   font-size: var(--t-tag);
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent);
 }
-
-/* Sessiz öncül, yüksek sesli fiil: fark ÖLÇÜ ve RENK ile. */
-.tool-title {
-  font-family: var(--display);
+.vow-h {
   display: grid;
-  line-height: 1;
+  font-family: var(--display);
+  font-weight: 600;
+  line-height: 1.02;
   letter-spacing: -0.035em;
 }
-.tool-title span {
-  font-size: clamp(1.35rem, 1.9vw, 1.85rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--ink);
+.vow-h span {
+  font-size: var(--t-h2);
 }
-.tool-title b {
+/* Markanın tezi tek kelime, ve sayfanın en büyük yazısı o. */
+.vow-h b {
   font-size: var(--t-mega);
   font-weight: 700;
   color: var(--accent);
 }
-
-.tool-art {
-  inline-size: 100%;
-}
-.tool .model {
-  /* İki eksen birden: dar pencerede genişlik, alçak pencerede yükseklik
-     kısıtlıyor. */
-  --w: clamp(34px, min(4.6vw, 7svh), 74px);
-  --u: clamp(16px, min(2vw, 3.1svh), 32px);
-  --d: clamp(34px, min(4.6vw, 7svh), 74px);
-}
-
-.tool-lede {
+.vow-lede {
   font-size: var(--t-lede);
-  line-height: 1.68;
   color: var(--ink-2);
-  max-inline-size: 26em;
+  max-inline-size: 46ch;
 }
-.tool-lede b {
-  color: var(--ink);
-  font-weight: 700;
-}
-.tool-go {
+.vow-go {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s-3);
+  margin-block-start: var(--s-2);
 }
-.tool-note {
+.vow-note {
   font-size: var(--t-small);
   color: var(--ink-3);
-}
-
-/* ── SAĞ: GEÇEN ÖLÇÜMLER ──────────────────────────────────────────── */
-.reel {
-  display: grid;
-  gap: var(--s-5);
-}
-
-/*
- * Her bölüm kendi yüzeyinde. Bölümler arasındaki ayrım bir çizgi değil
- * bir ARALIK: iki yüzey arasında sayfanın kendi zemini görünüyor.
- */
-.scene {
-  display: grid;
-  gap: var(--s-4);
-  border-radius: var(--r-panel);
-  padding: var(--pad);
-  box-shadow: var(--lift-1);
-  background: linear-gradient(158deg, var(--cool-1) 0%, var(--cool-2) 100%);
-}
-/* 01 ve 04 kendi konularının rengini alıyor: yazılan kayısı, ölçülen gül. */
-.scene:first-child {
-  background: linear-gradient(
-    152deg,
-    var(--warm-1) 0%,
-    var(--warm-2) 60%,
-    var(--warm-3) 100%
-  );
-}
-.scene:last-child {
-  background: linear-gradient(158deg, var(--rose-1) 0%, var(--rose-2) 100%);
-}
-
-.scene-no {
-  font-size: var(--t-tag);
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-}
-.scene-h {
-  font-family: var(--display);
-  font-size: var(--t-h2);
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.028em;
-  max-inline-size: 20ch;
-  text-wrap: balance;
-}
-.scene-sub {
-  font-size: var(--t-body);
-  color: var(--ink-2);
-  max-inline-size: 54ch;
-  text-wrap: pretty;
-}
-.scene-sub b {
-  color: var(--ink);
-  font-weight: 700;
-}
-.scene-body {
-  display: grid;
-  gap: var(--s-4);
-  min-inline-size: 0;
-  margin-block-start: var(--s-2);
-  /* Hat sütunları GÖRÜNTÜ genişliğine değil KENDİ genişliğine bakıyor:
-     sağ sütun görüntünün yarısından dar. */
-  container-type: inline-size;
 }
 
 /* ── kapanış — tam genişlik fotoğraf ────────────────────────────────── */
@@ -1888,20 +1941,13 @@ a.chip:hover {
  * 860px ALTI: iki sütun tek sütuna. Yapışkanlık kendiliğinden düşüyor —
  * yapışacak bir yan kalmıyor. `display: none` YOK, `order` YOK.
  */
+/*
+ * İKİ SÜTUN KURALLARI SİLİNDİ. Anasayfa artık tam genişlikte bantlardan
+ * oluşuyor; sarılacak bir sütun çifti, yapışacak bir panel kalmadı.
+ * Bantların dar ekran davranışı kendi ölçülerinde: `clamp` ile dolgu,
+ * `62ch` ile metin ölçüsü, 900px'te tek sütuna inen kanıt ızgarası.
+ */
 @media (max-width: 860px) {
-  .rig-body {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .tool {
-    position: static;
-    min-block-size: 0;
-    padding: var(--s-7) var(--pad);
-    overflow: visible;
-  }
-  .tool-in {
-    gap: var(--s-5);
-    max-inline-size: none;
-  }
   .coda {
     min-block-size: 0;
     padding: 0 0 var(--s-7);
@@ -4168,18 +4214,6 @@ a.chip:hover {
   font-weight: 800;
 }
 
-/* ── sahne gövdesi değiştiricileri ─────────────────────────────────── */
-.is-noisy,
-.is-quiet {
-  padding: var(--s-5);
-  border-radius: var(--r-card);
-  background: var(--soft);
-}
-.is-rail,
-.is-proof {
-  gap: var(--s-4);
-}
-
 
 /* ═══════════════════════════════════════════════════════════════════
    24 · HAREKET
@@ -4278,7 +4312,7 @@ a.chip:hover {
     transform: translateY(12px);
   }
 }
-[data-play="1"] .scene-body,
+[data-play="1"] .belt-body,
 [data-play="1"] .step-figure,
 [data-play="1"] .accuracy-band {
   animation: settle var(--d-2) var(--ease) both;
@@ -4405,8 +4439,6 @@ a.chip:hover {
   }
 
   /* Yüzeyler tek renge çöküyor: sınırı kenarlık veriyor. */
-  .scene,
-  .tool,
   .write,
   .read-text,
   .fixes,
@@ -4426,9 +4458,7 @@ a.chip:hover {
   .filters,
   .shell-bar,
   .defence,
-  .table-scroll,
-  .is-noisy,
-  .is-quiet {
+  .table-scroll {
     border: 1px solid CanvasText;
   }
 
