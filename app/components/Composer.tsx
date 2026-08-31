@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { saveDraftAction } from "../lib/draft-actions";
+import { PhotoScan } from "./PhotoScan";
 import { EMPTY_SAVE_STATE, type SaveState } from "../lib/save-state";
 import { countWords } from "../lib/words";
 
@@ -181,6 +182,18 @@ export function Composer({
    */
   const asti = words > maxWords;
 
+  /*
+   * FOTOĞRAFTAN GELEN METİN EKLENİYOR, DEĞİŞTİRİLMİYOR.
+   *
+   * Yazma alanında bir şey varsa çeviri onun ALTINA, boş bir satır bırakarak
+   * giriyor. Üstüne yazmak, defterin ikinci sayfasını çeken birinin birinci
+   * sayfasını silmek olurdu — ve çok sayfalı bir metin bu ürünün olağan
+   * hâli: her kare bir sayfa.
+   */
+  function fotograftanEkle(gelen: string) {
+    setText((onceki) => (onceki.trim() ? `${onceki.trimEnd()}\n\n${gelen}` : gelen));
+  }
+
   async function taslagiAt() {
     setText("");
     sonKayit.current = "";
@@ -198,6 +211,12 @@ export function Composer({
           {state.error}
         </p>
       ) : null}
+
+      {/*
+        Fotoğraf yolu yazma alanının ÜSTÜNDE: sıra böyle — önce metni
+        getiriyorsun, sonra okuyup düzeltiyorsun.
+      */}
+      <PhotoScan onText={fotograftanEkle} />
 
       <textarea
         className="editor"

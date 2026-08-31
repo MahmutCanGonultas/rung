@@ -20,6 +20,19 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["nspell", "dictionary-en", "dictionary-en-gb"],
 
   /*
+   * SERVER ACTION GÖVDE TAVANI — fotoğraf çevirisi için.
+   *
+   * Varsayılan 1 MB. Defter sayfasının fotoğrafı tarayıcıda uzun kenarı 1500
+   * piksele indirilip JPEG'e çevriliyor (bkz. `PhotoScan`), ama base64
+   * kodlaması boyutu üçte bir kadar şişiriyor ve karanlık, gürültülü bir kare
+   * sıkışmıyor. 3 MB o kareyi de geçiriyor; sunucu tarafında ayrıca 4,5 MB'lık
+   * kendi tavanı var (`scan-actions.ts`), yani bu satır bir kapı değil bir pay.
+   */
+  experimental: {
+    serverActions: { bodySizeLimit: "3mb" },
+  },
+
+  /*
    * TEK KANONİK ADRES — `www` apex'e yönleniyor.
    *
    * NEDEN ŞART, SÜS DEĞİL: oturum çerezi `domain` niteliği olmadan kuruluyor,

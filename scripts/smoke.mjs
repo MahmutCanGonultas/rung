@@ -554,6 +554,28 @@ async function main() {
     check("beş bağlam listeleniyor", contextCount === 5, `${contextCount} bağlam`);
     check("kendi konum kipi var", (await page.$$(".chip.is-own")).length === 1);
 
+    /*
+     * FOTOĞRAF YOLU — VARLIĞI sınanıyor, ÇALIŞMASI değil.
+     *
+     * Gerçek bir çeviri denemesi her koşumda görselli bir model çağrısı, yani
+     * gerçek para. Bu takım günde onlarca kez koşuyor. Buradaki kontrol
+     * denetimin ucuz kısmını yapıyor: kontrol ekranda mı, gerçekten bir dosya
+     * alanı mı, ve yalnız görsel mi kabul ediyor. Çevirinin kendisi elle
+     * ölçüldü ve sayıları `docs/plan.md`de.
+     */
+    const scanKabul = await page.$eval(".scan-input", (el) => ({
+      tip: el.type,
+      accept: el.getAttribute("accept"),
+      adsiz: el.getAttribute("name") === null,
+    }));
+    check("defter fotoğrafı alanı var", scanKabul.tip === "file", scanKabul.tip);
+    check("yalnız görsel kabul ediyor", scanKabul.accept === "image/*", String(scanKabul.accept));
+    /*
+     * Alanın `name`i OLMAMALI: olsaydı seçilen fotoğraf kayıt formuyla
+     * birlikte gönderilir ve ölçüm isteğine gereksiz bir yük binerdi.
+     */
+    check("fotoğraf alanı kayıt formuna girmiyor", scanKabul.adsiz === true);
+
     console.log("\n12 · başka görev ver");
     /*
      * "Başka görev ver" bağlantısı /write?context=..&skip=.. adresine gidiyor,
