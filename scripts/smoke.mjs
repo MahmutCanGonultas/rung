@@ -213,6 +213,23 @@ async function main() {
      */
     page.setDefaultTimeout(45000);
 
+    /*
+     * IP KOVALARI TEMİZLENİYOR — kendi ön koşulumuz.
+     *
+     * Bu takım her koşumda sekiz civarı hesap açıyor ve hepsi AYNI IP'den
+     * geliyor. Kayıt yolunda IP başına saatte otuz sınırı var; iki-üç koşum
+     * üst üste yapılınca sınır devreye giriyor ve kayıt SESSİZCE düşüyor —
+     * sessiz, çünkü "çok denedin" demek "bu adres kayıtlı" demenin dolaylı
+     * yolu olurdu. Yani ürün doğru davranıyor, testin ön koşulu yanlıştı:
+     * ÖLÇÜLDÜ, kovada otuz kayıt vardı ve bekleyen kayıt hiç yazılmıyordu.
+     *
+     * YALNIZ IP KOVALARI siliniyor. Adres başına kovalara dokunulmuyor —
+     * onlar gerçek davranışın parçası ve bir gün sınanacaklar.
+     */
+    await ask(
+      "DELETE FROM auth_attempts WHERE bucket LIKE 'signup-ip:%' OR bucket LIKE 'code-ip:%'"
+    ).catch(() => {});
+
     console.log(`\ntemel adres: ${BASE}`);
     console.log(`test hesabı: ${EMAIL}\n`);
 
@@ -442,7 +459,13 @@ async function main() {
       const elekPage = await elekCtx.newPage();
       await elekPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
       await submitAuthForm(elekPage, `kisi-${stamp}@hotmial.com`, PASSWORD);
-      const elekHata = await readText(elekPage, '[role="alert"]', 6);
+      /*
+       * Bol deneme: sunucu bu isteği milisaniyelerde reddediyor (elek DNS
+       * cevabını önbellekliyor) ama React'in hatayı çizmesi ilk gönderimde
+       * gecikebiliyor. ÖLÇÜLDÜ — aynı blokta ikinci kontrol geçerken birincisi
+       * düşüyordu. Ürünün değil, ölçüm aracının yarışı.
+       */
+      const elekHata = await readText(elekPage, '[role="alert"]', 16);
       check(
         "posta almayan alan adı reddedildi",
         Boolean(elekHata) && elekPage.url().includes("/register"),
@@ -451,7 +474,7 @@ async function main() {
 
       await elekPage.goto(`${BASE}/register`, { waitUntil: "networkidle0" });
       await submitAuthForm(elekPage, `kisi-${stamp}@mailinator.com`, PASSWORD);
-      const gecici = await readText(elekPage, '[role="alert"]', 6);
+      const gecici = await readText(elekPage, '[role="alert"]', 16);
       check(
         "tek kullanımlık adres reddedildi",
         Boolean(gecici) && /geçici/i.test(String(gecici)),
@@ -585,6 +608,73 @@ async function main() {
       String(oncekiler[0]).slice(0, 40)
     );
 
+    console.log("\n14c · günlük ölçüm hakkı");
+    /*
+     * Her kayıt bir model çağrısı, yani gerçek bir bedel. Sınır SUNUCUDA:
+     * ekranın düğmeyi kapatması bir sınır değil, form tarayıcısız da
+     * gönderilebiliyor. Bu adım ikisini de ölçüyor.
+     *
+     * Bu hesap yukarıda iki kayıt yazdı, yani üçüncü geçmeli, dördüncü
+     * reddedilmeli.
+     */
+    await page.goto(yazmaAdresi, { waitUntil: "networkidle0" });
+    await page.waitForSelector(".composer-quota", { timeout: 20000 });
+    const kalanMetin = await readText(page, ".composer-quota", 6);
+    check(
+      "kalan hak ekranda yazıyor",
+      /1 ölçüm hakkın kaldı/.test(String(kalanMetin)),
+      String(kalanMetin)
+    );
+
+    const UCUNCU =
+      "The shop told me the delivery would arrive on Tuesday but nothing came. " +
+      "I called them twice and nobody could tell me where my parcel is now, " +
+      "so I would like to know when it will be sent or when I get my money back.";
+    await page.$eval(".editor", (el) => { el.value = ""; });
+    await page.type(".editor", UCUNCU);
+    await page.click(".composer button[type=submit]");
+    await waitForUrl(page, (u) => /\/entries\/\d+$/.test(u), 25000);
+    check("üçüncü kayıt geçti", /\/entries\/\d+$/.test(page.url()), page.url());
+
+    /* Dördüncü: ekran kapalı olmalı VE sunucu reddetmeli. */
+    await page.goto(yazmaAdresi, { waitUntil: "networkidle0" });
+    await page.waitForSelector(".composer-quota", { timeout: 20000 });
+    const doldu = await readText(page, ".composer-quota", 6);
+    check("hak dolduğu yazıyor", /doldu/.test(String(doldu)), String(doldu));
+    const kapali = await page.$eval(
+      ".composer button[type=submit]",
+      (el) => el.disabled
+    );
+    check("kaydet düğmesi kapandı", kapali === true);
+
+    /*
+     * ASIL KONTROL: düğmeyi elle açıp gönderiyoruz. Ekranın kapatması bir
+     * sınır değil; sunucu reddetmezse sınır diye bir şey yok demektir.
+     */
+    await page.$eval(".editor", (el) => { el.value = ""; });
+    await page.type(".editor", UCUNCU);
+    await page.$eval(".composer button[type=submit]", (el) => { el.disabled = false; });
+    await Promise.all([
+      page.waitForNavigation({ waitUntil: "networkidle0", timeout: 8000 }).catch(() => {}),
+      page.click(".composer button[type=submit]"),
+    ]);
+    await new Promise((r) => setTimeout(r, 1200));
+    const sinirHata = await readText(page, ".composer .form-error", 10);
+    check(
+      "SUNUCU dördüncü kaydı reddetti",
+      Boolean(sinirHata) && /hakkın doldu/i.test(String(sinirHata)),
+      String(sinirHata).slice(0, 60)
+    );
+    const kayitSayisi = await ask(
+      "SELECT count(*)::int n FROM entries WHERE user_id = (SELECT id FROM users WHERE email = $1)",
+      [EMAIL]
+    );
+    check(
+      "veritabanında üç kayıt var, dört değil",
+      kayitSayisi.rows[0].n === 3,
+      `${kayitSayisi.rows[0].n} kayıt`
+    );
+
     console.log("\n15 · geçmiş");
     await page.goto(`${BASE}/history`, { waitUntil: "networkidle0" });
     /*
@@ -605,7 +695,7 @@ async function main() {
       listeDe.join(", ")
     );
     const rows = await page.$$eval(".entry-row", (els) => els.length);
-    check("iki satır var", rows === 2, `${rows} satır`);
+    check("üç satır var", rows === 3, `${rows} satır`);
 
     console.log("\n16 · arama");
     await page.goto(`${BASE}/history?q=deposit`, { waitUntil: "networkidle0" });
@@ -699,18 +789,29 @@ async function main() {
     );
 
     console.log("\n22 · hatalı metin gerçekten bulgu üretiyor");
-    await page.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
-    await page.waitForSelector(".composer button[type=submit]", { timeout: 15000 });
+    /*
+     * KENDİ HESABI. Ana hesap günlük üç ölçüm hakkını 14c'de doldurdu ve bu
+     * adımın kaydı reddediliyordu — testin kurgusu, ürünün kusuru değil.
+     * Sınır hesap başına, o yüzden taze bir hesap taze bir hakla geliyor.
+     */
+    const hataCtx = await browser.createBrowserContext();
+    const hataPage = await hataCtx.newPage();
+    const hataMail = `hata-${stamp}@rung.test`;
+    extraAccounts.push(hataMail);
+    await signupThrough(hataPage, hataMail, PASSWORD);
+
+    await hataPage.goto(`${BASE}/write`, { waitUntil: "networkidle0" });
+    await hataPage.waitForSelector(".composer button[type=submit]", { timeout: 20000 });
     const BAD =
       "i am agree with your suggestion about the meeting of tomorrow. " +
       "Thanks for the informations you sent me , i recieved them yesterday. " +
       "We should discuss about the the details when you are free next week.";
-    await page.type(".editor", BAD);
-    await page.click(".composer button[type=submit]");
-    await waitForUrl(page, (u) => /\/entries\/\d+$/.test(u) && u !== entryUrl, 20000);
+    await hataPage.type(".editor", BAD);
+    await hataPage.click(".composer button[type=submit]");
+    await waitForUrl(hataPage, (u) => /\/entries\/\d+$/.test(u), 25000);
     await new Promise((r) => setTimeout(r, 600));
 
-    const kinds = await page.$$eval(".fix-kind", (els) =>
+    const kinds = await hataPage.$$eval(".fix-kind", (els) =>
       els.map((el) => el.textContent ?? "")
     );
     const joined = kinds.join(" | ");
@@ -720,13 +821,14 @@ async function main() {
     check("yazım hatası yakalandı", /Yazım|yazım/.test(joined), joined);
     check("tekrar yakalandı", /tekrar/i.test(joined), joined);
 
-    const marks = await page.$$eval(".read-mark", (els) => els.length);
+    const marks = await hataPage.$$eval(".read-mark", (els) => els.length);
     check("metinde işaretler var", marks >= 6, `${marks} işaret`);
 
-    const suggestions = await page.$$eval(".fix-now", (els) =>
+    const suggestions = await hataPage.$$eval(".fix-now", (els) =>
       els.map((el) => el.textContent)
     );
     check("düzeltme önerisi veriliyor", suggestions.includes("I agree"), suggestions.join(", "));
+    await hataCtx.close();
 
     // ══════════ AŞAMA 09 · KURTARMA ══════════
     /*

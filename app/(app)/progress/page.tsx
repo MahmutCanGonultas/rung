@@ -221,7 +221,12 @@ export default async function ProgressPage() {
                 0.1
               );
               return families.map((f) => (
-                <div key={f.family} className="meter-row">
+                /*
+                  AİLE SINIFI SATIRDA: renk taksonomiden geliyor, elle
+                  yazılmıyor. Yeni bir alt kategori eklendiğinde rengi
+                  kendiliğinden doğru oluyor.
+                */
+                <div key={f.family} className={`meter-row fam-${f.family}`}>
                   <div className="meter-top">
                     <span className="meter-name">
                       {f.label}
@@ -238,7 +243,14 @@ export default async function ProgressPage() {
                       style={{ width: `${(f.firstMonth / scale) * 100}%` }}
                     />
                     <span
-                      className={f.stuck ? "meter-fill warn" : "meter-fill"}
+                      /*
+                        `warn` KALDIRILDI: renk artık aileden geliyor ve
+                        `--bad` ile `--fam-turkish-ink` birebir aynı hex —
+                        "takılmış Gramer" ile sağlıklı "Türkçe kaynaklı"
+                        piksel piksel aynı görünürdü. Durumu yandaki
+                        "▲ azalmıyor" yazısı söylüyor, ve o bir metin.
+                      */
+                      className="meter-fill"
                       style={{ width: `${(f.lastMonth / scale) * 100}%` }}
                     />
                   </span>

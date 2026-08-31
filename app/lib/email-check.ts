@@ -1,4 +1,25 @@
-import { resolveMx } from "node:dns/promises";
+import { Resolver } from "node:dns/promises";
+
+/*
+ * KENDİ ÇÖZÜMLEYİCİMİZ — sistemin değil.
+ *
+ * Bu dosyanın kendi yorumu zaten şunu söylüyordu: "çözümleyiciler yalan
+ * söylüyor, geliştirme makinesinin modemi olmayan her alan adına kendi
+ * IP'sini döndürüyor". Ama elek yine de SİSTEMİN çözümleyicisini
+ * kullanıyordu.
+ *
+ * ÖLÇÜLDÜ VE YAKALANDI: duman testinde `@hotmial.com` sekiz kez elekten
+ * GEÇTİ. Sunucu günlüğünde sekiz `mx_check_degraded` kaydı vardı — yani
+ * sorgu patlamış ve elek tasarım gereği geçirmişti. Aynı sorgu düz bir Node
+ * sürecinde altı kez üst üste temiz `ENODATA` veriyordu; fark çözümleyiciydi.
+ *
+ * Google ve Cloudflare, sırayla. İkisi de NXDOMAIN'i ele geçirmiyor ve
+ * ikisi de bu kontrolün cevabını tekrarlanabilir yapıyor: aynı adres, aynı
+ * sonuç, hangi makinede çalıştığından bağımsız.
+ */
+const resolver = new Resolver({ timeout: 4000, tries: 2 });
+resolver.setServers(["8.8.8.8", "1.1.1.1"]);
+const resolveMx = (domain: string) => resolver.resolveMx(domain);
 
 /*
  * ADRESİN GERÇEK OLUP OLMADIĞI — mail atmadan yapılabilenler.
@@ -81,14 +102,25 @@ const CACHE_MS = 6 * 60 * 60 * 1000;
 const cache = new Map<string, { ok: boolean; at: number }>();
 
 export type MailboxCheck =
+  | { ok: true }
   /*
-   * `degraded`: sorgu patladığı için GEÇİRİLDİ, doğrulandığı için değil.
-   * Günlüğü bu modül tutmuyor — `log` dosyası `server-only` işaretli ve onu
-   * import eden her şey birim testinde patlıyor. Sinyal çağırana veriliyor,
-   * o zaten sunucuda çalışıyor.
+   * `unreachable`: sorgu cevap vermedi. Artık GEÇİRMİYOR, çeviriyor.
+   *
+   * NEDEN DEĞİŞTİ. Eskiden ağ hıçkırığında geçiriyordu, gerekçesi de
+   * makuldü: "gerçek bir kullanıcıyı çevirmek, sahte bir adresi almaktan
+   * pahalı; arkasında zaten doğrulama bağlantısı var."
+   *
+   * O gerekçe KAYIT MODELİ DEĞİŞİNCE geçersiz oldu. Artık hesap yalnız
+   * maile giden bağlantıyla açılıyor, yani elekten geçen ölü bir alan adı
+   * doğrudan bir HARD BOUNCE demek. Gönderim alan adımız haftalık ve
+   * bounce oranı yeni bir alan adının yargılandığı ilk sayı (Resend eşiği
+   * %4, SES %5) — günde yirmi mail atarken tek bounce %5.
+   *
+   * Yani terazi tersine döndü: bir kullanıcıyı "biraz sonra tekrar dene"
+   * demeye zorlamak kurtarılabilir; yakılmış bir gönderim itibarı değil.
+   * `code` günlüğe gidiyor — sebebi saklamıyoruz.
    */
-  | { ok: true; degraded?: true }
-  | { ok: false; reason: "disposable" | "no_mail_server" };
+  | { ok: false; reason: "disposable" | "no_mail_server" | "unreachable"; code?: string };
 
 /*
  * Alan adı posta ALABİLİYOR MU — YALNIZCA MX'e bakıyor.
@@ -157,6 +189,11 @@ export async function checkMailbox(
       cache.set(domain, { ok: false, at: Date.now() });
       return { ok: false, reason: "no_mail_server" };
     }
-    return { ok: true, degraded: true };
+    /*
+     * Cevap alınamadı. ÖNBELLEĞE YAZILMIYOR: bu alan adı hakkında bir şey
+     * öğrenmedik, yalnız şu an soramadık. Yazsaydık geçici bir arıza altı
+     * saat boyunca gerçek bir alan adını kilitlerdi.
+     */
+    return { ok: false, reason: "unreachable", code };
   }
 }

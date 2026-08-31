@@ -66,23 +66,53 @@ test("tek kullanımlık adres DNS'e hiç sorulmadan eleniyor", async () => {
 });
 
 /*
- * ZAMAN AŞIMI RET SEBEBİ DEĞİL. Ağ hıçkırığı yüzünden gerçek bir kullanıcıyı
- * kayıttan çevirmek, sahte bir adresi içeri almaktan pahalı — arkasında zaten
- * doğrulama bağlantısı var. ÖLÇÜLDÜ: geliştirme makinesinin modemi uydurma
- * alan adlarında MX sorgusunu cevapsız bırakıp ETIMEOUT veriyor.
+ * DNS CEVAP VERMEZSE ARTIK ÇEVİRİYOR — eskiden geçiriyordu.
+ *
+ * Eski gerekçe makuldü: "ağ hıçkırığı yüzünden gerçek bir kullanıcıyı
+ * çevirmek, sahte bir adresi almaktan pahalı; arkasında zaten doğrulama
+ * bağlantısı var."
+ *
+ * O gerekçe KAYIT MODELİ DEĞİŞİNCE düştü. Hesap artık yalnız maile giden
+ * bağlantıyla açılıyor, yani elekten geçen ölü bir alan adı doğrudan bir
+ * HARD BOUNCE demek — ve bounce oranı yeni bir gönderim alan adının
+ * yargılandığı ilk sayı. Günde yirmi mail atarken tek bounce %5, Resend'in
+ * eşiği %4.
+ *
+ * Terazi tersine döndü: "biraz sonra tekrar dene" kurtarılabilir, yakılmış
+ * bir gönderim itibarı değil.
+ *
+ * ÖNBELLEĞE YAZILMIYOR: bu alan adı hakkında bir şey öğrenmedik, yalnız şu
+ * an soramadık. Yazsaydık geçici bir arıza gerçek bir alan adını altı saat
+ * kilitlerdi — bir sonraki test tam olarak bunu çiviliyor.
  */
-test("DNS zaman aşımında geçiriyor", async () => {
+test("DNS cevap vermezse ÇEVİRİYOR ve sebebi taşıyor", async () => {
   const dns: MxLookup = async () => {
     const e = new Error("timeout") as NodeJS.ErrnoException;
     e.code = "ETIMEOUT";
     throw e;
   };
-  /* `degraded` işareti şart: geçirildi ama DOĞRULANMADI, ve çağıran taraf bunu
-     günlüğe yazabilsin diye ayırt ediliyor. */
   assert.deepEqual(await checkMailbox("kisi@a5.ornek", dns), {
-    ok: true,
-    degraded: true,
+    ok: false,
+    reason: "unreachable",
+    code: "ETIMEOUT",
   });
+});
+
+test("cevapsız sorgu ÖNBELLEĞE YAZILMIYOR", async () => {
+  let ilk = true;
+  const dns: MxLookup = async (domain) => {
+    if (ilk) {
+      ilk = false;
+      const e = new Error("timeout") as NodeJS.ErrnoException;
+      e.code = "ETIMEOUT";
+      throw e;
+    }
+    return [{ exchange: `mx.${domain}` }];
+  };
+  const d = "kisi@a6.ornek";
+  assert.equal((await checkMailbox(d, dns)).ok, false, "ilk sorgu patlıyor");
+  /* İkinci deneme gerçekten yeniden soruyor — geçici arıza kilitlemiyor. */
+  assert.deepEqual(await checkMailbox(d, dns), { ok: true });
 });
 
 test("@ yoksa eleniyor", async () => {

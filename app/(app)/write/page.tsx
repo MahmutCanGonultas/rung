@@ -12,6 +12,7 @@ import {
 } from "../../lib/content";
 import { currentLevel } from "../../lib/k3/store";
 import { saveEntryAction } from "../../lib/entry-actions";
+import { dailyQuota } from "../../lib/entries";
 import { requireUser } from "../../lib/guard";
 import { notedWords } from "../../lib/vocab/notes";
 
@@ -70,7 +71,14 @@ export default async function WritePage({
   const user = await requireUser();
 
   const params = await searchParams;
-  const contexts = await listContexts();
+  /*
+   * Bağlam listesi ve günlük hak birbirine bağlı değil — paralel okunuyor,
+   * yoksa sayfa iki gidiş-dönüş bekliyor.
+   */
+  const [contexts, quota] = await Promise.all([
+    listContexts(),
+    dailyQuota(user.id),
+  ]);
   if (contexts.length === 0) {
     throw new Error("Hiç bağlam yok — `npm run seed` çalıştırıldı mı?");
   }
@@ -157,9 +165,12 @@ export default async function WritePage({
               iken satır sarımı onu önceki satırın sonunda bırakıyordu ve
               390px'te satır boşlukta duran bir "·" ile bitiyordu.
             */}
-            <span className="task-part">
-              {chosen!.minWords}–{chosen!.maxWords} kelime
-            </span>
+            {/*
+              Hedef aralığı BURADAN kalktı: aynı sayı altı yüz piksel aşağıda,
+              ULAŞILAN sayının yanında duruyor ve hemen üstündeki ray onu
+              gösteriyor. Hedef, ölçülen şeyin yanında anlamlı; görev
+              başlığının altında yalnızca bir sayı.
+            */}
             <span className="task-part">Seviye {chosen!.level}</span>
             <Link
               className="task-swap"
@@ -173,6 +184,8 @@ export default async function WritePage({
 
       <Composer
         action={saveEntryAction}
+        quotaLeft={quota.left}
+        quotaLimit={quota.limit}
         taskId={own ? "" : chosen!.id}
         minWords={own ? 10 : chosen!.minWords}
         maxWords={own ? 20000 : chosen!.maxWords}

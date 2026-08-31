@@ -3,7 +3,12 @@ import Link from "next/link";
 
 import { EntryRow } from "../../components/EntryRow";
 import { listContexts } from "../../lib/content";
-import { countEntries, listEntries, type EntrySummary } from "../../lib/entries";
+import {
+  countEntries,
+  listEntries,
+  LIST_LIMIT,
+  type EntrySummary,
+} from "../../lib/entries";
 import { requireUser } from "../../lib/guard";
 
 export const metadata: Metadata = { title: "Kayıtlar · Rung" };
@@ -75,6 +80,20 @@ export default async function HistoryPage({
               süzülmüş {entries.length}
             </>
           ) : null}
+          {/*
+            LİSTE KESİLDİYSE SÖYLENİYOR.
+            
+            Sorgu en fazla yüz kayıt getiriyor ve bu SESSİZDİ: yüz kırk sekiz
+            kaydı olan biri kalan kırk sekize hiçbir yoldan ulaşamıyor, üstelik
+            ulaşamadığını da bilmiyordu. Kayıtların değişmezliğiyle övünen bir
+            ürünün, sakladığı kayıtları sessizce göstermemesi olmaz.
+          */}
+          {entries.length >= LIST_LIMIT ? (
+            <>
+              <span className="log-sep">·</span>
+              <span className="log-cut">gösterilen son {LIST_LIMIT}</span>
+            </>
+          ) : null}
         </p>
       </header>
 
@@ -138,7 +157,12 @@ export default async function HistoryPage({
             </h2>
 
             {group.entries.map((entry) => (
-              <EntryRow key={entry.id} entry={entry} />
+              /*
+                Görev satırı çizilmiyor: on sekiz satırın on sekizinde aynı
+                iki görev cümlesi kırpılmış hâlde tekrar ediyordu. Satırı
+                ayırt eden şey kişinin KENDİ cümlesi, ve o zaten üstte.
+              */
+              <EntryRow key={entry.id} entry={entry} hideTask />
             ))}
           </div>
         ))

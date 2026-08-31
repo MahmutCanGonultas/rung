@@ -77,19 +77,25 @@ export async function registerAction(
    * bunu bekletmenin anlamı yok.
    */
   const mailbox = await checkMailbox(email);
-  if (mailbox.ok && mailbox.degraded) {
-    /* Sorgu patladı ve elek geçirdi — arkasında doğrulama bağlantısı var,
-       ama bunun sessizce olmaması gerekiyor. */
-    log.error("mx_check_degraded", new Error("DNS sorgusu yanıt vermedi"), { email });
-  }
   if (!mailbox.ok) {
-    return {
-      error:
-        mailbox.reason === "disposable"
-          ? "Geçici e-posta adresleri kullanılamıyor — bu ürün aylar boyunca ölçüyor ve şifreni unutursan o adrese geri dönmen gerekiyor."
-          : "Bu adresin alan adı posta almıyor. Yazımını kontrol eder misin?",
-      email,
+    if (mailbox.reason === "unreachable") {
+      /*
+       * Sorgu cevap vermedi. Bunu SESSİZ geçmiyoruz ve artık geçirmiyoruz
+       * da: elekten geçen ölü bir alan adı, hesabın maille açıldığı bu
+       * modelde doğrudan bir hard bounce demek ve gönderim itibarımızı
+       * yakıyor. Kod günlüğe yazılıyor ki sebebi tahmin etmeyelim.
+       */
+      log.error("mx_check_unreachable", new Error(mailbox.code ?? "?"), { email });
+    }
+    const mesaj: Record<string, string> = {
+      disposable:
+        "Geçici e-posta adresleri kullanılamıyor — bu ürün aylar boyunca ölçüyor ve şifreni unutursan o adrese geri dönmen gerekiyor.",
+      no_mail_server:
+        "Bu adresin alan adı posta almıyor. Yazımını kontrol eder misin?",
+      unreachable:
+        "Adresini şu an doğrulayamadık — bağlantı sorunu olabilir. Birkaç saniye sonra tekrar dener misin?",
     };
+    return { error: mesaj[mailbox.reason], email };
   }
 
   try {

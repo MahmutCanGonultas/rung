@@ -151,7 +151,19 @@ function RunPanel({ run, previous }: { run: EvalRun; previous: EvalRun | null })
               <div className="meter-top">
                 <span className="meter-name">
                   {level.level}
-                  {weak ? <span className="meter-flag">▲ {why}</span> : null}
+                  {/*
+                    Sayı BAYRAĞIN İÇİNDE. Altta ayrı bir satır olarak
+                    duruyordu ve o satır her seviyede çiziliyordu — oysa
+                    yanlış alarm cebirsel olarak `1 − isabet`: hiçbir veri
+                    kümesinde ondan farklı olamaz, yani beş satırın beşi de
+                    üstündeki çubuğun çıkarma işlemiydi. Sayı, yalnız kötü
+                    olduğu yerde ve sebebinin yanında duruyor.
+                  */}
+                  {weak ? (
+                    <span className="meter-flag">
+                      ▲ {why} {pct(level.falseAlarmRate)}
+                    </span>
+                  ) : null}
                 </span>
                 <span className="meter-sub">{level.items} örnek</span>
               </div>
@@ -178,9 +190,6 @@ function RunPanel({ run, previous }: { run: EvalRun; previous: EvalRun | null })
                 <span className="pair-val">{pct(level.recall)}</span>
               </div>
 
-              <div className="meter-sub">
-                yanlış alarm {pct(level.falseAlarmRate)}
-              </div>
             </div>
           );
         })}

@@ -8,7 +8,6 @@ import { Mark } from "../Mark";
 import { Stair } from "./Stair";
 import { TaxonomyChips, RecordStamp, LevelSignals } from "./Figures";
 import { InView } from "./InView";
-import { Pipeline } from "./Pipeline";
 import { Proof } from "./Proof";
 import { SampleAnalysis } from "./SampleAnalysis";
 
@@ -143,11 +142,23 @@ export function GateShell({
       </p>
 
       {/* ── ders: beş adım ──────────────────────────────────────────── */}
+      {/*
+        ÜÇ ADIM, BEŞ DEĞİL.
+        
+        Bu sayfa 6.612 pikseldi — anasayfadan %65 uzun, ve şifresini yazmaya
+        gelen kişinin aldığı şey buydu. Ölçüldü: iki adım başka yerde BİREBİR
+        duruyordu. 01 `SampleAnalysis`i gösteriyordu, oysa aynı bileşen aynı
+        sayfada katlamanın ÜSTÜNDE zaten çizili; 03 `Pipeline`ı gösteriyordu,
+        o da anasayfanın 03. bölümünün aynısı.
+
+        Kalan üçü ürün genelinde TEK çağrı yeri: taksonomi, değişmezlik,
+        seviye sinyalleri. Silinselerdi iddia üründen tamamen kaybolurdu.
+      */}
       <section className="gate-chapter" id="nasil" aria-labelledby="nasil-h">
         <header className="chapter-head">
           <p className="gate-kicker">Nasıl çalışıyor</p>
           <h2 className="chapter-title" id="nasil-h">
-            Beş adımda, baştan sona.
+            Üç adımda, baştan sona.
           </h2>
           <p className="chapter-sub">
             Aşağıdaki her şey bu sayfa açılırken hesaplandı ya da veritabanından
@@ -157,24 +168,6 @@ export function GateShell({
 
         <Step
           n="01"
-          title="Yazarsın. Alet hemen konuşmaz."
-          note="Beşin ikisi Türkçe konuşanlara özel bir aileden geldi. Genel bir dil aracı “the meeting of tomorrow” ifadesini biraz resmî diye geçiyor; burada kendi adı var."
-          caption="K0 motorunun bu sayfa çizilirken ürettiği beş bulgu."
-          figure={
-            <InView>
-              <SampleAnalysis part="shelf" open="all" />
-            </InView>
-          }
-        >
-          Bir görev seçip İngilizce yazıyorsun. Metnine dokunan ilk katman K0:
-          yazım, dil bilgisi kalıpları, kelime bandı ve cümle karmaşıklığı.
-          Hepsi <b>deterministic (belirlenimci)</b> — model çağrısı yok, aynı
-          metin her zaman aynı sonucu veriyor. Yukarıdaki cümlenin beş bulgusu
-          aşağıda, motorun kendi açıklamalarıyla duruyor.
-        </Step>
-
-        <Step
-          n="02"
           title="Her bulgu sabit bir yere yazılır."
           note="Beşinci aile ürünün ayırt edici tarafı: artikel düşürme, birebir çeviri, sözcük sırası, kalıp. Türkçede artikel yok, cinsiyetli zamir yok, sözcük sırası farklı — bu yüzden hatalar öngörülebilir ve karakteristik."
           caption="Listeyi tek bir kaynak belirliyor; oraya bir alt kategori eklendiğinde kadrana bir ışın ekleniyor."
@@ -190,24 +183,7 @@ export function GateShell({
         </Step>
 
         <Step
-          n="03"
-          title="Beş katman. Üçünde model çalışmıyor."
-          note="K2, K1’in gerekçesini bilerek görmüyor. İkinci geçişe bulgunun açıklaması verilmiyor — verilseydi model kendi cümlesini onaylardı."
-          caption="Mor işaretli iki satır modele giden katmanlar."
-          figure={
-            <InView className="step-rail">
-              <Pipeline />
-            </InView>
-          }
-        >
-          Metin beş katmandan sırayla geçiyor ve yalnızca yorum gerektiren kısım
-          modele gidiyor. Neyin modele verilmeyeceğini bilmek, model
-          çağırabilmekten daha zor. Modele giden kısım da serbest konuşmuyor:
-          sabit taksonomiye ve zorunlu bir şemaya yazmak zorunda.
-        </Step>
-
-        <Step
-          n="04"
+          n="02"
           title="Kayıt, yazıldığı gün neyse o kalıyor."
           note="Geçmişi düzeltebilen bir alet, geçmişi ölçemez. Altı ay sonra “o zaman ne ölçmüştük” sorusunun tek bir cevabı olmasının sebebi bu."
           figure={<RecordStamp />}
@@ -221,7 +197,7 @@ export function GateShell({
         </Step>
 
         <Step
-          n="05"
+          n="03"
           title="Aylar boyunca aynı ölçek."
           note="Hatasız olmak tek başına yüksek seviye vermiyor; A1 de kısa ve doğru cümle kurabilir. “Hata türü” sinyalinin en yüksek ağırlığı taşımasının sebebi bu."
           figure={<LevelSignals />}
@@ -258,10 +234,15 @@ export function GateShell({
         </InView>
       </section>
 
+      {/*
+        Kapanış başlığı SİLİNDİ: "Bugün yaz, altı ay sonra bak" aynı cümle
+        anasayfanın kapanışında zaten duruyor ve buraya kadar inen kişi onu
+        katlamanın üstünde de okumuş oluyor.
+
+        Geri dönüş bağlantısı KALDI — üç bin piksel inen birinin forma dönmek
+        için tek yolu kaydırmak olmasın.
+      */}
       <section className="gate-close">
-        <h2 className="chapter-title">
-          Bugün yaz. Altı ay sonra aynı ölçekte bak.
-        </h2>
         <p className="gate-scroll">
           <a href="#main">Yukarıdaki forma dön ↑</a>
         </p>

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import type { AnalysisState } from "./analysis-state";
 import { findEntryForUser } from "./entries";
 import { DEFAULT_LEVEL } from "./content-types";
-import { findingsFor } from "./analyses";
+import { findingsFor, latestAnalysis } from "./analyses";
 import { runK1 } from "./k1/run";
 import { runK2 } from "./k2/run";
 import { getSessionUser } from "./session";
@@ -29,6 +29,26 @@ export async function analyzeEntryAction(
   const entryId = readField(formData, "entryId");
   const entry = await findEntryForUser(entryId, user.id);
   if (!entry) return { ok: false, error: "Kayıt bulunamadı." };
+
+  /*
+   * BAŞARILI ÖLÇÜM VARSA TEKRAR KOŞULMUYOR — ve bu kontrol SUNUCUDA.
+   *
+   * Ekran zaten düğmeyi göstermiyor (`AutoAnalyze` yalnızca hiç koşum yokken
+   * ya da son koşum patlamışken çiziliyor). Ama ekranın bir şeyi göstermiyor
+   * olması bir sınır değil: bu bir server action ve doğrudan çağrılabiliyor.
+   * Her çağrı gerçek bir model isteği, yani gerçek bir para.
+   *
+   * Kayıtlar zaten DEĞİŞMEZ — aynı metnin ikinci ölçümü aynı metni ölçer.
+   * Yeniden koşmanın tek meşru sebebi öncekinin PATLAMIŞ olması, ve o durumda
+   * `status = 'failed'` olduğu için buradan geçiyor.
+   */
+  const onceki = await latestAnalysis(entry.id, user.id, "K1");
+  if (onceki?.status === "ok") {
+    return {
+      ok: false,
+      error: "Bu kayıt zaten ölçüldü. Kayıtlar değişmiyor, ölçüm de değişmiyor.",
+    };
+  }
 
   const outcome = await runK1({
     entryId: entry.id,

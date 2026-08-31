@@ -148,13 +148,19 @@ export type ListFilters = {
   limit?: number;
 };
 
+/*
+ * Listenin tavanı. Ekran bu sayıya değdiğinde kesildiğini SÖYLÜYOR —
+ * sessizce kırpmak, sakladığı kaydı göstermeyen bir arşiv demek.
+ */
+export const LIST_LIMIT = 100;
+
 export async function listEntries(
   userId: string,
   filters: ListFilters = {}
 ): Promise<EntrySummary[]> {
   const search = filters.search?.trim() || null;
   const contextSlug = filters.contextSlug?.trim() || null;
-  const limit = filters.limit ?? 100;
+  const limit = filters.limit ?? LIST_LIMIT;
 
   /*
    * Arama `websearch_to_tsquery` ile: kullanıcı "deposit landlord" yazarsa
@@ -203,6 +209,53 @@ export async function listEntries(
   `) as SummaryRow[];
 
   return rows.map(toSummary);
+}
+
+/*
+ * GÜNLÜK ÖLÇÜM HAKKI.
+ *
+ * Her kayıt bir model çağrısı demek ve o çağrının gerçek bir bedeli var —
+ * ölçüldü: K1 + K2 birlikte ~9 saniye ve her kayıt için bir kez koşuyor.
+ * Sınırsız bırakmak, ürünün maliyetini kullanıcı sayısıyla değil KLAVYE
+ * HIZIYLA orantılı yapardı.
+ *
+ * ÜÇ, çünkü ürün zaten günde üç paragraf yazılsın diye tasarlanmadı: vaadi
+ * "aylar boyunca izlemek". Günde bir kayıt bile altı ayda yüz seksen ölçüm
+ * demek. Üç, sınırın hissedilmeyeceği kadar geniş ve maliyetin öngörülebilir
+ * kalacağı kadar dar.
+ *
+ * GÜN İSTANBUL'A GÖRE, UTC'ye göre değil. Kullanıcılar Türkiye'de ve gece
+ * yarısı onların gece yarısı olmalı — UTC'de sayarsak hak akşam üçte
+ * yenilenir ve kimse nedenini anlayamaz.
+ */
+export const DAILY_ENTRIES = 3;
+
+export type Quota = {
+  used: number;
+  left: number;
+  limit: number;
+  /** Hakkın yenileneceği an — İstanbul'da gece yarısı. */
+  resetsAt: Date;
+};
+
+export async function dailyQuota(userId: string): Promise<Quota> {
+  const rows = (await db()`
+    SELECT
+      (SELECT count(*)::int FROM entries e
+        WHERE e.user_id = ${userId}
+          AND (e.created_at AT TIME ZONE 'Europe/Istanbul')::date
+            = (now() AT TIME ZONE 'Europe/Istanbul')::date) AS n,
+      (date_trunc('day', now() AT TIME ZONE 'Europe/Istanbul') + interval '1 day')
+        AT TIME ZONE 'Europe/Istanbul' AS resets
+  `) as Array<{ n: number; resets: Date }>;
+
+  const used = rows[0]?.n ?? 0;
+  return {
+    used,
+    left: Math.max(0, DAILY_ENTRIES - used),
+    limit: DAILY_ENTRIES,
+    resetsAt: rows[0].resets,
+  };
 }
 
 export async function countEntries(

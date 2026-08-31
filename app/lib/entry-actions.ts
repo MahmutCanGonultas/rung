@@ -5,10 +5,17 @@ import { redirect } from "next/navigation";
 import { log } from "./log";
 
 import { findContextBySlug, findTaskById } from "./content";
-import { createEntry } from "./entries";
+import { createEntry, dailyQuota } from "./entries";
 import type { SaveState } from "./save-state";
 import { getSessionUser } from "./session";
 import { readField } from "./validation";
+
+/* Hakkın yenilendiği an — kullanıcıya İstanbul saatiyle söyleniyor. */
+const SAAT = new Intl.DateTimeFormat("tr-TR", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Istanbul",
+});
 import { countWords } from "./words";
 import { analyze as analyzeK0 } from "./k0";
 import { estimateLevel } from "./k3/estimate";
@@ -75,6 +82,28 @@ export async function saveEntryAction(
   if (wordCount < MIN_WORDS) {
     return {
       error: `Ölçüm için en az ${MIN_WORDS} kelime gerekiyor — şu an ${wordCount}.`,
+      body,
+    };
+  }
+
+  /*
+   * GÜNLÜK HAK — sunucuda, ekranda değil.
+   *
+   * Yazma ekranı kalan hakkı gösteriyor ve sıfırlanınca düğmeyi kapatıyor,
+   * ama o bir sınır değil bir bilgi: form tarayıcısız da gönderilebiliyor.
+   * Parayı harcayan çağrı burada başlıyor, sayaç da burada.
+   *
+   * KONTROL METİN DOĞRULAMASINDAN SONRA: hakkı, kaydedilemeyecek bir metin
+   * yüzünden yakmak olmaz.
+   */
+  const quota = await dailyQuota(user.id);
+  if (quota.left <= 0) {
+    return {
+      error:
+        `Bugünlük ölçüm hakkın doldu — günde ${quota.limit} kayıt. ` +
+        `Her kayıt bir model çağrısı ve onun gerçek bir bedeli var; sınır ` +
+        `ürünün ayakta kalması için. Hakkın ${SAAT.format(quota.resetsAt)} ` +
+        `gibi yenileniyor.`,
       body,
     };
   }

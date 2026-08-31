@@ -151,7 +151,41 @@
      Tek ışık: üst en aydınlık, ön orta, yan koyu. Sıra iki temada aynı.
      Yanan basamak bandın kendi rengini alıyor. */
   --face-lift: rgba(255, 255, 255, 0.55);
-  --face-shade: rgba(122, 65, 48, 0.2);
+  /*
+   * Gölge derinleşti (0,20 → 0,30). Merdiven sayfanın tek gerçek hacimli
+   * nesnesi ve markanın motifi, ama HAVADA ASILI duruyordu: altındaki leke
+   * o kadar soluktu ki nesneyi bir yüzeye bağlamıyordu.
+   */
+  --face-shade: rgba(122, 65, 48, 0.3);
+  /*
+   * ZEMİN — panelden bir tık KOYU.
+   *
+   * İlk denemede zemin panelden AÇIKTI (#fdf1e8) ve sonuç tersine döndü:
+   * nesneyi bastıran bir düzlem değil, altında duran bir ışık havuzu oldu.
+   * ÖLÇÜLDÜ, ekran görüntüsüne bakıldı. Bir yüzeyin geriye gitmesi için
+   * üstündeki nesneden ve arkasındaki panelden koyu olması gerekiyor.
+   */
+  --model-floor: #f2d3bd;
+  /*
+   * TEMAS GÖLGESİ — `--face-shade`ten belirgin biçimde koyu.
+   *
+   * ÖLÇÜLDÜ: geniş zemin gölgesi tek başına okunmuyor, çünkü sahne
+   * `rotateX(-17deg)` ile eğik ve zemin düzlemi neredeyse profilden
+   * görünüyor — koca bir elips ince bir banda sıkışıyor. Nesneyi yere
+   * bağlayan şey geniş ve soluk leke değil, tabanın hemen çevresindeki dar
+   * ve koyu temas.
+   */
+  --contact-shade: rgba(96, 47, 30, 0.5);
+  /*
+   * ÖLÇÜM ÇUBUKLARININ HACMİ.
+   *
+   * `--sink`: rayın kendi içine gömülmesi — çubuk boyalı bir çizgi değil,
+   * bir OLUĞUN içinde duran bir dolgu.
+   * `--fill-lift`: dolgunun üst kenarındaki ışık; merdivenin yüzlerinde
+   * kullanılan kuralın aynısı, aynı yönden gelen aynı ışık.
+   */
+  --sink: inset 0 1px 2px rgba(96, 47, 30, 0.18);
+  --fill-lift: rgba(255, 255, 255, 0.32);
   --plinth: #efd6c4;
   --plinth-2: #e5c9b4;
   --plinth-3: #fbeadd;
@@ -249,7 +283,11 @@
     --model: #c3aeff;
 
     --face-lift: rgba(255, 255, 255, 0.16);
-    --face-shade: rgba(0, 0, 0, 0.45);
+    --face-shade: rgba(0, 0, 0, 0.58);
+    --model-floor: #1e1417;
+    --contact-shade: rgba(0, 0, 0, 0.72);
+    --sink: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+    --fill-lift: rgba(255, 255, 255, 0.16);
     --plinth: #3a2a2f;
     --plinth-2: #2e2126;
     --plinth-3: #46333a;
@@ -306,7 +344,11 @@
   --model: #c3aeff;
 
   --face-lift: rgba(255, 255, 255, 0.16);
-  --face-shade: rgba(0, 0, 0, 0.45);
+  --face-shade: rgba(0, 0, 0, 0.58);
+  --model-floor: #1e1417;
+  --contact-shade: rgba(0, 0, 0, 0.72);
+  --sink: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+  --fill-lift: rgba(255, 255, 255, 0.16);
   --plinth: #3a2a2f;
   --plinth-2: #2e2126;
   --plinth-3: #46333a;
@@ -436,10 +478,31 @@ table {
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-  --t-mega: clamp(2.6rem, 5.6vw, 4.6rem); /* ekranın tek büyük okuması */
-  --t-h1: clamp(2.3rem, 4.6vw, 4.1rem);
+  /*
+   * BEŞ BOY VARDI, GÖZ ÜÇÜNÜ GÖRÜYORDU.
+   *
+   * `--t-mega` ile `--t-h1` arasındaki oran 1,12'ydi — %12 fark hiyerarşi
+   * basamağı olarak algılanmıyor, sayfa hem düz hem kalabalık okunuyordu.
+   * `--t-h1` silindi: iki boy tek boya indi ve aradaki yer gerçek bir
+   * basamağa açıldı.
+   *
+   * `--t-mega` BÜYÜDÜ. Markanın tezi tek kelime — "Ölç." — ve o kelime
+   * sayfanın en büyük yazısı DEĞİLDİ; göz en büyük şeyi arıyor ve bir yüzde
+   * buluyordu. Artık ekranın tek büyük okuması gerçekten o.
+   */
+  --t-mega: clamp(2.9rem, 6.4vw, 5.4rem);
+  /*
+   * Ölçüm sayısının kendi boyu — `--t-mega`nın ALTINDA, bilerek. Sayfanın en
+   * büyük yazısı ürünün tezi olmalı, ölçütü değil.
+   */
+  --t-stat: clamp(2.4rem, 4.4vw, 3.6rem);
   --t-h2: clamp(1.55rem, 2.6vw, 2.1rem);
-  --t-h3: 1.22rem;
+  /*
+   * 1,22rem = 19,52px'ti ve `--t-read` (19,44) ile `--t-lede` (18) ile tek
+   * optik boya çökmüştü. `.section-title` işaretlemede bir `<h2>` ama görsel
+   * olarak iki basamak aşağıda çiziliyordu.
+   */
+  --t-h3: clamp(1.42rem, 1.75vw, 1.62rem);
   --t-lede: clamp(1.05rem, 1.25vw, 1.22rem);
   --t-body: 1rem;
   --t-small: 0.875rem;
@@ -754,9 +817,17 @@ a.chip:hover {
    ═══════════════════════════════════════════════════════════════════ */
 
 .model {
-  --w: clamp(44px, 6.2vw, 92px);
-  --u: clamp(20px, 2.7vw, 40px);
-  --d: clamp(44px, 6.2vw, 92px);
+  /*
+   * BÜYÜDÜ. Sayfanın tek gerçek hacimli nesnesi ve markanın motifi bu; onu
+   * büyütmek, ekrana yeni bir nesne eklemeden hacim kazandırmanın tek yolu.
+   * Yeni bir metafor icat edilmiyor, var olan büyütülüyor.
+   *
+   * Üst sınır 92 → 112px, birim 40 → 48px. Alt sınırlar dokunulmadı: mobilde
+   * zaten dar ve orada büyütmek taşma demek.
+   */
+  --w: clamp(44px, 7.4vw, 112px);
+  --u: clamp(20px, 3.2vw, 48px);
+  --d: clamp(44px, 7.4vw, 112px);
 
   display: grid;
   gap: var(--s-4);
@@ -771,7 +842,14 @@ a.chip:hover {
   /* Taban BİTMİŞ KARE: hareket kapalıyken de tam üç boyutlu. */
   transform: rotateX(-17deg) rotateY(-24deg);
 }
-/* Kaide gölgesi — model havada durmasın. `filter` YOK. */
+/*
+ * ZEMİN — model havada durmasın. `filter` YOK (preserve-3d zincirini
+ * düzleştirir).
+ *
+ * Artık iki katman: altta gerçek bir yüzey rengi, üstünde onu karartan
+ * radyal gölge. Tek başına gölge, nesneyi bir düzleme BASTIRMIYOR — sadece
+ * altında bir leke bırakıyordu.
+ */
 .model-ground {
   position: absolute;
   left: 50%;
@@ -781,10 +859,51 @@ a.chip:hover {
   margin-left: calc((var(--w) * 5 + var(--d) * 2.6) / -2);
   transform: translateY(50%) rotateX(90deg);
   border-radius: 40%;
+  background:
+    radial-gradient(50% 50% at 50% 50%, var(--face-shade) 0%, transparent 68%),
+    radial-gradient(50% 50% at 50% 50%, var(--model-floor) 0%, transparent 78%);
+}
+
+/*
+ * TEMAS ELİPSİ — nesnenin yere DEĞDİĞİ yer.
+ *
+ * Geniş zemin gölgesi "burada bir düzlem var" diyor; bu dar ve koyu elips
+ * "nesne ona basıyor" diyor. Gerçek gölgeler böyle çalışıyor: temas
+ * noktasında keskin ve koyu, uzaklaştıkça geniş ve soluk.
+ *
+ * Ayak izinden GENİŞ (`--d * 1.7`): daha darı kutuların altında tamamen
+ * kalıp hiç görünmüyordu — ölçüldü.
+ */
+.model-stage::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  /* Ayak izinden az geniş, ama ALÇAK: elips tabana yapışsın, koca bir
+     leke olmasın. */
+  width: calc(var(--w) * 5 + var(--d) * 2.2);
+  height: calc(var(--d) * 2.2);
+  margin-left: calc((var(--w) * 5 + var(--d) * 2.2) / -2);
+  /*
+   * ÖNE VE SOLA KAYDIRILMIŞ.
+   *
+   * Ortalanmış bir elipsin en koyu yeri tam olarak kutuların ALTINDA kalıyor
+   * ve görünen tek şey sönen kenarı oluyordu — üç deneme boyunca ölçüldü,
+   * ekranda hiçbir şey değişmedi. Gerçek bir gölge zaten ortalı değil:
+   * ışığın karşı tarafına düşüyor. Işık yukarı-ön-soldan geliyor (üst yüzler
+   * en aydınlık), yani gölge izleyiciye doğru ve sağa uzanıyor — ve o alan,
+   * tabanın önündeki açık kama, ekranda GÖRÜNEN tek zemin parçası.
+   *
+   * `translateY` döndürmeden ÖNCE uygulandığı için, `rotateX(90deg)`
+   * sonrasında Z eksenine dönüşüyor: yani izleyiciye doğru kaydırıyor.
+   */
+  transform: translate(3%, 64%) rotateX(90deg);
+  border-radius: 50%;
   background: radial-gradient(
     50% 50% at 50% 50%,
-    var(--face-shade) 0%,
-    transparent 70%
+    var(--contact-shade) 0%,
+    color-mix(in srgb, var(--contact-shade) 55%, transparent) 42%,
+    transparent 72%
   );
 }
 
@@ -806,7 +925,19 @@ a.chip:hover {
 .mbox > * {
   position: absolute;
   display: block;
-  /* Kenar ışığı: her yüzün üst kenarında ince bir parlaklık. */
+}
+/*
+ * KENAR IŞIĞI YALNIZ DİKEY YÜZLERDE.
+ *
+ * Önce her yüze uygulanıyordu, üst yüz dâhil. Üst yüz sıralı renk
+ * kodlamasını okutan TEK yüzey — beş basamağın rampadaki yerini oradan
+ * okuyoruz — ve üstüne beyaz bir bant koymak o okumayı bozuyordu. Işığın
+ * bir yönü var: yukarıdan geliyor, yani üst yüzü aydınlatıyor, dikey
+ * yüzlerin ÜST KENARINDA parlıyor.
+ */
+.f-front,
+.f-left,
+.f-right {
   background-image: linear-gradient(to bottom, var(--face-lift) 0, transparent 3px);
 }
 
@@ -857,12 +988,18 @@ a.chip:hover {
 .f-left {
   transform: translateX(calc(var(--w) / -2)) rotateY(-90deg);
 }
+/*
+ * Üst yüz iki piksel BÜYÜK. Tam ölçüde olduğunda üst yüzle ön yüzün
+ * birleştiği kenarda tarayıcının yuvarlamasından doğan tırtıklı bir çirtik
+ * kalıyordu — ekranda görünen o. İki piksel örtüşme dikişi kapatıyor ve
+ * `margin-top` aynı oranda kaydırılarak yüz merkezde kalıyor.
+ */
 .f-top {
   left: 0;
   width: 100%;
-  height: var(--d);
+  height: calc(var(--d) + 2px);
   top: 50%;
-  margin-top: calc(var(--d) / -2);
+  margin-top: calc((var(--d) + 2px) / -2);
   transform: translateY(calc(var(--h) / -2)) rotateX(90deg);
   background-color: var(--face);
 }
@@ -1434,7 +1571,7 @@ a.chip:hover {
   grid-column: 1 / -1;
 }
 .proof-cell.is-lead .proof-value {
-  font-size: clamp(3.4rem, 6.6vw, 5.6rem);
+  font-size: var(--t-stat);
   color: var(--accent);
 }
 .proof-note {
@@ -1495,6 +1632,19 @@ a.chip:hover {
    ucuna hiçbir kaydırmayla ulaşılamıyor; ÖLÇÜLDÜ, 900px'lik ekranda
    içerik 1015px'ti ve davetin altındaki not kayboluyordu. Boşluklar ve
    modelin birim ölçüsü bu yüzden `svh`ye bağlı. */
+/*
+ * YAPIŞKAN PANEL — ama YALNIZ SIĞDIĞINDA.
+ *
+ * ÖLÇÜLDÜ, üç ekran boyunda: panel 1280×720'de 786px, 1440×900'de 890px
+ * tutuyor. İkisinde de ekrandan uzun, ve yapışkan bir sütun ekrandan uzunsa
+ * ALT UCUNA HİÇBİR KAYDIRMAYLA ULAŞILAMIYOR — davetin altındaki not
+ * kayboluyor. Bu daha önce bir kez düzeltilmişti ve içerik büyüdükçe geri
+ * gelmiş.
+ *
+ * Bu sefer kural şartlı: panel ancak sığdığı boyda yapışıyor, sığmadığında
+ * sayfayla birlikte akıyor ve her şey ulaşılabilir kalıyor. Yapışkanlık bir
+ * konfor; ulaşılamayan içerik bir kusur.
+ */
 .tool {
   position: sticky;
   inset-block-start: var(--s-4);
@@ -1503,7 +1653,7 @@ a.chip:hover {
   align-content: center;
   min-block-size: min(760px, calc(100svh - var(--s-6)));
   border-radius: var(--r-panel);
-  padding: clamp(28px, 4.4svh, 54px) var(--pad);
+  padding: clamp(26px, 4svh, 48px) var(--pad);
   box-shadow: var(--lift-1);
   background: linear-gradient(
     152deg,
@@ -1516,10 +1666,22 @@ a.chip:hover {
      bu kırpmayla korunuyor. */
   overflow: hidden;
 }
+/*
+ * ALÇAK EKRANDA AKAR, YÜKSEK EKRANDA YAPIŞIR.
+ *
+ * 900px eşiği ölçümden geliyor: panel en sıkı hâlinde ~870px tutuyor ve
+ * yapışkan konum `--s-4` kadar da aşağıdan başlıyor.
+ */
+@media (max-height: 899px) {
+  .tool {
+    position: static;
+    min-block-size: 0;
+  }
+}
 .tool-in {
   display: grid;
   justify-items: start;
-  gap: clamp(16px, 2.4svh, 26px);
+  gap: clamp(15px, 2.2svh, 26px);
   max-inline-size: 32rem;
 }
 .tool-kicker {
@@ -1544,7 +1706,7 @@ a.chip:hover {
   color: var(--ink);
 }
 .tool-title b {
-  font-size: var(--t-h1);
+  font-size: var(--t-mega);
   font-weight: 700;
   color: var(--accent);
 }
@@ -1968,11 +2130,6 @@ a.chip:hover {
   min-inline-size: 0;
   container-type: inline-size;
 }
-.step-rail {
-  grid-column: 2;
-  min-inline-size: 0;
-  container-type: inline-size;
-}
 
 .gate-accuracy {
   display: grid;
@@ -2044,8 +2201,7 @@ a.chip:hover {
   }
   .step-body,
   .step-note,
-  .step-figure,
-  .step-rail {
+  .step-figure {
     grid-column: 1;
   }
 }
@@ -2483,11 +2639,66 @@ a.chip:hover {
 .composer-target {
   color: var(--ink-3);
 }
-.composer-flag {
-  padding: 2px var(--s-3);
+/*
+ * HEDEF RAYI — yazarken canlanan tek şey.
+ *
+ * Kâğıdın hemen altında, onunla aynı genişlikte. Dolgu yazdıkça büyüyor;
+ * kertik hedefin ALT SINIRININ olduğu yerde duruyor, yani "buradan sonrası
+ * ölçülebilir" demek.
+ *
+ * Kertik RENKLİ BİR BANT DEĞİL, iki piksellik bir çizgi: aynı hue'nun üç
+ * tonunu üst üste bindiren bir bant koyu temada 3:1'i geçmiyordu.
+ */
+.composer-rail {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  block-size: 6px;
+  /* Kâğıda yapışık değil, bir nefes altında: kenarlığın parçası gibi
+     görünmesin. */
+  margin-block-start: calc(var(--s-4) * -1 + 8px);
   border-radius: var(--r-pill);
-  background: var(--fam-turkish);
-  color: var(--fam-turkish-ink);
+  background: var(--hair-2);
+  overflow: hidden;
+}
+.composer-rail::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--sink);
+}
+.composer-rail-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  display: block;
+  border-radius: var(--r-pill);
+  background-color: var(--accent);
+  background-image: linear-gradient(to bottom, var(--fill-lift), transparent 70%);
+}
+/* Hedefi aştı: ray sakinleşiyor. Uzun yazmak hata değil. */
+.composer-rail-fill.is-full {
+  background-color: var(--ink-3);
+}
+.composer-rail-min {
+  position: absolute;
+  inset-block: 0;
+  inline-size: 2px;
+  display: block;
+  background: var(--page);
+}
+
+/*
+ * Günlük hak — sayacın yanında, kendi satırında değil.
+ *
+ * Sınır bir ceza değil, ürünün maliyetinin görünür hâli: her kayıt bir model
+ * çağrısı. Ama kendi uyarı kutusunu hak edecek kadar da önemli değil; hak
+ * dolmadan önce kimse fark etmese de olur.
+ */
+.composer-quota {
+  font-size: var(--t-micro);
+  color: var(--ink-3);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -3093,6 +3304,10 @@ a.chip:hover {
   font-weight: 800;
   color: var(--ink);
 }
+/* Listenin kesildiğini söyleyen not — sayı değil uyarı, o yüzden vurgusuz. */
+.log-cut {
+  color: var(--ink-3);
+}
 .log-sep {
   color: var(--ink-3);
 }
@@ -3247,6 +3462,7 @@ a.chip:hover {
   justify-content: end;
   padding-block-start: 2px;
 }
+/* Kayıt listesindeki yoğunluk çubuğu da aynı oluk gramerinde. */
 .entry-bar {
   display: block;
   inline-size: 84px;
@@ -3480,14 +3696,30 @@ a.chip:hover {
   font-size: var(--t-micro);
   color: var(--ink-3);
 }
+/*
+ * RAY BİR OLUK, boyalı bir çizgi değil.
+ *
+ * Oyuk `::after` ile ayrı bir katmanda çiziliyor, doğrudan elemana
+ * yazılmıyor: `inset` gölge kendi kutusunun içinde kalır ve %100 dolu bir
+ * çubukta dolgunun ALTINDA kaybolurdu — doğruluk sayfasındaki yedi tam
+ * çubuk hiç değişmezdi. Ayrı katman dolgunun ÜSTÜNDE duruyor.
+ */
 .meter-track {
   position: relative;
   display: block;
   inline-size: 100%;
-  block-size: 8px;
+  block-size: 10px;
   border-radius: var(--r-pill);
   background: var(--hair-2);
   overflow: hidden;
+}
+.meter-track::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--sink);
+  pointer-events: none;
 }
 .meter-was,
 .meter-fill {
@@ -3506,14 +3738,40 @@ a.chip:hover {
  * olduğu için sonucu kimse hesaplayamıyordu. Şimdi AYNI RENGİN soluk hâli —
  * "aynı şey, daha önce" demenin doğru grameri — ve opak, yani ölçülebilir.
  */
+/*
+ * RENK AİLEDEN GELİYOR — ve bu, dilin 3. kararının (nominal veri = beş hue)
+ * tam da ailelerin yan yana durduğu TEK ekranda uygulanmamış olmasıydı.
+ * Kayıt ayrıntısında öğrenilen renk burada geçerli oluyor: göz "Gramer"i
+ * iki ekranda aynı renkte görüyor.
+ *
+ * `--tone` yoksa `--accent`e düşüyor: aile sınıfı taşımayan çubuklar
+ * (ilerlemedeki genel ölçümler) eskisi gibi çiziliyor.
+ *
+ * RENK `background-color`, IŞIK `background-image`. İkisi de `background`
+ * kısayolunu kullanırsa biri ötekini eziyor.
+ */
 .meter-was {
-  background: color-mix(in srgb, var(--accent) 40%, var(--hair-2));
+  background-color: color-mix(in srgb, var(--tone, var(--accent)) 40%, var(--hair-2));
 }
 .meter-fill {
-  background: var(--accent);
+  background-color: var(--tone, var(--accent));
+  background-image: linear-gradient(to bottom, var(--fill-lift), transparent 70%);
 }
+/*
+ * "AZALMIYOR" ARTIK RENKLE DEĞİL YAZIYLA söyleniyor.
+ *
+ * `.meter-fill.warn` `--bad` kullanıyordu ve `--bad` ile `--fam-turkish-ink`
+ * iki temada da BİREBİR aynı hex (#8c2f4c): renkler aileden gelince
+ * "takılmış Gramer" ile sağlıklı "Türkçe kaynaklı" piksel piksel aynı
+ * görünecekti. Renk sınıflandırma, durum değil — durumu `.meter-flag`
+ * söylüyor ve o bir METİN, yani zorlanmış renklerde de duruyor.
+ *
+ * KURAL DURUYOR ama yalnız DOĞRULUK sayfası için: orada satırlar aile
+ * taşımıyor (`--tone` tanımsız, `--accent`e düşüyor) ve kırmızı gerçekten
+ * "bu sayı kötü" demek. İlerlemedeki aile çubuklarından bu sınıf kaldırıldı.
+ */
 .meter-fill.warn {
-  background: var(--bad);
+  background-color: var(--bad);
 }
 
 .pair {
@@ -3993,7 +4251,6 @@ a.chip:hover {
 }
 [data-play="1"] .scene-body,
 [data-play="1"] .step-figure,
-[data-play="1"] .step-rail,
 [data-play="1"] .accuracy-band {
   animation: settle var(--d-2) var(--ease) both;
 }
@@ -4111,6 +4368,13 @@ a.chip:hover {
    ═══════════════════════════════════════════════════════════════════ */
 
 @media (forced-colors: active) {
+  /* Temas elipsi bir GÖLGE, bilgi taşımıyor. Zorlanmış renklerde gradyanlar
+     düz renge çöküyor ve bu elips modelin altında opak bir leke olurdu. */
+  .model-stage::after,
+  .model-ground {
+    display: none;
+  }
+
   /* Yüzeyler tek renge çöküyor: sınırı kenarlık veriyor. */
   .scene,
   .tool,
@@ -4160,7 +4424,6 @@ a.chip:hover {
   .sample-mark,
   .taxo-chip,
   .row-level,
-  .composer-flag,
   .fix-badge,
   .step-folio {
     forced-color-adjust: none;
@@ -4168,6 +4431,23 @@ a.chip:hover {
     color: CanvasText;
     border: 1px solid CanvasText;
     box-shadow: none;
+  }
+
+  /*
+   * Hedef rayı: zorlanmış renklerde gradyanlar düz renge çöküyor ve dolgu
+   * ile ray aynı renge inebiliyor. Kertik tek anlam taşıyıcısı, o yüzden
+   * `CanvasText` ile zorlanıyor ve dolgu konturla ayrılıyor.
+   */
+  .composer-rail {
+    border: 1px solid CanvasText;
+  }
+  .composer-rail-fill {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  .composer-rail-min {
+    forced-color-adjust: none;
+    background: CanvasText;
   }
 
   /* Yuvalar ve noktalar: dolu ile boş aynı renge çökmesin. */
