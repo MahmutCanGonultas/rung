@@ -2574,12 +2574,41 @@ a.chip:hover {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--s-4);
-  max-inline-size: 68ch;
+  /*
+   * 78ch — OKUMA ölçüsü değil, YAZMA ölçüsü.
+   *
+   * Önce 68ch'ti ve gerekçesi doğruydu ama yanlış işe uygulanmıştı: 68ch
+   * göz satır başına dönebilsin diye, yani OKUMAK için. Bu yüzeyin işi
+   * okumak değil yazmak, ve yazarken imleç satırın sonuna yaklaştıkça dar
+   * bir kolon insanı sıkıştırıyor. Ürün sahibi de tam bunu söyledi:
+   * "defter yeri büyüyebilir."
+   *
+   * Ölçülen İngilizceyi OKUDUĞUMUZ yüzey (`.read-text`) 68ch'te kalıyor —
+   * iki ayrı iş, iki ayrı ölçü.
+   */
+  max-inline-size: 78ch;
 }
 .editor {
   --line: 1.9em;
   inline-size: 100%;
-  min-block-size: 44svh;
+  /*
+   * KÂĞIT BÜYÜDÜ. 44svh (900px'te ~396px, on dört satır) yazmaya davet
+   * etmiyordu; bu ekranın tek işi bir boş yüzey sunmak ve o yüzey ekranın
+   * yarısından azını kaplıyordu.
+   *
+   * YÜKSEKLİK ARTIK PENCEREYE BAĞLI.
+   *
+   * `min-block-size` yazmak hiçbir şey değiştirmiyordu ve bunu ölçerek
+   * öğrendim: gerçek yüksekliği `rows={14}` belirliyordu (satır yüksekliği ×
+   * on dört), `min-block-size` hep onun altında kalıyordu. Değeri
+   * büyütmek ekranda tek bir pikseli oynatmadı.
+   *
+   * `block-size` bağlayıcı. Alt sınır alçak pencerede kâğıdı kullanılmaz
+   * yapmıyor, üst sınır yüksek pencerede sayacı ve Kaydet düğmesini
+   * katlamanın çok altına itmiyor. `rows` niteliği yerinde kalıyor: CSS
+   * inmezse sayfa yine kullanılabilir bir kâğıtla açılıyor.
+   */
+  block-size: clamp(360px, 58svh, 620px);
   padding: var(--s-5);
   border: 1px solid transparent;
   border-radius: var(--r-card);
