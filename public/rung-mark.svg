@@ -1,0 +1,26 @@
+<!--
+  rung — marka işareti, tek dosya.
+
+  Uygulamadaki `Mark` bileşeniyle AYNI geometri: beş basamak, dördü kalın
+  kontur, beşincisi ince — "ölçüm hep bir üste bakıyor". Basamak 6 birim,
+  rıht 4,6 birim (eğim 37,5°); birleşim `miter`, çünkü merdiven mimaridir ve
+  köşesi diktir. Kutuya oturma dört yanda simetrik: 1,0 / 1,0 / 1,3 / 1,3.
+
+  ÇIKILAN BASAMAKLAR `currentColor`. Kökteki `color` markanın pas tonu, yani
+  dosya `<img>` ile çağrıldığında doğru rengi çiziyor; HTML'in içine
+  gömüldüğünde çevresinin rengini alıyor. Koyu zeminde `color` vermek yetiyor.
+
+  BEŞİNCİ BASAMAK SABİT VE NÖTR (#9a8a8f). Uygulamada bu basamak `--ink-3`,
+  yani temaya göre dönüyor; tek dosyada tema yok. Vurgu renginin saydamı
+  denendi ve olmadı: saydamlık rengi ZEMİNE karıştırıyor, koyu zeminde kayısı
+  kahverengiye çöküyor. Orta bir mor-gri hem kremde hem erikte okunuyor.
+
+  Adres: https://www.rungscale.com/rung-mark.svg
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 24" width="35" height="24"
+     fill="none" color="#a03a1e" role="img" aria-label="rung">
+  <path d="M2.5 21.2H8.5V16.6H14.5V12H20.5V7.4H26.5"
+        stroke="currentColor" stroke-width="3" stroke-linecap="butt" stroke-linejoin="miter"/>
+  <path d="M26.5 7.4V2.8H32.5"
+        stroke="#9a8a8f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="miter"/>
+</svg>

@@ -745,9 +745,14 @@ a.chip:hover {
 /* ═══════════════════════════════════════════════════════════════════
    06 · MARKA İŞARETİ
 
-   Beş basamak, her biri kendi bandının rengini taşıyor: işaretin kendisi
-   ölçeğin ta kendisi. Altıncı çizgi bir sonraki adım — ölçek beşte
-   bitmiyor.
+   Beş basamak, tek sürekli profil. Dördü vurgu renginde ve kalın —
+   çıkılmış olan; beşincisi ince ve nötr — henüz ölçülmemiş olan. Ölçek
+   beşte bitmiyor, işaret hep bir üste bakıyor.
+
+   Buradaki yorum bir zamanlar "her basamak kendi bandının rengini taşıyor"
+   diyordu. Çizim bunu hiç yapmadı ve yapmamalı da: renk kodlaması üç boyutlu
+   modelin işi — orada beş basamak beş bandın rengini taşıyor ve okunacak
+   kadar büyük. 17 pikselde beş ayrı renk çamurdur.
    ═══════════════════════════════════════════════════════════════════ */
 
 .mark {
@@ -771,16 +776,47 @@ a.chip:hover {
   block-size: auto;
   overflow: visible;
 }
+/*
+ * KONTUR, DOLGU DEĞİL.
+ *
+ * Buraya `fill: var(--accent)` yazılmıştı ve `stroke` hiç verilmemişti. Yol
+ * açık bir profil (`M… H… V… H…`); dolgu onu örtük olarak kapatıyor ve her
+ * basamak ayrı bir ÜÇGENE dönüşüyor. 64px'e büyütüldüğünde ekranda merdiven
+ * değil, çapraz dizilmiş testere dişleri çıkıyordu.
+ *
+ * `butt` uç: yuvarlak uç profili 1,5 birim uzatıyor ve mimari kesiti
+ * yumuşatıyor. `miter` birleşim dosyanın kendi kararı — merdivenin köşesi
+ * diktir.
+ *
+ * Aynı kesit sayfanın bant dikişinde de var: orada iki katmanla çizilen o
+ * beş basamaklı çizgi, burada tek bir konturla. Tek jest, iki ölçek.
+ */
 .mark-steps {
-  fill: var(--accent);
-}
-/* Henüz çıkılmamış basamak: boş kontur. */
-.mark-next {
   fill: none;
   stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+}
+/*
+ * Henüz çıkılmamış basamak: ince ve NÖTR kontur.
+ *
+ * Önce vurgu renginin saydamı denendi (%45, sonra %58) ve iki temada birden
+ * çalışmadı. Saydamlık rengi ZEMİNE doğru karıştırıyor: açık temada kayısı
+ * kremle karışıp yumuşak bir gül veriyor, koyu temada erikle karışıp
+ * KAHVERENGİYE çöküyor. Aynı değer bir yerde zarif, öbüründe kirli.
+ *
+ * Karıştırma yönünü temaya göre çevirmek yerine renk değişti: bu basamak
+ * artık `--ink-3`, yani metnin en sessiz tonu. Anlamı da bu — oraya henüz
+ * bir ölçüm yazılmadı, dolayısıyla vurgu rengini hak etmiyor. Saydamlık
+ * yok, yani hiçbir zeminde karışmıyor.
+ */
+.mark-next {
+  fill: none;
+  stroke: var(--ink-3);
   stroke-width: 1.6;
   stroke-linecap: round;
-  opacity: 0.45;
+  stroke-linejoin: miter;
 }
 .mark-word {
   font-family: var(--display);
