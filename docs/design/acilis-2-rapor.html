@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rung — Basılı rapor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F3EC;
+  --ink:#14120E;
+  --ink-2:#3C372E;
+  --ink-3:#6C6558;
+  --rule:#CBC3B2;
+  --rule-2:#E0DACB;
+  --blue:#24446E;
+  --red:#B23129;
+  --main:664px;
+  --side:260px;
+  --gap:60px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;
+  font-size:17px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.sheet{max-width:1236px;margin-left:auto;margin-right:auto;padding-left:48px;padding-right:48px}
+.grid{
+  display:grid;
+  grid-template-columns:96px minmax(0,var(--main)) minmax(0,var(--side));
+  column-gap:var(--gap);
+}
+.col-main{grid-column:2}
+.col-side{grid-column:3}
+.side-end{align-self:end}
+.col-wide{grid-column:2 / -1}
+.folio{
+  grid-column:1;
+  font-family:"Newsreader",Georgia,serif;
+  font-size:46px;font-weight:200;line-height:1;
+  color:#B7AE99;
+  font-variant-numeric:tabular-nums;
+  padding-top:8px;
+}
+h1,h2{font-family:"Newsreader",Georgia,serif;font-weight:300;letter-spacing:-.014em}
+.eyebrow{font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3)}
+.rule{height:1px;background:var(--rule);border:0}
+.rule-heavy{height:2px;background:var(--ink)}
+.hair{height:1px;background:var(--rule-2);border:0}
+
+/* ── masthead ─────────────────────────────── */
+.masthead{padding-top:36px}
+.masthead-row{display:flex;align-items:baseline;justify-content:space-between;gap:24px;padding-bottom:13px}
+.brand{font-family:"Newsreader",Georgia,serif;font-weight:400;font-size:26px;letter-spacing:-.02em}
+.masthead-meta{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);text-align:right}
+
+/* ── hero ─────────────────────────────────── */
+.hero{padding-top:118px}
+.hero h1{font-size:50px;line-height:1.2}
+.shout{
+  display:block;font-family:"Newsreader",Georgia,serif;font-weight:400;
+  font-size:214px;line-height:1.3;letter-spacing:-.05em;
+  margin-top:0;margin-bottom:-.22em;
+}
+.hero-lower{margin-top:44px;max-width:var(--main)}
+.lede{font-family:"Newsreader",Georgia,serif;font-size:21px;line-height:1.62;color:var(--ink-2);max-width:53ch}
+.actions{display:flex;align-items:center;gap:30px;flex-wrap:wrap;margin-top:38px}
+.btn-ink{
+  display:inline-block;background:var(--ink);color:var(--paper);
+  font-size:13.5px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;
+  padding:16px 32px;text-decoration:none;transition:background .2s ease;
+}
+.btn-ink:hover{background:var(--blue)}
+.btn-line{
+  font-size:13.5px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink);padding-bottom:4px;
+}
+.btn-line:hover{color:var(--blue);border-color:var(--blue)}
+.fineprint{font-size:13.5px;color:var(--ink-3);margin-top:26px}
+
+/* ── plate: the scale ─────────────────────── */
+.plate{padding-top:126px}
+.plate-head{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding-bottom:11px}
+.chart{display:flex;align-items:flex-end;gap:2.4%;height:390px;margin-top:56px}
+.bar{flex:1;position:relative;transform-origin:bottom center;animation:grow 1.1s cubic-bezier(.22,.9,.26,1) both}
+.bar i{position:absolute;inset:0;display:block}
+.bar:nth-child(1){height:24%;animation-delay:.06s}
+.bar:nth-child(2){height:43%;animation-delay:.15s}
+.bar:nth-child(3){height:62%;animation-delay:.24s}
+.bar:nth-child(4){height:81%;animation-delay:.33s}
+.bar:nth-child(5){height:100%;animation-delay:.42s}
+.bar:nth-child(1) i{background:repeating-linear-gradient(90deg,var(--blue) 0 1px,transparent 1px 9px)}
+.bar:nth-child(2) i{background:repeating-linear-gradient(90deg,var(--blue) 0 2px,transparent 2px 9px)}
+.bar:nth-child(3) i{background:repeating-linear-gradient(90deg,var(--blue) 0 4px,transparent 4px 9px)}
+.bar:nth-child(4) i{background:repeating-linear-gradient(90deg,var(--blue) 0 6px,transparent 6px 9px)}
+.bar:nth-child(5) i{background:var(--blue)}
+@keyframes grow{from{transform:scaleY(.03);opacity:0}to{transform:scaleY(1);opacity:1}}
+.axis{height:2px;background:var(--ink)}
+.bands{display:flex;gap:2.4%;margin-top:16px}
+.band{flex:1;position:relative;font-family:"Newsreader",Georgia,serif;font-size:34px;font-weight:300;letter-spacing:.01em}
+.band::before{content:"";position:absolute;top:-16px;left:0;width:1px;height:11px;background:var(--ink)}
+.caption{font-size:13.5px;color:var(--ink-3);margin-top:38px;max-width:70ch;line-height:1.6}
+.caption b{font-weight:500;color:var(--ink-2);letter-spacing:.17em;text-transform:uppercase;font-size:11px}
+
+/* ── sections ─────────────────────────────── */
+.sec{padding-top:158px}
+h2{font-size:42px;line-height:1.16;max-width:21ch}
+.dek{margin-top:22px;font-size:17px;color:var(--ink-2);max-width:62ch}
+
+.record{
+  display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+  margin-top:64px;padding-bottom:10px;border-bottom:1px solid var(--ink);
+  font-size:11px;font-weight:500;letter-spacing:.19em;text-transform:uppercase;
+}
+.record .r-red{color:var(--red)}
+.record .r-quiet{color:var(--ink-3)}
+
+.specimen{font-family:"Newsreader",Georgia,serif;font-size:28px;line-height:1.86;font-weight:300;margin-top:38px}
+mark{background:none;color:inherit;text-decoration:underline wavy var(--red);text-decoration-thickness:1.5px;text-underline-offset:8px}
+sup{font-family:"IBM Plex Sans",sans-serif;font-size:11px;font-weight:600;color:var(--red);vertical-align:super;line-height:0;margin-left:2px}
+.specimen.clean{color:var(--ink-2)}
+
+.notes{list-style:none;margin-top:52px}
+.col-wide .notes{margin-top:46px}
+.notes li{
+  display:grid;grid-template-columns:28px minmax(0,1fr) 250px;
+  column-gap:22px;align-items:baseline;padding:14px 0;
+  border-top:1px solid var(--rule-2);font-size:15.5px;
+}
+.notes li:last-child{border-bottom:1px solid var(--rule-2)}
+.n{color:var(--red);font-weight:600;font-size:12px;font-variant-numeric:tabular-nums}
+.was{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--red)}
+.arrow{color:var(--ink-3);padding:0 7px}
+.now{font-weight:500}
+.tax{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);text-align:right}
+
+.sidenote{font-family:"Newsreader",Georgia,serif;font-size:16.5px;line-height:1.64;color:var(--ink-2);border-top:1px solid var(--ink);padding-top:13px}
+.sn-quiet{color:var(--ink-3) !important}
+.sidenote .sn-label{display:block;font-family:"IBM Plex Sans",sans-serif;font-size:10.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--red);margin-bottom:11px;font-weight:500}
+
+/* ── layers ───────────────────────────────── */
+.layers{width:100%;border-collapse:collapse;margin-top:64px;text-align:left}
+.layers th{font-size:10.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--ink-3);font-weight:500;padding-bottom:10px;border-bottom:1px solid var(--ink)}
+.layers td{padding:20px 0;border-bottom:1px solid var(--rule-2);vertical-align:baseline}
+.layers .k{font-family:"Newsreader",Georgia,serif;font-size:25px;font-weight:400;width:82px}
+.layers .nm{width:210px;font-weight:500;font-size:16px}
+.layers .ds{color:var(--ink-2);font-size:15.5px;padding-right:36px}
+.layers .md{width:180px;text-align:right;font-size:11px;letter-spacing:.15em;text-transform:uppercase;white-space:nowrap}
+.layers .md.on{color:var(--blue);font-weight:500}
+.layers .md.off{color:var(--ink-3)}
+.dot{display:inline-block;width:7px;height:7px;margin-right:10px;vertical-align:middle}
+.md.on .dot{background:var(--blue)}
+.md.off .dot{border:1px solid var(--ink-3)}
+
+/* ── metrics ──────────────────────────────── */
+.metrics{margin-top:66px;border-top:2px solid var(--ink)}
+.metric{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:24px;padding:28px 0;border-bottom:1px solid var(--rule-2)}
+.m-label{font-size:11px;letter-spacing:.19em;text-transform:uppercase;color:var(--ink-3)}
+.m-note{font-size:13.5px;color:var(--ink-3);margin-top:8px}
+.m-val{font-family:"Newsreader",Georgia,serif;font-weight:300;font-size:62px;line-height:.9;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.metric.primary{padding:40px 0 34px}
+.metric.primary .m-label{color:var(--red);font-weight:500}
+.metric.primary .m-val{font-size:150px;color:var(--red);font-weight:400}
+.colophon{margin-top:30px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3)}
+
+/* ── closing ──────────────────────────────── */
+.closing{padding-top:186px;padding-bottom:24px}
+.closing h2{font-size:56px;max-width:16ch}
+footer{margin-top:148px;padding-bottom:70px}
+.foot-row{display:flex;justify-content:space-between;align-items:baseline;gap:24px;padding-top:15px}
+.foot-meta{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);text-align:right}
+
+@media (prefers-reduced-motion:reduce){.bar{animation:none}}
+
+/* ── narrow ───────────────────────────────── */
+@media (max-width:1180px){
+  :root{--main:100%;--gap:36px}
+  .grid{grid-template-columns:72px minmax(0,1fr)}
+  .col-main,.col-wide{grid-column:2}
+  .col-side{grid-column:2;margin-top:48px;max-width:580px}
+  .shout{font-size:17vw}
+}
+@media (max-width:720px){
+  body{font-size:16px}
+  .sheet{padding-left:24px;padding-right:24px}
+  .grid{grid-template-columns:1fr;column-gap:0}
+  .col-main,.col-side,.col-wide,.folio{grid-column:1}
+  .folio{order:1}.col-main{order:2}.col-wide{order:3}.col-side{order:4}
+  .folio{font-size:26px;padding-top:0;margin-bottom:16px}
+  .masthead{padding-top:26px}
+  .hero{padding-top:62px}
+  .hero h1{font-size:27px;line-height:1.24;max-width:none}
+  .shout{font-size:31vw;letter-spacing:-.045em;margin-top:6px}
+  .hero-lower{margin-top:34px}
+  .lede{font-size:18px}
+  .actions{gap:22px;margin-top:30px}
+  .btn-ink{padding:15px 26px;font-size:13px}
+  .plate{padding-top:78px}
+  .chart{height:232px;gap:2.8%}
+  .bands{gap:2.8%;margin-top:12px}
+  .band{font-size:19px}
+  .band::before{top:-12px;height:8px}
+  .caption{margin-top:28px;font-size:13px}
+  .sec{padding-top:94px}
+  h2{font-size:30px;max-width:none}
+  .dek{font-size:16px;margin-top:17px}
+  .record{flex-direction:column;align-items:flex-start;gap:6px;margin-top:44px;font-size:10px;letter-spacing:.16em}
+  .specimen{font-size:21px;line-height:1.92;margin-top:30px}
+  .notes{margin-top:38px}
+  .notes li{grid-template-columns:22px minmax(0,1fr);row-gap:6px;padding:13px 0;font-size:15px}
+  .tax{grid-column:2;text-align:left;font-size:11px}
+  .sidenote{margin-top:44px}
+  .layers{margin-top:42px}
+  .layers thead{display:none}
+  .layers tr{display:grid;grid-template-columns:48px minmax(0,1fr);border-bottom:1px solid var(--rule-2);padding:17px 0}
+  .layers td{border:0;padding:0}
+  .layers .k{font-size:21px;grid-row:span 3;width:auto}
+  .layers .nm{font-size:15px;width:auto}
+  .layers .ds{font-size:14.5px;padding:5px 0 0}
+  .layers .md{text-align:left;margin-top:9px;font-size:10.5px;width:auto}
+  .metrics{margin-top:44px}
+  .metric{grid-template-columns:1fr;align-items:start;gap:12px;padding:22px 0}
+  .metric.primary{padding:26px 0}
+  .m-val{font-size:46px}
+  .metric.primary .m-val{font-size:88px}
+  .closing{padding-top:104px}
+  .closing h2{font-size:34px}
+  .colophon{font-size:11px;margin-top:22px}
+  footer{margin-top:88px;padding-bottom:48px}
+  .foot-row{flex-direction:column;gap:9px}
+  .foot-meta{text-align:left}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="sheet">
+    <div class="masthead-row">
+      <div class="brand">rung.</div>
+      <div class="masthead-meta">Türkçe konuşanlar için</div>
+    </div>
+    <hr class="rule rule-heavy">
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <div class="sheet hero">
+    <h1>İngilizceni tahmin etme.<span class="shout">Ölç.</span></h1>
+    <div class="hero-lower">
+      <p class="lede">Yazdığın İngilizceye bakıp hatayı sabit bir taksonomiye yazan, aylar boyunca izleyen ve kendi doğruluğunu ölçen bir alet.</p>
+      <div class="actions">
+        <a class="btn-ink" href="#">Hesap oluştur</a>
+        <a class="btn-line" href="#">Giriş yap</a>
+      </div>
+      <p class="fineprint">E-posta ve şifre. Yirmi saniye.</p>
+    </div>
+  </div>
+
+  <!-- PLATE: THE SCALE -->
+  <div class="sheet plate">
+    <div class="plate-head">
+      <span class="eyebrow">Şekil 1 — Ölçek</span>
+      <span class="eyebrow">Beş bant · sıralı</span>
+    </div>
+    <hr class="rule">
+    <div class="chart" aria-hidden="true">
+      <div class="bar"><i></i></div>
+      <div class="bar"><i></i></div>
+      <div class="bar"><i></i></div>
+      <div class="bar"><i></i></div>
+      <div class="bar"><i></i></div>
+    </div>
+    <div class="axis"></div>
+    <div class="bands"><div class="band">A1</div><div class="band">A2</div><div class="band">B1</div><div class="band">B2</div><div class="band">C1</div></div>
+    <p class="caption"><b>Not</b> &nbsp;Ölçek beş banttan oluşur ve sıralıdır. Her ölçüm bu ölçeğin bir basamağına düşer; alet neyi süzeceğine buna bakarak karar verir.</p>
+  </div>
+
+  <!-- 01 -->
+  <section class="sheet grid sec">
+    <div class="folio">01</div>
+    <div class="col-main">
+      <h2>Yazarsın. Alet hemen konuşmaz.</h2>
+      <p class="dek">Bu cümle sayfa açılırken gerçek K0 katmanından geçti — maket değil. Model çağrısı yok: aynı metin her zaman aynı sonucu veriyor.</p>
+
+      <div class="record">
+        <span>K0 · Deterministik · Model yok</span>
+        <span class="r-red">5 bulgu</span>
+      </div>
+
+      <p class="specimen">
+        <mark>I am agree</mark><sup>1</sup> with your suggestion about <mark>the meeting of tomorrow</mark><sup>2</sup>. Thanks for the <mark>informations</mark><sup>3</sup> you sent me, <mark>i</mark><sup>4</sup> <mark>recieved</mark><sup>5</sup> them yesterday.
+      </p>
+    </div>
+    <div class="col-side">
+      <p class="sidenote"><span class="sn-label">Dipnot 1 — gerekçe</span>«Katılıyorum» Türkçede sıfat gibi kurulur; İngilizcede “agree” zaten fiil, yanına “am” gelmez.</p>
+    </div>
+    <div class="col-wide">
+      <ol class="notes">
+        <li><span class="n">1</span><span><span class="was">I am agree</span><span class="arrow">&rarr;</span><span class="now">I agree</span></span><span class="tax">Türkçe kaynaklı · kalıp</span></li>
+        <li><span class="n">2</span><span><span class="was">the meeting of tomorrow</span><span class="arrow">&rarr;</span><span class="now">tomorrow's meeting</span></span><span class="tax">Türkçe kaynaklı · sözcük sırası</span></li>
+        <li><span class="n">3</span><span><span class="was">informations</span><span class="arrow">&rarr;</span><span class="now">information</span></span><span class="tax">Sözcük · sayılabilirlik</span></li>
+        <li><span class="n">4</span><span><span class="was">i</span><span class="arrow">&rarr;</span><span class="now">I</span></span><span class="tax">Mekanik · büyük harf</span></li>
+        <li><span class="n">5</span><span><span class="was">recieved</span><span class="arrow">&rarr;</span><span class="now">received</span></span><span class="tax">Mekanik · yazım</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="sheet grid sec">
+    <div class="folio">02</div>
+    <div class="col-main">
+      <h2>Aynı motor, doğru cümlede susar.</h2>
+      <p class="dek">Bir hatayı kaçırmak telafi edilir, doğru bir cümleyi “düzeltmek” edilmez.</p>
+
+      <div class="record">
+        <span>K0 · Deterministik · Model yok</span>
+        <span class="r-quiet">0 bulgu</span>
+      </div>
+
+      <p class="specimen clean">I agree with your suggestion about tomorrow's meeting. Thank you for the information you sent me; I received it yesterday.</p>
+    </div>
+    <div class="col-side side-end">
+      <p class="sidenote"><span class="sn-label sn-quiet">Kayıt — 02</span>Motor bu cümlede hiçbir şey bulmadı. Uydurulmuş bir düzeltme yok.</p>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="sheet grid sec">
+    <div class="folio">03</div>
+    <div class="col-main">
+      <h2>Beş katmanın 3'ü model kullanmıyor.</h2>
+      <p class="dek">Neyin modele verilmeyeceğini bilmek, model çağırabilmekten daha zor.</p>
+    </div>
+    <div class="col-wide">
+      <table class="layers">
+        <thead><tr><th>Kat</th><th>Ad</th><th>İş</th><th style="text-align:right">Yapay zekâ</th></tr></thead>
+        <tbody>
+          <tr><td class="k">K0</td><td class="nm">Deterministik</td><td class="ds">Yazım, kurallar, kelime bandı, karmaşıklık</td><td class="md off"><span class="dot"></span>yapay zekâ yok</td></tr>
+          <tr><td class="k">K1</td><td class="nm">Model çıkarımı</td><td class="ds">Sabit taksonomiye ve zorunlu şemaya yazmak zorunda</td><td class="md on"><span class="dot"></span>model</td></tr>
+          <tr><td class="k">K2</td><td class="nm">İkinci geçiş</td><td class="ds">Her bulguya bağımsız olarak “bu gerçekten hata mı”</td><td class="md on"><span class="dot"></span>model</td></tr>
+          <tr><td class="k">K3</td><td class="nm">Seviyeye göre süzme</td><td class="ds">A1'e üç bulgu, C1'e hepsi</td><td class="md off"><span class="dot"></span>yapay zekâ yok</td></tr>
+          <tr><td class="k">K4</td><td class="nm">Sürümlü kayıt</td><td class="ds">Model kimliği ve prompt sürümü kayda yazılır</td><td class="md off"><span class="dot"></span>yapay zekâ yok</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="sheet grid sec">
+    <div class="folio">04</div>
+    <div class="col-main">
+      <h2>Ve kendi doğruluğunu ölçüp yayımlıyor.</h2>
+      <p class="dek">%100 doğruluk mümkün değil — dil modelleri olasılıksal çalışır. Yapılabilecek tek şey ölçmek. Aşağıdaki sayılar sabit yazılmadı.</p>
+    </div>
+    <div class="col-wide">
+      <div class="metrics">
+        <div class="metric primary">
+          <div>
+            <div class="m-label">Yanlış alarm</div>
+            <div class="m-note">ana ölçüt · 41 bulgunun 2'si</div>
+          </div>
+          <div class="m-val">%4,9</div>
+        </div>
+        <div class="metric">
+          <div>
+            <div class="m-label">Yakalama</div>
+            <div class="m-note">41 beklenen hata</div>
+          </div>
+          <div class="m-val">%95,1</div>
+        </div>
+        <div class="metric">
+          <div>
+            <div class="m-label">Ölçülen örnek</div>
+            <div class="m-note">altın kümeden</div>
+          </div>
+          <div class="m-val">41</div>
+        </div>
+      </div>
+      <p class="colophon">bu koşumda 41 örnek ölçüldü · prompt v1 · çaba low · K1+K2</p>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <div class="sheet grid closing">
+    <div class="col-main">
+      <h2>Bugün yaz, altı ay sonra bak</h2>
+      <div class="actions"><a class="btn-ink" href="#">Hesap oluştur</a></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="sheet">
+    <hr class="rule rule-heavy">
+    <div class="foot-row">
+      <div class="brand">rung.</div>
+      <div class="foot-meta">Türkçe konuşanlar için · İngilizce ölçüm aleti</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

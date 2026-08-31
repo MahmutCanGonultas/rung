@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rung — Tek nesne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ──────────────────────────────────────────────────────────────
+   Rung · açılış — "tek nesne"
+   Sayfa tek bir heykelin etrafında kurulu: beş basamaklı merdiven,
+   gerçek CSS 3B, ışık alan ve gölge düşüren bir kütle.
+   Zemin tek renk ve sakin. Kutu yok, kart yok.
+   ────────────────────────────────────────────────────────────── */
+
+:root{
+  --ink:      #090b0e;   /* zemin */
+  --ink-2:    #0e1116;
+  --text:     #eef1f5;
+  --text-2:   #a3abb6;
+  --text-3:   #6e7783;
+  --line:     rgba(255,255,255,.10);
+  --line-2:   rgba(255,255,255,.055);
+  --ice:      #93e2f2;   /* C1 · en üst basamağın rengi */
+  --rose:     #f2a3b2;   /* bulgu işareti */
+  --serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --mono:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--ink); color:var(--text);
+  font-family:var(--serif); font-weight:300;
+  font-size:clamp(17px,1.15vw,19px); line-height:1.62;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+h1,h2,h3,p,figure,blockquote{ margin:0; }
+a{ color:inherit; }
+
+/* ── zeminin hafif hacmi ─────────────────────────────────────── */
+.air{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(70% 55% at 74% 34%, rgba(120,180,210,.10), transparent 66%),
+    radial-gradient(90% 60% at 20% 8%,  rgba(90,110,150,.06),  transparent 70%);
+}
+
+/* ── NESNE ───────────────────────────────────────────────────── */
+.object{
+  position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+}
+.place{
+  position:absolute; left:72%; top:52%;
+  perspective:2000px; perspective-origin:50% 46%;
+  --s:.70;
+  transform:translate(-50%,-50%) scale(var(--s));
+}
+.spin{
+  transform-style:preserve-3d;
+  transform:rotateX(-16deg) rotateY(-31deg);
+}
+.stair{
+  position:relative; width:806px; height:448px;
+  transform-style:preserve-3d;
+  animation:breathe 11s ease-in-out infinite;
+}
+@keyframes breathe{
+  0%,100%{ transform:translateY(-8px) rotateY(0deg); }
+  50%    { transform:translateY(10px) rotateY(3deg); }
+}
+
+/* basamaklar */
+.rung{
+  position:absolute; bottom:0; width:150px;
+  left:calc(var(--i) * 164px);
+  height:calc(var(--h) * 1px);
+  transform-style:preserve-3d;
+}
+.f{ position:absolute; backface-visibility:hidden; }
+.f.front{ inset:0; transform:translateZ(75px); background:hsl(var(--c) / 1); }
+.f.back { inset:0; transform:rotateY(180deg) translateZ(75px); background:hsl(var(--c) / 1); }
+.f.left { inset:0; transform:rotateY(-90deg) translateZ(75px); background:hsl(var(--cd) / 1); }
+.f.right{ inset:0; transform:rotateY(90deg)  translateZ(75px); background:hsl(var(--cd) / 1); }
+.f.top  {
+  left:0; width:150px; height:150px; top:50%; margin-top:-75px;
+  transform:rotateX(90deg) translateZ(calc(var(--h) * .5px));
+  background:hsl(var(--cl) / 1);
+}
+/* üst yüzeyin ön kenarında ince bir ışık çizgisi — hacmi keskinleştirir */
+.f.front::after{
+  content:""; position:absolute; left:0; right:0; top:0; height:2px;
+  background:hsl(var(--cl) / .85);
+}
+.lbl{
+  position:absolute; left:16px; bottom:14px;
+  font-family:var(--mono); font-size:25px; font-weight:500;
+  letter-spacing:.06em; color:hsl(var(--ct) / 1);
+}
+
+/* beş bant: A1 karanlık ve alçak → C1 buz gibi parlak ve yüksek */
+.r1{ --i:0; --h:112; --c:216 20% 25%; --cd:216 22% 17%; --cl:214 18% 33%; --ct:214 25% 76%; }
+.r2{ --i:1; --h:196; --c:211 25% 35%; --cd:212 27% 25%; --cl:209 24% 44%; --ct:209 30% 86%; }
+.r3{ --i:2; --h:280; --c:201 32% 48%; --cd:203 33% 35%; --cl:199 34% 58%; --ct:201 45% 12%; }
+.r4{ --i:3; --h:364; --c:192 44% 63%; --cd:194 40% 47%; --cl:190 48% 73%; --ct:196 45% 12%; }
+.r5{ --i:4; --h:448; --c:186 62% 80%; --cd:188 48% 62%; --cl:184 70% 90%; --ct:192 55% 11%; }
+
+/* zemine düşen ışık ve gölge */
+.floor{
+  position:absolute; left:50%; margin-left:-620px; width:1240px;
+  bottom:-330px; height:660px;
+  transform:rotateX(90deg);
+  background:
+    radial-gradient(ellipse 34% 30% at 50% 50%, rgba(0,0,0,.85), rgba(0,0,0,0) 70%),
+    radial-gradient(ellipse 48% 44% at 50% 50%, rgba(150,205,225,.13), rgba(0,0,0,0) 72%);
+  filter:blur(22px);
+}
+.bloom{
+  position:absolute; right:-140px; top:-160px; width:760px; height:760px;
+  border-radius:50%; transform:translateZ(-260px);
+  background:radial-gradient(circle at 50% 50%, rgba(147,226,242,.20), rgba(147,226,242,0) 62%);
+  filter:blur(30px);
+}
+
+/* kaydırınca dönen ve küçülen nesne */
+@keyframes spin{
+  from{ transform:rotateX(-16deg) rotateY(-31deg); }
+  to  { transform:rotateX(-31deg) rotateY(44deg); }
+}
+@keyframes recede{
+  from{ transform:translate(-50%,-50%) scale(var(--s)); opacity:1; }
+  to  { transform:translate(-50%,-50%) translate(26%,14%) scale(calc(var(--s) * .44)); opacity:.30; }
+}
+@supports (animation-timeline: scroll()){
+  .spin{
+    animation-name:spin; animation-duration:auto; animation-timing-function:linear;
+    animation-fill-mode:both; animation-timeline:scroll(root); animation-range:0% 100%;
+  }
+  .place{
+    animation-name:recede; animation-duration:auto; animation-timing-function:linear;
+    animation-fill-mode:both; animation-timeline:scroll(root); animation-range:0 70vh;
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  .stair,.spin,.place{ animation:none !important; }
+}
+
+/* ── sayfa iskeleti ──────────────────────────────────────────── */
+.page{ position:relative; z-index:1; }
+.wrap{ max-width:1180px; margin:0 auto; padding:0 clamp(22px,5vw,76px); }
+.col{ max-width:620px; }
+.col-wide{ max-width:720px; }
+
+section{ padding-block:clamp(88px,12.5vh,152px); }
+
+.tag{
+  font-family:var(--mono); font-size:11.5px; font-weight:400;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--text-3);
+}
+.tag .on{ color:var(--ice); }
+
+/* ── başlık alanı ────────────────────────────────────────────── */
+.brand{
+  position:relative; z-index:2;
+  padding:clamp(26px,3.6vh,44px) 0 0;
+  font-family:var(--mono); font-size:15px; font-weight:500; letter-spacing:.02em;
+}
+.hero{ padding-block:clamp(56px,11vh,120px) clamp(110px,18vh,190px); }
+.hero .tag{ margin-bottom:clamp(26px,4vh,44px); }
+h1{
+  font-weight:200; line-height:.94; letter-spacing:-.022em;
+  font-size:clamp(2.35rem,4.7vw,4.05rem);
+}
+h1 .big{
+  display:block; color:var(--ice);
+  font-size:clamp(5.4rem,13.4vw,13rem);
+  line-height:.84; letter-spacing:-.045em; margin-top:.18em;
+}
+.lede{
+  margin-top:clamp(30px,4.6vh,50px); max-width:27em;
+  font-size:clamp(1.02rem,1.3vw,1.24rem); color:var(--text-2); line-height:1.66;
+}
+.cta{ margin-top:clamp(34px,5vh,54px); display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+.btn{
+  font-family:var(--mono); font-size:13px; letter-spacing:.04em; text-decoration:none;
+  padding:14px 26px; border-radius:3px; border:1px solid transparent; display:inline-block;
+}
+.btn-1{ background:var(--ice); color:#06232b; font-weight:500; }
+.btn-2{ border-color:var(--line); color:var(--text); }
+.note{ margin-top:18px; font-family:var(--mono); font-size:12px; color:var(--text-3); }
+
+.scale{
+  margin-top:clamp(46px,7vh,76px); display:flex; align-items:center; gap:14px;
+  font-family:var(--mono); font-size:12px; letter-spacing:.14em; color:var(--text-3);
+}
+.scale b{ font-weight:400; }
+.scale .s5{ color:var(--ice); }
+.scale i{ flex:1; height:1px; background:linear-gradient(90deg,var(--line-2),var(--line)); max-width:120px; }
+
+/* ── bölüm başlıkları ────────────────────────────────────────── */
+.num{
+  font-family:var(--mono); font-size:11.5px; letter-spacing:.2em; color:var(--text-3);
+  padding-bottom:16px; border-bottom:1px solid var(--line-2); margin-bottom:clamp(38px,5vh,58px);
+  display:block;
+}
+h2{
+  font-weight:200; letter-spacing:-.018em; line-height:1.06;
+  font-size:clamp(1.95rem,3.8vw,3.1rem);
+}
+.sub{ margin-top:22px; max-width:32em; color:var(--text-2); font-size:1.02rem; }
+
+/* ── 01 · ölçülen cümle ──────────────────────────────────────── */
+.meter{
+  margin-top:clamp(44px,6vh,68px);
+  display:flex; align-items:baseline; justify-content:space-between; gap:6px 20px;
+  flex-wrap:wrap; padding-bottom:14px; border-bottom:1px solid var(--line-2);
+}
+.count{ font-family:var(--mono); font-size:12px; letter-spacing:.16em; color:var(--ice); white-space:nowrap; }
+.sentence{
+  margin-top:clamp(28px,4vh,40px);
+  font-family:var(--mono); font-weight:400; line-height:1.85;
+  font-size:clamp(15px,1.42vw,19px); color:var(--text);
+}
+.hit{ position:relative; color:var(--rose); border-bottom:1px dashed rgba(242,163,178,.6); }
+.hit sup{
+  position:absolute; right:-.1em; top:-1.05em;
+  font-size:.58em; letter-spacing:0; color:var(--rose);
+}
+.ok{ color:var(--text-2); }
+
+.finds{ margin-top:clamp(42px,6vh,62px); max-width:720px; }
+.find{
+  display:grid; grid-template-columns:30px 1fr auto; gap:8px 20px; align-items:baseline;
+  padding:15px 0; border-top:1px solid var(--line-2);
+}
+.find:last-child{ border-bottom:1px solid var(--line-2); }
+.find .n{ font-family:var(--mono); font-size:12px; color:var(--text-3); }
+.find .fix{ font-family:var(--mono); font-size:14.5px; line-height:1.5; }
+.find .fix s{ text-decoration:none; color:var(--rose); }
+.find .fix em{ font-style:normal; color:var(--text-3); padding:0 .45em; }
+.find .fix b{ font-weight:400; color:var(--text); }
+.find .fam{ font-family:var(--mono); font-size:11.5px; color:var(--text-3); letter-spacing:.02em; white-space:nowrap; }
+.why{
+  margin-top:clamp(34px,5vh,46px); max-width:30em;
+  font-style:italic; font-size:1.12rem; color:var(--text-2); line-height:1.6;
+  padding-left:22px; border-left:1px solid var(--line);
+}
+
+/* ── 02 · sessizlik ──────────────────────────────────────────── */
+.silent .sentence{ color:var(--text-2); }
+.zero{
+  font-family:var(--mono); font-size:12px; letter-spacing:.16em; color:var(--text-3);
+}
+
+/* ── 03 · katmanlar = merdivenin cepheden görünüşü ───────────── */
+.layers{ margin-top:clamp(44px,6vh,64px); max-width:760px; }
+.layer{
+  display:grid; grid-template-columns:112px 1fr auto; gap:8px 30px; align-items:end;
+  padding:0 0 16px; border-bottom:1px solid var(--line-2); margin-bottom:18px;
+}
+.step{ display:flex; flex-direction:column; justify-content:flex-end; gap:9px; height:100%; }
+.bar{ height:calc(var(--bh) * 1px); background:hsl(var(--c) / 1); border-radius:2px 2px 0 0; position:relative; }
+.bar::before{ content:""; position:absolute; inset:0 0 auto; height:2px; background:hsl(var(--cl) / .9); border-radius:2px 2px 0 0; }
+.layer .k{ font-family:var(--mono); font-size:12px; font-weight:500; letter-spacing:.16em; color:var(--text-3); }
+.layer .t{ font-size:1.02rem; color:var(--text); }
+.layer .d{ font-size:.94rem; color:var(--text-2); }
+.layer .m{ font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-3); white-space:nowrap; }
+.layer .m.ai{ color:var(--ice); }
+
+/* ── 04 · doğruluk ───────────────────────────────────────────── */
+.headline-num{
+  margin-top:clamp(48px,7vh,74px);
+  font-weight:200; letter-spacing:-.045em; line-height:.82;
+  font-size:clamp(5.2rem,14.5vw,13.5rem); color:var(--ice);
+}
+.headline-num small{ font-size:.34em; letter-spacing:-.01em; margin-right:.06em; vertical-align:.42em; }
+.metric-name{ font-family:var(--mono); font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--text-3); }
+.metric-sub{ margin-top:18px; font-family:var(--mono); font-size:12.5px; color:var(--text-2); }
+.stats{ margin-top:clamp(50px,7vh,72px); max-width:620px; }
+.stat{
+  display:grid; grid-template-columns:180px 118px 1fr; gap:24px; align-items:baseline;
+  padding:17px 0; border-top:1px solid var(--line-2);
+}
+.stat .sn{ font-family:var(--mono); font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--text-3); }
+.stat .sv{ font-size:1.5rem; font-weight:300; }
+.stat .sd{ font-family:var(--mono); font-size:11.5px; color:var(--text-3); }
+.colophon{
+  margin-top:clamp(34px,5vh,48px); font-family:var(--mono); font-size:11.5px;
+  color:var(--text-3); letter-spacing:.02em; line-height:1.8;
+}
+
+/* ── kapanış ─────────────────────────────────────────────────── */
+.end{ padding-block:clamp(120px,20vh,220px); }
+.end h2{ font-size:clamp(2.2rem,5.6vw,4.6rem); font-weight:200; }
+.end .cta{ margin-top:clamp(38px,5vh,56px); }
+footer{
+  border-top:1px solid var(--line-2); padding:34px 0 60px;
+  display:flex; gap:18px; flex-wrap:wrap; align-items:baseline; justify-content:space-between;
+}
+footer .fb{ font-family:var(--mono); font-size:15px; font-weight:500; }
+footer .ft{ font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; color:var(--text-3); text-transform:uppercase; }
+
+/* ── daralt ──────────────────────────────────────────────────── */
+@media (max-width:1180px){ .place{ --s:.54; left:74%; } }
+@media (max-width:900px){
+  .place{ --s:.42; left:50%; top:31%; }
+  .hero{ padding-top:min(46vh,360px); }
+  .col,.col-wide{ max-width:none; }
+  @supports (animation-timeline: scroll()){
+    .place{ animation-range:0 38vh; }
+    @keyframes recede{
+      from{ transform:translate(-50%,-50%) scale(var(--s)); opacity:1; }
+      to  { transform:translate(-50%,-50%) translateY(-16%) scale(calc(var(--s) * .78)); opacity:0; }
+    }
+  }
+}
+@media (max-width:760px){
+  .place{ --s:.40; }
+  .meter{ flex-direction:column; align-items:flex-start; }
+  .layer{ grid-template-columns:1fr; gap:10px; align-items:start; }
+  .step{ flex-direction:row; align-items:center; gap:14px; height:auto; }
+  .bar{ height:11px; border-radius:2px; width:calc(var(--bw) * 1px); flex:none; }
+  .find{ grid-template-columns:26px 1fr; }
+  .find .fam{ grid-column:2; white-space:normal; }
+  .stat{ grid-template-columns:1fr; gap:4px; padding:14px 0; }
+}
+@media (max-width:420px){ .place{ --s:.36; top:29%; } }
+</style>
+</head>
+<body>
+
+<div class="air"></div>
+
+<div class="object" aria-hidden="true">
+  <div class="place">
+    <div class="spin">
+      <div class="stair">
+        <div class="bloom"></div>
+        <div class="floor"></div>
+        <div class="rung r1"><div class="f back"></div><div class="f left"></div><div class="f right"></div><div class="f top"></div><div class="f front"><span class="lbl">A1</span></div></div>
+        <div class="rung r2"><div class="f back"></div><div class="f left"></div><div class="f right"></div><div class="f top"></div><div class="f front"><span class="lbl">A2</span></div></div>
+        <div class="rung r3"><div class="f back"></div><div class="f left"></div><div class="f right"></div><div class="f top"></div><div class="f front"><span class="lbl">B1</span></div></div>
+        <div class="rung r4"><div class="f back"></div><div class="f left"></div><div class="f right"></div><div class="f top"></div><div class="f front"><span class="lbl">B2</span></div></div>
+        <div class="rung r5"><div class="f back"></div><div class="f left"></div><div class="f right"></div><div class="f top"></div><div class="f front"><span class="lbl">C1</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="wrap">
+
+    <header class="brand">rung.</header>
+
+    <section class="hero">
+      <div class="col">
+        <p class="tag">Türkçe konuşanlar için</p>
+        <h1>İngilizceni tahmin etme.<span class="big">Ölç.</span></h1>
+        <p class="lede">Yazdığın İngilizceye bakıp hatayı sabit bir taksonomiye yazan, aylar boyunca izleyen ve kendi doğruluğunu ölçen bir alet.</p>
+        <div class="cta">
+          <a class="btn btn-1" href="#">Hesap oluştur</a>
+          <a class="btn btn-2" href="#">Giriş yap</a>
+        </div>
+        <p class="note">E-posta ve şifre. Yirmi saniye.</p>
+        <p class="scale"><b>A1</b><i></i><b>A2</b><i></i><b>B1</b><i></i><b>B2</b><i></i><b class="s5">C1</b></p>
+      </div>
+    </section>
+
+    <section>
+      <div class="col-wide">
+        <span class="num">01 — ölçüm</span>
+        <h2>Yazarsın. Alet hemen konuşmaz.</h2>
+        <p class="sub">Bu cümle sayfa açılırken gerçek K0 katmanından geçti — maket değil. Model çağrısı yok: aynı metin her zaman aynı sonucu veriyor.</p>
+
+        <p class="meter"><span class="tag">K0 · Deterministik · Model yok</span><span class="count">5 bulgu</span></p>
+
+        <p class="sentence"><span class="hit">I am agree<sup>1</sup></span> with your suggestion about <span class="hit">the meeting of tomorrow<sup>2</sup></span>. Thanks for the <span class="hit">informations<sup>3</sup></span> you sent me, <span class="hit">i<sup>4</sup></span> <span class="hit">recieved<sup>5</sup></span> them yesterday.</p>
+
+        <div class="finds">
+          <div class="find"><span class="n">1</span><span class="fix"><s>I am agree</s><em>→</em><b>I agree</b></span><span class="fam">Türkçe kaynaklı · kalıp</span></div>
+          <div class="find"><span class="n">2</span><span class="fix"><s>the meeting of tomorrow</s><em>→</em><b>tomorrow's meeting</b></span><span class="fam">Türkçe kaynaklı · sözcük sırası</span></div>
+          <div class="find"><span class="n">3</span><span class="fix"><s>informations</s><em>→</em><b>information</b></span><span class="fam">Sözcük · sayılabilirlik</span></div>
+          <div class="find"><span class="n">4</span><span class="fix"><s>i</s><em>→</em><b>I</b></span><span class="fam">Mekanik · büyük harf</span></div>
+          <div class="find"><span class="n">5</span><span class="fix"><s>recieved</s><em>→</em><b>received</b></span><span class="fam">Mekanik · yazım</span></div>
+        </div>
+
+        <p class="why">“Katılıyorum” Türkçede sıfat gibi kurulur; İngilizcede “agree” zaten fiil, yanına “am” gelmez.</p>
+      </div>
+    </section>
+
+    <section class="silent">
+      <div class="col-wide">
+        <span class="num">02 — sessizlik</span>
+        <h2>Aynı motor, doğru cümlede susar.</h2>
+        <p class="sub">Bir hatayı kaçırmak telafi edilir, doğru bir cümleyi “düzeltmek” edilmez.</p>
+
+        <p class="meter"><span class="tag">K0 · Deterministik · Model yok</span><span class="zero">0 bulgu</span></p>
+
+        <p class="sentence ok">I agree with your suggestion about tomorrow's meeting. Thank you for the information you sent me; I received it yesterday.</p>
+
+        <p class="why">Motor bu cümlede hiçbir şey bulmadı. Uydurulmuş bir düzeltme yok.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="col-wide">
+        <span class="num">03 — katmanlar</span>
+        <h2>Beş katmanın 3'ü model kullanmıyor.</h2>
+        <p class="sub">Neyin modele verilmeyeceğini bilmek, model çağırabilmekten daha zor.</p>
+
+        <div class="layers">
+          <div class="layer" style="--bh:18;--bw:44;--c:216 20% 25%;--cl:214 18% 40%;">
+            <div class="step"><div class="k">K0</div><div class="bar"></div></div>
+            <div><div class="t">Deterministik</div><div class="d">Yazım, kurallar, kelime bandı, karmaşıklık</div></div>
+            <div class="m">yapay zekâ yok</div>
+          </div>
+          <div class="layer" style="--bh:32;--bw:78;--c:211 25% 35%;--cl:209 24% 50%;">
+            <div class="step"><div class="k">K1</div><div class="bar"></div></div>
+            <div><div class="t">Model çıkarımı</div><div class="d">Sabit taksonomiye ve zorunlu şemaya yazmak zorunda</div></div>
+            <div class="m ai">model</div>
+          </div>
+          <div class="layer" style="--bh:46;--bw:112;--c:201 32% 48%;--cl:199 34% 62%;">
+            <div class="step"><div class="k">K2</div><div class="bar"></div></div>
+            <div><div class="t">İkinci geçiş</div><div class="d">Her bulguya bağımsız olarak “bu gerçekten hata mı”</div></div>
+            <div class="m ai">model</div>
+          </div>
+          <div class="layer" style="--bh:60;--bw:146;--c:192 44% 63%;--cl:190 48% 76%;">
+            <div class="step"><div class="k">K3</div><div class="bar"></div></div>
+            <div><div class="t">Seviyeye göre süzme</div><div class="d">A1'e üç bulgu, C1'e hepsi</div></div>
+            <div class="m">yapay zekâ yok</div>
+          </div>
+          <div class="layer" style="--bh:74;--bw:180;--c:186 62% 80%;--cl:184 70% 92%;">
+            <div class="step"><div class="k">K4</div><div class="bar"></div></div>
+            <div><div class="t">Sürümlü kayıt</div><div class="d">Model kimliği ve prompt sürümü kayda yazılır</div></div>
+            <div class="m">yapay zekâ yok</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="col-wide">
+        <span class="num">04 — doğruluk</span>
+        <h2>Ve kendi doğruluğunu ölçüp yayımlıyor.</h2>
+        <p class="sub">%100 doğruluk mümkün değil — dil modelleri olasılıksal çalışır. Yapılabilecek tek şey ölçmek. Aşağıdaki sayılar sabit yazılmadı.</p>
+
+        <p class="metric-name" style="margin-top:clamp(46px,7vh,72px)">Yanlış alarm</p>
+        <p class="headline-num" style="margin-top:34px"><small>%</small>4,9</p>
+        <p class="metric-sub">ana ölçüt · 41 bulgunun 2'si</p>
+
+        <div class="stats">
+          <div class="stat"><span class="sn">Yakalama</span><span class="sv">%95,1</span><span class="sd">41 beklenen hata</span></div>
+          <div class="stat"><span class="sn">Ölçülen örnek</span><span class="sv">41</span><span class="sd">altın kümeden</span></div>
+        </div>
+
+        <p class="colophon">bu koşumda 41 örnek ölçüldü · prompt v1 · çaba low · K1+K2</p>
+      </div>
+    </section>
+
+    <section class="end">
+      <div class="col-wide">
+        <h2>Bugün yaz,<br>altı ay sonra bak.</h2>
+        <div class="cta"><a class="btn btn-1" href="#">Hesap oluştur</a></div>
+      </div>
+    </section>
+
+    <footer>
+      <span class="fb">rung.</span>
+      <span class="ft">Türkçe konuşanlar için · İngilizce ölçüm aleti</span>
+    </footer>
+
+  </div>
+</div>
+
+</body>
+</html>

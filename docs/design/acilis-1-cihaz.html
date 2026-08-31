@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rung — Ölçüm cihazı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090b;
+  --panel-hi:#15181c;
+  --panel-lo:#0c0e11;
+  --line:#212630;
+  --line-soft:#15181d;
+  --ink:#E8ECF1;
+  --ink-2:#AFB7C2;
+  --ink-3:#858E99;
+  --amber:#FFAA3C;
+  --mint:#3FE3A0;
+  --cyan:#5AD4FF;
+  --violet:#AC8CFF;
+  --red:#FF6A57;
+  --gut:clamp(20px,4vw,40px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  color:var(--ink-2);
+  font-family:"Archivo",system-ui,-apple-system,Segoe UI,sans-serif;
+  font-size:16px;line-height:1.55;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+/* graticule — the instrument's engraved grid */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 60px),
+    repeating-linear-gradient(180deg,rgba(255,255,255,.028) 0 1px,transparent 1px 60px);
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(120% 80% at 50% -10%,rgba(90,212,255,.05),transparent 60%),
+             radial-gradient(100% 70% at 50% 110%,rgba(0,0,0,.9),transparent 60%);
+}
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 var(--gut)}
+.wrap::before{content:"";position:absolute;inset:0;pointer-events:none;
+  border-left:1px solid #1B1F26;border-right:1px solid #1B1F26}
+
+/* ---------- shared instrument primitives ---------- */
+.lbl{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-3);
+}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.panel{
+  position:relative;
+  background:linear-gradient(180deg,var(--panel-hi),var(--panel-lo));
+  border:1px solid var(--line);
+  border-radius:3px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 40px 70px -40px #000;
+}
+.strip{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  padding:13px clamp(16px,2.4vw,26px);row-gap:7px;
+  border-bottom:1px solid var(--line);
+  background:rgba(0,0,0,.28);
+}
+.lamp{display:inline-flex;align-items:center;gap:8px}
+.lamp i{
+  width:7px;height:7px;border-radius:50%;flex:none;
+  background:#2b313a;box-shadow:inset 0 0 0 1px rgba(0,0,0,.6);
+}
+.lamp.on i{background:var(--mint);box-shadow:0 0 10px var(--mint),0 0 22px rgba(63,227,160,.45)}
+.lamp.on.amber i{background:var(--amber);box-shadow:0 0 10px var(--amber),0 0 22px rgba(255,170,60,.4)}
+.lamp.on.violet i{background:var(--violet);box-shadow:0 0 10px var(--violet),0 0 22px rgba(172,140,255,.4)}
+
+/* ---------- masthead ---------- */
+.mast{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:22px 0 20px;border-bottom:1px solid var(--line-soft);
+}
+.brand{font-size:19px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.brand span{color:var(--mint)}
+
+/* ---------- hero ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 452px;gap:clamp(28px,5vw,72px);
+  align-items:center;padding:clamp(40px,6.5vh,78px) 0 clamp(48px,8vh,90px)}
+.eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+.eyebrow::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,var(--line),transparent)}
+h1{font-weight:500;letter-spacing:-.02em;color:var(--ink-2);
+  font-size:clamp(27px,3.3vw,42px);line-height:1.1}
+h1 .big{
+  display:block;font-weight:800;letter-spacing:-.045em;line-height:1;
+  font-size:clamp(84px,11.5vw,156px);
+  margin-top:2px;padding-top:.06em;color:var(--ink);
+  background:linear-gradient(178deg,#FFFFFF 8%,#C6CDD6 46%,#767E89 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.lede{max-width:44ch;margin-top:26px;font-size:clamp(15px,1.15vw,17px);line-height:1.6;color:var(--ink-2)}
+.keys{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}
+.key{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;text-decoration:none;padding:15px 26px;border-radius:2px;
+  border:1px solid var(--line);color:var(--ink);background:rgba(255,255,255,.02);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);transition:background .2s,border-color .2s;
+}
+.key:hover{background:rgba(255,255,255,.06);border-color:#333a45}
+.key.primary{
+  color:#07090b;border-color:#D6DDE5;
+  background:linear-gradient(180deg,#FBFDFF,#C4CCD6);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 26px rgba(200,215,230,.16);
+}
+.key.primary:hover{background:linear-gradient(180deg,#fff,#D3DAE3)}
+.note{margin-top:16px;font-size:12px;letter-spacing:.06em;color:var(--ink-3)}
+
+/* ---------- the calibrated scale (ladder motif) ---------- */
+.scale{position:relative;overflow:hidden}
+.scale::after{ /* glass sheen — volume from light, not gradients of colour */
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:3px;
+  background:linear-gradient(158deg,rgba(255,255,255,.055),rgba(255,255,255,0) 34%);
+}
+.rail{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:end;
+  padding:20px clamp(18px,2.2vw,26px) 0}
+.rail-lbl{font-size:9.5px;color:#5B646F}
+.grad{position:relative;height:15px}
+.grad::before,.grad::after{content:"";position:absolute;left:0;right:0;bottom:0}
+.grad::before{height:6px;background:repeating-linear-gradient(90deg,#333B46 0 1px,transparent 1px 5%)}
+.grad::after{height:14px;background:repeating-linear-gradient(90deg,#4A5461 0 1px,transparent 1px 25%)}
+.rungs{position:relative;padding:12px clamp(18px,2.2vw,26px) 26px}
+.rungs::after{ /* measuring sweep */
+  content:"";position:absolute;left:0;right:0;height:130px;top:-130px;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(90,212,255,.10),transparent);
+  animation:sweep 7.5s cubic-bezier(.4,0,.2,1) infinite;
+}
+@keyframes sweep{0%{transform:translateY(0)}62%,100%{transform:translateY(660px)}}
+.rung{position:relative;display:grid;grid-template-columns:52px minmax(0,1fr);align-items:center;
+  gap:16px;height:clamp(66px,8.4vh,92px)}
+.rung + .rung{border-top:1px solid var(--line-soft)}
+.rung .band{
+  font-family:"IBM Plex Mono",monospace;font-size:24px;font-weight:600;letter-spacing:.01em;color:#5A626D;
+}
+.chan{
+  position:relative;height:22px;border-radius:2px;background:#060709;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.95),inset 0 -1px 0 rgba(255,255,255,.055);
+}
+.chan i{
+  position:absolute;left:0;top:0;bottom:0;width:var(--w);border-radius:2px;
+  background:linear-gradient(180deg,#1C222A,#101419);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.11),inset -1px 0 0 rgba(255,255,255,.10);
+}
+.rung.lit .band{color:var(--cyan);text-shadow:0 0 18px rgba(90,212,255,.6)}
+.rung.lit .chan i{
+  background:linear-gradient(180deg,#9BE6FF,#2FA9DC);
+  box-shadow:0 0 26px rgba(90,212,255,.5),inset 0 1px 0 rgba(255,255,255,.65);
+  animation:breathe 3.6s ease-in-out infinite;
+}
+.rung.lit::before{ /* indicator pointer riding the measured band */
+  content:"";position:absolute;left:-26px;top:50%;transform:translateY(-50%);
+  border:6px solid transparent;border-left:9px solid var(--cyan);
+  filter:drop-shadow(0 0 7px rgba(90,212,255,.85));
+}
+@keyframes breathe{0%,100%{opacity:1}50%{opacity:.74}}
+/* ---------- sections ---------- */
+section{padding:clamp(64px,10vh,120px) 0;border-top:1px solid var(--line-soft)}
+.sec-head{max-width:62ch;margin-bottom:clamp(28px,4vw,48px)}
+.sec-no{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.sec-no::after{content:"";height:1px;flex:1;max-width:120px;background:var(--line)}
+h2{font-size:clamp(26px,3.1vw,40px);font-weight:600;letter-spacing:-.025em;line-height:1.14;color:var(--ink)}
+.sub{margin-top:14px;font-size:15px;line-height:1.6;color:var(--ink-3);max-width:56ch}
+
+/* measured sentence */
+.readout{padding:clamp(22px,3vw,40px)}
+.sentence{
+  font-family:"IBM Plex Mono",monospace;font-size:clamp(15px,1.65vw,22px);line-height:2;
+  color:var(--ink);overflow-wrap:break-word;letter-spacing:-.01em;
+}
+.sentence m{
+  background:rgba(255,170,60,.09);color:#FFD9A3;
+  box-shadow:inset 0 -2px 0 var(--amber);padding:2px 1px;
+}
+.sentence sup{font-size:9px;color:var(--amber);letter-spacing:.06em;vertical-align:super;margin-left:2px}
+.sentence.clean{color:#CFE9DC}
+.sentence.clean m{background:none;color:inherit;box-shadow:none}
+
+.findings{list-style:none;border-top:1px solid var(--line);margin-top:clamp(22px,3vw,36px)}
+.findings li{
+  display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:18px;align-items:baseline;
+  padding:17px 0;border-bottom:1px solid var(--line-soft);
+}
+.idx{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--amber);letter-spacing:.1em}
+.fix{font-family:"IBM Plex Mono",monospace;font-size:clamp(13px,1.15vw,15.5px);color:var(--ink-3);
+  display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
+.fix s{text-decoration:line-through;text-decoration-color:var(--red);color:var(--ink-3)}
+.fix em{font-style:normal;color:#4A525C}
+.fix b{font-weight:500;color:var(--mint)}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);text-align:right;white-space:nowrap}
+.quote{
+  margin-top:clamp(26px,3.4vw,40px);padding:4px 0 4px 24px;border-left:2px solid var(--amber);
+  font-size:clamp(15px,1.2vw,17px);line-height:1.6;color:var(--ink-2);max-width:70ch;
+}
+.foot-note{margin-top:22px;font-size:13px;color:var(--ink-3)}
+
+/* layers */
+.layers{list-style:none;border-top:1px solid var(--line)}
+.layers li{
+  display:grid;grid-template-columns:56px 180px minmax(0,1fr) 168px;gap:20px;align-items:center;
+  padding:20px 0;border-bottom:1px solid var(--line-soft);
+}
+.layers .k{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600;color:#4E5762}
+.layers li.ai .k{color:var(--violet);text-shadow:0 0 14px rgba(172,140,255,.4)}
+.kname{color:var(--ink);font-size:16px;font-weight:500}
+.kdesc{color:var(--ink-3);font-size:14px}
+.layers .lamp{justify-content:flex-end}
+.layers .lamp span{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+
+/* metrics */
+.metrics{display:grid;grid-template-columns:1.45fr 1fr 1fr;gap:clamp(12px,1.6vw,20px)}
+.metric{padding:clamp(20px,2.6vw,32px);display:flex;flex-direction:column;gap:10px;min-width:0}
+.metric .num{
+  font-family:"Archivo",sans-serif;font-weight:800;letter-spacing:-.05em;line-height:.84;
+  font-variant-numeric:tabular-nums;color:var(--ink);font-size:clamp(56px,6.4vw,86px);margin-top:8px;
+}
+.metric .num u{text-decoration:none;font-size:.42em;letter-spacing:0;margin-left:.06em;color:var(--ink-3)}
+.metric.main .num{font-size:clamp(84px,13vw,178px);color:var(--mint);
+  text-shadow:0 0 60px rgba(63,227,160,.3)}
+.metric.main .num u{color:rgba(63,227,160,.55)}
+.metric.b .num{color:var(--cyan)}
+.metric .cap{font-size:12px;color:var(--ink-3);letter-spacing:.02em;margin-top:auto;padding-top:16px}
+.bar{height:5px;background:#0E1218;border-radius:2px;box-shadow:inset 0 1px 2px rgba(0,0,0,.9);margin-top:18px;position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:var(--w);background:var(--mint);box-shadow:0 0 14px var(--mint);border-radius:2px}
+.metric.b .bar i{background:var(--cyan);box-shadow:0 0 14px var(--cyan)}
+.bar.ticks{height:14px;background:none;box-shadow:none;border-radius:0}
+.bar.ticks::before,.bar.ticks::after{content:"";position:absolute;left:0;right:0;bottom:0}
+.bar.ticks::before{height:6px;background:repeating-linear-gradient(90deg,#333B46 0 1px,transparent 1px 5%)}
+.bar.ticks::after{height:13px;background:repeating-linear-gradient(90deg,#4A5461 0 1px,transparent 1px 25%)}
+.plate{margin-top:clamp(16px,2vw,22px);padding:15px 20px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* closing */
+.close{text-align:center;padding:clamp(84px,13vh,150px) 0}
+.close h2{font-size:clamp(32px,5.4vw,68px);font-weight:800;letter-spacing:-.04em}
+.steps{display:flex;justify-content:center;align-items:flex-end;gap:10px;margin-bottom:40px}
+.steps i{display:block;width:36px;background:#252C35;border-radius:1px;box-shadow:inset 0 1px 0 rgba(255,255,255,.09)}
+.steps i:nth-child(1){height:11px}.steps i:nth-child(2){height:20px}.steps i:nth-child(3){height:29px}
+.steps i:nth-child(4){height:38px}.steps i:nth-child(5){height:47px;background:var(--mint);box-shadow:0 0 22px rgba(63,227,160,.55),inset 0 1px 0 rgba(255,255,255,.4)}
+.close .keys{justify-content:center;margin-top:34px}
+footer{border-top:1px solid var(--line-soft);padding:28px 0 46px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+
+@media (max-width:960px){
+  .hero{grid-template-columns:1fr;gap:44px;padding-top:44px}
+  .layers li{grid-template-columns:44px minmax(0,1fr);gap:6px 16px}
+  .layers .kdesc{grid-column:2}
+  .layers .lamp{grid-column:2;justify-content:flex-start;margin-top:4px}
+  .metrics{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .findings li{grid-template-columns:32px minmax(0,1fr);gap:6px 12px}
+  .tag{grid-column:2;text-align:left;white-space:normal}
+  .sentence{line-height:1.95}
+  .rung{grid-template-columns:42px minmax(0,1fr);gap:12px}
+  .rung .band{font-size:20px}
+  .rung.lit::before{left:-14px;border-left-width:7px;border-width:5px;border-left-style:solid}
+  .strip{gap:10px}
+  .strip > :last-child{margin-left:auto}
+  .plate > :last-child{margin-left:auto}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="brand">rung<span>.</span></div>
+  </header>
+
+  <div class="hero">
+    <div>
+      <div class="eyebrow"><span class="lbl">TÜRKÇE KONUŞANLAR İÇİN</span></div>
+      <h1>İngilizceni tahmin etme.<span class="big">Ölç.</span></h1>
+      <p class="lede">Yazdığın İngilizceye bakıp hatayı sabit bir taksonomiye yazan, aylar boyunca izleyen ve kendi doğruluğunu ölçen bir alet.</p>
+      <div class="keys">
+        <a class="key primary" href="#">Hesap oluştur</a>
+        <a class="key" href="#">Giriş yap</a>
+      </div>
+      <p class="note">E-posta ve şifre. Yirmi saniye.</p>
+    </div>
+
+    <div class="panel scale">
+      <div class="strip"><span class="lbl">ÖLÇEK</span><span class="lbl">5 BANT · SIRALI</span></div>
+      <div class="rail"><span class="rail-lbl lbl">A1</span><span class="grad"></span><span class="rail-lbl lbl">C1</span></div>
+      <div class="rungs">
+        <div class="rung dim"><span class="band">A1</span><span class="chan"><i style="--w:16%"></i></span></div>
+        <div class="rung dim"><span class="band">A2</span><span class="chan"><i style="--w:37%"></i></span></div>
+        <div class="rung lit"><span class="band">B1</span><span class="chan"><i style="--w:58%"></i></span></div>
+        <div class="rung dim"><span class="band">B2</span><span class="chan"><i style="--w:79%"></i></span></div>
+        <div class="rung dim"><span class="band">C1</span><span class="chan"><i style="--w:100%"></i></span></div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-no"><span class="lbl">01</span></div>
+      <h2>Yazarsın. Alet hemen konuşmaz.</h2>
+      <p class="sub">Bu cümle sayfa açılırken gerçek K0 katmanından geçti — maket değil. Model çağrısı yok: aynı metin her zaman aynı sonucu veriyor.</p>
+    </div>
+    <div class="panel">
+      <div class="strip">
+        <span class="lamp on amber"><i></i><span class="lbl">K0 · DETERMİNİSTİK · MODEL YOK</span></span>
+        <span class="lbl">5 BULGU</span>
+      </div>
+      <div class="readout">
+        <p class="sentence">"<m>I am agree<sup>1</sup></m> with your suggestion about <m>the meeting of tomorrow<sup>2</sup></m>. Thanks for the <m>informations<sup>3</sup></m> you sent me, <m>i<sup>4</sup></m> <m>recieved<sup>5</sup></m> them yesterday."</p>
+        <ol class="findings">
+          <li><span class="idx">01</span><span class="fix"><s>I am agree</s><em>→</em><b>I agree</b></span><span class="tag">Türkçe kaynaklı · kalıp</span></li>
+          <li><span class="idx">02</span><span class="fix"><s>the meeting of tomorrow</s><em>→</em><b>tomorrow's meeting</b></span><span class="tag">Türkçe kaynaklı · sözcük sırası</span></li>
+          <li><span class="idx">03</span><span class="fix"><s>informations</s><em>→</em><b>information</b></span><span class="tag">Sözcük · sayılabilirlik</span></li>
+          <li><span class="idx">04</span><span class="fix"><s>i</s><em>→</em><b>I</b></span><span class="tag">Mekanik · büyük harf</span></li>
+          <li><span class="idx">05</span><span class="fix"><s>recieved</s><em>→</em><b>received</b></span><span class="tag">Mekanik · yazım</span></li>
+        </ol>
+        <p class="quote">«"Katılıyorum" Türkçede sıfat gibi kurulur; İngilizcede "agree" zaten fiil, yanına "am" gelmez.»</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-no"><span class="lbl">02</span></div>
+      <h2>Aynı motor, doğru cümlede susar.</h2>
+      <p class="sub">Bir hatayı kaçırmak telafi edilir, doğru bir cümleyi "düzeltmek" edilmez.</p>
+    </div>
+    <div class="panel">
+      <div class="strip">
+        <span class="lamp on"><i></i><span class="lbl">0 BULGU</span></span>
+        <span class="lbl">K0 · DETERMİNİSTİK</span>
+      </div>
+      <div class="readout">
+        <p class="sentence clean">"I agree with your suggestion about tomorrow's meeting. Thank you for the information you sent me; I received it yesterday."</p>
+        <p class="foot-note">Motor bu cümlede hiçbir şey bulmadı. Uydurulmuş bir düzeltme yok.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-no"><span class="lbl">03</span></div>
+      <h2>Beş katmanın 3'ü model kullanmıyor.</h2>
+      <p class="sub">Neyin modele verilmeyeceğini bilmek, model çağırabilmekten daha zor.</p>
+    </div>
+    <ul class="layers">
+      <li><span class="k">K0</span><span class="kname">Deterministik</span><span class="kdesc">Yazım, kurallar, kelime bandı, karmaşıklık</span><span class="lamp"><i></i><span>Yapay zekâ yok</span></span></li>
+      <li class="ai"><span class="k">K1</span><span class="kname">Model çıkarımı</span><span class="kdesc">Sabit taksonomiye ve zorunlu şemaya yazmak zorunda</span><span class="lamp on violet"><i></i><span>Model</span></span></li>
+      <li class="ai"><span class="k">K2</span><span class="kname">İkinci geçiş</span><span class="kdesc">Her bulguya bağımsız olarak "bu gerçekten hata mı"</span><span class="lamp on violet"><i></i><span>Model</span></span></li>
+      <li><span class="k">K3</span><span class="kname">Seviyeye göre süzme</span><span class="kdesc">A1'e üç bulgu, C1'e hepsi</span><span class="lamp"><i></i><span>Yapay zekâ yok</span></span></li>
+      <li><span class="k">K4</span><span class="kname">Sürümlü kayıt</span><span class="kdesc">Model kimliği ve prompt sürümü kayda yazılır</span><span class="lamp"><i></i><span>Yapay zekâ yok</span></span></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-no"><span class="lbl">04</span></div>
+      <h2>Ve kendi doğruluğunu ölçüp yayımlıyor.</h2>
+      <p class="sub">%100 doğruluk mümkün değil — dil modelleri olasılıksal çalışır. Yapılabilecek tek şey ölçmek. Aşağıdaki sayılar sabit yazılmadı.</p>
+    </div>
+    <div class="metrics">
+      <div class="panel metric main">
+        <span class="lbl">YANLIŞ ALARM</span>
+        <div class="num">4,9<u>%</u></div>
+        <div class="bar"><i style="--w:4.9%"></i></div>
+        <span class="cap">ana ölçüt · 41 bulgunun 2'si</span>
+      </div>
+      <div class="panel metric b">
+        <span class="lbl">YAKALAMA</span>
+        <div class="num">95,1<u>%</u></div>
+        <div class="bar"><i style="--w:95.1%"></i></div>
+        <span class="cap">41 beklenen hata</span>
+      </div>
+      <div class="panel metric">
+        <span class="lbl">ÖLÇÜLEN ÖRNEK</span>
+        <div class="num">41</div>
+        <div class="bar ticks"></div>
+        <span class="cap">altın kümeden</span>
+      </div>
+    </div>
+    <div class="panel plate">
+      <span class="lbl">bu koşumda 41 örnek ölçüldü</span>
+      <span class="lbl">prompt v1 · çaba low · K1+K2</span>
+    </div>
+  </section>
+
+  <div class="close">
+    <div class="steps"><i></i><i></i><i></i><i></i><i></i></div>
+    <h2>Bugün yaz, altı ay sonra bak</h2>
+    <div class="keys"><a class="key primary" href="#">Hesap oluştur</a></div>
+  </div>
+
+  <footer>
+    <div class="brand">rung<span>.</span></div>
+    <span class="lbl">Türkçe konuşanlar için · İngilizce ölçüm aleti</span>
+  </footer>
+
+</div>
+</body>
+</html>
