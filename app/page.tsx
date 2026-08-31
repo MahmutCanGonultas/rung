@@ -40,6 +40,20 @@ import { getSessionUser } from "./lib/session";
  * sınıflandırmadıkları için orada yalnızca süstüler.
  *   --  KAPANIŞ     fotoğraf · asıl vaat: altı ay sonra
  *
+ * ═══ TEK İSKELET: SÖYLE SOLDA, GÖSTER SAĞDA ═══
+ *
+ * Sayfada iki ayrı iskelet karışıyordu. 00, 04 ve kapanış iki sütunluydu;
+ * 01, 02 ve 03 ise tam genişlikte bir bantta sola yaslanmış tek sütundu.
+ * ÖLÇÜLDÜ: 1440px'te 02 ve 03'ün içeriği bandın sol %62'sinde bitiyor,
+ * sağdaki %38 boş kalıyordu. Ürün sahibi: "sayfada bir şey çok fazla, bir
+ * şeyde eksik gibi; bakarken gözüm kötü hissediyor."
+ *
+ * İkisi de aynı kusurdu. 02 beş bulgu satırını tam genişliğe yayıyordu
+ * (düzeltme solda, aile etiketi 700 piksel ötede) — ÇOK FAZLA. 03 aynı
+ * bileşenle yalnızca beş satır metin taşıyordu — EKSİK. İkisi de iki
+ * sütuna geçti; artık sayfanın tamamı tek kurala uyuyor ve 01 (bir SIRA,
+ * yan yana okunması gereken üç adım) tek ve bilerek konmuş istisna.
+ *
  * `%4,9` artık sayfanın SONUNDA. Dün başındaydı ve o yanlıştı: kanıt, sorusu
  * olan kişiye verilir — henüz ne olduğunu bilmeyen kişiye değil. Kanıt duvarı
  * kompozisyonu doğruydu, duvara asılan SIRA yanlıştı.
@@ -150,13 +164,13 @@ export default async function HomePage() {
 
       {/* ══ 02 · NE GÖRECEKSİN ═══════════════════════════════════════ */}
       <section className="belt is-warm" aria-labelledby="gor-h">
-        <div className="belt-in">
+        <div className="belt-in duo">
           <header className="belt-head">
             <h2 className="belt-h" id="gor-h">
               Her öneri, <b>nedeniyle</b> birlikte
             </h2>
             <p className="belt-sub">
-              Aşağıdaki cümle bu sayfa açılırken gerçekten ölçüldü — hazır bir
+              Buradaki cümle bu sayfa açılırken gerçekten ölçüldü — hazır bir
               görsel değil. İşaretlerin üstüne bak: her biri neyin nasıl
               yazılabileceğini ve <b>neden</b> öyle olduğunu söylüyor. Ezber
               değil, sebep.
@@ -170,7 +184,7 @@ export default async function HomePage() {
 
       {/* ══ 03 · UYDURMAZ ════════════════════════════════════════════ */}
       <section className="belt is-pale" aria-labelledby="sessiz-h">
-        <div className="belt-in">
+        <div className="belt-in duo">
           <header className="belt-head">
             <h2 className="belt-h" id="sessiz-h">
               Doğru yazdığında <b>susar</b>

@@ -1701,20 +1701,116 @@ a.chip:hover {
  * basamağın gireceği bir yüzey yok.
  */
 .belt + .belt {
-  --seam: clamp(18px, 2.4vw, 40px);
-  margin-block-start: calc(var(--seam) * -1);
-  padding-block-start: calc(clamp(56px, 8vw, 118px) + var(--seam));
-  clip-path: polygon(
-    0 var(--seam),
-    20% var(--seam),
-    20% calc(var(--seam) * 0.75),
-    40% calc(var(--seam) * 0.75),
-    40% calc(var(--seam) * 0.5),
-    60% calc(var(--seam) * 0.5),
-    60% calc(var(--seam) * 0.25),
-    80% calc(var(--seam) * 0.25),
-    80% 0,
+  /*
+   * ÖLÇÜ MARKANIN KENDİ ORANI.
+   *
+   * İlk deneme tam genişlikte beş çentikti: her basamak %20 genişliğinde ve
+   * `--seam / 4` yüksekliğinde. ÖLÇÜLDÜ — 1440px'te 288 × 8,6 piksel, yani
+   * 33:1. Marka işaretinin basamağı 6 birim basamak / 4,6 birim rıht, yani
+   * 1,3:1. Otuz kat yassı bir "merdiven" merdiven gibi okunmuyor; kenarı
+   * ısırılmış bir yüzey gibi okunuyor. Ürün sahibi: "basamak yapısı mantıklı
+   * ama görünüş kötü."
+   *
+   * Artık merdiven TAM GENİŞLİKTE DEĞİL: sol kenarda duran, sınırlı ve
+   * marka oranına yakın (2:1) bir figür. Beş basamak, sonra düz. Dikiş bir
+   * çizgi; o çizgi solda tırmanıyor ve sonra sakinleşiyor.
+   */
+  --rise: clamp(46px, 7vw, 104px);
+  --tread: calc(var(--rise) * 0.4);
+  /*
+   * Sayfa BOYU DEĞİŞMİYOR: bant `--rise` kadar yukarı çekiliyor ve aynı
+   * kadar üst dolgu veriliyor. Yani içerik yerinde kalıyor, bant yalnızca
+   * üstündekinin içine giriyor. Kırpılan bölge dolgunun içinde, o yüzden
+   * hiçbir metin merdivenin altında kalmıyor.
+   */
+  margin-block-start: calc(var(--rise) * -1);
+  padding-block-start: calc(clamp(56px, 8vw, 118px) + var(--rise));
+  --line: 2px;
+  --seam-path: polygon(
+    0 var(--rise),
+    var(--tread) var(--rise),
+    var(--tread) calc(var(--rise) * 0.8),
+    calc(var(--tread) * 2) calc(var(--rise) * 0.8),
+    calc(var(--tread) * 2) calc(var(--rise) * 0.6),
+    calc(var(--tread) * 3) calc(var(--rise) * 0.6),
+    calc(var(--tread) * 3) calc(var(--rise) * 0.4),
+    calc(var(--tread) * 4) calc(var(--rise) * 0.4),
+    calc(var(--tread) * 4) calc(var(--rise) * 0.2),
+    calc(var(--tread) * 5) calc(var(--rise) * 0.2),
+    calc(var(--tread) * 5) 0,
     100% 0,
+    100% 100%,
+    0 100%
+  );
+  clip-path: var(--seam-path);
+  /*
+   * Zemin `::after`a taşındığı için bandın kendi `background`ı boş: iki
+   * katman birden boyarsa çizgi altta kalıyor.
+   */
+  position: relative;
+  isolation: isolate;
+  background: none;
+}
+/*
+ * DİKİŞ ÇİZGİSİ — İKİ KATMAN, ÇÜNKÜ GÖLGE BURADA İMKÂNSIZ.
+ *
+ * Önce `filter: drop-shadow` denendi ve ÇALIŞMADI. Sebebi bir zevk meselesi
+ * değil, sıralama: tarayıcı önce `filter`i uyguluyor, SONRA `clip-path` ile
+ * kırpıyor. Gölge siluetin dışına düştüğü için kırpma onu tamamen siliyor.
+ * ÖLÇÜLDÜ — 6 piksel kaydırılmış SAF KIRMIZI bir gölgeyle bile dikişte tek
+ * bir kırmızı piksel çıkmadı; çıkan o tek piksel gölge değil, kırpma
+ * kenarının kenar yumuşatmasıydı.
+ *
+ * Çalışan yol iki katman:
+ *   ::before  dış siluetin tamamını ÇİZGİ RENGİYLE dolduruyor
+ *   ::after   aynı siluet, 2 piksel AŞAĞIDA, bandın zeminiyle
+ *
+ * Aradaki 2 piksellik fark çizginin kendisi, ve basamakları birebir
+ * izliyor — çünkü iki katman da aynı poligonu kullanıyor.
+ *
+ * `--seam-path` bir jetonda: aynı poligonu iki yere yazmak, birinin
+ * unutulması demekti.
+ */
+.belt + .belt::before,
+.belt + .belt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.belt + .belt::before {
+  z-index: -2;
+  background: color-mix(in srgb, var(--ink) 22%, transparent);
+}
+.belt + .belt::after {
+  z-index: -1;
+  background: var(--belt-bg);
+  /*
+   * İÇ SİLUET — dış siluetin çizgi kalınlığı kadar AŞINMIŞ hâli.
+   *
+   * İlk hâli katmanı 2 piksel aşağı kaydırıyordu ve ÇİZGİ KOPUKTU: yalnızca
+   * yatay basamaklar çiziliyor, dikey rıhtlar boş kalıyordu — merdiven beş
+   * ayrı çizgiye bölünüyordu. Marka işaretinin kendi kararı ise tam tersi:
+   * "tek sürekli profil", çünkü beş ayrı parça telefon sinyal ikonu gibi
+   * okunuyor.
+   *
+   * Bu yüzden kaydırma değil AŞINDIRMA: yatay kenarlar 2 piksel aşağı,
+   * dikey kenarlar 2 piksel sağa. Sol kenar (x = 0) ve alt kenar
+   * DOKUNULMUYOR — onlar bandın dış sınırı, çizgi değil.
+   */
+  clip-path: polygon(
+    0 calc(var(--rise) + var(--line)),
+    calc(var(--tread) + var(--line)) calc(var(--rise) + var(--line)),
+    calc(var(--tread) + var(--line)) calc(var(--rise) * 0.8 + var(--line)),
+    calc(var(--tread) * 2 + var(--line)) calc(var(--rise) * 0.8 + var(--line)),
+    calc(var(--tread) * 2 + var(--line)) calc(var(--rise) * 0.6 + var(--line)),
+    calc(var(--tread) * 3 + var(--line)) calc(var(--rise) * 0.6 + var(--line)),
+    calc(var(--tread) * 3 + var(--line)) calc(var(--rise) * 0.4 + var(--line)),
+    calc(var(--tread) * 4 + var(--line)) calc(var(--rise) * 0.4 + var(--line)),
+    calc(var(--tread) * 4 + var(--line)) calc(var(--rise) * 0.2 + var(--line)),
+    calc(var(--tread) * 5 + var(--line)) calc(var(--rise) * 0.2 + var(--line)),
+    calc(var(--tread) * 5 + var(--line)) var(--line),
+    100% var(--line),
     100% 100%,
     0 100%
   );
@@ -1734,11 +1830,20 @@ a.chip:hover {
    içeride zayıflatıyordu.
 
    Kalan: sıcak zeminin iki tonu, ve sonda tek bir koyu. */
+/*
+ * Zemin bir JETONDA duruyor, `background`ta değil: dikiş çizgisi bandın
+ * zeminini 2 piksel aşağı kaydırılmış İKİNCİ bir katmanda tekrar çizmek
+ * zorunda (aşağıdaki `::after`), ve aynı gradyanı iki yere elle yazmak
+ * ikisinin ayrışması demekti.
+ */
+.belt {
+  background: var(--belt-bg);
+}
 .belt.is-warm {
-  background: linear-gradient(152deg, var(--warm-1) 0%, var(--warm-2) 58%, var(--warm-3) 100%);
+  --belt-bg: linear-gradient(152deg, var(--warm-1) 0%, var(--warm-2) 58%, var(--warm-3) 100%);
 }
 .belt.is-pale {
-  background: linear-gradient(152deg, var(--page) 0%, var(--warm-1) 100%);
+  --belt-bg: linear-gradient(152deg, var(--page) 0%, var(--warm-1) 100%);
 }
 
 /*
@@ -1763,7 +1868,7 @@ a.chip:hover {
   --soft-2: #34252a;
   --pill: #553f47;
   color: var(--ink);
-  background: linear-gradient(152deg, #241a1e 0%, #2e2026 60%, #34242b 100%);
+  --belt-bg: linear-gradient(152deg, #241a1e 0%, #2e2026 60%, #34242b 100%);
 }
 
 /* ── bant başlığı ───────────────────────────────────────────────────
@@ -1791,6 +1896,58 @@ a.chip:hover {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
 }
+
+/* ── SÖYLE SOLDA, GÖSTER SAĞDA ──────────────────────────────────────
+ *
+ * Sayfada iki ayrı iskelet vardı ve karışık duruyorlardı:
+ *
+ *   · İKİ SÜTUN — açılış (metin | model), dayanak (metin | %4,9),
+ *     kapanış (fotoğraf | davet)
+ *   · TAM GENİŞLİK SOL SÜTUN — 01, 02 ve 03
+ *
+ * İkincisi ölçüldüğünde kusur sayıya döküldü: 1440px'te 02 ve 03 bantlarının
+ * içeriği bandın SOL %62'sinde bitiyor, sağdaki 38% tamamen boş. Üstelik bu
+ * iki bant aynı bileşeni taşıyor ama biri beş bulguyla dolu, diğeri beş
+ * satır metin. Ürün sahibinin tarifi ikisini birden söylüyor: "sayfada bir
+ * şey çok fazla, bir şeyde eksik gibi."
+ *
+ *   ÇOK FAZLA  →  02: beş bulgu satırı tam genişliğe yayılıyor, düzeltme
+ *                 solda, aile etiketi 700 piksel ötede sağda, arası boş.
+ *   EKSİK      →  03: beş satır metin, sağında koca bir boşluk.
+ *
+ * İkisinin de sebebi aynı: tam genişlikte bir bantta sola yaslanmış bir
+ * sütun. Çözüm de aynı — 02 ve 03 sayfanın ÖBÜR iskeletine geçiyor. Böylece
+ * sayfa tek bir kurala oturuyor:
+ *
+ *   00  söyle | göster        03  söyle | göster
+ *   01  üç kartlık dizi       04  söyle | göster
+ *   02  söyle | göster        --  göster | söyle   (aynalı kapanış)
+ *
+ * Bir kural, ortada bilerek konmuş tek istisna (01 bir SIRA, o yüzden yan
+ * yana), ve sonda aynası. Boş sağ taraf dolduğu için 03 eksik durmuyor;
+ * bulgu satırları 590 piksele indiği için 02 de yayılmıyor.
+ */
+.duo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-6);
+  /* Üstten hizalı: iki sütun aynı çizgide başlıyor. Ortalamak, kısa sütunu
+     havada bırakıp yapıyı yeniden belirsizleştirirdi. */
+  align-items: start;
+}
+@media (min-width: 860px) {
+  .duo {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--s-7);
+  }
+}
+/* Başlık bloğu artık kendi sütununda: alt boşluğu ızgaranın `gap`i veriyor,
+   ölçüsünü de sütun. `62ch` orada bir şeyi bağlamıyordu. */
+.duo .belt-head {
+  margin-block-end: 0;
+  max-inline-size: none;
+}
+
 .belt-more {
   margin-block-start: var(--s-5);
   font-size: var(--t-small);
@@ -1881,13 +2038,27 @@ a.chip:hover {
   list-style: none;
   counter-reset: none;
 }
+/*
+ * KARTLAR GÖRÜNMÜYORDU. ÖLÇÜLDÜ: kartın içi (253, 244, 238), altındaki
+ * bandın zemini (252, 243, 236) — her kanalda BİR birim fark. Ekranda üç
+ * kart değil, havada duran üç metin bloğu vardı.
+ *
+ * Sebep yüzeyin kendisi değil, üstüne konduğu yer: `--soft` sayfanın
+ * varsayılan zemininden ayrılmak için ayarlanmış, ama `is-pale` bandı zaten
+ * o zeminin ta kendisi. Aynı jeton, farklı bir bantta anlamını yitiriyor.
+ *
+ * Çözüm dilin kendi ayrımı: yüzey `--soft-2`ye çıkıyor ve `--lift-1` ile
+ * KALKIYOR. Kapanış kartı da tam olarak böyle ayrılıyor — yani yeni bir
+ * yüzey dili icat edilmiyor, var olanı kullanılıyor.
+ */
 .step-card {
   display: grid;
   align-content: start;
   gap: var(--s-3);
   padding: var(--pad);
   border-radius: var(--r-panel);
-  background: var(--soft);
+  background: var(--soft-2);
+  box-shadow: var(--lift-1);
 }
 /* Rakam büyük ve vurgu renginde: sıra sayfanın kendi ritmi. */
 .step-n {
@@ -4317,13 +4488,25 @@ a.chip:hover {
 /* 1 · MODELİN SALINIMI — imza hareketi. Dönmüyor, salınıyor. */
 @keyframes rig-sway {
   from {
-    transform: rotateX(-19deg) rotateY(-33deg);
+    transform: rotateX(-18deg) rotateY(-26deg);
   }
   to {
-    transform: rotateX(-15deg) rotateY(-15deg);
+    transform: rotateX(-16deg) rotateY(-22deg);
   }
 }
 /*
+ * GENLİK ONDA BİRE İNDİ.
+ *
+ * Salınım 33 dereceden 15 dereceye, yani 18 DERECELİK bir yalpa yapıyordu ve
+ * turu 36 saniye sürüyordu. O kadar yavaş ki dönerken görülmüyor; başka bir
+ * yere bakıp geri döndüğünde nesne BAŞKA BİR AÇIDA duruyor. Ürün sahibinin
+ * tarifi tam buydu: "3B model arada kendi kendine oynuyor." Hareketin
+ * kendisi değil, GENLİĞİ kusurluydu — bu ölçekte salınım bir nefes değil,
+ * bir kayma.
+ *
+ * Şimdi 26°'den 22°'ye: dört derece. Nesnenin canlı durması için yeter,
+ * "az önce başka yerdeydi" dedirtmeye yetmez.
+ *
  * SALINIM YALNIZ ANASAYFADA — kapıda değil.
  *
  * Kural `is-fixed`i kapsamıyordu ve kapı ekranında merdiven sonsuza kadar
@@ -4514,6 +4697,23 @@ a.chip:hover {
    ═══════════════════════════════════════════════════════════════════ */
 
 @media (forced-colors: active) {
+  /*
+   * DİKİŞ KALKIYOR. Merdiven iki zemin arasındaki TON farkıyla okunuyor ve
+   * zorlanmış renklerde iki zemin de aynı `Canvas`a çöküyor — yani kırpma
+   * bir motif değil, sebepsiz bir çentik olurdu. Bantlar burada düz
+   * dikdörtgen; ayrımı üstteki kenarlık taşıyor.
+   */
+  .belt + .belt {
+    margin-block-start: 0;
+    padding-block-start: clamp(56px, 8vw, 118px);
+    clip-path: none;
+    border-block-start: 1px solid CanvasText;
+  }
+  .belt + .belt::before,
+  .belt + .belt::after {
+    display: none;
+  }
+
   /* Temas elipsi bir GÖLGE, bilgi taşımıyor. Zorlanmış renklerde gradyanlar
      düz renge çöküyor ve bu elips modelin altında opak bir leke olurdu. */
   .model-stage::after,
@@ -4537,6 +4737,7 @@ a.chip:hover {
   .gate-enter,
   .gate-read,
   .auth-card,
+  .step-card,
   .earlier,
   .filters,
   .shell-bar,
