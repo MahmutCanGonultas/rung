@@ -163,7 +163,23 @@ export default async function HomePage() {
           </header>
 
           <ol className="steps">
+            {/*
+              KARTLARIN GRAFİĞİ — üçü de saf CSS, tek bir dosya indirilmiyor.
+              
+              Her biri o adımda ekranda gerçekten olan şeyin şeması: konu
+              çipleri, yazılmış bir paragraf, ve ölçek. Üçüncüsü markanın
+              kendi merdiveni, düz hâliyle — yani kartlara yeni bir görsel
+              dil girmiyor, var olan tekrar ediyor.
+              
+              `aria-hidden`: üçü de yanlarındaki başlığın resmi. Ekran
+              okuyucuya aynı şeyi iki kez söylemek gürültü.
+            */}
             <li className="step-card">
+              <span className="step-art is-topics" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
               <p className="step-n">1</p>
               <h3 className="step-t">Bir konu seç</h3>
               <p className="step-w">
@@ -172,6 +188,11 @@ export default async function HomePage() {
               </p>
             </li>
             <li className="step-card">
+              <span className="step-art is-lines" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
               <p className="step-n">2</p>
               <h3 className="step-t">İngilizce yaz</h3>
               <p className="step-w">
@@ -180,6 +201,13 @@ export default async function HomePage() {
               </p>
             </li>
             <li className="step-card">
+              <span className="step-art is-scale" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+              </span>
               <p className="step-n">3</p>
               <h3 className="step-t">Ölçümünü gör</h3>
               <p className="step-w">

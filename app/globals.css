@@ -2324,10 +2324,102 @@ a.chip:hover {
   background: var(--soft-2);
   box-shadow: var(--lift-1);
 }
-/* Rakam büyük ve vurgu renginde: sıra sayfanın kendi ritmi. */
+/* ── kart grafikleri ────────────────────────────────────────────────
+ *
+ * Üçü de saf CSS: dosya yok, SVG yok, yalnız birkaç `<i>` ve birkaç kural.
+ * Her biri o adımda ekranda gerçekten olan şeyin şeması — konu çipleri,
+ * yazılmış bir paragraf, ölçek. Üçüncüsü markanın kendi merdiveni; kartlara
+ * yeni bir görsel dil girmiyor, var olan tekrarlıyor.
+ *
+ * Dolmamış parçalar `--hair-2`: iki temada da zeminin üstünde okunan tek
+ * nötr. (`--pill` denenemezdi — açık temada saf beyaz, yani beyaz kartın
+ * üstünde görünmez.)
+ */
+.step-art {
+  display: flex;
+  block-size: 60px;
+  margin-block-end: var(--s-2);
+}
+.step-art i {
+  display: block;
+  background: var(--hair-2);
+}
+
+/* 1 · konu çipleri — biri seçili */
+.step-art.is-topics {
+  align-items: center;
+  gap: 8px;
+}
+.step-art.is-topics i {
+  block-size: 24px;
+  border-radius: var(--r-pill);
+}
+.step-art.is-topics i:nth-child(1) {
+  inline-size: 54px;
+}
+.step-art.is-topics i:nth-child(2) {
+  inline-size: 38px;
+  background: var(--accent);
+}
+.step-art.is-topics i:nth-child(3) {
+  inline-size: 46px;
+}
+
+/* 2 · yazılmış bir paragraf — son satır yarım, çünkü yazı orada bitiyor */
+.step-art.is-lines {
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  inline-size: 100%;
+}
+.step-art.is-lines i {
+  block-size: 9px;
+  border-radius: 5px;
+}
+.step-art.is-lines i:nth-child(1) {
+  inline-size: 100%;
+}
+.step-art.is-lines i:nth-child(2) {
+  inline-size: 88%;
+}
+.step-art.is-lines i:nth-child(3) {
+  inline-size: 46%;
+  background: var(--accent);
+}
+
+/* 3 · ölçek — beş basamak, ölçülen yanıyor */
+.step-art.is-scale {
+  align-items: flex-end;
+  gap: 7px;
+}
+.step-art.is-scale i {
+  inline-size: 15px;
+  border-radius: 4px 4px 0 0;
+  /* Tabandan büyüyor: ölçek zaten böyle okunuyor, sıfırdan yukarı. */
+  transform-origin: bottom;
+}
+.step-art.is-scale i:nth-child(1) {
+  block-size: 16px;
+}
+.step-art.is-scale i:nth-child(2) {
+  block-size: 26px;
+}
+.step-art.is-scale i:nth-child(3) {
+  block-size: 36px;
+}
+.step-art.is-scale i:nth-child(4) {
+  block-size: 46px;
+  background: var(--accent);
+}
+.step-art.is-scale i:nth-child(5) {
+  block-size: 56px;
+}
+
+/* Rakam grafiğin altında ve KÜÇÜLDÜ: görsel ağırlığı artık grafik taşıyor,
+   rakamın işi yalnızca sırayı söylemek. */
 .step-n {
   font-family: var(--display);
-  font-size: var(--t-h2);
+  font-size: var(--t-h3);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -5117,26 +5209,24 @@ a.chip:hover {
  * duruyor. Katlanan tek şey hareket; içerik değil.
  */
 /*
- * YOL 14 → 44 PİKSEL, SÜRE 460 → 900 ms, VE BULANIKLIK.
+ * YOL 14 → 44 PİKSEL, SÜRE 460 → 820 ms, VE SAYDAMLIK.
  *
- * İlk ayar 14 piksel / 460 ms'ti ve ürün sahibi üç kez "hiçbir şey
- * değişmiyor gibi" dedi. Genliği artırmak yetmedi; eksik olan şey YOL değil,
- * ODAĞA GELME. Bulanıklıktan netliğe geçen bir yüzeyi göz kaçırmıyor,
- * 30 piksellik bir kaymayı kaçırıyor.
+ * İlk ayar 14 piksel / 460 ms'ti ve fark edilmiyordu. Eksik olan şey yalnız
+ * yol değil, GÖRÜNÜRLÜK EŞİĞİYDİ: saydamdan gelen bir yüzey, aynı yolu düz
+ * kayan bir yüzeyden çok daha net okunuyor. (Bir tur da bulanıklık denendi
+ * ve geri alındı — gerekçesi `reveal` yorumunda.)
  */
 .open-top .mark-link,
 .open-say > * {
   transition:
-    opacity 900ms var(--ease),
-    transform 900ms var(--ease),
-    filter 900ms var(--ease);
+    opacity 820ms var(--ease),
+    transform 820ms var(--ease);
 }
 @starting-style {
   .open-top .mark-link,
   .open-say > * {
     opacity: 0;
     transform: translateY(44px);
-    filter: blur(12px);
   }
 }
 /* Gecikmeler `nth-child` ile, elemanlara sınıf eklenmeden: sıra DOM'daki
@@ -5185,14 +5275,24 @@ a.chip:hover {
    ═══════════════════════════════════════════════════════════════════ */
 
 /*
- * TEK JEST, ÜÇ ŞİDDETTE. Giren her yüzey aynı şeyi yapıyor: uzaktan,
- * bulanık ve aşağıdan gelip yerine oturuyor.
+ * TEK JEST, ÜÇ ŞİDDETTE. Giren her yüzey aynı şeyi yapıyor: aşağıdan,
+ * saydamdan ve biraz küçükten gelip yerine oturuyor.
+ *
+ * BULANIKLIK DENENDİ VE GERİ ALINDI. Bir tur boyunca her giriş 14 piksel
+ * bulanıktan netleşiyordu; teoride "odağa gelme", ekranda ise okunmayan
+ * metin. Ürün sahibi tek cümleyle söyledi: "blur daha da kötü yapmış."
+ * Haklıydı ve sebebi şu — bu sayfadaki yüzeylerin çoğu METİN, ve bulanık
+ * metin zarif değil bozuk görünüyor; hele kaydırma sırasında ekranın
+ * yarısı okunmaz hâlde kalıyor. Bulanıklık bir fotoğrafta işe yarar,
+ * bir raporda yaramaz.
+ *
+ * Geriye kalan üç şey yeterince görünür ve hiçbiri okumayı bozmuyor:
+ * saydamlık, konum, ölçek.
  */
 @keyframes reveal {
   from {
     opacity: 0;
-    transform: translateY(72px) scale(0.94);
-    filter: blur(14px);
+    transform: translateY(64px) scale(0.96);
   }
 }
 /* Ölçüm bantlarında sol sütun SOLDAN, pano SAĞDAN. Yatay hareket dikeyden
@@ -5200,23 +5300,27 @@ a.chip:hover {
 @keyframes reveal-left {
   from {
     opacity: 0;
-    transform: translate(-90px, 40px);
-    filter: blur(14px);
+    transform: translate(-80px, 30px);
   }
 }
 @keyframes reveal-right {
   from {
     opacity: 0;
-    transform: translate(90px, 40px);
-    filter: blur(14px);
+    transform: translate(80px, 30px);
   }
 }
 /* Doğruluk sayısı bir SAYI: uzaktan gelmiyor, büyüyerek yerleşiyor. */
 @keyframes reveal-figure {
   from {
     opacity: 0;
-    transform: scale(0.72);
-    filter: blur(18px);
+    transform: scale(0.68);
+  }
+}
+/* Kart grafiklerindeki çubuklar tabanından büyüyor — ölçek zaten böyle
+   okunuyor: sıfırdan yukarı. */
+@keyframes grow-bar {
+  from {
+    transform: scaleY(0.06);
   }
 }
 
@@ -5247,6 +5351,31 @@ a.chip:hover {
       animation: reveal-figure linear;
       animation-timeline: view();
       animation-range: entry 0% cover 52%;
+    }
+
+    /*
+     * ÖLÇEK ÇUBUKLARI KAYDIRIRKEN BÜYÜYOR.
+     *
+     * Kart yerine otururken içindeki beş çubuk tabanından yükseliyor, ve
+     * beşi arka arkaya. Grafik yalnız durmuyor, ölçümün kendisini
+     * canlandırıyor — sayfanın söylediği şeyin şeması.
+     */
+    .step-art.is-scale i {
+      animation: grow-bar linear;
+      animation-timeline: view();
+      animation-range: entry 0% cover 52%;
+    }
+    .step-art.is-scale i:nth-child(2) {
+      animation-range: entry 0% cover 58%;
+    }
+    .step-art.is-scale i:nth-child(3) {
+      animation-range: entry 0% cover 64%;
+    }
+    .step-art.is-scale i:nth-child(4) {
+      animation-range: entry 0% cover 70%;
+    }
+    .step-art.is-scale i:nth-child(5) {
+      animation-range: entry 0% cover 76%;
     }
 
     /* Kademe ayrı bir sınıfla değil ARALIĞI uzatarak veriliyor. */
