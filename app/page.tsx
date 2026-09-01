@@ -74,61 +74,78 @@ export default async function HomePage() {
     <main className="wall" id="main">
       {/* ══ 00 · BU NE ═══════════════════════════════════════════════ */}
       <section className="belt is-warm belt-open" aria-labelledby="acilis-h">
-        <div className="belt-in open-hero">
+        <div className="belt-in open-in">
           {/*
-            Açılışta sıralı giriş SAF CSS: `@starting-style`. Bir sarmalayıcı
-            ve `IntersectionObserver` denendi ve ÇAKMA üretti — gerekçesi
-            `globals.css`te `settle` yorumunda, ölçülmüş sayılarla.
+            MARKA KENDİ SATIRINDA, SAYFANIN TEPESİNDE.
+            
+            Önce kahraman metninin ilk çocuğuydu ve metinle birlikte dikey
+            ortalanıyordu: ÖLÇÜLDÜ, 1440px'te logo sayfanın 120. pikselinde
+            başlıyordu — üstünde bir avuç boşluk, ve ürün sahibinin dediği
+            gibi "çok aşağıda". Bir sitenin markası başlıkla birlikte
+            ortalanmaz; tepede durur.
+            
+            Artık bandın ilk satırı. Altındaki kahraman ızgarası kalan alanda
+            ortalanıyor, yani metin ile model hâlâ birbirine göre dengeli.
           */}
-          <div className="open-say">
+          <header className="open-top">
             <Link className="mark-link" href="/">
               <Mark size="xl" />
             </Link>
-            <p className="open-kicker">Türkçe konuşanlar için</p>
-            <h1 className="open-h" id="acilis-h">
-              {/*
+          </header>
+
+          <div className="open-hero">
+            {/*
+              Açılışta sıralı giriş SAF CSS: `@starting-style`. Bir sarmalayıcı
+              ve `IntersectionObserver` denendi ve ÇAKMA üretti — gerekçesi
+              `globals.css`te `settle` yorumunda, ölçülmüş sayılarla.
+            */}
+            <div className="open-say">
+              <p className="open-kicker">Türkçe konuşanlar için</p>
+              <h1 className="open-h" id="acilis-h">
+                {/*
                 "şu an" arasında KIRILMAZ BOŞLUK. `text-wrap: balance` iki
                 satırı eşitlemeye çalışırken başlığı "İngilizcen şu / an
                 nerede?" diye kırdı — Türkçede "şu an" tek bir zaman zarfı ve
                 ortasından bölünmesi cümleyi bir an için okunmaz yapıyor.
                 Dengeleme kalıyor, kırabileceği yerler kısıtlanıyor.
               */}
-              İngilizcen şu&nbsp;an <b>nerede?</b>
-            </h1>
-            <p className="open-lede">
-              Bir paragraf yaz — on beş dakika. Seviyeni ölçelim, ve altı ay
-              sonra ne kadar ilerlediğini yan yana görelim.
-            </p>
-            <div className="open-go">
-              {user ? (
-                <Link className="btn btn-primary btn-lg" href="/write">
-                  Yazmaya başla
-                </Link>
-              ) : (
-                <>
-                  <Link className="btn btn-primary btn-lg" href="/register">
-                    Hesap oluştur
+                İngilizcen şu&nbsp;an <b>nerede?</b>
+              </h1>
+              <p className="open-lede">
+                Bir paragraf yaz — on beş dakika. Seviyeni ölçelim, ve altı ay
+                sonra ne kadar ilerlediğini yan yana görelim.
+              </p>
+              <div className="open-go">
+                {user ? (
+                  <Link className="btn btn-primary btn-lg" href="/write">
+                    Yazmaya başla
                   </Link>
-                  <Link className="btn btn-lg" href="/login">
-                    Giriş yap
-                  </Link>
-                </>
-              )}
+                ) : (
+                  <>
+                    <Link className="btn btn-primary btn-lg" href="/register">
+                      Hesap oluştur
+                    </Link>
+                    <Link className="btn btn-lg" href="/login">
+                      Giriş yap
+                    </Link>
+                  </>
+                )}
+              </div>
+              <p className="open-note">
+                {user
+                  ? `Giriş yapıldı — ${user.email}`
+                  : "E-posta ve şifre. Kart yok, yirmi saniye."}
+              </p>
             </div>
-            <p className="open-note">
-              {user
-                ? `Giriş yapıldı — ${user.email}`
-                : "E-posta ve şifre. Kart yok, yirmi saniye."}
-            </p>
-          </div>
 
-          {/*
+            {/*
             Ölçek, sayfanın ilk gördüğü nesne. Beş bant ürünün tamamı: kişinin
             sorusu "ben neredeyim", cevabın şekli bu.
           */}
-          <InView className="open-art">
-            <Stair />
-          </InView>
+            <InView className="open-art">
+              <Stair />
+            </InView>
+          </div>
         </div>
       </section>
 
@@ -140,8 +157,8 @@ export default async function HomePage() {
               Üç adım, on beş dakika
             </h2>
             <p className="belt-sub">
-              Kurs yok, ders yok, konuşacağın bir bot yok. Yazıyorsun, ve
-              nerede olduğunu görüyorsun.
+              Kurs yok, ders yok, konuşacağın bir bot yok. Yazıyorsun, ve nerede
+              olduğunu görüyorsun.
             </p>
           </header>
 
@@ -150,8 +167,8 @@ export default async function HomePage() {
               <p className="step-n">1</p>
               <h3 className="step-t">Bir konu seç</h3>
               <p className="step-w">
-                Günlük hayat, iş, teknik, resmî — ya da tamamen kendi konun.
-                Her konunun kendi görevleri var.
+                Günlük hayat, iş, teknik, resmî — ya da tamamen kendi konun. Her
+                konunun kendi görevleri var.
               </p>
             </li>
             <li className="step-card">
@@ -227,13 +244,11 @@ export default async function HomePage() {
             <p className="belt-sub">
               Yanılıyor — ve ne sıklıkta yanıldığını ölçüp yayımlıyoruz. Bir
               ürünün &ldquo;doğru çalışıyor&rdquo; demesi kolay, kaç kere
-              yanıldığını söylemesi zor. Yandaki sayı sabit yazılmadı, son
-              ölçüm koşumundan okundu.
+              yanıldığını söylemesi zor. Yandaki sayı sabit yazılmadı, son ölçüm
+              koşumundan okundu.
             </p>
             <p className="belt-more">
-              <Link href="/accuracy">
-                Nasıl ölçtüğümüzün tamamı →
-              </Link>
+              <Link href="/accuracy">Nasıl ölçtüğümüzün tamamı →</Link>
             </p>
           </div>
           <InView className="trust-num">

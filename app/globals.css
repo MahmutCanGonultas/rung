@@ -903,12 +903,15 @@ a.chip:hover {
    * büyütmek, ekrana yeni bir nesne eklemeden hacim kazandırmanın tek yolu.
    * Yeni bir metafor icat edilmiyor, var olan büyütülüyor.
    *
-   * Üst sınır 92 → 112px, birim 40 → 48px. Alt sınırlar dokunulmadı: mobilde
-   * zaten dar ve orada büyütmek taşma demek.
+   * Üst sınır 92 → 112 → 132px, birim 40 → 48 → 57px. Alt sınırlar
+   * neredeyse dokunulmadı: mobilde zaten dar ve orada büyütmek taşma demek.
+   *
+   * İkinci büyütme sütun oranıyla birlikte geldi (5/6): nesne artık metinden
+   * geniş bir sütunda duruyor, yani büyümesi metni sıkıştırmıyor.
    */
-  --w: clamp(44px, 7.4vw, 112px);
-  --u: clamp(20px, 3.2vw, 48px);
-  --d: clamp(44px, 7.4vw, 112px);
+  --w: clamp(46px, 8.8vw, 132px);
+  --u: clamp(21px, 3.8vw, 57px);
+  --d: clamp(46px, 8.8vw, 132px);
 
   display: grid;
   gap: var(--s-4);
@@ -2150,9 +2153,35 @@ a.chip:hover {
 
    Buraya ÖNCE `%4,9` konmuştu ve yanlıştı: kanıt, sorusu olan kişiye
    verilir; henüz ürünün ne olduğunu bilmeyen kişiye değil. */
+/*
+ * BANT İKİ SATIR: ÜSTTE MARKA, ALTINDA KAHRAMAN.
+ *
+ * Eskiden bandın içeriği tek blok hâlinde dikey ORTALANIYORDU ve marka o
+ * bloğun ilk satırıydı — yani logo da metinle birlikte aşağı iniyordu.
+ * ÖLÇÜLDÜ: 1440px'te logonun tepesi sayfanın 120. pikselindeydi. Bir sitenin
+ * markası başlıkla birlikte ortalanmaz; tepede durur.
+ *
+ * Üst dolgu bandın genel dolgusundan (115px) ayrıldı: marka satırı için
+ * gereken şey hava değil, YAKINLIK. Kahraman ızgarası kalan alanda
+ * ortalanmaya devam ediyor, yani metin ile model dengesi bozulmuyor.
+ */
 .belt-open {
-  min-block-size: min(84svh, 760px);
+  /* 88svh fazlaydı: marka yukarı çıkınca altta 250 piksellik boş bir kayısı
+     alanı kalıyordu. 80svh nefes bırakıyor, boşluk bırakmıyor. */
+  min-block-size: min(80svh, 760px);
+  padding-block-start: clamp(26px, 3.2vw, 44px);
   display: grid;
+}
+.open-in {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  inline-size: 100%;
+}
+.open-top {
+  display: flex;
+  align-items: center;
+}
+.open-hero {
   align-content: center;
 }
 .open-hero {
@@ -2162,8 +2191,16 @@ a.chip:hover {
   align-items: center;
 }
 @media (min-width: 900px) {
+  /*
+   * Sütunlar 6/5'ten 5/6'ya döndü: NESNE metinden geniş.
+   *
+   * Sayfanın tek hacimli nesnesi o ve markanın anlattığı şey o; dar sütunda
+   * kendi kutusunu doldurup duruyordu. Metin tarafı 550 piksele iniyor ve
+   * sıkılaştırılmış başlık orada rahat duruyor — ölçüldü, satır kırılması
+   * değişmiyor.
+   */
   .open-hero {
-    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
     gap: var(--s-7);
   }
 }
@@ -2172,11 +2209,7 @@ a.chip:hover {
   justify-items: start;
   gap: var(--s-4);
 }
-/* İşaret büyüdü, altına da hava gerekti: 46 pikselde künyeye `--s-4`
-   kadar yaklaşınca ikisi tek blok gibi okunuyordu. */
-.open-say > .mark-link {
-  margin-block-end: var(--s-3);
-}
+
 .open-kicker {
   font-size: var(--t-tag);
   font-weight: 800;
@@ -5070,33 +5103,43 @@ a.chip:hover {
  * Desteklemeyen tarayıcıda kural hiç uygulanmıyor ve metin doğrudan yerinde
  * duruyor. Katlanan tek şey hareket; içerik değil.
  */
+/*
+ * YOL 14 → 30 PİKSEL, SÜRE 460 → 640 ms.
+ *
+ * İlk ayar "belli belirsiz"di ve ürün sahibi haklıydı: 14 piksellik bir
+ * kayma, 86 piksellik bir başlığın yanında fark edilmiyor. Hareketin
+ * görülmesi için yolun harfin boyuyla yarışabilmesi gerekiyor.
+ */
+.open-top .mark-link,
 .open-say > * {
   transition:
-    opacity var(--d-2) var(--ease),
-    transform var(--d-2) var(--ease);
+    opacity 640ms var(--ease),
+    transform 640ms var(--ease);
 }
 @starting-style {
+  .open-top .mark-link,
   .open-say > * {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(30px);
   }
 }
 /* Gecikmeler `nth-child` ile, elemanlara sınıf eklenmeden: sıra DOM'daki
-   sıradır ve bir satır eklenince kendiliğinden yerine oturuyor. */
+   sıradır ve bir satır eklenince kendiliğinden yerine oturuyor. Marka
+   sıfırıncı, metin 80 ms'den itibaren. */
+.open-say > *:nth-child(1) {
+  transition-delay: 80ms;
+}
 .open-say > *:nth-child(2) {
-  transition-delay: 70ms;
+  transition-delay: 160ms;
 }
 .open-say > *:nth-child(3) {
-  transition-delay: 140ms;
+  transition-delay: 240ms;
 }
 .open-say > *:nth-child(4) {
-  transition-delay: 210ms;
+  transition-delay: 320ms;
 }
 .open-say > *:nth-child(5) {
-  transition-delay: 280ms;
-}
-.open-say > *:nth-child(6) {
-  transition-delay: 350ms;
+  transition-delay: 400ms;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -5128,12 +5171,20 @@ a.chip:hover {
  * Zamanlayıcılı salınımın yerini alıyor — o, bakmadığın anda açı
  * değiştirdiği için "kayma" gibi okunuyordu.
  */
+/*
+ * DÖNÜŞ 12 → 18 DERECE, ve sona doğru hafifçe küçülüyor.
+ *
+ * On iki derece "belli belirsiz"di. Alt sınır −30°'ye çekildi (nesne
+ * sayfanın tepesinde daha yandan görünüyor), üst sınır −12°'de bırakıldı:
+ * daha sığ açılarda üst yüzle arka yüz ekranda aynı düzleme yaklaşıyor ve
+ * kutu düzleşiyor. Küçülme kaydırmayı bir uzaklaşma gibi okutuyor.
+ */
 @keyframes rig-turn {
   from {
-    transform: rotateX(-17deg) rotateY(-24deg);
+    transform: rotateX(-18deg) rotateY(-30deg) scale(1);
   }
   to {
-    transform: rotateX(-13deg) rotateY(-12deg);
+    transform: rotateX(-12deg) rotateY(-12deg) scale(0.94);
   }
 }
 
@@ -5166,6 +5217,55 @@ a.chip:hover {
       animation: rig-turn linear both;
       animation-timeline: scroll(root block);
       animation-range: 0 100svh;
+    }
+  }
+}
+
+/*
+ * YÜZEYLER GÖRÜŞ ALANINA GİRERKEN YÜKSELİYOR.
+ *
+ * `settle` bunu zaten yapıyordu ama tek atışlık ve 12 piksellikti — yani
+ * "belli belirsiz". Burada yol 56 piksel ve hareket KAYDIRMAYA bağlı: kişi
+ * yavaş kaydırırsa yavaş, hızlı kaydırırsa hızlı yükseliyor. Fark edilen
+ * şey de bu; süreye bağlı bir geçiş, kaydırmanın hızına yetişemediği anda
+ * görünmez oluyor.
+ *
+ * `both` YOK, ve bu bilinçli. Doldurma olmadan animasyon aralığın DIŞINDA
+ * hiç uygulanmıyor: aralık başlamadan önce öğe ekranın altında (kimse
+ * görmüyor) ve taban CSS'i, yani bitmiş kareyi çiziyor. Böylece tam sayfa
+ * görüntüsü alan araçlar — `shots.mjs`, `contrast.mjs`, paylaşım kartı —
+ * sayfayı hep bitmiş hâlde görüyor.
+ *
+ * Kartların kademesi ayrı bir sınıfla değil, ARALIĞI uzatarak veriliyor:
+ * ikinci kart biraz daha geç, üçüncü biraz daha geç bitiyor.
+ */
+@keyframes rise-in {
+  from {
+    transform: translateY(56px) scale(0.97);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .step-card,
+    .duo .belt-head,
+    .duo .belt-body,
+    .trust-num,
+    .coda-say {
+      animation: rise-in linear;
+      animation-timeline: view();
+      animation-range: entry 0% cover 34%;
+    }
+    .step-card:nth-child(2) {
+      animation-range: entry 0% cover 41%;
+    }
+    .step-card:nth-child(3) {
+      animation-range: entry 0% cover 48%;
+    }
+    /* Sağdaki ölçüm panosu sol sütundan biraz sonra yerine oturuyor:
+       önce "ne diyor", sonra "işte kanıtı". */
+    .duo .belt-body {
+      animation-range: entry 0% cover 44%;
     }
   }
 }
