@@ -1002,6 +1002,8 @@ a.chip:hover {
   inset: 0;
 }
 .f-front {
+  /* Bir piksel yukarı: üst yüzle arasındaki yuvarlama çirtiğini kapatıyor. */
+  inset-block-start: -1px;
   transform: translateZ(calc(var(--d) / 2));
   background-color: color-mix(in srgb, var(--face) 82%, #000 18%);
 }
@@ -1025,38 +1027,72 @@ a.chip:hover {
   transform: translateX(calc(var(--w) / -2)) rotateY(-90deg);
 }
 /*
- * Üst yüz iki piksel BÜYÜK. Tam ölçüde olduğunda üst yüzle ön yüzün
- * birleştiği kenarda tarayıcının yuvarlamasından doğan tırtıklı bir çirtik
- * kalıyordu — ekranda görünen o. İki piksel örtüşme dikişi kapatıyor ve
- * `margin-top` aynı oranda kaydırılarak yüz merkezde kalıyor.
+ * DİKİŞİ ÜST YÜZ DEĞİL ÖN YÜZ KAPATIYOR.
+ *
+ * Üst yüz iki piksel büyük çiziliyordu: bir piksel öne, bir piksel ARKAYA
+ * taşıyordu. Öndeki taşma dikişi kapatıyordu ama arkadaki hiçbir şeyin önüne
+ * gelmiyor — arkasında kutu yok, zemin var. Sonuç ekranda görünüyordu:
+ * basamakların arka kenarında noktalı gri bir çizgi, kenar yumuşatmanın
+ * yarım piksellik izi. Ürün sahibi "3B modelde bir enteresanlık var" derken
+ * gördüğü şeylerden biri buydu.
+ *
+ * Artık üst yüz TAM ölçüde ve dikişi ön yüz bir piksel yukarı uzayarak
+ * kapatıyor: ön yüz z ekseninde daha yakında, yani üst yüzün ön dudağını
+ * örtüyor ve arkada hiçbir şey taşmıyor.
  */
 .f-top {
   left: 0;
   width: 100%;
-  height: calc(var(--d) + 2px);
+  height: var(--d);
   top: 50%;
-  margin-top: calc((var(--d) + 2px) / -2);
+  margin-top: calc(var(--d) / -2);
   transform: translateY(calc(var(--h) / -2)) rotateX(90deg);
   background-color: var(--face);
 }
 
 /*
- * Yanan basamak: kendi rengini korur ama ETRAFINDA IŞIK olur. Rengi
- * değiştirmek bandın kimliğini bozardı — B1 hep B1 sarısı.
+ * YANAN BASAMAK: YÜZÜ AYDINLANIYOR, ETRAFINA GÖLGE DÜŞMÜYOR.
+ *
+ * Önce `box-shadow` ile hâle çiziliyordu ve AÇIK TEMADA TERS ÇALIŞIYORDU:
+ * bandın kendi rengiyle çizilen bir gölge, açık kayısı zeminden DAHA KOYU:
+ * yani ekranda ışık değil, basamakların üstünde gezinen kirli bir leke
+ * vardı. Ürün sahibinin tarifi birebir buydu — "3B modelin üstüne arada
+ * gölgeler düşüyor".
+ *
+ * Üstelik `box-shadow` üç boyutlu dönmüş bir yüzeyde kendi düzleminde
+ * çiziliyor ve dönüşle birlikte eğriliyor: hâle komşu basamakların üstüne
+ * taşıyor, derinlik sırasına da uymuyordu.
+ *
+ * Şimdi ışık gerçekten ışık: yüzün rengi beyaza doğru açılıyor. Bandın
+ * kimliği korunuyor — B1 hâlâ B1 sarısı, sadece üstüne ışık düşmüş hâli. Ve
+ * iki temada da aynı yönde çalışıyor, çünkü açmak her zemin üzerinde açmak.
  */
-.mstep.is-lit .f-top,
-.mstep.is-lit .f-front {
-  box-shadow: 0 0 34px 6px color-mix(in srgb, var(--face) 55%, transparent);
-}
-
 /*
- * KAPI EKRANI: ışık tırmanmıyor, ÖLÇÜLEN basamakta duruyor. Anasayfada
- * merdiven bir VAAT (ışık A1'den C1'e yürüyor), kapıda bir OKUMA — aşağıdaki
- * cümlenin ölçüldüğü yeri gösteriyor. Tek nesne, iki davranış.
+ * KAPI EKRANI: ölçülen basamak KENDİ RENGİNDE, ötekiler GERİ ÇEKİLİYOR.
+ *
+ * Önce yanan basamağı açmak denendi ve ölçüldü: rampa zaten A1'den C1'e
+ * koyulaşıyor, yani A2'yi açmak onu A1'e benzetiyor — "işaretli" değil
+ * "solgun" okunuyordu. Anasayfada aynı açma doğru çalışıyor, çünkü orada ışık
+ * GEZİYOR ve hareketin kendisi işareti taşıyor; kapıda hareket yok.
+ *
+ * Bu yüzden burada işaret ters yönden veriliyor: ölçülen bandın rengine hiç
+ * dokunulmuyor — B1 hâlâ tam olarak B1 — ve ötekiler zemine doğru
+ * karıştırılarak geri çekiliyor. Bandın kimliği tam olarak işaretin
+ * bulunduğu yerde korunmuş oluyor.
+ *
+ * `opacity` KULLANILMIYOR: birden küçük bir saydamlık, `preserve-3d`
+ * zincirinin içindeki bir öğeyi zincirden çıkarıyor. Renk karıştırmanın
+ * böyle bir yan etkisi yok.
  */
-.model.is-fixed .mstep.is-lit .f-top,
-.model.is-fixed .mstep.is-lit .f-front {
-  box-shadow: 0 0 40px 8px color-mix(in srgb, var(--face) 62%, transparent);
+.model.is-fixed .mstep:not(.is-lit) .f-top {
+  background-color: color-mix(in srgb, var(--face) 42%, var(--page));
+}
+.model.is-fixed .mstep:not(.is-lit) .f-front {
+  background-color: color-mix(in srgb, var(--face) 38%, var(--page));
+}
+.model.is-fixed .mstep:not(.is-lit) .f-left,
+.model.is-fixed .mstep:not(.is-lit) .f-right {
+  background-color: color-mix(in srgb, var(--face) 34%, var(--page));
 }
 
 /* ── ölçek satırı · modelin DIŞINDA ─────────────────────────────────
@@ -1920,8 +1956,10 @@ a.chip:hover {
   font-family: var(--display);
   font-size: var(--t-h2);
   font-weight: 600;
+  /* Rampanın orta durağı: başlık büyük ama kahraman değil. */
+  font-stretch: 92%;
   line-height: 1.1;
-  letter-spacing: -0.028em;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 .belt-sub {
@@ -1984,6 +2022,45 @@ a.chip:hover {
   max-inline-size: none;
 }
 
+/* ── ÖLÇÜM BLOĞU TEK NESNE ──────────────────────────────────────────
+ *
+ * Ölçülen cümle ile bulgu rafı iki ayrı blok gibi duruyordu: cümle bandın
+ * zemininde yüzüyor, altında ayrı bir liste başlıyor, aralarındaki bağı
+ * yalnızca üst simgelerin sayısı kuruyordu. Ürün sahibi: "şu iki taraf sanki
+ * birleşik gibi daha güzel bir temayla halledilse."
+ *
+ * Haklı, ve sebebi şu: bunlar iki şey değil, BİR ÖLÇÜMÜN İKİ YARISI —
+ * okunan cümle ve o cümleden çıkan rapor. Artık tek bir yüzeyin üstündeler,
+ * aralarında bir saç teli ayraç. Aletin ekranı gibi: üstte okuma, altta
+ * dökümü.
+ *
+ * Yüzey dili yeni değil: `--soft-2` + `--lift-1`, yani üç adım kartıyla ve
+ * kapanış kartıyla aynı ayrım.
+ *
+ * YALNIZCA `.duo` İÇİNDE. Aynı bileşen kapı ekranında iki parçasını AYRI
+ * yerlere koyuyor ve kayıt sayfasında kendi kabında duruyor; kuralı
+ * `.sample-*`a bağlamak oraları da kutulardı.
+ */
+.duo .belt-body {
+  gap: 0;
+  padding: var(--pad);
+  border-radius: var(--r-panel);
+  background: var(--soft-2);
+  box-shadow: var(--lift-1);
+}
+/* Ayraç: okuma biter, döküm başlar. */
+.duo .belt-body .sample-findings {
+  margin-block-start: var(--s-4);
+  padding-block-start: var(--s-2);
+  border-block-start: 1px solid var(--hair);
+}
+.duo .belt-body .sample-silent {
+  margin-block-start: var(--s-4);
+  padding-block-start: var(--s-4);
+  padding-block-end: 0;
+  border-block-start: 1px solid var(--hair);
+}
+
 .belt-more {
   margin-block-start: var(--s-5);
   font-size: var(--t-small);
@@ -2030,14 +2107,34 @@ a.chip:hover {
   text-transform: uppercase;
   color: var(--accent);
 }
-/* Sayfanın en büyük yazısı bir SORU. Cevabı ürünün kendisi. */
+/*
+ * Sayfanın en büyük yazısı bir SORU. Cevabı ürünün kendisi.
+ *
+ * GENİŞLİK EKSENİ NİHAYET KULLANILIYOR. `layout.tsx` yıllardır "Bricolage'ın
+ * `wdth` ekseni sayesinde büyük puntoda sıkılaşabiliyor" diye yazıyordu ama
+ * hiçbir kural o ekseni çevirmiyordu: eksen indiriliyor, kullanılmıyordu.
+ * 86 pikselde %100 genişlik yüzü yumuşak ve balonumsu gösteriyor.
+ *
+ * Kural bir RAMPA, tek bir değer değil: yazı büyüdükçe daralıyor.
+ *   mega (86px) → %85    ·  bölüm başlığı (~34px) → %92    ·  gerisi %100
+ * Optik olarak doğrusu bu — büyük puntoda harfler zaten geniş görünüyor,
+ * küçük puntoda daraltmak okunurluğu yiyor.
+ *
+ * `line-height` 1,0'dan 1,03'e: iki satırda "şu"nun çengeli alttaki satırın
+ * çıkıntılarına değecek kadar yaklaşıyordu.
+ */
 .open-h {
   font-family: var(--display);
   font-size: var(--t-mega);
   font-weight: 600;
-  line-height: 1.0;
-  letter-spacing: -0.038em;
-  max-inline-size: 14ch;
+  font-stretch: 85%;
+  line-height: 1.03;
+  letter-spacing: -0.042em;
+  /* Ölçü `ch` biriminde ve `ch` yüz daraldıkça daralıyor; 14 karakterlik
+     eski sınır artık satırı erken kırıyordu. Kırma kararı `balance`a
+     bırakıldı: iki satır birbirine yakın uzunlukta çıkıyor. */
+  max-inline-size: 17ch;
+  text-wrap: balance;
 }
 .open-h b {
   font-weight: 700;
@@ -2045,6 +2142,11 @@ a.chip:hover {
 }
 .open-lede {
   font-size: var(--t-lede);
+  /* 1,6 satır aralığı başlığın altında dağınık duruyordu; 1,5 iki cümleyi
+     tek blok gibi tutuyor. `pretty` son satırda tek kelime bırakmıyor. */
+  line-height: 1.5;
+  letter-spacing: -0.006em;
+  text-wrap: pretty;
   color: var(--ink-2);
   max-inline-size: 44ch;
 }
@@ -4782,19 +4884,37 @@ a.chip:hover {
  * bandın kimliğini bozardı: B1 hep B1 sarısı. Kapı ekranında `is-fixed`
  * tırmanışı kapatıyor ve ölçülen basamak sabit yanıyor.
  */
-@keyframes rung-climb {
+@keyframes rung-climb-top {
   0%,
   10% {
-    box-shadow: 0 0 34px 6px color-mix(in srgb, var(--face) 55%, transparent);
+    background-color: color-mix(in srgb, var(--face) 62%, #fff4ea);
   }
   22%,
   100% {
-    box-shadow: 0 0 0 0 transparent;
+    background-color: var(--face);
   }
 }
-[data-play="1"] .model:not(.is-fixed) .mstep .f-top,
+@keyframes rung-climb-front {
+  0%,
+  10% {
+    background-color: color-mix(in srgb, var(--face) 70%, #fff4ea);
+  }
+  22%,
+  100% {
+    background-color: color-mix(in srgb, var(--face) 82%, #000 18%);
+  }
+}
+/*
+ * İki ayrı dizi, çünkü iki yüzün DİNLENME rengi farklı: üst yüz bandın saf
+ * rengi, ön yüz onun %18 karartılmışı. Tek dizi ikisini aynı renge çekerdi
+ * ve kutu ışık geçerken düzleşirdi.
+ */
+[data-play="1"] .model:not(.is-fixed) .mstep .f-top {
+  animation: rung-climb-top 6s linear infinite;
+  animation-delay: calc(var(--n) * 1.2s);
+}
 [data-play="1"] .model:not(.is-fixed) .mstep .f-front {
-  animation: rung-climb 6s linear infinite;
+  animation: rung-climb-front 6s linear infinite;
   animation-delay: calc(var(--n) * 1.2s);
 }
 /*

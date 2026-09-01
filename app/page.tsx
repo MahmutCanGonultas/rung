@@ -81,7 +81,14 @@ export default async function HomePage() {
             </Link>
             <p className="open-kicker">Türkçe konuşanlar için</p>
             <h1 className="open-h" id="acilis-h">
-              İngilizcen şu an <b>nerede?</b>
+              {/*
+                "şu an" arasında KIRILMAZ BOŞLUK. `text-wrap: balance` iki
+                satırı eşitlemeye çalışırken başlığı "İngilizcen şu / an
+                nerede?" diye kırdı — Türkçede "şu an" tek bir zaman zarfı ve
+                ortasından bölünmesi cümleyi bir an için okunmaz yapıyor.
+                Dengeleme kalıyor, kırabileceği yerler kısıtlanıyor.
+              */}
+              İngilizcen şu&nbsp;an <b>nerede?</b>
             </h1>
             <p className="open-lede">
               Bir paragraf yaz — on beş dakika. Seviyeni ölçelim, ve altı ay
