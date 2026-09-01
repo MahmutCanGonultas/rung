@@ -2387,7 +2387,20 @@ a.chip:hover {
 .coda {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
+  /*
+   * `hidden` DEĞİL `clip`, ve fark burada işlevsel.
+   *
+   * `overflow: hidden` bir KAYDIRMA KABI kuruyor — kaydırma çubuğu çıkmasa
+   * bile. Kaydırmaya bağlı animasyonlar (`animation-timeline: view()`) en
+   * yakın kaydırma kabına göre ölçülüyor, yani bu kutunun içindeki her şey
+   * SAYFAYI değil bu kutuyu izliyordu: kutu hiç kaymadığı için ilerleme
+   * sabit kalıyordu. ÖLÇÜLDÜ — kapanış metni sayfanın her yerinde 0,86
+   * opaklık ve 2px bulanıklıkta donmuştu, fotoğrafın paralaksı da hiç
+   * çalışmıyordu.
+   *
+   * `clip` aynı kırpmayı yapıyor ama kaydırma kabı kurmuyor.
+   */
+  overflow: clip;
   border-radius: var(--r-panel);
   min-block-size: clamp(340px, 40vw, 560px);
   display: grid;
@@ -5104,23 +5117,26 @@ a.chip:hover {
  * duruyor. Katlanan tek şey hareket; içerik değil.
  */
 /*
- * YOL 14 → 30 PİKSEL, SÜRE 460 → 640 ms.
+ * YOL 14 → 44 PİKSEL, SÜRE 460 → 900 ms, VE BULANIKLIK.
  *
- * İlk ayar "belli belirsiz"di ve ürün sahibi haklıydı: 14 piksellik bir
- * kayma, 86 piksellik bir başlığın yanında fark edilmiyor. Hareketin
- * görülmesi için yolun harfin boyuyla yarışabilmesi gerekiyor.
+ * İlk ayar 14 piksel / 460 ms'ti ve ürün sahibi üç kez "hiçbir şey
+ * değişmiyor gibi" dedi. Genliği artırmak yetmedi; eksik olan şey YOL değil,
+ * ODAĞA GELME. Bulanıklıktan netliğe geçen bir yüzeyi göz kaçırmıyor,
+ * 30 piksellik bir kaymayı kaçırıyor.
  */
 .open-top .mark-link,
 .open-say > * {
   transition:
-    opacity 640ms var(--ease),
-    transform 640ms var(--ease);
+    opacity 900ms var(--ease),
+    transform 900ms var(--ease),
+    filter 900ms var(--ease);
 }
 @starting-style {
   .open-top .mark-link,
   .open-say > * {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(44px);
+    filter: blur(12px);
   }
 }
 /* Gecikmeler `nth-child` ile, elemanlara sınıf eklenmeden: sıra DOM'daki
@@ -5148,193 +5164,143 @@ a.chip:hover {
    2026'nın asıl farkı: hareket bir SÜREYE değil, kişinin kendi
    kaydırmasına bağlı. Sayfa duruyorken duruyor, kaydırınca canlanıyor.
 
-   Bu ürün için doğru olması ayrıca önemli: ürün sahibi zamanlayıcıyla
-   dönen modeli "kendi kendine oynuyor" diye eleştirdi ve haklıydı. Ölçüm
-   aleti kendi kendine kıpırdamaz; ELİNİ SÜRÜNCE kıpırdar.
+   ═══ BİR KISIT BURADAN KALDIRILDI, VE YANLIŞTI ═══
 
-   Hepsi saf CSS: `animation-timeline`. JavaScript yok, kütüphane yok.
-   Desteklemeyen tarayıcıda `@supports` bloğu hiç uygulanmıyor ve taban CSS
-   — yani bitmiş kare — kalıyor.
+   Bu bölüm uzun süre "yalnız DÖNÜŞTÜRME, opaklık yok" kuralıyla yazıldı.
+   Gerekçe şuydu: görünürlüğü kaydırmaya bağlayan bir sayfanın tam sayfa
+   görüntüsü yarısı boş çıkar, ve `shots.mjs` / `contrast.mjs` / paylaşım
+   kartı o sayfayı ölçemez.
 
-   YALNIZ DÖNÜŞTÜRME (transform), OPAKLIK YOK. Kaydırmaya bağlı bir opaklık,
-   sayfanın alt yarısını "henüz görünmemiş" hâlde bırakıyor: tam sayfa
-   görüntüsü alan her araç (bizim `shots.mjs`, `contrast.mjs`, paylaşım
-   kartı) yarısı boş bir sayfa görüyor. Bu ekranların kendi ölçüm aracımızla
-   ölçülebilir kalması, bir geçiş efektinden daha değerli.
+   GEREKÇE BAŞTAN YANLIŞTI. Üç aracın üçü de sayfayı zaten
+   `prefers-reduced-motion: reduce` ile açıyor — kendi dosyalarında yazıyor —
+   ve buradaki her kural `no-preference` ile korunuyor. Yani araçlar hiçbir
+   zaman hareketli hâli görmüyordu; kısıt kimseyi korumuyor, yalnızca
+   hareketi kısıyordu. Ürün sahibi üç kez "hiçbir şey değişmiyor gibi" dedi
+   ve her seferinde genlik biraz artırıldı; asıl kusur genlikte değil, kendi
+   koyduğum bu kuraldaydı.
+
+   Artık dil tek: OPAKLIK + BULANIKLIK + ÖLÇEK + KONUM. Bulanıklık burada
+   süs değil — içerik odağa GELİYOR, ve gözün "bir şey oldu" demesi için en
+   güçlü işaret bu.
    ═══════════════════════════════════════════════════════════════════ */
 
 /*
- * MERDİVEN KAYDIRMAYLA DÖNÜYOR.
- *
- * `from` taban CSS'in tam olarak çizdiği açı: sayfanın tepesinde nesne
- * hareketsiz duruyor ve kaydırdıkça bir viewport boyunca 12 derece dönüyor.
- * Zamanlayıcılı salınımın yerini alıyor — o, bakmadığın anda açı
- * değiştirdiği için "kayma" gibi okunuyordu.
+ * TEK JEST, ÜÇ ŞİDDETTE. Giren her yüzey aynı şeyi yapıyor: uzaktan,
+ * bulanık ve aşağıdan gelip yerine oturuyor.
  */
-/*
- * DÖNÜŞ 12 → 18 DERECE, ve sona doğru hafifçe küçülüyor.
- *
- * On iki derece "belli belirsiz"di. Alt sınır −30°'ye çekildi (nesne
- * sayfanın tepesinde daha yandan görünüyor), üst sınır −12°'de bırakıldı:
- * daha sığ açılarda üst yüzle arka yüz ekranda aynı düzleme yaklaşıyor ve
- * kutu düzleşiyor. Küçülme kaydırmayı bir uzaklaşma gibi okutuyor.
- */
-@keyframes rig-turn {
+@keyframes reveal {
   from {
-    transform: rotateX(-18deg) rotateY(-30deg) scale(1);
-  }
-  to {
-    transform: rotateX(-12deg) rotateY(-12deg) scale(0.94);
+    opacity: 0;
+    transform: translateY(72px) scale(0.94);
+    filter: blur(14px);
   }
 }
-
-/*
- * KAPANIŞ FOTOĞRAFI SAYFADAN YAVAŞ GEÇİYOR.
- *
- * Klasik paralaks, ama burada bir işi var: fotoğraf bandın arkasında bir
- * DÜZLEM gibi davranıyor, yani kapanış kartı yüzeylerden biri olmaktan
- * çıkıp bir pencere oluyor. `scale` şart — kaydırma sırasında kenarların
- * açılmaması için fazladan pay.
- */
-@keyframes coda-drift {
+/* Ölçüm bantlarında sol sütun SOLDAN, pano SAĞDAN. Yatay hareket dikeyden
+   çok daha görünür: göz zaten yukarıdan aşağı kayıyor. */
+@keyframes reveal-left {
   from {
-    transform: translateY(-5%) scale(1.12);
-  }
-  to {
-    transform: translateY(5%) scale(1.12);
+    opacity: 0;
+    transform: translate(-90px, 40px);
+    filter: blur(14px);
   }
 }
-
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    /*
-     * İki seçici de yazılıyor: kural zamanlayıcılı salınımı ezmek zorunda ve
-     * o kural `[data-play="1"]` ile başlıyor. Bayraksız hâli de var, çünkü
-     * kaydırmaya bağlı hareket JavaScript istemiyor.
-     */
-    .model:not(.is-fixed) .model-stage,
-    [data-play="1"] .model:not(.is-fixed) .model-stage {
-      animation: rig-turn linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0 100svh;
-    }
+@keyframes reveal-right {
+  from {
+    opacity: 0;
+    transform: translate(90px, 40px);
+    filter: blur(14px);
   }
 }
-
-/*
- * YÜZEYLER GÖRÜŞ ALANINA GİRERKEN YÜKSELİYOR.
- *
- * `settle` bunu zaten yapıyordu ama tek atışlık ve 12 piksellikti — yani
- * "belli belirsiz". Burada yol 56 piksel ve hareket KAYDIRMAYA bağlı: kişi
- * yavaş kaydırırsa yavaş, hızlı kaydırırsa hızlı yükseliyor. Fark edilen
- * şey de bu; süreye bağlı bir geçiş, kaydırmanın hızına yetişemediği anda
- * görünmez oluyor.
- *
- * `both` YOK, ve bu bilinçli. Doldurma olmadan animasyon aralığın DIŞINDA
- * hiç uygulanmıyor: aralık başlamadan önce öğe ekranın altında (kimse
- * görmüyor) ve taban CSS'i, yani bitmiş kareyi çiziyor. Böylece tam sayfa
- * görüntüsü alan araçlar — `shots.mjs`, `contrast.mjs`, paylaşım kartı —
- * sayfayı hep bitmiş hâlde görüyor.
- *
- * Kartların kademesi ayrı bir sınıfla değil, ARALIĞI uzatarak veriliyor:
- * ikinci kart biraz daha geç, üçüncü biraz daha geç bitiyor.
- */
-@keyframes rise-in {
+/* Doğruluk sayısı bir SAYI: uzaktan gelmiyor, büyüyerek yerleşiyor. */
+@keyframes reveal-figure {
   from {
-    transform: translateY(90px) scale(0.96);
-  }
-}
-/* Sol sütun SOLDAN, sağdaki pano SAĞDAN geliyor. Yatay hareket dikeyden
-   çok daha görünür: göz zaten yukarıdan aşağı kayıyor, o yönde 90 piksel
-   akışa karışıyor — yana 60 piksel karışmıyor. */
-@keyframes slide-left {
-  from {
-    transform: translate(-60px, 60px);
-  }
-}
-@keyframes slide-right {
-  from {
-    transform: translate(60px, 60px);
+    opacity: 0;
+    transform: scale(0.72);
+    filter: blur(18px);
   }
 }
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .step-card,
-    .trust-num,
-    .coda-say {
-      animation: rise-in linear;
+    .coda-say,
+    .duo .belt-head,
+    .duo .belt-body,
+    .sample-finding {
+      animation: reveal linear;
       animation-timeline: view();
       /*
        * ARALIK UZUN, VE SEBEBİ ÖLÇÜLDÜ.
        *
-       * `cover 34%` ile hareket yaklaşık 200 piksellik bir kaydırmada bitiyordu:
-       * kart 300'de 26 piksel kaymış, 500'de çoktan yerine oturmuş oluyordu.
-       * Ürün sahibi "kaydırırken bir şey olur diye düşündüm, hâlâ yok" derken
-       * gördüğü şey buydu — hareket vardı ama görülecek kadar sürmüyordu.
-       * `cover 55%` onu üç katına çıkarıyor.
+       * `cover 34%` ile hareket ~200 piksellik bir kaydırmada bitiyordu: kart
+       * 300'de kaymış, 500'de çoktan oturmuştu. O kadarını tek tekerlek
+       * hareketiyle geçen biri hiçbir şey görmüyor.
+       *
+       * ÜST SINIRI DA VAR. Bir denemede aralık `cover 74%`e kadar uzatıldı ve
+       * ters kusur çıktı: pano ekranın ortasına gelip OKUNACAK konuma
+       * geldiğinde hâlâ 9 piksel bulanıktı. Kural şu — hareket öğe ekranın
+       * ortasına varmadan BİTMELİ; yaklaşık `cover 50%` o nokta.
        */
-      animation-range: entry 0% cover 55%;
+      animation-range: entry 0% cover 48%;
     }
-    .step-card:nth-child(2) {
-      animation-range: entry 0% cover 66%;
-    }
-    .step-card:nth-child(3) {
-      animation-range: entry 0% cover 77%;
-    }
-
-    /*
-     * DAR EKRANDA YATAY KAYMA YOK.
-     *
-     * `.duo` 861 pikselin altında tek sütuna iniyor: solda/sağda diye bir şey
-     * kalmıyor, yani yatay giriş anlamsız. Dahası zararlı — pano orada tam
-     * genişlikte ve 60 piksel sağa kayınca bandın `overflow-x: clip` sınırına
-     * çarpıp kırpılıyor. Dar ekran düz yükselişle yetiniyor.
-     */
-    .duo .belt-head,
-    .duo .belt-body {
-      animation: rise-in linear;
+    .trust-num {
+      animation: reveal-figure linear;
       animation-timeline: view();
       animation-range: entry 0% cover 52%;
     }
-    .duo .belt-body {
-      animation-range: entry 0% cover 68%;
-    }
-  }
 
-  @media (prefers-reduced-motion: no-preference) and (min-width: 861px) {
-    .duo .belt-head {
-      animation-name: slide-left;
+    /* Kademe ayrı bir sınıfla değil ARALIĞI uzatarak veriliyor. */
+    .step-card:nth-child(2) {
+      animation-range: entry 0% cover 56%;
+    }
+    .step-card:nth-child(3) {
+      animation-range: entry 0% cover 64%;
     }
     /* Pano sol sütundan sonra oturuyor: önce "ne diyor", sonra "işte kanıtı". */
     .duo .belt-body {
-      animation-name: slide-right;
+      animation-range: entry 0% cover 56%;
     }
 
     /*
-     * BULGULAR TEK TEK GELİYOR.
-     *
-     * Panonun kendisi yerine otururken içindeki beş satır arka arkaya
-     * düşüyor. Kaydırma boyunca sürekli bir şeyin kımıldaması, tek bir büyük
-     * hareketten daha çok "canlı" okunuyor — ve burada anlamı da var: rapor
-     * satır satır yazılıyor.
+     * BULGULAR TEK TEK GELİYOR — rapor satır satır yazılıyor. Kaydırma
+     * boyunca sürekli bir şeyin kımıldaması, tek büyük hareketten daha
+     * canlı okunuyor.
      */
-    .sample-finding {
-      animation: rise-in linear;
-      animation-timeline: view();
-      animation-range: entry 0% cover 62%;
-    }
     .sample-finding:nth-child(2) {
-      animation-range: entry 0% cover 70%;
+      animation-range: entry 0% cover 54%;
     }
     .sample-finding:nth-child(3) {
-      animation-range: entry 0% cover 78%;
+      animation-range: entry 0% cover 60%;
     }
     .sample-finding:nth-child(4) {
-      animation-range: entry 0% cover 86%;
+      animation-range: entry 0% cover 66%;
     }
     .sample-finding:nth-child(5) {
-      animation-range: entry 0% cover 94%;
+      animation-range: entry 0% cover 72%;
+    }
+  }
+
+  /*
+   * DAR EKRANDA YATAY KAYMA YOK.
+   *
+   * `.duo` 861 pikselin altında tek sütuna iniyor: solda/sağda diye bir şey
+   * kalmıyor. Dahası pano orada tam genişlikte ve 90 piksel yana kayınca
+   * bandın `overflow-x: clip` sınırına çarpıp kırpılıyor.
+   */
+  @media (prefers-reduced-motion: no-preference) and (min-width: 861px) {
+    .duo .belt-head {
+      animation-name: reveal-left;
+    }
+    .duo .belt-body {
+      animation-name: reveal-right;
+    }
+    /* Kapanış fotoğrafı sayfadan yavaş geçiyor: kapanış kartı bir yüzey
+       olmaktan çıkıp pencere oluyor. `scale` şart — kaydırırken kenarların
+       açılmaması için pay. */
+    .coda-photo {
+      animation: coda-drift linear both;
+      animation-timeline: view();
+      animation-range: cover;
     }
   }
 }
@@ -5342,36 +5308,61 @@ a.chip:hover {
 /*
  * KAHRAMAN KAYDIRIRKEN AYRIŞIYOR.
  *
- * İlk kaydırma hareketinde bir şey olması gerekiyor — sayfanın altındaki
- * yüzeyler ne kadar iyi girerse girsin, kişi ilk olarak KAHRAMANI
- * kaydırıyor. Metin sayfadan hızlı çıkıyor, nesne yavaş: aradaki fark
- * derinlik oluyor.
+ * İlk kaydırma hareketinde bir şey olmalı: kişi sayfanın altındaki yüzeyleri
+ * görmeden önce KAHRAMANI kaydırıyor. Üç katman üç hızda gidiyor, metin en
+ * hızlı, nesne en yavaş — aradaki fark derinlik oluyor.
  *
- * Üç katman üç hızda: marka en yavaş, metin en hızlı, nesne ters yönde.
- * Hepsi yalnız DÖNÜŞTÜRME, yani hiçbir şey kaybolmuyor.
+ * Nesne önce TERS yöne kaydırıldı ve ekranda kırıldı: bandın alt kenarını
+ * geçince alttaki bant üstüne biniyor (bantlar dikiş kadar örtüşüyor) ve
+ * A1…C1 künyesi ortadan kesiliyordu. Aynı derinlik hız farkıyla kuruluyor.
  */
-@keyframes hero-mark {
+/*
+ * MERDİVEN KAYDIRMAYLA DÖNÜYOR.
+ *
+ * `from` taban CSS'in çizdiği açıya yakın: sayfanın tepesinde nesne
+ * hareketsiz, kaydırdıkça bir viewport boyunca dönüyor ve hafifçe
+ * küçülüyor. Zamanlayıcılı salınımın yerini aldı — o, bakmadığın anda açı
+ * değiştirdiği için "kayma" gibi okunuyordu.
+ *
+ * Üst sınır −10°'de duruyor: daha sığ açılarda üst yüzle arka yüz ekranda
+ * aynı düzleme yaklaşıyor ve kutu düzleşiyor.
+ */
+@keyframes rig-turn {
+  from {
+    transform: rotateX(-19deg) rotateY(-34deg) scale(1);
+  }
   to {
-    transform: translateY(-40px);
+    transform: rotateX(-11deg) rotateY(-10deg) scale(0.9);
   }
 }
-@keyframes hero-say {
+
+/*
+ * KAPANIŞ FOTOĞRAFI SAYFADAN YAVAŞ GEÇİYOR — bandın arkasında bir düzlem
+ * gibi. `scale` şart: kaydırma sırasında kenarların açılmaması için pay.
+ */
+@keyframes coda-drift {
+  from {
+    transform: translateY(-9%) scale(1.2);
+  }
+  to {
+    transform: translateY(9%) scale(1.2);
+  }
+}
+
+@keyframes hero-mark {
   to {
     transform: translateY(-90px);
   }
 }
-/*
- * NESNE DE YUKARI GİDİYOR, AMA GERİDE KALARAK.
- *
- * Önce ters yöne (+55px) kaydırıldı ve ekranda kırıldı: nesne bandın alt
- * kenarını geçince altındaki bant onun ÜSTÜNE biniyor (bantlar dikiş kadar
- * örtüşüyor) ve A1…C1 künyesi ortadan kesiliyordu. Aynı derinlik hissi ters
- * yönle değil, HIZ FARKIYLA da kuruluyor: metin −90, nesne −25. Metin
- * uçarken nesne oyalanıyor.
- */
+@keyframes hero-say {
+  to {
+    transform: translateY(-190px);
+    opacity: 0.15;
+  }
+}
 @keyframes hero-art {
   to {
-    transform: translateY(-25px);
+    transform: translateY(-60px);
   }
 }
 
@@ -5392,20 +5383,15 @@ a.chip:hover {
       animation-timeline: scroll(root block);
       animation-range: 0 90svh;
     }
-  }
-}
-
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) and (min-width: 861px) {
-    /* Yalnız geniş ekranda: dar ekranda fotoğraf `position: static` ve
-       kendi kutusunda kayınca altında boşluk açılıyor. */
-    .coda-photo {
-      animation: coda-drift linear both;
-      animation-timeline: view();
-      animation-range: cover;
+    .model:not(.is-fixed) .model-stage,
+    [data-play="1"] .model:not(.is-fixed) .model-stage {
+      animation: rig-turn linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 100svh;
     }
   }
 }
+
 
 /*
  * 4 · ÖLÇÜM ÇUBUĞU SIFIRDAN DEĞERİNE.
