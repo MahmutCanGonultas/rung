@@ -75,6 +75,11 @@ export default async function HomePage() {
       {/* ══ 00 · BU NE ═══════════════════════════════════════════════ */}
       <section className="belt is-warm belt-open" aria-labelledby="acilis-h">
         <div className="belt-in open-hero">
+          {/*
+            Açılışta sıralı giriş SAF CSS: `@starting-style`. Bir sarmalayıcı
+            ve `IntersectionObserver` denendi ve ÇAKMA üretti — gerekçesi
+            `globals.css`te `settle` yorumunda, ölçülmüş sayılarla.
+          */}
           <div className="open-say">
             <Link className="mark-link" href="/">
               <Mark size="lg" />

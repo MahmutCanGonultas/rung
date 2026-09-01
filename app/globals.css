@@ -1460,6 +1460,33 @@ a.chip:hover {
   content: " \2212";
 }
 
+/*
+ * ÇEKMECE YUMUŞAK AÇILIYOR.
+ *
+ * `<details>` tarayıcı varsayılanında ZIPLAYARAK açılıyor. `::details-content`
+ * ve `interpolate-size` ile yüksekliği `auto`ya doğru geçişlenebiliyor — CSS
+ * bunu ancak yakın zamanda yapabilir oldu, ve desteklemeyen tarayıcı eski
+ * davranışta kalıyor: `@supports` bloğu hiç uygulanmıyor, çekmece yine
+ * açılıyor, sadece anında.
+ */
+@supports (interpolate-size: allow-keywords) and selector(::details-content) {
+  @media (prefers-reduced-motion: no-preference) {
+    :root {
+      interpolate-size: allow-keywords;
+    }
+    .sample-finding::details-content {
+      block-size: 0;
+      overflow: clip;
+      transition:
+        block-size var(--d-2) var(--ease),
+        content-visibility var(--d-2) allow-discrete;
+    }
+    .sample-finding[open]::details-content {
+      block-size: auto;
+    }
+  }
+}
+
 .sample-why {
   padding-block-end: var(--s-4);
   padding-inline-start: calc(32px + var(--s-4));
@@ -2160,8 +2187,24 @@ a.chip:hover {
   font-size: var(--t-small);
   color: var(--ink-3);
 }
+/*
+ * MODELİN ARKASINDA IŞIK.
+ *
+ * Nesne düz bir zeminde duruyordu ve kahramanın sağ yarısı boş bir renk
+ * alanıydı. Bu gradyan yeni bir NESNE değil — kutunun kendi zemin katmanı —
+ * ama sahneye derinlik veriyor: ışık nereden geliyorsa orası açık, kenarlar
+ * koyu. Modelin üst yüzlerinin en aydınlık yüz olmasıyla aynı yön.
+ *
+ * Vurgu renginin %11'i: renk olarak okunmuyor, sıcaklık olarak okunuyor.
+ * Daha fazlası bandın kendi gradyanıyla yarışıyordu.
+ */
 .open-art {
   inline-size: 100%;
+  background: radial-gradient(
+    58% 52% at 60% 44%,
+    color-mix(in srgb, var(--accent) 11%, transparent) 0%,
+    transparent 72%
+  );
 }
 
 /* ── 01 · ÜÇ ADIM ───────────────────────────────────────────────────
@@ -4933,10 +4976,25 @@ a.chip:hover {
 /*
  * 3 · YÜZEY YERİNE OTURUYOR.
  * 12px'ten fazla değil: daha fazlası zıplama gibi duruyor.
+ *
+ * OPAKLIK KALKTI, YALNIZ KONUM KALDI — ve sebebi ölçüldü.
+ *
+ * Bu dizinin tetiği JavaScript: `InView` öğe ekrana girince `data-play`
+ * basıyor. Ama taban CSS'in bitmiş kareyi çizmesi ŞART (dosyanın kendi
+ * kuralı, sayfa JavaScript'siz de tam olsun diye), yani öğe ÖNCE tam
+ * görünür çiziliyor, sonra bayrak basılıyor, sonra dizi onu opaklık
+ * sıfırdan yeniden getiriyor. Sonuç bir ÇAKMA: içerik görünüyor, kayboluyor,
+ * geri geliyor.
+ *
+ * ÖLÇÜLDÜ: başlık 760 ms'de tam görünürdü, 890 ms'de 0,001'e düştü, 1224
+ * ms'de ancak 0,87'ye gelebiliyordu. Aradaki 130 ms gözle görülür.
+ *
+ * Kural bundan sonra şu: JavaScript'in tetiklediği bir giriş dizisi
+ * OPAKLIK ANİMASYONU YAPAMAZ. Konum yapabilir — kaymış bir öğe "eksik"
+ * değil, yalnızca birkaç piksel ötede.
  */
 @keyframes settle {
   from {
-    opacity: 0.001;
     transform: translateY(12px);
   }
 }
@@ -4944,6 +5002,134 @@ a.chip:hover {
 [data-play="1"] .step-figure,
 [data-play="1"] .accuracy-band {
   animation: settle var(--d-2) var(--ease) both;
+}
+
+/*
+ * KAHRAMAN SIRAYLA GİRİYOR — JAVASCRIPT'SİZ.
+ *
+ * Sıra okuma sırası: kime yazıldığı (künye) → soru → nasıl olacağı → düğme.
+ * Toplam 350 ms; daha uzunu bekletmek olur ve bu sayfanın işi bekletmek
+ * değil.
+ *
+ * `@starting-style` KULLANILIYOR, `IntersectionObserver` DEĞİL. Fark, yukarıda
+ * `settle` yorumunda anlatılan çakma: JavaScript'in bastığı bir bayrak, öğe
+ * ZATEN ÇİZİLDİKTEN SONRA geliyor. `@starting-style` ise öğenin İLK çizimine
+ * ait — arada tam görünür bir kare hiç olmuyor, o yüzden burada opaklık da
+ * güvenli.
+ *
+ * Desteklemeyen tarayıcıda kural hiç uygulanmıyor ve metin doğrudan yerinde
+ * duruyor. Katlanan tek şey hareket; içerik değil.
+ */
+.open-say > * {
+  transition:
+    opacity var(--d-2) var(--ease),
+    transform var(--d-2) var(--ease);
+}
+@starting-style {
+  .open-say > * {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+/* Gecikmeler `nth-child` ile, elemanlara sınıf eklenmeden: sıra DOM'daki
+   sıradır ve bir satır eklenince kendiliğinden yerine oturuyor. */
+.open-say > *:nth-child(2) {
+  transition-delay: 70ms;
+}
+.open-say > *:nth-child(3) {
+  transition-delay: 140ms;
+}
+.open-say > *:nth-child(4) {
+  transition-delay: 210ms;
+}
+.open-say > *:nth-child(5) {
+  transition-delay: 280ms;
+}
+.open-say > *:nth-child(6) {
+  transition-delay: 350ms;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   24b · KAYDIRMAYA BAĞLI HAREKET
+
+   2026'nın asıl farkı: hareket bir SÜREYE değil, kişinin kendi
+   kaydırmasına bağlı. Sayfa duruyorken duruyor, kaydırınca canlanıyor.
+
+   Bu ürün için doğru olması ayrıca önemli: ürün sahibi zamanlayıcıyla
+   dönen modeli "kendi kendine oynuyor" diye eleştirdi ve haklıydı. Ölçüm
+   aleti kendi kendine kıpırdamaz; ELİNİ SÜRÜNCE kıpırdar.
+
+   Hepsi saf CSS: `animation-timeline`. JavaScript yok, kütüphane yok.
+   Desteklemeyen tarayıcıda `@supports` bloğu hiç uygulanmıyor ve taban CSS
+   — yani bitmiş kare — kalıyor.
+
+   YALNIZ DÖNÜŞTÜRME (transform), OPAKLIK YOK. Kaydırmaya bağlı bir opaklık,
+   sayfanın alt yarısını "henüz görünmemiş" hâlde bırakıyor: tam sayfa
+   görüntüsü alan her araç (bizim `shots.mjs`, `contrast.mjs`, paylaşım
+   kartı) yarısı boş bir sayfa görüyor. Bu ekranların kendi ölçüm aracımızla
+   ölçülebilir kalması, bir geçiş efektinden daha değerli.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/*
+ * MERDİVEN KAYDIRMAYLA DÖNÜYOR.
+ *
+ * `from` taban CSS'in tam olarak çizdiği açı: sayfanın tepesinde nesne
+ * hareketsiz duruyor ve kaydırdıkça bir viewport boyunca 12 derece dönüyor.
+ * Zamanlayıcılı salınımın yerini alıyor — o, bakmadığın anda açı
+ * değiştirdiği için "kayma" gibi okunuyordu.
+ */
+@keyframes rig-turn {
+  from {
+    transform: rotateX(-17deg) rotateY(-24deg);
+  }
+  to {
+    transform: rotateX(-13deg) rotateY(-12deg);
+  }
+}
+
+/*
+ * KAPANIŞ FOTOĞRAFI SAYFADAN YAVAŞ GEÇİYOR.
+ *
+ * Klasik paralaks, ama burada bir işi var: fotoğraf bandın arkasında bir
+ * DÜZLEM gibi davranıyor, yani kapanış kartı yüzeylerden biri olmaktan
+ * çıkıp bir pencere oluyor. `scale` şart — kaydırma sırasında kenarların
+ * açılmaması için fazladan pay.
+ */
+@keyframes coda-drift {
+  from {
+    transform: translateY(-5%) scale(1.12);
+  }
+  to {
+    transform: translateY(5%) scale(1.12);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /*
+     * İki seçici de yazılıyor: kural zamanlayıcılı salınımı ezmek zorunda ve
+     * o kural `[data-play="1"]` ile başlıyor. Bayraksız hâli de var, çünkü
+     * kaydırmaya bağlı hareket JavaScript istemiyor.
+     */
+    .model:not(.is-fixed) .model-stage,
+    [data-play="1"] .model:not(.is-fixed) .model-stage {
+      animation: rig-turn linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 100svh;
+    }
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 861px) {
+    /* Yalnız geniş ekranda: dar ekranda fotoğraf `position: static` ve
+       kendi kutusunda kayınca altında boşluk açılıyor. */
+    .coda-photo {
+      animation: coda-drift linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
 }
 
 /*
