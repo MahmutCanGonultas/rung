@@ -5241,31 +5241,156 @@ a.chip:hover {
  */
 @keyframes rise-in {
   from {
-    transform: translateY(56px) scale(0.97);
+    transform: translateY(90px) scale(0.96);
+  }
+}
+/* Sol sütun SOLDAN, sağdaki pano SAĞDAN geliyor. Yatay hareket dikeyden
+   çok daha görünür: göz zaten yukarıdan aşağı kayıyor, o yönde 90 piksel
+   akışa karışıyor — yana 60 piksel karışmıyor. */
+@keyframes slide-left {
+  from {
+    transform: translate(-60px, 60px);
+  }
+}
+@keyframes slide-right {
+  from {
+    transform: translate(60px, 60px);
   }
 }
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .step-card,
-    .duo .belt-head,
-    .duo .belt-body,
     .trust-num,
     .coda-say {
       animation: rise-in linear;
       animation-timeline: view();
-      animation-range: entry 0% cover 34%;
+      /*
+       * ARALIK UZUN, VE SEBEBİ ÖLÇÜLDÜ.
+       *
+       * `cover 34%` ile hareket yaklaşık 200 piksellik bir kaydırmada bitiyordu:
+       * kart 300'de 26 piksel kaymış, 500'de çoktan yerine oturmuş oluyordu.
+       * Ürün sahibi "kaydırırken bir şey olur diye düşündüm, hâlâ yok" derken
+       * gördüğü şey buydu — hareket vardı ama görülecek kadar sürmüyordu.
+       * `cover 55%` onu üç katına çıkarıyor.
+       */
+      animation-range: entry 0% cover 55%;
     }
     .step-card:nth-child(2) {
-      animation-range: entry 0% cover 41%;
+      animation-range: entry 0% cover 66%;
     }
     .step-card:nth-child(3) {
-      animation-range: entry 0% cover 48%;
+      animation-range: entry 0% cover 77%;
     }
-    /* Sağdaki ölçüm panosu sol sütundan biraz sonra yerine oturuyor:
-       önce "ne diyor", sonra "işte kanıtı". */
+
+    /*
+     * DAR EKRANDA YATAY KAYMA YOK.
+     *
+     * `.duo` 861 pikselin altında tek sütuna iniyor: solda/sağda diye bir şey
+     * kalmıyor, yani yatay giriş anlamsız. Dahası zararlı — pano orada tam
+     * genişlikte ve 60 piksel sağa kayınca bandın `overflow-x: clip` sınırına
+     * çarpıp kırpılıyor. Dar ekran düz yükselişle yetiniyor.
+     */
+    .duo .belt-head,
     .duo .belt-body {
-      animation-range: entry 0% cover 44%;
+      animation: rise-in linear;
+      animation-timeline: view();
+      animation-range: entry 0% cover 52%;
+    }
+    .duo .belt-body {
+      animation-range: entry 0% cover 68%;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (min-width: 861px) {
+    .duo .belt-head {
+      animation-name: slide-left;
+    }
+    /* Pano sol sütundan sonra oturuyor: önce "ne diyor", sonra "işte kanıtı". */
+    .duo .belt-body {
+      animation-name: slide-right;
+    }
+
+    /*
+     * BULGULAR TEK TEK GELİYOR.
+     *
+     * Panonun kendisi yerine otururken içindeki beş satır arka arkaya
+     * düşüyor. Kaydırma boyunca sürekli bir şeyin kımıldaması, tek bir büyük
+     * hareketten daha çok "canlı" okunuyor — ve burada anlamı da var: rapor
+     * satır satır yazılıyor.
+     */
+    .sample-finding {
+      animation: rise-in linear;
+      animation-timeline: view();
+      animation-range: entry 0% cover 62%;
+    }
+    .sample-finding:nth-child(2) {
+      animation-range: entry 0% cover 70%;
+    }
+    .sample-finding:nth-child(3) {
+      animation-range: entry 0% cover 78%;
+    }
+    .sample-finding:nth-child(4) {
+      animation-range: entry 0% cover 86%;
+    }
+    .sample-finding:nth-child(5) {
+      animation-range: entry 0% cover 94%;
+    }
+  }
+}
+
+/*
+ * KAHRAMAN KAYDIRIRKEN AYRIŞIYOR.
+ *
+ * İlk kaydırma hareketinde bir şey olması gerekiyor — sayfanın altındaki
+ * yüzeyler ne kadar iyi girerse girsin, kişi ilk olarak KAHRAMANI
+ * kaydırıyor. Metin sayfadan hızlı çıkıyor, nesne yavaş: aradaki fark
+ * derinlik oluyor.
+ *
+ * Üç katman üç hızda: marka en yavaş, metin en hızlı, nesne ters yönde.
+ * Hepsi yalnız DÖNÜŞTÜRME, yani hiçbir şey kaybolmuyor.
+ */
+@keyframes hero-mark {
+  to {
+    transform: translateY(-40px);
+  }
+}
+@keyframes hero-say {
+  to {
+    transform: translateY(-90px);
+  }
+}
+/*
+ * NESNE DE YUKARI GİDİYOR, AMA GERİDE KALARAK.
+ *
+ * Önce ters yöne (+55px) kaydırıldı ve ekranda kırıldı: nesne bandın alt
+ * kenarını geçince altındaki bant onun ÜSTÜNE biniyor (bantlar dikiş kadar
+ * örtüşüyor) ve A1…C1 künyesi ortadan kesiliyordu. Aynı derinlik hissi ters
+ * yönle değil, HIZ FARKIYLA da kuruluyor: metin −90, nesne −25. Metin
+ * uçarken nesne oyalanıyor.
+ */
+@keyframes hero-art {
+  to {
+    transform: translateY(-25px);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .open-top {
+      animation: hero-mark linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90svh;
+    }
+    .open-say {
+      animation: hero-say linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90svh;
+    }
+    .open-art {
+      animation: hero-art linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90svh;
     }
   }
 }
