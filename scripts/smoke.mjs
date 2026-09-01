@@ -576,6 +576,36 @@ async function main() {
      */
     check("fotoğraf alanı kayıt formuna girmiyor", scanKabul.adsiz === true);
 
+    /*
+     * SEVİYENİN BİR ÜSTÜNDEN KELİME ÖNERİSİ.
+     *
+     * Üç şey birden sınanıyor: öneri çıkıyor mu, önerilen bant gerçekten
+     * kişinin bandının ÜSTÜ mü, ve her önerinin Türkçesi ile türü var mı.
+     * Sonuncusu önemli — karşılığı olmayan bir kelime listesi ezber
+     * listesidir, ve liste elle derlendiği için sessizce eksilebilir.
+     */
+    const oneriler = await page.$$eval(".stretch-word", (els) =>
+      els.map((el) => ({
+        en: el.querySelector(".stretch-en")?.textContent?.trim() ?? "",
+        pos: el.querySelector(".stretch-pos")?.textContent?.trim() ?? "",
+        tr: el.querySelector(".stretch-tr")?.textContent?.trim() ?? "",
+      }))
+    );
+    check("kelime önerisi çıkıyor", oneriler.length > 0, `${oneriler.length} öneri`);
+    check(
+      "her önerinin türü ve Türkçesi var",
+      oneriler.every((o) => o.en.length > 1 && o.pos.length > 1 && o.tr.length > 1),
+      JSON.stringify(oneriler[0] ?? {})
+    );
+    const oneriBant = await readText(page, ".stretch-band");
+    const BANTLAR = ["A1", "A2", "B1", "B2", "C1"];
+    check(
+      "öneri seviyenin ÜSTÜNDEN geliyor",
+      BANTLAR.indexOf(String(oneriBant)) >= BANTLAR.indexOf("A1") &&
+        String(oneriBant) !== "A1",
+      `öneri bandı ${oneriBant}`
+    );
+
     console.log("\n12 · başka görev ver");
     /*
      * "Başka görev ver" bağlantısı /write?context=..&skip=.. adresine gidiyor,

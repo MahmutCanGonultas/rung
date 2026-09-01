@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { Composer } from "../../components/Composer";
 import { OffBandStrip } from "../../components/OffBandStrip";
+import { WordStretch } from "../../components/WordStretch";
 import {
   findContextBySlug,
   findTaskById,
@@ -45,6 +46,20 @@ const HABER: Record<string, string> = {
 
 /** Adres `?context=own` olduğunda görev verilmiyor: konu kullanıcının. */
 const OWN = "own";
+
+/*
+ * Kelime önerilerinin tohumu İSTANBUL GÜNÜ.
+ *
+ * Sunucunun UTC günü kullanılsaydı öneriler gece üçte değişirdi — kişinin
+ * hâlâ "dün" saydığı bir saatte. Günlük ölçüm hakkı da aynı takvimi
+ * kullanıyor; iki yerde iki farklı gün tanımı olmamalı.
+ */
+const ISTANBUL_DAY = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Istanbul",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
 /*
  * YAZMA EKRANI — iki kip.
@@ -253,6 +268,14 @@ export default async function WritePage({
         önce yaz, takılırsan aşağısı burada. Kendi konusunda yazarken görevden
         türeyen bir kelime listesi olmuyor, o yüzden şerit yalnız görevli kipte.
       */}
+      {/*
+        ÖNERİLER HER İKİ KİPTE DE VAR — görevli yazarken de, kendi konusunda
+        yazarken de. `OffBandStrip` görev metnine bağlı olduğu için serbest
+        kipte çizilemiyor; bu ondan bağımsız, kişinin ölçülen seviyesine
+        bakıyor.
+      */}
+      <WordStretch level={level} userId={user.id} today={ISTANBUL_DAY.format(new Date())} />
+
       {own ? null : (
         <OffBandStrip
           prompt={chosen!.prompt}
