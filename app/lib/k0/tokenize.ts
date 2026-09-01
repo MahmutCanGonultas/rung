@@ -57,10 +57,22 @@ export type Word = {
  * Kesme işareti kelimenin parçası: "don't" ve "student's" tek kelime.
  * Tire de öyle: "state-of-the-art" tek kelime — `countWords` ile aynı kural.
  * Sayılar kelime sayılmıyor: "2026" yazmak kelime dağarcığı göstermiyor.
+ *
+ * HARF `\p{L}`, `[A-Za-z]` DEĞİL — ve bu bir hata düzeltmesi.
+ *
+ * Eski kalıp yalnız ASCII harf tanıyordu, yani ilk aksanlı harf kelimeyi
+ * İKİYE BÖLÜYORDU. Ürün sahibi "Mersin/Türkiye" yazdı ve ekranda şunu
+ * gördü: "rkiye → kine, sözlükte yok". Çünkü "Türkiye" iki belirtece
+ * ayrılmıştı — "T" ve "rkiye" — ve ikincisi büyük harfle başlamadığı için
+ * özel isim elemesine de takılmıyordu. "İstanbul'da" ise "stanbul'da"
+ * oluyordu: baştaki harf tamamen düşüyordu.
+ *
+ * Yan etkisi doğru yönde: "Türkiye" artık BİR kelime sayılıyor, iki değil.
+ * Kelime sayısı ve ondan türeyen ölçümler bir parça daha doğru.
  */
 export function words(text: string): Word[] {
   const found: Word[] = [];
-  const pattern = /[A-Za-z]+(?:['’\-][A-Za-z]+)*/g;
+  const pattern = /\p{L}+(?:['’\-]\p{L}+)*/gu;
 
   let match: RegExpExecArray | null;
   while ((match = pattern.exec(text)) !== null) {

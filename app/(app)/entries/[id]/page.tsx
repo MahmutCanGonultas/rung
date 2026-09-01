@@ -13,7 +13,7 @@ import { requireUser } from "../../../lib/guard";
 import { analyze as analyzeK0 } from "../../../lib/k0";
 import { BAND_ORDER, bandOf } from "../../../lib/k0/bands";
 import { segment } from "../../../lib/k0/segments";
-import { words } from "../../../lib/k0/tokenize";
+import { sentences, words } from "../../../lib/k0/tokenize";
 import { partitionFindings } from "../../../lib/k2/display";
 import { familyOf } from "../../../lib/taxonomy";
 import { filterForLevel, limitFor } from "../../../lib/k3/filter";
@@ -216,9 +216,19 @@ export default async function EntryPage({
         </p>
       ) : null}
 
-      {/* ══ 4 · ÖLÇÜM AYRINTISI — hepsi tek kutuda ══════════════════ */}
+      {/*
+        ══ 4 · BU ÖLÇÜM NASIL ÇIKTI ═════════════════════════════════
+        
+        Başlık "Ölçüm ayrıntısı"ydı ve içi mühendise yazılmıştı: "skor 2,34 / 4",
+        "yan cümle 0,34", "çeşitlilik 0,72", "prompt v1". Ürün sahibi: "bir
+        kullanıcının anlayabileceği gibi değil, aşırı profesyonel görünüyor."
+        
+        Sayılar KALDI — ürünün iddiası ölçtüğünü göstermek, ve gizlenen sayı
+        güven vermiyor. Değişen şey her sayının yanında ne anlama geldiğinin
+        yazması, ve başlıkların kişinin kendi sorusu olması.
+      */}
       <details className="read-detail">
-        <summary>Ölçüm ayrıntısı</summary>
+        <summary>Bu ölçüm nasıl çıktı?</summary>
         <div className="detail-body">
           <Signals estimate={written} />
           <Metrics k0={k0} />
@@ -260,33 +270,57 @@ function Signals({
 
   return (
     <section className="detail-part">
-      <h3 className="detail-h">
-        Seviye · skor {estimate.score.toFixed(2)} / 4
-      </h3>
+      <h3 className="detail-h">Seviyeni belirleyen dört şey</h3>
       <p className="detail-note">
-        Dördü de deterministik katmandan, model kullanılmadan. Kaydedildiği anda
-        ölçüldü, sonradan değişmiyor.
+        Bu dördüne ayrı ayrı bakılıyor ve seviyen ortalamalarından çıkıyor.
+        Hiçbirinde yapay zekâ kullanılmıyor: aynı metin her zaman aynı sonucu
+        veriyor. Yazdığın anda ölçüldü, sonradan değişmiyor.
       </p>
       <dl className="lvl">
         {estimate.signals.map((s) => (
           <div key={s.name} className="lvl-row">
-            <dt className="lvl-name">{s.name}</dt>
+            <dt className="lvl-name">
+              {s.name}
+              {/*
+                Sinyal adları motordan geliyor ve doğru adlar — ama tek
+                başlarına ne ölçtüklerini söylemiyorlar. Açıklama burada,
+                motorda değil: motorun işi ölçmek, ekranın işi anlatmak.
+              */}
+              {SIGNAL_MEANING[s.name] ? (
+                <span className="lvl-what">{SIGNAL_MEANING[s.name]}</span>
+              ) : null}
+            </dt>
             <dd className="lvl-band">{s.band}</dd>
             <dd className="lvl-detail">{s.detail}</dd>
           </div>
         ))}
       </dl>
+      <p className="detail-stamp">
+        dördünün ortalaması: {estimate.score.toFixed(2)} / 4
+      </p>
     </section>
   );
 }
+
+/** Her sinyalin GÜNLÜK DİLDE ne ölçtüğü. Anahtarlar `k3/estimate.ts`ten. */
+const SIGNAL_MEANING: Record<string, string> = {
+  "Kelime bandı": "Ne kadar ileri seviye kelime kullandığın",
+  "Cümle karmaşıklığı": "Cümlelerini ne kadar uzun ve katmanlı kurduğun",
+  "Hata yoğunluğu": "Yüz kelimede kaç hata çıktığı",
+  "Hata türü": "Hataların temel konularda mı, ince ayrıntılarda mı olduğu",
+};
 
 /* ── ayrıntı · ham ölçüler ─────────────────────────────────────────── */
 function Metrics({ k0 }: { k0: ReturnType<typeof analyzeK0> }) {
   const m = k0.metrics;
   return (
     <section className="detail-part">
-      <h3 className="detail-h">Ham ölçüler</h3>
-      <dl className="pairs">
+      <h3 className="detail-h">Metnin sayıları</h3>
+      <p className="detail-note">
+        Yukarıdaki dört şey bu sayılardan hesaplanıyor. Hepsi doğrudan
+        yazdığın metinden sayıldı.
+      </p>
+      <dl className="pairs is-explained">
         <div className="pair">
           <dt>kelime</dt>
           <dd>{m.wordCount}</dd>
@@ -296,27 +330,44 @@ function Metrics({ k0 }: { k0: ReturnType<typeof analyzeK0> }) {
           <dd>{m.sentenceCount}</dd>
         </div>
         <div className="pair">
-          <dt>ort. cümle</dt>
+          <dt>cümle başına kelime</dt>
           <dd>{num(m.avgSentenceLength)}</dd>
-        </div>
-        <div className="pair">
-          <dt>yan cümle</dt>
-          <dd>{num(m.subordinationRatio, 2)}</dd>
-        </div>
-        <div className="pair">
-          <dt>çeşitlilik</dt>
-          <dd>
-            {m.movingAverageTTR === null ? "—" : num(m.movingAverageTTR, 2)}
+          <dd className="pair-what">
+            Uzun cümle tek başına iyi değil, ama kurabiliyor olmak seviye
+            göstergesi.
           </dd>
         </div>
         <div className="pair">
-          <dt>100 kelimede</dt>
+          <dt>yan cümleli cümle oranı</dt>
+          <dd>{num(m.subordinationRatio, 2)}</dd>
+          <dd className="pair-what">
+            &ldquo;…çünkü…&rdquo;, &ldquo;…olduğu için…&rdquo; gibi ikinci bir
+            cümle taşıyanların payı. 0,30 demek: her on cümlenin üçü.
+          </dd>
+        </div>
+        <div className="pair">
+          <dt>kelime çeşitliliği</dt>
+          <dd>
+            {m.movingAverageTTR === null ? "—" : num(m.movingAverageTTR, 2)}
+          </dd>
+          <dd className="pair-what">
+            Aynı kelimeyi tekrarlamak yerine kaç farklı kelime kullandığın.
+            1&apos;e yakın olması iyi.
+          </dd>
+        </div>
+        <div className="pair">
+          <dt>100 kelimede bulgu</dt>
           <dd>{num(k0.findingsPer100Words)}</dd>
+          <dd className="pair-what">
+            Metinler farklı uzunlukta olduğu için hata SAYISI değil oranı
+            karşılaştırılabilir olan.
+          </dd>
         </div>
       </dl>
       {!m.reliable ? (
         <p className="detail-note">
-          Metin kısa — oranlar oynak. Kırk kelimenin üstünde ölçüm oturuyor.
+          Bu metin kısa olduğu için oranlar oynak — birkaç kelime sayıyı çok
+          değiştiriyor. Kırk kelimenin üstünde ölçüm oturuyor.
         </p>
       ) : null}
     </section>
@@ -348,6 +399,24 @@ function Bands({
   const yazim = new Set(
     findings.filter((f) => f.subcategory === "spelling").map((f) => f.original.toLowerCase())
   );
+  /*
+   * ÖZEL İSİMLER KELİME DAĞARCIĞI DEĞİL.
+   *
+   * "Mersin", "Türkiye", "Ayşe" — ölçüm bunları bir bandın üstünde sayıp
+   * "bu ileri kelimeleri kullanmışsın" diyordu, ve deftere almak için
+   * öneriyordu. Bir yer adını bilmek İngilizce kelime bilgisi değil.
+   *
+   * Eleme yazım katmanındakiyle aynı: cümle başında OLMAYAN büyük harfli
+   * kelime özel isim sayılıyor. ASCII dışı harf taşıyanlar da düşüyor —
+   * onlar zaten İngilizce kelime değil.
+   */
+  const cumleBasi = new Set(sentences(text).map((c) => c.start));
+  const ozelIsim = (w: { text: string; start: number }) => {
+    const ilk = w.text[0];
+    if (!ilk || ilk !== ilk.toUpperCase() || !/\p{L}/u.test(ilk)) return false;
+    return !cumleBasi.has(w.start);
+  };
+
   const taban = BAND_ORDER.indexOf(level);
   const gorulen = new Set<string>();
   const ustu: Array<{ surface: string; sentence: string }> = [];
@@ -355,6 +424,8 @@ function Bands({
   for (const w of words(text)) {
     const key = w.text.toLowerCase();
     if (gorulen.has(key) || yazim.has(key)) continue;
+    if (ozelIsim(w)) continue;
+    if (/[^\u0000-\u007F]/.test(w.text)) continue;
     gorulen.add(key);
     if (BAND_ORDER.indexOf(bandOf(key)) <= taban) continue;
     ustu.push({
@@ -365,7 +436,12 @@ function Bands({
 
   return (
     <section className="detail-part">
-      <h3 className="detail-h">Kelime bandı · farklı kelimeler</h3>
+      <h3 className="detail-h">Kullandığın kelimeler hangi seviyeden</h3>
+      <p className="detail-note">
+        Metindeki her farklı kelime, İngilizcede genelde hangi seviyede
+        öğrenildiğine göre sayıldı. Çubuk o dağılımı gösteriyor: soldaki
+        başlangıç seviyesi, sağdaki ileri seviye.
+      </p>
 
       <div className="bands-bar" role="img" aria-label="Kelime bandı dağılımı">
         {BAND_ORDER.map((band) =>
@@ -388,7 +464,8 @@ function Bands({
           </li>
         ))}
         <li className="bands-item bands-above">
-          temel bandın üstü <b>%{Math.round(bands.aboveBasic * 100)}</b>
+          başlangıç seviyesinin üstünde{" "}
+          <b>%{Math.round(bands.aboveBasic * 100)}</b>
         </li>
       </ul>
 
@@ -427,13 +504,19 @@ function Provenance({
 }) {
   return (
     <section className="detail-part">
-      <h3 className="detail-h">Bu ölçümü ne üretti</h3>
+      <h3 className="detail-h">Bunu kim ölçtü?</h3>
       <p className="detail-note">
-        Yazım, temel kurallar ve seviye ölçümü <b>modelsiz</b> yapılıyor — aynı
-        metin her zaman aynı sonucu verir. Yorum gerektiren hatalar model
-        katmanından geçiyor ve <b>ikinci bir kez doğrulanıyor</b>; doğrulamayı
-        geçemeyen bulgu sana hiç gösterilmiyor. Kaydedilen metin bir daha
-        değiştirilemez.
+        Yazım hataları, temel dilbilgisi kuralları ve seviyen{" "}
+        <b>yapay zekâ kullanılmadan</b> bulunuyor — sabit kurallarla, yani aynı
+        metin her zaman aynı sonucu veriyor. Yalnızca yorum gerektiren hatalar
+        (bir kalıbın Türkçeden geldiğini anlamak gibi) yapay zekâya soruluyor,
+        ve gelen her cevap <b>ikinci kez kontrol ediliyor</b>: metinde
+        gerçekten bulunmayan bir düzeltme sana hiç gösterilmiyor.
+      </p>
+      <p className="detail-note">
+        Yazdığın metin kaydedildikten sonra değiştirilemiyor. Altı ay sonra
+        &ldquo;ilerledim&rdquo; diyebilmen, iki metnin de yazıldığı günkü
+        hâliyle durmasına bağlı.
       </p>
       {k1?.status === "ok" ? (
         <p className="detail-stamp">

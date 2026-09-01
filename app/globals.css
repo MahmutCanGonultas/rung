@@ -3956,6 +3956,29 @@ a.chip:hover {
 .lvl-row:first-child {
   border-block-start: 0;
 }
+/*
+ * SAYININ YANINDA NE ANLAMA GELDİĞİ.
+ *
+ * Bu kutu bir zamanlar yalnız sayı gösteriyordu — "yan cümle 0,34" — ve
+ * ürün sahibi haklı olarak "kullanıcı anlayamaz" dedi. Sayılar kaldı, çünkü
+ * gizlenen sayı güven vermiyor; yanlarına ne ölçtükleri yazıldı.
+ *
+ * Küçük ve sessiz: açıklama sayının önüne geçmemeli, yalnızca elini tutmalı.
+ */
+.pair-what,
+.lvl-what {
+  display: block;
+  margin-block-start: 4px;
+  font-size: var(--t-micro);
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--ink-3);
+  max-inline-size: 44ch;
+  /* Etiketler versal ve harf aralıklı; açıklama normal metin. */
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 .lvl-name {
   grid-column: 1;
   font-size: var(--t-body);
@@ -3984,6 +4007,33 @@ a.chip:hover {
   display: grid;
   gap: 2px;
 }
+/*
+ * AÇIKLAMALI ÖLÇÜ IZGARASI — etiket, sayı, altında ne olduğu.
+ *
+ * Ortak `.pair` bu dosyanın ilerisinde üç sütuna zorlanıyor (doğruluk
+ * sayfasının satırları için yazılmış ama sınıfa kapsam verilmemiş). Üçüncü
+ * çocuk eklenince açıklama o sütuna düşüp etiketin üstüne biniyordu —
+ * ÖLÇÜLDÜ, ekran görüntüsünde metinler iç içe geçmişti.
+ *
+ * Buradaki ızgara kendi kapsamını taşıyor ve o kuralı özgüllükle geçiyor:
+ * doğruluk sayfasına dokunulmuyor.
+ */
+.pairs.is-explained {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--s-5);
+}
+.pairs.is-explained .pair {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 2px;
+}
+.pairs.is-explained .pair dd:first-of-type {
+  font-family: var(--display);
+  font-size: var(--t-h3);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
 .pair dt,
 .pair-key {
   font-size: var(--t-tag);

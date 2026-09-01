@@ -90,3 +90,55 @@ test("Amerikan yazımı da yanlış alarm vermiyor", () => {
 test("iki sözlük de gerçek hatayı yakalıyor", () => {
   assert.deepEqual(flagged("I recieved the adress yesterday."), ["recieved", "adress"]);
 });
+
+/*
+ * ═══ ÜRÜN SAHİBİNİN BİLDİRDİĞİ YANLIŞ ALARMLAR ═══
+ *
+ * Beşi de canlıda görüldü ve her biri ayrı bir sebepten kaynaklanıyordu.
+ * Testler o sebepleri tek tek tutuyor: biri geri gelirse burada düşer.
+ */
+
+test("aksanlı kelime İKİYE BÖLÜNMÜYOR — 'Türkiye' → 'rkiye' değil", () => {
+  /*
+   * Belirteçleyici yalnız ASCII harf tanıdığı için "Türkiye" iki parçaya
+   * ayrılıyor ve "rkiye" küçük harfle başladığından özel isim elemesine de
+   * takılmıyordu. Ekranda görülen: "rkiye → kine".
+   */
+  assert.deepEqual(flagged("I live in Mersin/Türkiye and I work there."), []);
+  assert.deepEqual(flagged("İstanbul'da yaşıyorum but I write in English."), []);
+});
+
+test("küçük harfli kısaltmalar hata değil — pc, tv, url, pdf", () => {
+  // Sözlükler bunları YALNIZ versal biçimde tutuyor: "PC", "TV", "URL".
+  assert.deepEqual(
+    flagged("My pc is old so I bought a tv and sent the pdf by url."),
+    []
+  );
+});
+
+test("kısaltmaların çoğulu da hata değil — pcs, tvs, pdfs", () => {
+  assert.deepEqual(flagged("I have two pcs, three tvs and many pdfs."), []);
+});
+
+test("kısaltma çoğulu kuralı GERÇEK hatayı yutmuyor", () => {
+  // "gos" bir kısaltma çoğulu değil; gövdesi ("go") normal bir kelime.
+  assert.deepEqual(flagged("He gos to work every day."), ["gos"]);
+});
+
+test("tireli birleşikler parça parça biliniyor", () => {
+  assert.deepEqual(
+    flagged("I watch a tv-series and I use state-of-the-art tools."),
+    []
+  );
+});
+
+test("adreslerin içi kelime sayılmıyor", () => {
+  assert.deepEqual(
+    flagged("Write to ahmet@example.com or visit www.example.com today."),
+    []
+  );
+});
+
+test("sözlüğün hiç bilmediği yaygın kısaltmalar listede", () => {
+  assert.deepEqual(flagged("The ui, the ux and the wifi are fine for a phd."), []);
+});
