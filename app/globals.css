@@ -771,10 +771,32 @@ a.chip:hover {
 .mark-lg {
   font-size: 27px;
 }
+/*
+ * KAHRAMAN BOYU — yalnız anasayfada.
+ *
+ * Kabuğun çubuğunda işaret ürünün adını HATIRLATIYOR; anasayfada ürünü
+ * TANITIYOR. 27 pikselde, 86 piksellik başlığın yanında bir dipnot gibi
+ * kalıyordu; ürün sahibi "logo ve ad daha büyük göze çarpsın, profesyonel
+ * bir site gibi" dedi.
+ *
+ * Esnek: dar ekranda 30 pikselde duruyor, 1440'ta 46'ya çıkıyor — sabit bir
+ * değer telefonda başlığı ezerdi.
+ */
+.mark-xl {
+  font-size: clamp(30px, 3.4vw, 46px);
+}
 .mark-glyph {
   inline-size: 1.4em;
   block-size: auto;
   overflow: visible;
+}
+/*
+ * Büyük boyda merdiven de büyüyor, ve söze göre DAHA ÇOK büyüyor. Küçük
+ * boyda glif bir işaretçi — kalabalık bir çubukta yer kaplamamalı; büyük
+ * boyda nesnenin kendisi, ve markanın anlattığı şey o.
+ */
+.mark-xl .mark-glyph {
+  inline-size: 1.65em;
 }
 /*
  * KONTUR, DOLGU DEĞİL.
@@ -818,11 +840,34 @@ a.chip:hover {
   stroke-linecap: round;
   stroke-linejoin: miter;
 }
+/*
+ * SÖZ SIKILAŞTI VE AĞIRLAŞTI.
+ *
+ * Yüzün genişlik ekseni başlıklarda bir rampaya bağlandı (mega %85, bölüm
+ * başlığı %92); marka sözü ise bu rampanın dışında, TEK bir değerde duruyor.
+ * Sebep: bir logonun harf biçimi boydan boya aynı kalmalı — kabuğun
+ * çubuğundaki "rung." ile anasayfadaki "rung." iki ayrı logo gibi
+ * görünemez. %86, başlıkların sesiyle aynı ailede ama boya bağlı değil.
+ *
+ * Ağırlık 700 → 800: söz artık glifin yanında kendi başına duruyor.
+ */
 .mark-word {
   font-family: var(--display);
-  font-weight: 700;
-  font-size: 0.95em;
-  letter-spacing: -0.03em;
+  font-weight: 800;
+  font-stretch: 86%;
+  font-size: 1.02em;
+  letter-spacing: -0.045em;
+}
+/*
+ * NOKTA VURGU RENGİNDE — ve `<i>` olduğu için eğik geliyordu.
+ *
+ * Tarayıcının `<i>` varsayılanı italik; bir noktanın italiği görünmez ama
+ * yanlış. Renk ise bir karar: ad biter, ölçüm başlar. Aynı nokta markanın
+ * her yerinde aynı yeri işaretliyor.
+ */
+.mark-word i {
+  font-style: normal;
+  color: var(--accent);
 }
 .mark-link {
   display: inline-flex;
@@ -2126,6 +2171,11 @@ a.chip:hover {
   display: grid;
   justify-items: start;
   gap: var(--s-4);
+}
+/* İşaret büyüdü, altına da hava gerekti: 46 pikselde künyeye `--s-4`
+   kadar yaklaşınca ikisi tek blok gibi okunuyordu. */
+.open-say > .mark-link {
+  margin-block-end: var(--s-3);
 }
 .open-kicker {
   font-size: var(--t-tag);

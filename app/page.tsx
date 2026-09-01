@@ -82,7 +82,7 @@ export default async function HomePage() {
           */}
           <div className="open-say">
             <Link className="mark-link" href="/">
-              <Mark size="lg" />
+              <Mark size="xl" />
             </Link>
             <p className="open-kicker">Türkçe konuşanlar için</p>
             <h1 className="open-h" id="acilis-h">

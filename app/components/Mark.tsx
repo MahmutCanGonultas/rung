@@ -45,8 +45,16 @@ export function Mark({
   size = "md",
 }: {
   className?: string;
-  /** `sm` dar üst çubuk · `md` varsayılan · `lg` kapı ekranının maştı. */
-  size?: "sm" | "md" | "lg";
+  /**
+   * `sm` dar üst çubuk · `md` varsayılan · `lg` kapı ekranının maştı ·
+   * `xl` YALNIZ anasayfanın kahramanı.
+   *
+   * `xl` ayrı bir boy, çünkü orada işaretin işi başka: kabuğun çubuğunda
+   * ürünün adını hatırlatıyor, anasayfada ürünü TANITIYOR. Aynı ölçüde
+   * çizilseydi sayfanın en büyük yazısının (86px başlık) yanında bir
+   * dipnot gibi kalırdı.
+   */
+  size?: "sm" | "md" | "lg" | "xl";
 }) {
   return (
     <span
